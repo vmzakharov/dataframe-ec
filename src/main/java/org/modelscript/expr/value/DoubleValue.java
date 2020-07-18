@@ -41,4 +41,10 @@ implements NumberValue
     {
         return ValueType.DOUBLE;
     }
+
+    @Override
+    public String toString()
+    {
+        return this.asStringLiteral();
+    }
 }

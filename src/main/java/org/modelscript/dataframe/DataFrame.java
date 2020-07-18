@@ -16,6 +16,7 @@ import org.modelscript.expr.DataFrameEvalContext;
 import org.modelscript.expr.EvalContext;
 import org.modelscript.expr.Expression;
 import org.modelscript.expr.value.BooleanValue;
+import org.modelscript.expr.value.LongValue;
 import org.modelscript.expr.value.Value;
 import org.modelscript.expr.value.ValueType;
 import org.modelscript.expr.visitor.InMemoryEvaluationVisitor;
@@ -31,7 +32,7 @@ public class DataFrame
     private final MutableList<DfColumn> columnsInOrder = Lists.mutable.of();
     private int rowCount = 0;
 
-    private final DataFrameEvalContext evalContext;
+    private final DataFrameEvalContext evalContext; // todo: make threadlocal
     private IntList rowIndex = null;
 
     public DataFrame(String newName)
@@ -399,19 +400,22 @@ public class DataFrame
     public void sortByExpression(String expressionString)
     {
         IntInterval interval = IntInterval.zeroTo(this.rowCount - 1);
-        MutableIntList indexes = interval.toList();
 
         Expression expression = ExpressionParserHelper.toExpression(expressionString);
-        ImmutableList<Value> values = interval.collect(i -> this.evaluateExpression(expression, i));
+        DfTuple[] tuples = interval
+                .collect(i -> new DfTuple(i, this.evaluateExpression(expression, i).toString()))
+                .toArray(new DfTuple[this.rowCount]);
 
-        indexes.sortBy((i, j) -> values.get(i).toString().compareTo(values.get(j).toString())));
+        //        indexes.sortThis((i, j) -> values.get(i).toString().compareTo(values.get(j).toString())));
+        Arrays.sort(tuples);
 
-        this.rowIndex = indexes;
+        this.rowIndex = ArrayIterate.collectInt(tuples, DfTuple::getRowIndex);
     }
 
-    private Value evaluateExpression(Expression expression, int rowIndex)
+    public Value evaluateExpression(Expression expression, int rowIndex)
     {
-        return null;
+        this.getEvalContext().setRowIndex(rowIndex);
+        return expression.evaluate(new InMemoryEvaluationVisitor(evalContext));
     }
 
     private DfTuple rowToTuple(int rowIndex, ListIterable<DfColumn> columnsToCollect)
@@ -422,7 +426,7 @@ public class DataFrame
         {
             values[i] = (Comparable<Object>) columnsToCollect.get(i).getObject(rowIndex);
         }
-        return new DfTuple(values, rowIndex);
+        return new DfTuple(rowIndex, values);
     }
 
     public void unsort()

@@ -139,6 +139,43 @@ public class DataFrameSortTest
         DataFrameUtil.assertEquals(expected, dataFrame);
     }
 
+    @Test
+    public void sortByExpression()
+    {
+        DataFrame dataFrame = new DataFrame("FrameOfData")
+                .addStringColumn("Name").addLongColumn("Record").addStringColumn("Foo").addLongColumn("Bar")
+                .addDoubleColumn("Baz").addDoubleColumn("Qux")
+                .addRow("Abigail", 0, "456",  11L, 10.0, 20.0)
+                .addRow("Carol",   1, "Xyz",  15L, 28.0, 40.0)
+                .addRow("Abigail", 2, "123",  15L, 15.0, 10.0)
+                .addRow("Bob",     3, "Def",  13L, 13.0, 25.0)
+                .addRow("Carol",   4, "Zzz",  14L, 14.0, 40.0)
+                .addRow("Abigail", 5, "789",  12L, 12.0, 11.0);
+
+//        dataFrame.addDoubleColumn("Xxx", "Bar * 2 + Baz");
+
+        this.printDataFrame("Original", dataFrame);
+
+        dataFrame.sortByExpression("Bar * 2 + Baz");
+
+        this.printDataFrame("Sorted", dataFrame);
+
+        DataFrame expected = new DataFrame("FrameOfData")
+                .addStringColumn("Name").addLongColumn("Record").addStringColumn("Foo").addLongColumn("Bar")
+                .addDoubleColumn("Baz").addDoubleColumn("Qux")
+                .addRow("Abigail", 0, "456",  11L, 10.0, 20.0)
+                .addRow("Abigail", 5, "789",  12L, 12.0, 11.0)
+                .addRow("Bob",     3, "Def",  13L, 13.0, 25.0)
+                .addRow("Carol",   4, "Zzz",  14L, 14.0, 40.0)
+                .addRow("Abigail", 2, "123",  15L, 15.0, 10.0)
+                .addRow("Carol",   1, "Xyz",  15L, 28.0, 40.0)
+                ;
+
+//        expected.addDoubleColumn("Xxx", "Bar * 2 + Baz");
+
+        DataFrameUtil.assertEquals(expected, dataFrame);
+    }
+
     private void printDataFrame(String title, DataFrame dataFrame)
     {
         System.out.println("-- " + title);

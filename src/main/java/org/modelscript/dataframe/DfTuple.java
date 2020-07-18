@@ -1,14 +1,17 @@
 package org.modelscript.dataframe;
 
+import org.eclipse.collections.impl.utility.ArrayIterate;
+import org.modelscript.expr.value.Value;
+
 import java.util.Arrays;
 
 public class DfTuple
 implements Comparable<DfTuple>
 {
-    private final Comparable<Object>[] items;
+    private final Comparable[] items;
     private final int rowIndex;
 
-    public DfTuple(Comparable<Object>[] newItems, int newRowIndex)
+    public DfTuple(int newRowIndex, Comparable... newItems)
     {
         this.items = newItems;
         this.rowIndex = newRowIndex;
@@ -37,8 +40,8 @@ implements Comparable<DfTuple>
     @Override
     public int compareTo(DfTuple that)
     {
-        Comparable<Object>[] these = this.items;
-        Comparable<Object>[] others = that.items;
+        Comparable[] these = this.items;
+        Comparable[] others = that.items;
 
         if (these == others)
         {
@@ -47,8 +50,8 @@ implements Comparable<DfTuple>
 
         for (int i = 0; i < these.length; i++)
         {
-            Comparable<Object> thisItem = these[i];
-            Comparable<Object> thatItem = others[i];
+            Comparable thisItem = these[i];
+            Comparable thatItem = others[i];
 
             int result = thisItem.compareTo(thatItem);
             if (result != 0)
@@ -58,5 +61,11 @@ implements Comparable<DfTuple>
         }
 
         return 0;
+    }
+
+    @Override
+    public String toString()
+    {
+        return this.rowIndex + ": " + ArrayIterate.makeString(this.items);
     }
 }

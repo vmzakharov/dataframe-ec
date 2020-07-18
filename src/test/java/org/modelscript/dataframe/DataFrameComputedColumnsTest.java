@@ -9,7 +9,7 @@ import org.junit.Test;
 import org.modelscript.expr.SimpleEvalContext;
 import org.modelscript.expr.value.LongValue;
 
-public class ComputedColumns
+public class DataFrameComputedColumnsTest
 {
     private DataFrame df;
 
