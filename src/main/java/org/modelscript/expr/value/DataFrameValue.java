@@ -29,4 +29,10 @@ implements Value
     {
         return this.dataFrame.asCsvString();
     }
+
+    @Override
+    public int compareTo(Value o)
+    {
+        throw new UnsupportedOperationException("Not Implemented");
+    }
 }

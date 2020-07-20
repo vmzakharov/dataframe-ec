@@ -4,4 +4,6 @@ public interface NumberValue
 extends Value
 {
     double doubleValue();
+
+
 }

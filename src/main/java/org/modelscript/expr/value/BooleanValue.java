@@ -3,6 +3,7 @@ package org.modelscript.expr.value;
 import org.modelscript.expr.ArithmeticOp;
 
 abstract public class BooleanValue
+extends AbstractValue
 implements Value
 {
     static public BooleanValue TRUE = new BooleanValue()
@@ -52,5 +53,12 @@ implements Value
     public ValueType getType()
     {
         return ValueType.BOOLEAN;
+    }
+
+    @Override
+    public int compareTo(Value other)
+    {
+        this.checkSameTypeForComparison(other);
+        return Boolean.compare(this.isTrue(), ((BooleanValue) other).isTrue());
     }
 }

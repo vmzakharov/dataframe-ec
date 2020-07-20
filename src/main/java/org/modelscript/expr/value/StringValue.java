@@ -4,7 +4,7 @@ import org.modelscript.expr.ArithmeticOp;
 import org.modelscript.expr.ComparisonOp;
 
 public class StringValue
-implements Value
+extends AbstractValue
 {
     private final String value;
 
@@ -41,5 +41,12 @@ implements Value
     public ValueType getType()
     {
         return ValueType.STRING;
+    }
+
+    @Override
+    public int compareTo(Value other)
+    {
+        this.checkSameTypeForComparison(other);
+        return other.isVoid() ? 1 : this.stringValue().compareTo(other.stringValue());
     }
 }

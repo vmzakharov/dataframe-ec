@@ -41,4 +41,10 @@ implements Value
     {
         return this.items.get(index);
     }
+
+    @Override
+    public int compareTo(Value o)
+    {
+        throw new UnsupportedOperationException("Not implemented");
+    }
 }

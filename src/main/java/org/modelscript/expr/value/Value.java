@@ -3,7 +3,10 @@ package org.modelscript.expr.value;
 import org.modelscript.expr.ArithmeticOp;
 import org.modelscript.expr.ComparisonOp;
 
+import java.util.Comparator;
+
 public interface Value
+extends Comparable<Value>
 {
     Value VOID = new Value()
     {
@@ -12,6 +15,12 @@ public interface Value
 
         @Override
         public ValueType getType() { return ValueType.VOID; }
+
+        @Override
+        public int compareTo(Value other)
+        {
+            return this == other ? 0 : -1;
+        }
     };
 
     default String stringValue()

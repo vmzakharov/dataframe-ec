@@ -4,6 +4,7 @@ import org.modelscript.expr.ArithmeticOp;
 import org.modelscript.expr.ComparisonOp;
 
 public class DoubleValue
+extends AbstractValue
 implements NumberValue
 {
     private final double value;
@@ -43,8 +44,9 @@ implements NumberValue
     }
 
     @Override
-    public String toString()
+    public int compareTo(Value other)
     {
-        return this.asStringLiteral();
+        this.checkSameTypeForComparison(other);
+        return other.isVoid() ? 1 : Double.compare(this.doubleValue(), ((DoubleValue) other).doubleValue());
     }
 }

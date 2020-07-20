@@ -4,6 +4,7 @@ import org.modelscript.expr.ArithmeticOp;
 import org.modelscript.expr.ComparisonOp;
 
 public class LongValue
+extends AbstractValue
 implements NumberValue
 {
     private final long value;
@@ -54,5 +55,12 @@ implements NumberValue
     public ValueType getType()
     {
         return ValueType.LONG;
+    }
+
+    @Override
+    public int compareTo(Value other)
+    {
+        this.checkSameTypeForComparison(other);
+        return other.isVoid() ? 1 : Long.compare(this.longValue(), ((LongValue) other).longValue());
     }
 }
