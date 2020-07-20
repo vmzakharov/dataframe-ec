@@ -399,17 +399,11 @@ public class DataFrame
 
     public void sortByExpression(String expressionString)
     {
-        IntInterval interval = IntInterval.zeroTo(this.rowCount - 1);
-
+        this.unsort();
         Expression expression = ExpressionParserHelper.toExpression(expressionString);
-        DfTuple[] tuples = interval
-                .collect(i -> new DfTuple(i, this.evaluateExpression(expression, i).toString()))
-                .toArray(new DfTuple[this.rowCount]);
-
-        //        indexes.sortThis((i, j) -> values.get(i).toString().compareTo(values.get(j).toString())));
-        Arrays.sort(tuples);
-
-        this.rowIndex = ArrayIterate.collectInt(tuples, DfTuple::getRowIndex);
+        MutableIntList indexes = IntInterval.zeroTo(this.rowCount - 1).toList();
+        indexes.sortThisBy(i -> this.evaluateExpression(expression, i));
+        this.rowIndex = indexes;
     }
 
     public Value evaluateExpression(Expression expression, int rowIndex)

@@ -10,7 +10,7 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <eclipseCollections.version>10.0.0</eclipseCollections.version>
+        <eclipseCollections.version>10.3.0.M4</eclipseCollections.version>
         <antlr.version>4.7.1</antlr.version>
     </properties>
 
