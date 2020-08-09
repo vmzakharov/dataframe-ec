@@ -2,15 +2,15 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <groupId>zakhav.test</groupId>
-    <artifactId>model-notation</artifactId>
-    <version>1.0</version>
+    <artifactId>ec-dataframe</artifactId>
+    <version>1.0.0-SNAPSHOT</version>
     <packaging>jar</packaging>
-    <name>model-notation</name>
+    <name>ec-dataframe</name>
     <url>http://maven.apache.org</url>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <eclipseCollections.version>10.3.0.M4</eclipseCollections.version>
+        <eclipseCollections.version>10.3.0-SNAPSHOT</eclipseCollections.version>
         <antlr.version>4.7.1</antlr.version>
     </properties>
 

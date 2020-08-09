@@ -4,29 +4,23 @@ import org.eclipse.collections.impl.utility.ArrayIterate;
 import org.modelscript.expr.value.Value;
 
 import java.util.Arrays;
+import java.util.Comparator;
 
 public class DfTuple
 implements Comparable<DfTuple>
 {
-    private final Comparable[] items;
-    private final int rowIndex;
+    private final Object[] items;
 
-    public DfTuple(int newRowIndex, Comparable... newItems)
+    public DfTuple(Object... newItems)
     {
         this.items = newItems;
-        this.rowIndex = newRowIndex;
-    }
-
-    public int getRowIndex()
-    {
-        return this.rowIndex;
     }
 
     @Override
     public boolean equals(Object o)
     {
         if (this == o) { return true; }
-        if (o == null || getClass() != o.getClass()) { return false; }
+        if (o == null || this.getClass() != o.getClass()) { return false; }
         DfTuple dfTuple = (DfTuple) o;
         return Arrays.equals(items, dfTuple.items);
     }
@@ -40,8 +34,8 @@ implements Comparable<DfTuple>
     @Override
     public int compareTo(DfTuple that)
     {
-        Comparable[] these = this.items;
-        Comparable[] others = that.items;
+        Object[] these = this.items;
+        Object[] others = that.items;
 
         if (these == others)
         {
@@ -50,10 +44,11 @@ implements Comparable<DfTuple>
 
         for (int i = 0; i < these.length; i++)
         {
-            Comparable thisItem = these[i];
-            Comparable thatItem = others[i];
+            Object thisItem = these[i];
+            Object thatItem = others[i];
 
-            int result = thisItem.compareTo(thatItem);
+
+            int result = ((Comparable) thisItem).compareTo(thatItem);
             if (result != 0)
             {
                 return result;
@@ -66,6 +61,6 @@ implements Comparable<DfTuple>
     @Override
     public String toString()
     {
-        return this.rowIndex + ": " + ArrayIterate.makeString(this.items);
+        return ArrayIterate.makeString(this.items);
     }
 }

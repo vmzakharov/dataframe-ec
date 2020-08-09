@@ -29,6 +29,19 @@ public class DataFrameSortTest
 
         DataFrameUtil.assertEquals(expected, dataFrame);
 
+        dataFrame.sortBy(Lists.immutable.of("Foo"));
+
+        expected = new DataFrame("FrameOfData")
+                .addStringColumn("Name").addStringColumn("Foo").addLongColumn("Bar").addDoubleColumn("Baz").addDoubleColumn("Qux")
+                .addRow("Alice",   "Abc",  11L, 10.0, 20.0)
+                .addRow("Albert",  "Def",  12L, 12.0, 10.0)
+                .addRow("Bob",     "Def",  13L, 13.0, 25.0)
+                .addRow("Abigail", "Def",  15L, 15.0, 11.0)
+                .addRow("Carol",   "Xyz",  14L, 14.0, 40.0)
+                ;
+
+        DataFrameUtil.assertEquals(expected, dataFrame);
+
         dataFrame.unsort();
 
         DataFrame expectedUnsorted = new DataFrame("FrameOfData")

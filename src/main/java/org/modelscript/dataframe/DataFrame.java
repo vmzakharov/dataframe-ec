@@ -385,6 +385,8 @@ public class DataFrame
 
     public void sortBy(ListIterable<String> columnsToSortByNames)
     {
+        this.unsort();
+
         ListIterable<DfColumn> columnsToSortBy = this.columnsNamed(columnsToSortByNames);
 
         DfTuple[] tuples = new DfTuple[this.rowCount];
@@ -393,8 +395,10 @@ public class DataFrame
             tuples[i] = this.rowToTuple(i, columnsToSortBy);
         }
 
-        Arrays.sort(tuples);
-        this.rowIndex = ArrayIterate.collectInt(tuples, DfTuple::getRowIndex);
+        MutableIntList indexes = IntInterval.zeroTo(this.rowCount - 1).toList();
+        indexes.sortThisBy(i -> tuples[i]);
+
+        this.rowIndex = indexes;
     }
 
     public void sortByExpression(String expressionString)
@@ -415,12 +419,12 @@ public class DataFrame
     private DfTuple rowToTuple(int rowIndex, ListIterable<DfColumn> columnsToCollect)
     {
         int size = columnsToCollect.size();
-        Comparable<Object>[] values = new Comparable[columnsToCollect.size()];
+        Object[] values = new Object[size];
         for (int i = 0; i < size; i++)
         {
-            values[i] = (Comparable<Object>) columnsToCollect.get(i).getObject(rowIndex);
+            values[i] = columnsToCollect.get(i).getObject(rowIndex);
         }
-        return new DfTuple(rowIndex, values);
+        return new DfTuple(values);
     }
 
     public void unsort()
