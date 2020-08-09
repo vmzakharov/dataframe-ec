@@ -3,6 +3,7 @@ package org.modelscript.dataframe;
 import org.eclipse.collections.api.list.ImmutableList;
 import org.eclipse.collections.api.list.ListIterable;
 import org.eclipse.collections.api.list.MutableList;
+import org.eclipse.collections.api.list.primitive.BooleanList;
 import org.eclipse.collections.api.list.primitive.IntList;
 import org.eclipse.collections.api.list.primitive.MutableIntList;
 import org.eclipse.collections.api.map.MutableMap;
@@ -356,6 +357,28 @@ public class DataFrame
             if (((BooleanValue) select).isTrue())
             {
                 filtered.copyRowFrom(this, i);
+            }
+        }
+        filtered.seal();
+        return filtered;
+    }
+
+    /**
+     * creates a new data frame, which contain a subset of rows of this data frame for the rows with the index marked
+     * in the boolean list passed as the parameter
+     *
+     * @param marked a boolean list indicating whether to select the row for inclusion into the you data frame (true) or
+     *               not (false)
+     * @return a data frame containing the filtered subset of rows
+     */
+    public DataFrame selectMarked(BooleanList marked)
+    {
+        DataFrame filtered = this.cloneStructure();
+        for (int i = 0; i < this.rowCount; i++)
+        {
+            if (marked.get(i))
+            {
+                filtered.copyRowFrom(this, this.rowIndexMap(i));
             }
         }
         filtered.seal();
