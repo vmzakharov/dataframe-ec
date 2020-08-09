@@ -10,7 +10,7 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <eclipseCollections.version>10.3.0-SNAPSHOT</eclipseCollections.version>
+        <eclipseCollections.version>10.3.0</eclipseCollections.version>
         <antlr.version>4.7.1</antlr.version>
     </properties>
 
@@ -19,7 +19,6 @@
             <groupId>org.antlr</groupId>
             <artifactId>antlr4</artifactId>
             <version>4.7.1</version>
-            <!--<type>pom</type>-->
         </dependency>
         <dependency>
             <groupId>junit</groupId>
