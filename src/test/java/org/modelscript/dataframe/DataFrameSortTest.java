@@ -18,7 +18,7 @@ public class DataFrameSortTest
 
         dataFrame.sortBy(Lists.immutable.of("Name"));
 
-        DataFrame expected = new DataFrame("FrameOfData")
+        DataFrame expected = new DataFrame("Expected FrameOfData")
                 .addStringColumn("Name").addStringColumn("Foo").addLongColumn("Bar").addDoubleColumn("Baz").addDoubleColumn("Qux")
                 .addRow("Abigail", "Def",  15L, 15.0, 11.0)
                 .addRow("Albert",  "Def",  12L, 12.0, 10.0)
@@ -31,7 +31,7 @@ public class DataFrameSortTest
 
         dataFrame.sortBy(Lists.immutable.of("Foo"));
 
-        expected = new DataFrame("FrameOfData")
+        expected = new DataFrame("Expected FrameOfData")
                 .addStringColumn("Name").addStringColumn("Foo").addLongColumn("Bar").addDoubleColumn("Baz").addDoubleColumn("Qux")
                 .addRow("Alice",   "Abc",  11L, 10.0, 20.0)
                 .addRow("Albert",  "Def",  12L, 12.0, 10.0)
@@ -67,13 +67,9 @@ public class DataFrameSortTest
                 .addRow("Carol",   "Zzz",  14L, 14.0, 40.0)
                 .addRow("Abigail", "789",  12L, 12.0, 11.0);
 
-        this.printDataFrame("Original", dataFrame);
-
         dataFrame.sortBy(Lists.immutable.of("Name", "Bar"));
 
-        this.printDataFrame("Sorted", dataFrame);
-
-        DataFrame expected = new DataFrame("FrameOfData")
+        DataFrame expected = new DataFrame("Expected FrameOfData")
                 .addStringColumn("Name").addStringColumn("Foo").addLongColumn("Bar").addDoubleColumn("Baz").addDoubleColumn("Qux")
                 .addRow("Abigail", "456",  11L, 10.0, 20.0)
                 .addRow("Abigail", "789",  12L, 12.0, 11.0)
@@ -99,13 +95,9 @@ public class DataFrameSortTest
                 .addRow("Abigail", "789",  12L, 12.0, 11.0);
         dataFrame.addDoubleColumn("Quuz", "Bar * 2 + Baz");
 
-        this.printDataFrame("Original", dataFrame);
-
         dataFrame.sortBy(Lists.immutable.of("Quuz"));
 
-        this.printDataFrame("Sorted", dataFrame);
-
-        DataFrame expected = new DataFrame("FrameOfData")
+        DataFrame expected = new DataFrame("Expected FrameOfData")
                 .addStringColumn("Name").addStringColumn("Foo").addLongColumn("Bar").addDoubleColumn("Baz").addDoubleColumn("Qux").addDoubleColumn("Quuz")
                 .addRow("Abigail", "456",  11L, 10.0, 20.0, 32.0)
                 .addRow("Abigail", "789",  12L, 12.0, 11.0, 36.0)
@@ -132,13 +124,9 @@ public class DataFrameSortTest
         dataFrame.addDoubleColumn("Quuz", "Bar * 2 + Baz");
         dataFrame.addDoubleColumn("Waldo", "Quuz + 10.0");
 
-        this.printDataFrame("Original", dataFrame);
-
         dataFrame.sortBy(Lists.immutable.of("Quuz"));
 
-        this.printDataFrame("Sorted", dataFrame);
-
-        DataFrame expected = new DataFrame("FrameOfData")
+        DataFrame expected = new DataFrame("Expected FrameOfData")
                 .addStringColumn("Name").addStringColumn("Foo").addLongColumn("Bar").addDoubleColumn("Baz").addDoubleColumn("Qux")
                 .addDoubleColumn("Quuz").addDoubleColumn("Waldo")
                 .addRow("Abigail", "456",  11L, 10.0, 20.0, 32.0, 42.0)
@@ -167,13 +155,9 @@ public class DataFrameSortTest
 
 //        dataFrame.addDoubleColumn("Xxx", "Bar * 2 + Baz");
 
-        this.printDataFrame("Original", dataFrame);
-
         dataFrame.sortByExpression("Bar * 2 + Baz");
 
-        this.printDataFrame("Sorted", dataFrame);
-
-        DataFrame expected = new DataFrame("FrameOfData")
+        DataFrame expected = new DataFrame("Expected FrameOfData")
                 .addStringColumn("Name").addLongColumn("Record").addStringColumn("Foo").addLongColumn("Bar")
                 .addDoubleColumn("Baz").addDoubleColumn("Qux")
                 .addRow("Abigail", 0, "456",  11L, 10.0, 20.0)
@@ -187,11 +171,5 @@ public class DataFrameSortTest
 //        expected.addDoubleColumn("Xxx", "Bar * 2 + Baz");
 
         DataFrameUtil.assertEquals(expected, dataFrame);
-    }
-
-    private void printDataFrame(String title, DataFrame dataFrame)
-    {
-        System.out.println("-- " + title);
-        System.out.println(dataFrame.asCsvString());
     }
 }

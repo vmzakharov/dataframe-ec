@@ -1,5 +1,7 @@
 package org.modelscript.dataframe;
 
+import org.eclipse.collections.api.block.function.primitive.IntToBooleanFunction;
+import org.eclipse.collections.api.block.predicate.primitive.BooleanPredicate;
 import org.eclipse.collections.api.list.ImmutableList;
 import org.eclipse.collections.api.list.ListIterable;
 import org.eclipse.collections.api.list.MutableList;
@@ -365,7 +367,8 @@ public class DataFrame
 
     /**
      * creates a new data frame, which contain a subset of rows of this data frame for the rows with the index marked
-     * in the boolean list passed as the parameter
+     * (i.e. set to true) in the boolean list passed as the parameter. This is the behavior the opposite of
+     * {@code selectNotMarked}
      *
      * @param marked a boolean list indicating whether to select the row for inclusion into the you data frame (true) or
      *               not (false)
@@ -373,10 +376,30 @@ public class DataFrame
      */
     public DataFrame selectMarked(BooleanList marked)
     {
+        return this.selectByMarkValue(marked, mark -> mark);
+    }
+
+    /**
+     * creates a new data frame, which contain a subset of rows of this data frame for the rows with the index not marked
+     * (i.e. set to false) in the boolean list passed as the parameter. This is the behavior the opposite of
+     * {@code selectMarked}
+     *
+     * @param marked a boolean list indicating whether to select the row for inclusion into the you data frame (=false) or
+     *               not (true)
+     * @return a data frame containing the filtered subset of rows
+     */
+    public DataFrame selectNotMarked(BooleanList marked)
+    {
+        return this.selectByMarkValue(marked, mark -> !mark);
+    }
+
+    private DataFrame selectByMarkValue(BooleanList marked, BooleanPredicate markAtIndexPredicate)
+    {
+
         DataFrame filtered = this.cloneStructure();
         for (int i = 0; i < this.rowCount; i++)
         {
-            if (marked.get(i))
+            if (markAtIndexPredicate.accept(marked.get(i)))
             {
                 filtered.copyRowFrom(this, this.rowIndexMap(i));
             }
@@ -384,6 +407,7 @@ public class DataFrame
         filtered.seal();
         return filtered;
     }
+
 
     private void copyRowFrom(DataFrame source, int rowIndex)
     {

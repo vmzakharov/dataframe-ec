@@ -86,11 +86,7 @@ public class DataFrameAggregationTest
         dataFrame.addRow("Carol", "Qqq",  789L, 15.0, 40.0);
         dataFrame.addRow("Carol", "Zzz",  789L, 15.0, 40.0);
 
-//        System.out.println(dataFrame.asCsvString());
-
         DataFrame summed = dataFrame.sumBy(Lists.immutable.of("Bar", "Baz", "Qux"), Lists.immutable.of("Name"));
-
-//        System.out.println(summed.asCsvString());
 
         Assert.assertEquals(3, summed.rowCount());
 
@@ -117,11 +113,7 @@ public class DataFrameAggregationTest
         dataFrame.addRow("Carol", "Qqq",   10L, 55.0, 22.0);
         dataFrame.addRow("Carol", "Rrr",  789L, 16.0, 41.0);
 
-//        System.out.println(dataFrame.asCsvString());
-
         DataFrame summed = dataFrame.sumBy(Lists.immutable.of("Bar", "Baz", "Qux"), Lists.immutable.of("Name", "Foo"));
-
-//        System.out.println(summed.asCsvString());
 
         DataFrame expected = new DataFrame("Expected")
                 .addStringColumn("Name").addStringColumn("Foo").addLongColumn("Bar").addDoubleColumn("Baz").addDoubleColumn("Qux")
