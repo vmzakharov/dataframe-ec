@@ -8,17 +8,17 @@ implements Value
 {
     public static final VectorValue EMPTY = new VectorValue(Lists.immutable.empty());
 
-    private final ListIterable<Value> items;
+    private final ListIterable<Value> elements;
 
     public VectorValue(ListIterable<Value> newItems)
     {
-        this.items = newItems;
+        this.elements = newItems;
     }
 
     @Override
     public String asStringLiteral()
     {
-        return this.items.collect(Value::asStringLiteral).makeString("[", ", ", "]");
+        return this.elements.collect(Value::asStringLiteral).makeString("[", ", ", "]");
     }
 
     @Override
@@ -27,19 +27,19 @@ implements Value
         return ValueType.VECTOR;
     }
 
-    public ListIterable<Value> getItems()
+    public ListIterable<Value> getElements()
     {
-        return this.items;
+        return this.elements;
     }
 
     public int size()
     {
-        return this.items.size();
+        return this.elements.size();
     }
 
     public Value get(int index)
     {
-        return this.items.get(index);
+        return this.elements.get(index);
     }
 
     @Override

@@ -7,10 +7,10 @@ import org.modelscript.expr.visitor.ExpressionVisitor;
 public class BinaryExpr
 implements Expression
 {
-    private Expression operand1;
-    private Expression operand2;
+    private final Expression operand1;
+    private final Expression operand2;
 
-    private BinaryOp operation;
+    private final BinaryOp operation;
 
     public BinaryExpr(Expression newOperand1, Expression newOperand2, BinaryOp newOperation)
     {

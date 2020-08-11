@@ -89,4 +89,22 @@ public class SimpleExpressionFromString
         Assert.assertEquals(Lists.mutable.of("barbar", "bazbaz"), projectionExpr.getElementNames());
         Assert.assertNotNull(projectionExpr.getWhereClause());
     }
+
+    @Test
+    public void vectorExpression()
+    {
+        Script script = ExpressionParserHelper.toScript("[\"a\", \"b\", \"c\"]");
+
+        Expression expression = script.getExpressions().get(0);
+
+        Assert.assertEquals(VectorExpr.class, expression.getClass());
+
+        VectorExpr vectorExpr = (VectorExpr) expression;
+
+        Assert.assertEquals(3, vectorExpr.getElements().size());
+
+        Assert.assertEquals(
+                Lists.immutable.of("\"a\"", "\"b\"", "\"c\""),
+                vectorExpr.getElements().collect(e -> ((ConstExpr) e).getValue().asStringLiteral()));
+    }
 }

@@ -3,6 +3,7 @@ package org.modelscript;
 import org.junit.Assert;
 import org.junit.Test;
 import org.modelscript.expr.AnonymousScript;
+import org.modelscript.expr.value.BooleanValue;
 import org.modelscript.expr.value.LongValue;
 import org.modelscript.expr.value.Value;
 import org.modelscript.expr.visitor.InMemoryEvaluationVisitor;
@@ -35,5 +36,34 @@ public class ScriptFromStringTest
         Value result = script.evaluate();
         Assert.assertTrue(result.isInt());
         Assert.assertEquals(6, ((LongValue) result).longValue());
+    }
+
+    @Test
+    public void inOperator()
+    {
+        AnonymousScript script = ExpressionParserHelper.toScript(
+                "x = 1\n" +
+                "y = 1\n" +
+                "x in [3, 2, y]");
+        Value result = script.evaluate();
+        Assert.assertTrue(result.isBoolean());
+        Assert.assertTrue(((BooleanValue) result).isTrue());
+
+        script = ExpressionParserHelper.toScript(
+                "x= \"a\"\n" +
+                "y= \"b\"\n" +
+                "q= \"c\"\n" +
+                "x in [\"b\", y, q]");
+        result = script.evaluate();
+        Assert.assertTrue(result.isBoolean());
+        Assert.assertFalse(((BooleanValue) result).isTrue());
+
+        script = ExpressionParserHelper.toScript(
+                "y= \"b\"\n" +
+                "q= \"c\"\n" +
+                "\"c\" in [\"b\", y, q]");
+        result = script.evaluate();
+        Assert.assertTrue(result.isBoolean());
+        Assert.assertTrue(((BooleanValue) result).isTrue());
     }
 }

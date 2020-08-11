@@ -14,4 +14,5 @@ public interface ExpressionVisitor
     void visitFunctionScriptExpr(FunctionScript expr);
     void visitVarExpr(VarExpr expr);
     void visitProjectionExpr(ProjectionExpr expr);
+    void visitVectorExpr(VectorExpr expr);
 }

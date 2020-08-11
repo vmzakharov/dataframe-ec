@@ -178,6 +178,13 @@ implements ExpressionVisitor
         this.store(ValueType.DATA_FRAME);
     }
 
+    @Override
+    public void visitVectorExpr(VectorExpr expr)
+    {
+        // todo: support vectors of types, perhaps?
+        this.store(ValueType.VECTOR);
+    }
+
     public ValueType getLastExpressionType()
     {
         return this.lastExpressionType;

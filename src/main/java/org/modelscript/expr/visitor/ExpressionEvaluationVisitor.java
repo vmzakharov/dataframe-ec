@@ -14,4 +14,5 @@ public interface ExpressionEvaluationVisitor
     Value visitFunctionScriptExpr(FunctionScript expr);
     Value visitVarExpr(VarExpr expr);
     Value visitProjectionExpr(ProjectionExpr expr);
+    Value visitVectorExpr(VectorExpr expr);
 }

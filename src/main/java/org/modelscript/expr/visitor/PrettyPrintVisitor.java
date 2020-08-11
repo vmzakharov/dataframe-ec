@@ -133,6 +133,12 @@ implements ExpressionVisitor
         this.print(expr.getAlias()).print(" : ").printExpression(expr.getExpression());
     }
 
+    @Override
+    public void visitVectorExpr(VectorExpr expr)
+    {
+        this.print("[").printExpressionList(expr.getElements()).print("]");
+    }
+
     private PrettyPrintVisitor print(String s)
     {
         this.printer.print(s);

@@ -3,7 +3,6 @@ package org.modelscript.expr.function;
 import org.eclipse.collections.api.list.ImmutableList;
 import org.eclipse.collections.api.map.ImmutableMap;
 import org.eclipse.collections.impl.factory.Lists;
-import org.modelscript.expr.ArithmeticOp;
 import org.modelscript.expr.EvalContext;
 import org.modelscript.expr.value.LongValue;
 import org.modelscript.expr.value.StringValue;
@@ -21,7 +20,7 @@ public class BuiltInFunctions
             {
                 VectorValue parameters = (VectorValue) context.getVariableOrDefault(magicalParameterName(), VectorValue.EMPTY);
                 Printer printer = PrinterFactory.getPrinter();
-                parameters.getItems().forEach(e -> printer.print(e.stringValue()));
+                parameters.getElements().forEach(e -> printer.print(e.stringValue()));
                 return Value.VOID;
             }
         },
@@ -32,7 +31,7 @@ public class BuiltInFunctions
             {
                 VectorValue parameters = (VectorValue) context.getVariableOrDefault(magicalParameterName(), VectorValue.EMPTY);
                 Printer printer = PrinterFactory.getPrinter();
-                parameters.getItems().forEach(e -> printer.print(e.stringValue()));
+                parameters.getElements().forEach(e -> printer.print(e.stringValue()));
                 printer.newLine();
                 return Value.VOID;
             }

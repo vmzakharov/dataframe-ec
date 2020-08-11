@@ -177,6 +177,14 @@ implements ExpressionEvaluationVisitor
         return new DataFrameValue(dataFrame);
     }
 
+    @Override
+    public Value visitVectorExpr(VectorExpr expr)
+    {
+        return new VectorValue(
+                expr.getElements().collect(e -> e.evaluate(this))
+        );
+    }
+
     public EvalContext getContext()
     {
         return this.context;

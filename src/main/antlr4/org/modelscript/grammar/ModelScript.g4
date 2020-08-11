@@ -34,12 +34,15 @@ expr :
     | expr op=(GT | GTE | LT | LTE | EQ | NE) expr #compareExpr
     | expr op=AND expr         #andExpr
     | expr op=(OR | XOR) expr  #orExpr
+    | expr IN vectorExpr       #inExpr
+    | vectorExpr               #standaloneVectorExpr
     | INT                      #intLiteralExpr
     | DOUBLE                   #doubleLiteralExpr
     | STRING                   #stringLiteralExpr
     | ID                       #varExpr
-    | '[' exprList ']'         #vectorExpr
     ;
+
+vectorExpr : '[' exprList ']' | '[' ']';
 
 exprList :  expr ( ',' expr )*;
 
@@ -56,6 +59,8 @@ LT  : '<' ;
 LTE : '<=' ;
 EQ  : '==';
 NE  : '!=';
+
+IN  : 'in' ;
 
 AND  : 'and' ;
 OR   : 'or' ;

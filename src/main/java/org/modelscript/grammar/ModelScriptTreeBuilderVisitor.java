@@ -121,13 +121,13 @@ extends ModelScriptBaseVisitor<Expression>
     @Override
     public Expression visitAndExpr(AndExprContext ctx)
     {
-        return  this.visitBooleanOperation(ctx.expr(0), ctx.expr(1), ctx.op);
+        return this.visitBooleanOperation(ctx.expr(0), ctx.expr(1), ctx.op);
     }
 
     @Override
     public Expression visitOrExpr(OrExprContext ctx)
     {
-        return  this.visitBooleanOperation(ctx.expr(0), ctx.expr(1), ctx.op);
+        return this.visitBooleanOperation(ctx.expr(0), ctx.expr(1), ctx.op);
     }
 
     private Expression visitBooleanOperation(ExprContext exprContext1, ExprContext exprContext2, Token opToken)
@@ -135,9 +135,15 @@ extends ModelScriptBaseVisitor<Expression>
         BooleanOp operation = null;
         switch (opToken.getType())
         {
-            case AND: operation = BooleanOp.AND; break;
-            case OR: operation = BooleanOp.OR;   break;
-            case XOR: operation = BooleanOp.XOR;      break;
+            case AND:
+                operation = BooleanOp.AND;
+                break;
+            case OR:
+                operation = BooleanOp.OR;
+                break;
+            case XOR:
+                operation = BooleanOp.XOR;
+                break;
         }
 
         return new BinaryExpr(this.visit(exprContext1), this.visit(exprContext2), operation);
@@ -192,6 +198,30 @@ extends ModelScriptBaseVisitor<Expression>
         this.script.addFunctionScript(functionScript);
 
         return null;
+    }
+
+    @Override
+    public Expression visitInExpr(InExprContext ctx)
+    {
+        return new BinaryExpr(
+                this.visit(ctx.expr()),
+                this.visit(ctx.vectorExpr()),
+                ContainsOp.IN);
+    }
+
+    @Override
+    public Expression visitVectorExpr(VectorExprContext ctx)
+    {
+        ListIterable<Expression> elements;
+        if (ctx.exprList() == null)
+        {
+            elements = Lists.immutable.of();
+        }
+        else
+        {
+            elements = ListIterate.collect(ctx.exprList().expr(), this::visit);
+        }
+        return new VectorExpr(elements);
     }
 
     @Override
