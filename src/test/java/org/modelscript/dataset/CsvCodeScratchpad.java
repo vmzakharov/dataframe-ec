@@ -17,8 +17,11 @@ public class CsvCodeScratchpad
     private void readStuff()
     {
 //        String fileName = "src/test/resources/employees.csv";
+//        String fileNameOut = "src/test/resources/employees_out.csv";
         String fileName = "src/test/resources/employees_1mm.csv";
+        String fileNameOut = "src/test/resources/employees_1mm_out.csv";
         CsvDataSet dataSet = new CsvDataSet(fileName, "Employee");
+        dataSet.convertEmptyElementsToNulls();
 
         Stopwatch stopwatch = new Stopwatch();
         stopwatch.start();
@@ -27,25 +30,28 @@ public class CsvCodeScratchpad
         stopwatch.start();
         DataFrame dataFrame1 = dataSet.loadAsDataFrame();
         stopwatch.stop();
-
-        this.report(dataFrame1.rowCount(), stopwatch);
-
-        stopwatch.start();
-        DataFrame dataFrame2 = dataSet.loadAsDataFrame();
-        stopwatch.stop();
-
-        this.report(dataFrame2.rowCount(), stopwatch);
+        this.report("Loaded", dataFrame1.rowCount(), stopwatch);
 
         stopwatch.start();
-        DataFrame dataFrame3 = dataSet.loadAsDataFrame();
+        CsvDataSet dataSetOut = new CsvDataSet(fileNameOut, "Employee");
+        dataSetOut.write(dataFrame1);
         stopwatch.stop();
+        this.report("Wrote", dataFrame1.rowCount(), stopwatch);
 
-        this.report(dataFrame3.rowCount(), stopwatch);
+//        stopwatch.start();
+//        DataFrame dataFrame2 = dataSet.loadAsDataFrame();
+//        stopwatch.stop();
+//        this.report("Loaded", dataFrame2.rowCount(), stopwatch);
+//
+//        stopwatch.start();
+//        DataFrame dataFrame3 = dataSet.loadAsDataFrame();
+//        stopwatch.stop();
+//        this.report("Loaded", dataFrame3.rowCount(), stopwatch);
     }
 
-    private void report(int rowCount, Stopwatch stopwatch)
+    private void report(String message, int rowCount, Stopwatch stopwatch)
     {
-        System.out.printf("Loaded %,d rows\n", rowCount);
+        System.out.printf(message + ": %,d rows\n", rowCount);
         System.out.printf("Elapsed time, ms: %,d, Memory used, bytes: %,d [T: %,d, F: %,d, U: %,d]\n",
                 stopwatch.elapsedTimeMillis(),
                 stopwatch.usedMemoryChangeBytes(),

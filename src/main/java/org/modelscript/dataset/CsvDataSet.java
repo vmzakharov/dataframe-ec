@@ -2,14 +2,12 @@ package org.modelscript.dataset;
 
 import org.eclipse.collections.api.list.MutableList;
 import org.eclipse.collections.impl.factory.Lists;
+import org.eclipse.collections.impl.utility.ArrayIterate;
 import org.eclipse.collections.impl.utility.ListIterate;
 import org.modelscript.dataframe.*;
 import org.modelscript.expr.value.ValueType;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
+import java.io.*;
 
 public class CsvDataSet
 extends DataSetAbstract
@@ -18,7 +16,10 @@ extends DataSetAbstract
 
     public static final char SEPARATOR = ',';
     public static final char QUOTE_CHARACTER = '"';
+
     private final String dataFileName;
+
+    private boolean convertEmptyElementsToNulls = false;
 
     public CsvDataSet(String dataFileName, String newName)
     {
@@ -30,6 +31,11 @@ extends DataSetAbstract
     public void openFileForReading()
     {
         File file = new File(this.dataFileName);
+    }
+
+    public void convertEmptyElementsToNulls()
+    {
+        this.convertEmptyElementsToNulls = true;
     }
 
     @Override
@@ -52,7 +58,53 @@ extends DataSetAbstract
 
     public void write(DataFrame dataFrame)
     {
+        try (BufferedWriter writer = new BufferedWriter(this.createWriter(), BUFFER_SIZE))
+        {
+            int columnCount = dataFrame.columnCount();
 
+            for (int columnIndex = 0; columnIndex < columnCount; columnIndex++)
+            {
+                writer.write(dataFrame.getColumnAt(columnIndex).getName());
+
+                if (columnIndex < columnCount - 1)
+                {
+                    writer.write(SEPARATOR);
+                }
+            }
+            writer.write('\n');
+
+            int rowCount = dataFrame.rowCount();
+            for (int rowIndex = 0; rowIndex < rowCount; rowIndex++)
+            {
+                for (int columnIndex = 0; columnIndex < columnCount; columnIndex++)
+                {
+                    String valueAsLiteral = dataFrame.getColumnAt(columnIndex).getValueAsStringLiteral(rowIndex);
+                    writer.write(valueAsLiteral);
+
+                    if (columnIndex < columnCount - 1)
+                    {
+                        writer.write(SEPARATOR);
+                    }
+                }
+                writer.write('\n');
+            }
+        }
+        catch (IOException e)
+        {
+            throw new RuntimeException("Failed write data frame to '" + this.dataFileName + "'", e);
+        }
+    }
+
+    private Writer createWriter()
+    throws IOException
+    {
+        return new FileWriter(this.dataFileName);
+    }
+
+    private Reader createReader()
+    throws IOException
+    {
+        return new FileReader(this.dataFileName);
     }
 
     public DataFrame loadAsDataFrame()
@@ -61,17 +113,11 @@ extends DataSetAbstract
         df.enablePooling();
 
         /*
-        try (Stream<String> stream = Files.lines(Paths.get(fileName))) {
-            stream.forEach(System.out::println);
-        }
-        */
-
-        /*
           expected format:
           header1,header2,header3,...
           "String",123,45.67,...
          */
-        try (BufferedReader reader = new BufferedReader(new FileReader(this.dataFileName), BUFFER_SIZE))
+        try (BufferedReader reader = new BufferedReader(this.createReader(), BUFFER_SIZE))
         {
             String line;
             line = reader.readLine();
@@ -159,7 +205,12 @@ extends DataSetAbstract
 
     private String stripQuotesIfAny(String aString)
     {
-        return this.surroundedByQuotes(aString) ? aString.substring(1, aString.length() - 1) : aString;
+        if (aString == null || !this.surroundedByQuotes(aString))
+        {
+            return aString;
+        }
+
+        return aString.substring(1, aString.length() - 1);
     }
 
     private boolean canParseAsLong(String aString)
@@ -247,7 +298,7 @@ extends DataSetAbstract
             {
                 if (!closedQuote)
                 {
-                    elements.add(substringOrNull(aString, currentTokenStart, index));
+                    elements.add(this.substringOrNull(aString, currentTokenStart, index));
                 }
                 closedQuote = false;
                 initialBlanks = true;
@@ -285,6 +336,11 @@ extends DataSetAbstract
 
     private String substringOrNull(String aString, int beginIndex, int endIndex)
     {
-        return (beginIndex > endIndex) ? null : aString.substring(beginIndex, endIndex);
+        if(beginIndex < endIndex)
+        {
+            return aString.substring(beginIndex, endIndex);
+        }
+
+        return this.convertEmptyElementsToNulls ? null : "";
     }
 }

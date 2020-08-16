@@ -4,11 +4,18 @@ import org.eclipse.collections.api.factory.Lists;
 import org.eclipse.collections.api.list.MutableList;
 import org.eclipse.collections.impl.utility.ArrayIterate;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
 
 public class TextParsing
 {
-    private final CsvDataSet dataSet = new CsvDataSet("Foo", "Bar");
+    private CsvDataSet dataSet;
+
+    @Before
+    public void configureDataSet()
+    {
+        this.dataSet = new CsvDataSet("Foo", "Bar");
+    }
 
     @Test
     public void simpleString()
@@ -25,11 +32,20 @@ public class TextParsing
     }
 
     @Test
+    public void splitStringWithNulls()
+    {
+        this.dataSet.convertEmptyElementsToNulls();
+        this.validateSplitting(
+                "eenie,, miny, , moe,",
+                new String[] {"eenie", null, " miny", " ", " moe", null});
+    }
+
+    @Test
     public void splitStringWithFirstAndLastEmptyValues()
     {
         this.validateSplitting(
                 ",eenie, meenie  ,  , miny,, moe,",
-                new String[] {"", "eenie"," meenie  ","  "," miny", ""," moe",""});
+                new String[] {"", "eenie", " meenie  ", "  ", " miny", "", " moe", ""});
     }
 
     @Test
