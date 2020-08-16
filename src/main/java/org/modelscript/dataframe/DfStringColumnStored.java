@@ -2,18 +2,19 @@ package org.modelscript.dataframe;
 
 import org.eclipse.collections.api.list.ImmutableList;
 import org.eclipse.collections.api.list.MutableList;
+import org.eclipse.collections.api.set.Pool;
 import org.eclipse.collections.impl.factory.Lists;
-import org.modelscript.expr.value.StringValue;
+import org.eclipse.collections.impl.set.mutable.UnifiedSet;
 import org.modelscript.expr.value.Value;
 import org.modelscript.expr.value.ValueType;
-
-import java.lang.reflect.Constructor;
 
 public class DfStringColumnStored
 extends DfStringColumn
 implements DfColumnStored
 {
-    MutableList<String> values = Lists.mutable.of();
+    private final MutableList<String> values = Lists.mutable.of();
+
+    private Pool<String> pool = new UnifiedSet<>();
 
     public DfStringColumnStored(DataFrame owner, String newName)
     {
@@ -42,13 +43,19 @@ implements DfColumnStored
 
     public void addString(String s)
     {
-        this.values.add(s);
+        this.values.add(this.pool.put(s));
+    }
+
+    @Override
+    public void seal()
+    {
+        this.pool = null;
     }
 
     @Override
     public void addObject(Object newObject)
     {
-        this.values.add((String) newObject);
+        this.addString((String) newObject);
     }
 
     @Override

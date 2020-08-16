@@ -1,5 +1,7 @@
 package org.modelscript.dataset;
 
+import org.eclipse.collections.api.factory.Lists;
+import org.eclipse.collections.api.list.MutableList;
 import org.eclipse.collections.impl.utility.ArrayIterate;
 import org.junit.Assert;
 import org.junit.Test;
@@ -66,7 +68,8 @@ public class TextParsing
 
     private void validateSplitting(String input, String[] expected)
     {
-        String[] result = this.dataSet.splitMindingQs(input);
+        MutableList<String> result = Lists.mutable.of();
+        this.dataSet.splitMindingQsInto(input, result);
 
 //        System.out.println("----------");
 //        System.out.println("i> [" + input + "]");
@@ -75,7 +78,7 @@ public class TextParsing
 //        System.out.print("a> ");
 //        printArray(result);
 
-        Assert.assertArrayEquals(expected, result);
+        Assert.assertArrayEquals(expected, result.toArray());
     }
     
     public void printArray(String[] a)

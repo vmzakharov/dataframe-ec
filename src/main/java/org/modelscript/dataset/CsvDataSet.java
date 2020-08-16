@@ -2,7 +2,7 @@ package org.modelscript.dataset;
 
 import org.eclipse.collections.api.list.MutableList;
 import org.eclipse.collections.impl.factory.Lists;
-import org.eclipse.collections.impl.utility.ArrayIterate;
+import org.eclipse.collections.impl.utility.ListIterate;
 import org.modelscript.dataframe.*;
 import org.modelscript.expr.value.ValueType;
 
@@ -12,8 +12,10 @@ import java.io.FileReader;
 import java.io.IOException;
 
 public class CsvDataSet
-        extends DataSetAbstract
+extends DataSetAbstract
 {
+    public static int BUFFER_SIZE = 65_536;
+
     public static final char SEPARATOR = ',';
     public static final char QUOTE_CHARACTER = '"';
     private final String dataFileName;
@@ -48,6 +50,11 @@ public class CsvDataSet
 //
     }
 
+    public void write(DataFrame dataFrame)
+    {
+
+    }
+
     public DataFrame loadAsDataFrame()
     {
         DataFrame df = new DataFrame(this.getName());
@@ -63,20 +70,26 @@ public class CsvDataSet
           header1,header2,header3,...
           "String",123,45.67,...
          */
-        try (BufferedReader reader = new BufferedReader(new FileReader(this.dataFileName)))
+        try (BufferedReader reader = new BufferedReader(new FileReader(this.dataFileName), BUFFER_SIZE))
         {
             String line;
             line = reader.readLine();
-            String[] headers = this.splitMindingQs(line);
+
+            MutableList<String> headers = Lists.mutable.of();
+            this.splitMindingQsInto(line, headers);
 
             line = reader.readLine();
 
-            String[] elements = this.splitMindingQs(line);
-            ValueType[] types = new ValueType[headers.length];
+            MutableList<String> elements = Lists.mutable.of();
+            this.splitMindingQsInto(line, elements);
 
-            for (int i = 0; i < elements.length; i++)
+            MutableList<ValueType> types = Lists.mutable.of();
+
+            int columnCount = elements.size();
+
+            for (int i = 0; i < columnCount; i++)
             {
-                String element = elements[i];
+                String element = elements.get(i);
                 ValueType guessedType;
                 if (this.surroundedByQuotes(element))
                 {
@@ -95,15 +108,17 @@ public class CsvDataSet
                     guessedType = ValueType.STRING;
                 }
 
-                types[i] = guessedType;
+                types.add(guessedType);
             }
 
-            ArrayIterate.forEachInBoth(headers, types, df::addColumn);
+            ListIterate.forEachInBoth(headers, types, df::addColumn);
 
-            this.parseAndAddLineToDataFrame(df, line);
+            MutableList<String> lineElements = Lists.mutable.withInitialCapacity(headers.size());
+
+            this.parseAndAddLineToDataFrame(df, line, lineElements, columnCount);
             while ((line = reader.readLine()) != null)
             {
-                this.parseAndAddLineToDataFrame(df, line);
+                this.parseAndAddLineToDataFrame(df, line, lineElements, columnCount);
             }
 
             df.seal();
@@ -116,14 +131,14 @@ public class CsvDataSet
         return df;
     }
 
-    private void parseAndAddLineToDataFrame(DataFrame dataFrame, String line)
+    private void parseAndAddLineToDataFrame(DataFrame dataFrame, String line, MutableList<String> elements, int columnCount)
     {
-        String[] elements = this.splitMindingQs(line);
-        for (int i = 0; i < elements.length; i++)
+        this.splitMindingQsInto(line, elements);
+        for (int i = 0; i < columnCount; i++)
         {
             DfColumn column = dataFrame.getColumnAt(i);
             ValueType columnType = column.getType();
-            String element = elements[i];
+            String element = elements.get(i);
             switch (columnType)
             {
                 case LONG:
@@ -133,10 +148,10 @@ public class CsvDataSet
                     ((DfDoubleColumnStored) column).addDouble(Double.parseDouble(element));
                     break;
                 case STRING:
-                    ((DfStringColumnStored) column).addString(this.stripQuotesIfAny(element)) ;
+                    ((DfStringColumnStored) column).addString(this.stripQuotesIfAny(element));
                     break;
                 default:
-                    throw new RuntimeException("Ay, Carrumba!");
+                    throw new RuntimeException("Don't know what to do with the column type: " + columnType);
             }
         }
     }
@@ -182,20 +197,21 @@ public class CsvDataSet
         return (aString.charAt(0) == QUOTE_CHARACTER) && (aString.charAt(aString.length() - 1) == QUOTE_CHARACTER);
     }
 
-    public String[] splitMindingQs(String aString)
+    public void splitMindingQsInto(String aString, MutableList<String> elements)
     {
-        MutableList<String> elements = Lists.mutable.of();
+        elements.clear();
 
         int currentTokenStart = 0;
         boolean insideQuotes = false;
         boolean initialBlanks = true;
         boolean closedQuote = false;
+        int charCount = aString.length();
 
-        for (int index = 0; index < aString.length(); index++)
+        for (int index = 0; index < charCount; index++)
         {
             char curChar = aString.charAt(index);
 
-            boolean endOfLine = index == aString.length() - 1;
+            boolean endOfLine = index == charCount - 1;
             if (endOfLine)
             {
                 if (insideQuotes && !this.isQuote(curChar))
@@ -213,7 +229,7 @@ public class CsvDataSet
                 }
                 else
                 {
-                    elements.add(substringOrNull(aString, currentTokenStart, index + 1));
+                    elements.add(this.substringOrNull(aString, currentTokenStart, index + 1));
                 }
             }
             else if (insideQuotes)
@@ -222,19 +238,10 @@ public class CsvDataSet
                 {
                     insideQuotes = false;
                     closedQuote = true;
-                    elements.add(substringOrNull(aString, currentTokenStart, index + 1));
+                    elements.add(this.substringOrNull(aString, currentTokenStart, index + 1));
                     currentTokenStart = index + 1;
                 }
             }
-//            else if (closedQuote)
-//            {
-//                closedQuote = false;
-//                if (!this.isTokenSeparator(aString.charAt(index)))
-//                {
-//                    this.throwBadFormat("Unexpected character '" + aString.charAt(index + 1) + "' at position " + (index + 1) + ", was hoping for a separator or end of line.");
-//                }
-//                currentTokenStart = index + 1;
-//            }
             else if (this.isTokenSeparator(curChar))
             {
                 if (!closedQuote)
@@ -258,8 +265,6 @@ public class CsvDataSet
                 }
             }
         }
-
-        return elements.toArray(new String[elements.size()]);
     }
 
     private void throwBadFormat(String message)

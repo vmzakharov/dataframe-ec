@@ -1,8 +1,6 @@
 package org.modelscript.dataframe;
 
-import org.eclipse.collections.api.block.function.primitive.IntToBooleanFunction;
 import org.eclipse.collections.api.block.predicate.primitive.BooleanPredicate;
-import org.eclipse.collections.api.list.ImmutableList;
 import org.eclipse.collections.api.list.ListIterable;
 import org.eclipse.collections.api.list.MutableList;
 import org.eclipse.collections.api.list.primitive.BooleanList;
@@ -11,22 +9,16 @@ import org.eclipse.collections.api.list.primitive.MutableIntList;
 import org.eclipse.collections.api.map.MutableMap;
 import org.eclipse.collections.impl.factory.Lists;
 import org.eclipse.collections.impl.factory.Maps;
-import org.eclipse.collections.impl.factory.primitive.IntLists;
-import org.eclipse.collections.impl.list.Interval;
 import org.eclipse.collections.impl.list.primitive.IntInterval;
 import org.eclipse.collections.impl.utility.ArrayIterate;
 import org.modelscript.expr.DataFrameEvalContext;
 import org.modelscript.expr.EvalContext;
 import org.modelscript.expr.Expression;
 import org.modelscript.expr.value.BooleanValue;
-import org.modelscript.expr.value.LongValue;
 import org.modelscript.expr.value.Value;
 import org.modelscript.expr.value.ValueType;
 import org.modelscript.expr.visitor.InMemoryEvaluationVisitor;
 import org.modelscript.util.ExpressionParserHelper;
-
-import java.util.Arrays;
-import java.util.Comparator;
 
 public class DataFrame
 {
@@ -268,6 +260,9 @@ public class DataFrame
         this.evalContext.setNestedContext(newEvalContext);
     }
 
+    /**
+     * indicates that no further updates can be made to this data frame.
+     */
     public void seal()
     {
         MutableIntList storedColumnsSizes = this.columnsInOrder.select(DfColumn::isStored).collectInt(DfColumn::getSize);
@@ -284,6 +279,8 @@ public class DataFrame
                         "Stored column sizes are not the same when attempting to seal data frame '" + this.getName() + "'");
             }
         }
+
+        this.columnsInOrder.forEach(DfColumn::seal);
     }
 
     public DataFrame sum(ListIterable<String> columnNames)
@@ -292,7 +289,7 @@ public class DataFrame
 
         DataFrame summedDataFrame = new DataFrame("Sum Of " + this.getName());
 
-        columnsToSum.forEach(each -> summedDataFrame.addColumn(each.getName(), each.getType()));
+        columnsToSum.forEachWith(DfColumn::cloneSchemaAndAttachTo, summedDataFrame);
 
         ListIterable<Number> sums = columnsToSum.collect(
                 each -> (each instanceof DfDoubleColumn) ? ((DfDoubleColumn) each).sum() : ((DfLongColumn) each).sum()

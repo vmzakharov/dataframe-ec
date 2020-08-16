@@ -41,4 +41,6 @@ public interface DfColumn
     void cloneSchemaAndAttachTo(DataFrame attachTo);
 
     void addRowToColumn(int rowIndex, DfColumn target);
+
+    void seal();
 }
