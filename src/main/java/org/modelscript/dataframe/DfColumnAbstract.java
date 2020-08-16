@@ -73,10 +73,4 @@ implements DfColumn
 
         attachTo.addColumn(clonedColumn);
     }
-
-    @Override
-    public void seal()
-    {
-        // nothing
-    }
 }

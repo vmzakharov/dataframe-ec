@@ -42,5 +42,13 @@ public interface DfColumn
 
     void addRowToColumn(int rowIndex, DfColumn target);
 
-    void seal();
+    default void seal()
+    {
+        // nothing
+    }
+
+    default void enablePooling()
+    {
+        // nothing
+    }
 }

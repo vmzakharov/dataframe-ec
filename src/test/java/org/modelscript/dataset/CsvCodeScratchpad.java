@@ -28,24 +28,30 @@ public class CsvCodeScratchpad
         DataFrame dataFrame1 = dataSet.loadAsDataFrame();
         stopwatch.stop();
 
-        this.report("Loaded " + dataFrame1.rowCount() + " rows", stopwatch);
+        this.report(dataFrame1.rowCount(), stopwatch);
 
         stopwatch.start();
         DataFrame dataFrame2 = dataSet.loadAsDataFrame();
         stopwatch.stop();
 
-        this.report("Loaded " + dataFrame2.rowCount() + " rows", stopwatch);
+        this.report(dataFrame2.rowCount(), stopwatch);
 
         stopwatch.start();
         DataFrame dataFrame3 = dataSet.loadAsDataFrame();
         stopwatch.stop();
 
-        this.report("Loaded " + dataFrame3.rowCount() + " rows", stopwatch);
+        this.report(dataFrame3.rowCount(), stopwatch);
     }
 
-    private void report(String message, Stopwatch stopwatch)
+    private void report(int rowCount, Stopwatch stopwatch)
     {
-        System.out.println(message);
-        System.out.printf("Elapsed time, ms: %,d, Memory used, bytes: %,d\n", stopwatch.elapsedTimeMillis(), stopwatch.usedMemoryChangeBytes());
+        System.out.printf("Loaded %,d rows\n", rowCount);
+        System.out.printf("Elapsed time, ms: %,d, Memory used, bytes: %,d [T: %,d, F: %,d, U: %,d]\n",
+                stopwatch.elapsedTimeMillis(),
+                stopwatch.usedMemoryChangeBytes(),
+                stopwatch.totalMemoryBytes(),
+                stopwatch.freeMemoryBytes(),
+                stopwatch.usedMemoryBytes()
+        );
     }
 }

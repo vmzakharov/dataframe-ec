@@ -58,6 +58,7 @@ extends DataSetAbstract
     public DataFrame loadAsDataFrame()
     {
         DataFrame df = new DataFrame(this.getName());
+        df.enablePooling();
 
         /*
         try (Stream<String> stream = Files.lines(Paths.get(fileName))) {

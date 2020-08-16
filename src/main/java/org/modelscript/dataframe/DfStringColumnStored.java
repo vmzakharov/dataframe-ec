@@ -14,7 +14,7 @@ implements DfColumnStored
 {
     private final MutableList<String> values = Lists.mutable.of();
 
-    private Pool<String> pool = new UnifiedSet<>();
+    private Pool<String> pool = null;
 
     public DfStringColumnStored(DataFrame owner, String newName)
     {
@@ -43,7 +43,20 @@ implements DfColumnStored
 
     public void addString(String s)
     {
-        this.values.add(this.pool.put(s));
+        if (pool == null)
+        {
+            this.values.add(s);
+        }
+        else
+        {
+            this.values.add(this.pool.put(s));
+        }
+    }
+
+    @Override
+    public void enablePooling()
+    {
+        this.pool = new UnifiedSet<>();
     }
 
     @Override

@@ -8,16 +8,22 @@ public class Stopwatch
     private long startUsedMemoryBytes;
     private long endUsedMemoryBytes;
 
+    private long totalMemoryBytes;
+    private long usedMemoryBytes;
+    private long freeMemoryBytes;
+
     public void start()
     {
-        this.startUsedMemoryBytes = this.usedMemoryBytes();
+        this.recordMemoryUsage();
+        this.startUsedMemoryBytes = this.usedMemoryBytes;
         this.startTimeMillis = System.currentTimeMillis();
     }
 
     public void stop()
     {
         this.endTimeMillis = System.currentTimeMillis();
-        this.endUsedMemoryBytes = this.usedMemoryBytes();
+        this.recordMemoryUsage();
+        this.endUsedMemoryBytes = this.usedMemoryBytes;
     }
 
     public long elapsedTimeMillis()
@@ -30,12 +36,30 @@ public class Stopwatch
         return this.endUsedMemoryBytes - this.startUsedMemoryBytes;
     }
 
-    private long usedMemoryBytes()
+    public long totalMemoryBytes()
+    {
+        return this.totalMemoryBytes;
+    }
+
+    public long usedMemoryBytes()
+    {
+        return this.usedMemoryBytes;
+    }
+
+    public long freeMemoryBytes()
+    {
+        return this.freeMemoryBytes;
+    }
+
+    private void recordMemoryUsage()
     {
         System.gc();
         System.gc();
         System.gc();
         Runtime runtime = Runtime.getRuntime();
-        return runtime.totalMemory() - runtime.freeMemory();
+
+        this.freeMemoryBytes = runtime.freeMemory();
+        this.totalMemoryBytes = runtime.totalMemory();
+        this.usedMemoryBytes = this.totalMemoryBytes - this.freeMemoryBytes;
     }
 }

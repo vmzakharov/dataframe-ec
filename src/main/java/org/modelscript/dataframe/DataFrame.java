@@ -29,6 +29,7 @@ public class DataFrame
 
     private final DataFrameEvalContext evalContext; // todo: make threadlocal
     private IntList rowIndex = null;
+    private boolean poolingEnabled = false;
 
     public DataFrame(String newName)
     {
@@ -77,12 +78,23 @@ public class DataFrame
         }
         this.columnsByName.put(newColumn.getName(), newColumn);
         this.columnsInOrder.add(newColumn);
+
+        if (this.isPoolingEnabled())
+        {
+            newColumn.enablePooling();
+        }
         return this;
     }
 
-    public DfColumn getColumnNamedOrNull(String columnName)
+    public void enablePooling()
     {
-        return this.columnsByName.get(columnName);
+        this.poolingEnabled = true;
+        this.columnsInOrder.forEach(DfColumn::enablePooling);
+    }
+
+    public boolean isPoolingEnabled()
+    {
+        return this.poolingEnabled;
     }
 
     public DfColumn getColumnNamed(String columnName)
@@ -408,14 +420,15 @@ public class DataFrame
 
     private void copyRowFrom(DataFrame source, int rowIndex)
     {
-        this.columnsInOrder.each(
-                each -> {
-                    if (each.isStored())
-                    {
-                        source.getColumnNamed(each.getName()).addRowToColumn(rowIndex, each);
-                    }
-                }
-        );
+        for (int columnIndex = 0; columnIndex < this.columnsInOrder.size(); columnIndex++)
+        {
+            DfColumn thisColumn = this.columnsInOrder.get(columnIndex);
+
+            if (thisColumn.isStored())
+            {
+                source.getColumnAt(columnIndex).addRowToColumn(rowIndex, thisColumn);
+            }
+        }
     }
 
     public DataFrame cloneStructure()
