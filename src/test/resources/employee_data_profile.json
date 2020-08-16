@@ -1,0 +1,35 @@
+{
+  "fields": [
+    {
+      "name": "EmployeeId",
+      "type": "integer",
+      "unique": true
+    },
+    {
+      "name": "Name",
+      "type": "string"
+    },
+    {
+      "name": "HireDate",
+      "type": "date"
+    },
+    {
+      "name": "Department",
+      "type": "string"
+    },
+    {
+      "name": "Salary",
+      "type": "decimal"
+    }
+  ],
+  "constraints": [
+    { "field": "EmployeeId", "greaterThan": 0 },
+    { "field": "Name", "matchingRegex": "[A-Z][a-z]{4,10} [A-Z][a-z]{5,10}" },
+    { "field": "HireDate", "after": "1987-05-05" },
+    { "field": "HireDate", "before": "2020-12-31" },
+    { "field": "Department", "inSet": ["Accounting", "Export", "Import", "Marketing", "Audit"] },
+    { "field": "Salary", "greaterThan": 50000 },
+    { "field": "Salary", "lessThan": 1000000 },
+    { "field": "Salary", "granularTo": 0.01 }
+  ]
+}
