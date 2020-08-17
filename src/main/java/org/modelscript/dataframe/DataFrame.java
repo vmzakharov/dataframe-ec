@@ -131,7 +131,7 @@ public class DataFrame
         {
             for (int columnIndex = 0; columnIndex < columnCount; columnIndex++)
             {
-                row[columnIndex] = this.getStringLiteral(rowIndex,columnIndex);
+                row[columnIndex] = this.getValueAsStringLiteral(rowIndex,columnIndex);
             }
             s.append(ArrayIterate.makeString(row));
             s.append('\n');
@@ -222,9 +222,14 @@ public class DataFrame
         return this.columnsByName.get(columnName).getValue(rowIndex);
     }
 
-    public String getStringLiteral(int rowIndex, int columnIndex)
+    public String getValueAsStringLiteral(int rowIndex, int columnIndex)
     {
         return this.columnsInOrder.get(columnIndex).getValueAsStringLiteral(this.rowIndexMap(rowIndex));
+    }
+
+    public String getValueAsString(int rowIndex, int columnIndex)
+    {
+        return this.columnsInOrder.get(columnIndex).getValueAsString(this.rowIndexMap(rowIndex));
     }
 
     public long getLong(String columnName, int rowIndex)
