@@ -1,6 +1,7 @@
 package org.modelscript.dataframe;
 
 import org.eclipse.collections.api.factory.Lists;
+import org.junit.Assert;
 import org.junit.Test;
 
 public class DataFrameSortTest
@@ -108,6 +109,39 @@ public class DataFrameSortTest
                 ;
 
         DataFrameUtil.assertEquals(expected, dataFrame);
+    }
+
+    @Test
+    public void sortEmptyDataFrameByColumns()
+    {
+        DataFrame dataFrame = new DataFrame("FrameOfData")
+                .addStringColumn("Name").addStringColumn("Foo").addLongColumn("Bar").addDoubleColumn("Baz");
+
+        dataFrame.sortBy(Lists.immutable.of("Foo", "Baz"));
+
+        Assert.assertTrue("Sorted!", true);
+    }
+
+    @Test(expected = RuntimeException.class)
+    public void sortEmptyDataFrameByMissingColumnsNotAllowed()
+    {
+        DataFrame dataFrame = new DataFrame("FrameOfData")
+                .addStringColumn("Name").addStringColumn("Foo").addLongColumn("Bar").addDoubleColumn("Baz");
+
+        dataFrame.sortBy(Lists.immutable.of("Waldo"));
+
+        Assert.fail();
+    }
+
+    @Test
+    public void sortEmptyDataFrameByExpression()
+    {
+        DataFrame dataFrame = new DataFrame("FrameOfData")
+                .addStringColumn("Name").addStringColumn("Foo").addLongColumn("Bar").addDoubleColumn("Baz");
+
+        dataFrame.sortByExpression("Baz * 2.5");
+
+        Assert.assertTrue("Sorted!", true);
     }
 
     @Test

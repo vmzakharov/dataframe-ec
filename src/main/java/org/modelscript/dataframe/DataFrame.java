@@ -9,6 +9,7 @@ import org.eclipse.collections.api.list.primitive.MutableIntList;
 import org.eclipse.collections.api.map.MutableMap;
 import org.eclipse.collections.impl.factory.Lists;
 import org.eclipse.collections.impl.factory.Maps;
+import org.eclipse.collections.impl.factory.primitive.IntLists;
 import org.eclipse.collections.impl.list.primitive.IntInterval;
 import org.eclipse.collections.impl.utility.ArrayIterate;
 import org.modelscript.expr.DataFrameEvalContext;
@@ -300,9 +301,9 @@ public class DataFrame
         this.columnsInOrder.forEach(DfColumn::seal);
     }
 
-    public DataFrame sum(ListIterable<String> columnNames)
+    public DataFrame sum(ListIterable<String> columnsToSumNames)
     {
-        ListIterable<DfColumn> columnsToSum = this.getColumnsToAggregate(columnNames);
+        ListIterable<DfColumn> columnsToSum = this.getColumnsToAggregate(columnsToSumNames);
 
         DataFrame summedDataFrame = new DataFrame("Sum Of " + this.getName());
 
@@ -449,7 +450,14 @@ public class DataFrame
     {
         this.unsort();
 
+        // doing this here to make sure that the columns exists even if the data frame is empty
         ListIterable<DfColumn> columnsToSortBy = this.columnsNamed(columnsToSortByNames);
+
+        if (this.rowCount == 0)
+        {
+            this.rowIndex = IntLists.immutable.empty();
+            return;
+        }
 
         DfTuple[] tuples = new DfTuple[this.rowCount];
         for (int i = 0; i < this.rowCount; i++)
@@ -466,6 +474,12 @@ public class DataFrame
     public void sortByExpression(String expressionString)
     {
         this.unsort();
+        if (this.rowCount == 0)
+        {
+            this.rowIndex = IntLists.immutable.empty();
+            return;
+        }
+
         Expression expression = ExpressionParserHelper.toExpression(expressionString);
         MutableIntList indexes = IntInterval.zeroTo(this.rowCount - 1).toList();
         indexes.sortThisBy(i -> this.evaluateExpression(expression, i));
