@@ -5,12 +5,17 @@ import org.eclipse.collections.api.list.ListIterable;
 import org.eclipse.collections.api.list.MutableList;
 import org.eclipse.collections.api.list.primitive.BooleanList;
 import org.eclipse.collections.api.list.primitive.IntList;
+import org.eclipse.collections.api.list.primitive.MutableBooleanList;
 import org.eclipse.collections.api.list.primitive.MutableIntList;
 import org.eclipse.collections.api.map.MutableMap;
+import org.eclipse.collections.api.tuple.Twin;
 import org.eclipse.collections.impl.factory.Lists;
 import org.eclipse.collections.impl.factory.Maps;
+import org.eclipse.collections.impl.factory.primitive.BooleanLists;
 import org.eclipse.collections.impl.factory.primitive.IntLists;
+import org.eclipse.collections.impl.list.mutable.primitive.BooleanArrayList;
 import org.eclipse.collections.impl.list.primitive.IntInterval;
+import org.eclipse.collections.impl.tuple.Tuples;
 import org.eclipse.collections.impl.utility.ArrayIterate;
 import org.modelscript.expr.DataFrameEvalContext;
 import org.modelscript.expr.EvalContext;
@@ -381,6 +386,32 @@ public class DataFrame
     }
 
     /**
+     * Compute a boolean list (effectively a bitmap) with the values based on the provided expression
+     * @param filterExpressionString the expression to set the flags by
+     * @return a boolean list with values set to what the filter expression evaluates tfor each row
+     */
+    public BooleanList markRowsBy(String filterExpressionString)
+    {
+        MutableBooleanList marks = BooleanArrayList.newWithNValues(this.rowCount, false);
+
+        DataFrameEvalContext context = new DataFrameEvalContext(this);
+        Expression filterExpression = ExpressionParserHelper.toExpression(filterExpressionString);
+        InMemoryEvaluationVisitor evaluationVisitor = new InMemoryEvaluationVisitor(context);
+
+        for (int i = 0; i < this.rowCount; i++)
+        {
+            context.setRowIndex(i);
+            BooleanValue evalResult = (BooleanValue) filterExpression.evaluate(evaluationVisitor);
+            if (evalResult.isTrue())
+            {
+                marks.set(i, true);
+            }
+        }
+
+        return marks;
+    }
+
+    /**
      * creates a new data frame, which contain a subset of rows of this data frame for the rows with the index marked
      * (i.e. set to true) in the boolean list passed as the parameter. This is the behavior the opposite of
      * {@code selectNotMarked}
@@ -439,7 +470,12 @@ public class DataFrame
 
     public DataFrame cloneStructure()
     {
-        DataFrame cloned = new DataFrame(this.getName() + "-copy");
+        return this.cloneStructure(this.getName() + "-copy");
+    }
+
+    public DataFrame cloneStructure(String newName)
+    {
+        DataFrame cloned = new DataFrame(newName);
 
         this.columnsInOrder.each(each -> each.cloneSchemaAndAttachTo(cloned));
 
