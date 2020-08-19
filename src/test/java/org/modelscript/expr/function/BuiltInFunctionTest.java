@@ -51,4 +51,12 @@ public class BuiltInFunctionTest
         Assert.assertEquals("there!", ExpressionTestUtil.evaluateToString("substr(\"Hello, there!\", 7)"));
         Assert.assertEquals("Hello, there", ExpressionTestUtil.evaluateToString("substr(\"Hello, there!\", 0, 12)"));
     }
+
+    @Test
+    public void startsWith()
+    {
+        Assert.assertTrue(ExpressionTestUtil.evaluateToBoolean("startsWith(\"Hello, there!\", \"Hello\")"));
+        Assert.assertFalse(ExpressionTestUtil.evaluateToBoolean("startsWith(\"Hello, there!\", \"Hola\")"));
+        Assert.assertFalse(ExpressionTestUtil.evaluateToBoolean("startsWith(\"Hello, there!\", \"there\")"));
+    }
 }
