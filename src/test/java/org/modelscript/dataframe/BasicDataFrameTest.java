@@ -3,7 +3,7 @@ package org.modelscript.dataframe;
 import org.junit.Assert;
 import org.junit.Test;
 
-public class SimpleDataFrameTest
+public class BasicDataFrameTest
 {
     @Test
     public void createSimpleDataFrame()

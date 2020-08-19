@@ -20,7 +20,7 @@ public class ScriptFromStringTest
                 "z = x + y";
         AnonymousScript script = ExpressionParserHelper.toScript(scriptText);
         Value result = script.evaluate(new InMemoryEvaluationVisitor());
-        Assert.assertTrue(result.isInt());
+        Assert.assertTrue(result.isLong());
         Assert.assertEquals(3, ((LongValue) result).longValue());
     }
 
@@ -34,7 +34,7 @@ public class ScriptFromStringTest
                 "3+1 +2";
         AnonymousScript script = ExpressionParserHelper.toScript(scriptText);
         Value result = script.evaluate();
-        Assert.assertTrue(result.isInt());
+        Assert.assertTrue(result.isLong());
         Assert.assertEquals(6, ((LongValue) result).longValue());
     }
 

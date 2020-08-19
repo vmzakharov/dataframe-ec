@@ -3,8 +3,6 @@ package org.modelscript.expr.value;
 import org.modelscript.expr.ArithmeticOp;
 import org.modelscript.expr.ComparisonOp;
 
-import java.util.Comparator;
-
 public interface Value
 extends Comparable<Value>
 {
@@ -44,7 +42,7 @@ extends Comparable<Value>
 
     default boolean isVoid()    { return this == VOID; }
     default boolean isBoolean() { return this.getType().isBoolean(); }
-    default boolean isInt()     { return this.getType().isInt(); }
+    default boolean isLong()    { return this.getType().isLong(); }
     default boolean isDouble()  { return this.getType().isDouble(); }
     default boolean isNumber()  { return this.getType().isNumber(); }
     default boolean isString()  { return this.getType().isString(); }

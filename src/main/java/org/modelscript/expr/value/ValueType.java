@@ -6,7 +6,7 @@ public enum ValueType
 
     public boolean isVoid()    { return this == VOID; }
     public boolean isBoolean() { return this == BOOLEAN; }
-    public boolean isInt()     { return this == LONG; }
+    public boolean isLong()    { return this == LONG; }
     public boolean isDouble()  { return this == DOUBLE; }
     public boolean isNumber()  { return this == NUMBER || this == LONG || this == DOUBLE; }
     public boolean isString()  { return this == STRING; }

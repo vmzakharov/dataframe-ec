@@ -49,7 +49,7 @@ implements DfColumn
     }
 
     @Override
-    public void cloneSchemaAndAttachTo(DataFrame attachTo)
+    public DfColumn cloneSchemaAndAttachTo(DataFrame attachTo)
     {
         DfColumn clonedColumn;
         try
@@ -72,5 +72,7 @@ implements DfColumn
         }
 
         attachTo.addColumn(clonedColumn);
+
+        return clonedColumn;
     }
 }

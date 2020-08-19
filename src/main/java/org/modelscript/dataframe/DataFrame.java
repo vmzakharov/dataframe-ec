@@ -8,14 +8,11 @@ import org.eclipse.collections.api.list.primitive.IntList;
 import org.eclipse.collections.api.list.primitive.MutableBooleanList;
 import org.eclipse.collections.api.list.primitive.MutableIntList;
 import org.eclipse.collections.api.map.MutableMap;
-import org.eclipse.collections.api.tuple.Twin;
 import org.eclipse.collections.impl.factory.Lists;
 import org.eclipse.collections.impl.factory.Maps;
-import org.eclipse.collections.impl.factory.primitive.BooleanLists;
 import org.eclipse.collections.impl.factory.primitive.IntLists;
 import org.eclipse.collections.impl.list.mutable.primitive.BooleanArrayList;
 import org.eclipse.collections.impl.list.primitive.IntInterval;
-import org.eclipse.collections.impl.tuple.Tuples;
 import org.eclipse.collections.impl.utility.ArrayIterate;
 import org.modelscript.expr.DataFrameEvalContext;
 import org.modelscript.expr.EvalContext;
@@ -30,7 +27,7 @@ public class DataFrame
 {
     private final String name;
     private final MutableMap<String, DfColumn> columnsByName = Maps.mutable.of();
-    private final MutableList<DfColumn> columnsInOrder = Lists.mutable.of();
+    private final MutableList<DfColumn> columns = Lists.mutable.of();
     private int rowCount = 0;
 
     private final DataFrameEvalContext evalContext; // todo: make threadlocal
@@ -83,7 +80,7 @@ public class DataFrame
                     + newColumn.getName() + "' already bound to '" + newColumn.getDataFrame().getName() + "'");
         }
         this.columnsByName.put(newColumn.getName(), newColumn);
-        this.columnsInOrder.add(newColumn);
+        this.columns.add(newColumn);
 
         if (this.isPoolingEnabled())
         {
@@ -95,7 +92,7 @@ public class DataFrame
     public void enablePooling()
     {
         this.poolingEnabled = true;
-        this.columnsInOrder.forEach(DfColumn::enablePooling);
+        this.columns.forEach(DfColumn::enablePooling);
     }
 
     public boolean isPoolingEnabled()
@@ -108,19 +105,19 @@ public class DataFrame
         DfColumn column = this.columnsByName.get(columnName);
         if (column == null)
         {
-            ErrorReporter.reportError("Column '" + columnName + "' does not exist in DataFrame '" + this.getName() + "'");
+            ErrorReporter.reportAndThrow("Column '" + columnName + "' does not exist in DataFrame '" + this.getName() + "'");
         }
         return column;
     }
 
     public DfColumn getColumnAt(int columnIndex)
     {
-        return this.columnsInOrder.get(columnIndex);
+        return this.columns.get(columnIndex);
     }
 
     public void addRow(ListIterable<Value> rowValues)
     {
-        rowValues.forEachWithIndex((v, i) -> this.columnsInOrder.get(i).addValue(v));
+        rowValues.forEachWithIndex((v, i) -> this.columns.get(i).addValue(v));
         this.rowCount++;
     }
 
@@ -128,7 +125,7 @@ public class DataFrame
     {
         StringBuilder s = new StringBuilder();
 
-        s.append(this.columnsInOrder.collect(DfColumn::getName).makeString());
+        s.append(this.columns.collect(DfColumn::getName).makeString());
         s.append('\n');
 
         int columnCount = this.columnCount();
@@ -153,21 +150,21 @@ public class DataFrame
 
     public DataFrame addRow()
     {
-        columnsInOrder.forEach(dfColumn -> dfColumn.addEmptyValue());
+        columns.forEach(dfColumn -> dfColumn.addEmptyValue());
         rowCount++;
         return this;
     }
 
     public DataFrame addRow(Object... values)
     {
-        ArrayIterate.forEachWithIndex(values, (v, i) -> this.columnsInOrder.get(i).addObject(v));
+        ArrayIterate.forEachWithIndex(values, (v, i) -> this.columns.get(i).addObject(v));
         rowCount++;
         return this;
     }
 
     public int columnCount()
     {
-        return this.columnsInOrder.size();
+        return this.columns.size();
     }
 
     public String getName()
@@ -210,12 +207,12 @@ public class DataFrame
     
     public Object getObject(int rowIndex, int columnIndex)
     {
-        return this.columnsInOrder.get(columnIndex).getObject(this.rowIndexMap(rowIndex));
+        return this.columns.get(columnIndex).getObject(this.rowIndexMap(rowIndex));
     }
 
     public Value getValue(int rowIndex, int columnIndex)
     {
-        return this.columnsInOrder.get(columnIndex).getValue(this.rowIndexMap(rowIndex));
+        return this.columns.get(columnIndex).getValue(this.rowIndexMap(rowIndex));
     }
 
     public Value getValue(String columnName, int rowIndex)
@@ -230,12 +227,12 @@ public class DataFrame
 
     public String getValueAsStringLiteral(int rowIndex, int columnIndex)
     {
-        return this.columnsInOrder.get(columnIndex).getValueAsStringLiteral(this.rowIndexMap(rowIndex));
+        return this.columns.get(columnIndex).getValueAsStringLiteral(this.rowIndexMap(rowIndex));
     }
 
     public String getValueAsString(int rowIndex, int columnIndex)
     {
-        return this.columnsInOrder.get(columnIndex).getValueAsString(this.rowIndexMap(rowIndex));
+        return this.columns.get(columnIndex).getValueAsString(this.rowIndexMap(rowIndex));
     }
 
     public long getLong(String columnName, int rowIndex)
@@ -288,7 +285,7 @@ public class DataFrame
      */
     public void seal()
     {
-        MutableIntList storedColumnsSizes = this.columnsInOrder.select(DfColumn::isStored).collectInt(DfColumn::getSize);
+        MutableIntList storedColumnsSizes = this.columns.select(DfColumn::isStored).collectInt(DfColumn::getSize);
         if (storedColumnsSizes.size() == 0)
         {
             this.rowCount = 0;
@@ -303,7 +300,7 @@ public class DataFrame
             }
         }
 
-        this.columnsInOrder.forEach(DfColumn::seal);
+        this.columns.forEach(DfColumn::seal);
     }
 
     public DataFrame sum(ListIterable<String> columnsToSumNames)
@@ -329,7 +326,7 @@ public class DataFrame
 
         ListIterable<DfColumn> nonNumericColumns = columnsToAggregate.reject(each -> each.getType().isNumber());
 
-        ErrorReporter.reportError(nonNumericColumns.notEmpty(),
+        ErrorReporter.reportAndThrow(nonNumericColumns.notEmpty(),
                 "Attempting to aggregate non-numeric columns: "
                 + nonNumericColumns.collect(DfColumn::getName).makeString() + " in data frame '" + this.getName() + "'");
 
@@ -457,9 +454,9 @@ public class DataFrame
 
     private void copyRowFrom(DataFrame source, int rowIndex)
     {
-        for (int columnIndex = 0; columnIndex < this.columnsInOrder.size(); columnIndex++)
+        for (int columnIndex = 0; columnIndex < this.columns.size(); columnIndex++)
         {
-            DfColumn thisColumn = this.columnsInOrder.get(columnIndex);
+            DfColumn thisColumn = this.columns.get(columnIndex);
 
             if (thisColumn.isStored())
             {
@@ -477,7 +474,7 @@ public class DataFrame
     {
         DataFrame cloned = new DataFrame(newName);
 
-        this.columnsInOrder.each(each -> each.cloneSchemaAndAttachTo(cloned));
+        this.columns.each(each -> each.cloneSchemaAndAttachTo(cloned));
 
         return cloned;
     }
@@ -547,5 +544,24 @@ public class DataFrame
     private ListIterable<DfColumn> columnsNamed(ListIterable<String> columnNames)
     {
         return columnNames.collect(this::getColumnNamed);
+    }
+
+    /**
+     * Creates a new data frame which is a union of this data frame and the data frame passed as the parameter.
+     * The data frame schemas must match.
+     * @param other the data frame to union with
+     * @return a data frame with the rows being the union of the rows this data frame and the parameter
+     */
+    public DataFrame union(DataFrame other)
+    {
+        ErrorReporter.reportAndThrow(this.columnCount() != other.columnCount(), "Attempting to union data frames with different number of columns");
+        DataFrame dfUnion = new DataFrame("union");
+
+        this.columns.forEach(
+                col -> col.mergeWithInto(other.getColumnNamed(col.getName()), dfUnion)
+        );
+
+        dfUnion.seal();
+        return dfUnion;
     }
 }

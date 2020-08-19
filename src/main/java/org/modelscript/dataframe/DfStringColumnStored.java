@@ -4,6 +4,8 @@ import org.eclipse.collections.api.list.ImmutableList;
 import org.eclipse.collections.api.list.MutableList;
 import org.eclipse.collections.api.set.Pool;
 import org.eclipse.collections.impl.factory.Lists;
+import org.eclipse.collections.impl.factory.primitive.DoubleLists;
+import org.eclipse.collections.impl.list.mutable.FastList;
 import org.eclipse.collections.impl.set.mutable.UnifiedSet;
 import org.modelscript.expr.value.Value;
 import org.modelscript.expr.value.ValueType;
@@ -12,7 +14,7 @@ public class DfStringColumnStored
 extends DfStringColumn
 implements DfColumnStored
 {
-    private final MutableList<String> values = Lists.mutable.of();
+    private MutableList<String> values = Lists.mutable.of();
 
     private Pool<String> pool = null;
 
@@ -116,5 +118,20 @@ implements DfColumnStored
     public void incrementFrom(int targetRowIndex, DfColumn sourceColumn, int sourceRowIndex)
     {
         throw new RuntimeException("Not sure if this makes sense");
+    }
+
+    @Override
+    public DfColumn mergeWithInto(DfColumn other, DataFrame target)
+    {
+        ErrorReporter.reportAndThrow(!this.getClass().equals(other.getClass()), "Attempting to merge colums of different types");
+
+        DfStringColumnStored mergedCol = (DfStringColumnStored) this.cloneSchemaAndAttachTo(target);
+
+//        ((FastList<String>) mergedCol.values).ensureCapacity(this.getSize() + other.getSize());
+        mergedCol.values = Lists.mutable.withInitialCapacity(this.getSize() + other.getSize());
+
+        mergedCol.values.addAll(this.values);
+        mergedCol.values.addAll(((DfStringColumnStored) other).values);
+        return mergedCol;
     }
 }

@@ -1,5 +1,7 @@
 package org.modelscript.dataframe;
 
+import javax.xml.crypto.Data;
+
 public interface DfColumnComputed
 extends DfColumn
 {
@@ -29,5 +31,11 @@ extends DfColumn
     default void unmodifiableColumnException()
     {
         throw new UnsupportedOperationException("Cannot modify computed column '" + this.getName() + "'");
+    }
+
+    @Override
+    default DfColumn mergeWithInto(DfColumn other, DataFrame target)
+    {
+        return this.cloneSchemaAndAttachTo(target);
     }
 }

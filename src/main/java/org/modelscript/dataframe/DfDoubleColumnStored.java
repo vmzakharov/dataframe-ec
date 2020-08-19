@@ -3,6 +3,7 @@ package org.modelscript.dataframe;
 import org.eclipse.collections.api.list.primitive.ImmutableDoubleList;
 import org.eclipse.collections.api.list.primitive.MutableDoubleList;
 import org.eclipse.collections.impl.factory.primitive.DoubleLists;
+import org.eclipse.collections.impl.factory.primitive.LongLists;
 import org.modelscript.expr.value.DoubleValue;
 import org.modelscript.expr.value.NumberValue;
 import org.modelscript.expr.value.Value;
@@ -11,7 +12,7 @@ import org.modelscript.expr.value.ValueType;
 public class DfDoubleColumnStored
 extends DfDoubleColumn
 {
-    MutableDoubleList values = DoubleLists.mutable.of();
+    private MutableDoubleList values = DoubleLists.mutable.of();
 
     public DfDoubleColumnStored(DataFrame owner, String newName)
     {
@@ -103,6 +104,19 @@ extends DfDoubleColumn
     {
         double stored = this.values.get(targetRowIndex);
         this.values.set(targetRowIndex, stored + ((DfDoubleColumn) sourceColumn).getDouble(sourceRowIndex));
+    }
+
+    @Override
+    public DfColumn mergeWithInto(DfColumn other, DataFrame target)
+    {
+        ErrorReporter.reportAndThrow(!this.getClass().equals(other.getClass()), "Attempting to merge colums of different types");
+
+        DfDoubleColumnStored mergedCol = (DfDoubleColumnStored) this.cloneSchemaAndAttachTo(target);
+
+        mergedCol.values = DoubleLists.mutable.withInitialCapacity(this.getSize() + other.getSize());
+        mergedCol.values.addAll(this.values);
+        mergedCol.values.addAll(((DfDoubleColumnStored) other).values);
+        return mergedCol;
     }
 
     @Override

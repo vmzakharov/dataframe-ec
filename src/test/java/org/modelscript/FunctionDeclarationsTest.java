@@ -24,7 +24,7 @@ public class FunctionDeclarationsTest
 
         AnonymousScript script = ExpressionParserHelper.toScript(scriptText);
         Value result = script.evaluate();
-        Assert.assertTrue(result.isInt());
+        Assert.assertTrue(result.isLong());
         Assert.assertEquals(19, ((LongValue) result).longValue());
     }
 
@@ -48,7 +48,7 @@ public class FunctionDeclarationsTest
 
         AnonymousScript script = ExpressionParserHelper.toScript(scriptText);
         Value result = script.evaluate();
-        Assert.assertTrue(result.isInt());
+        Assert.assertTrue(result.isLong());
         Assert.assertEquals(13, ((LongValue) result).longValue());
     }
 

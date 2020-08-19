@@ -10,7 +10,7 @@ public class DfLongColumnStored
 extends DfLongColumn
 implements DfColumnStored
 {
-    MutableLongList values = LongLists.mutable.of();
+    private MutableLongList values = LongLists.mutable.of();
 
     public DfLongColumnStored(DataFrame newDataFrame, String newName)
     {
@@ -20,7 +20,7 @@ implements DfColumnStored
     @Override
     public void addValue(Value value)
     {
-        if (value.isInt())
+        if (value.isLong())
         {
             this.addLong(((LongValue) value).longValue());
         }
@@ -84,5 +84,18 @@ implements DfColumnStored
     public void addEmptyValue()
     {
         this.values.add(0L);
+    }
+
+    @Override
+    public DfColumn mergeWithInto(DfColumn other, DataFrame target)
+    {
+        ErrorReporter.reportAndThrow(!this.getClass().equals(other.getClass()), "Attempting to merge colums of different types");
+
+        DfLongColumnStored mergedCol = (DfLongColumnStored) this.cloneSchemaAndAttachTo(target);
+
+        mergedCol.values = LongLists.mutable.withInitialCapacity(this.getSize() + other.getSize());
+        mergedCol.values.addAll(this.values);
+        mergedCol.values.addAll(((DfLongColumnStored) other).values);
+        return mergedCol;
     }
 }

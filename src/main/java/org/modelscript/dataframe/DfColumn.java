@@ -38,7 +38,7 @@ public interface DfColumn
 
     void incrementFrom(int targetRowIndex, DfColumn sourceColumn, int sourceRowIndex);
 
-    void cloneSchemaAndAttachTo(DataFrame attachTo);
+    DfColumn cloneSchemaAndAttachTo(DataFrame attachTo);
 
     void addRowToColumn(int rowIndex, DfColumn target);
 
@@ -51,4 +51,6 @@ public interface DfColumn
     {
         // nothing
     }
+
+    DfColumn mergeWithInto(DfColumn other, DataFrame target);
 }
