@@ -1,13 +1,17 @@
 package org.modelscript.dataframe;
 
+import org.eclipse.collections.api.collection.primitive.MutableBooleanCollection;
+import org.eclipse.collections.api.list.ImmutableList;
 import org.eclipse.collections.api.list.primitive.BooleanList;
+import org.eclipse.collections.api.list.primitive.MutableBooleanList;
 import org.eclipse.collections.impl.factory.Lists;
 import org.eclipse.collections.impl.factory.primitive.BooleanLists;
+import org.eclipse.collections.impl.list.primitive.IntInterval;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-public class DataFrameFilterTest
+public class DataFrameBitmapTest
 {
     private DataFrame dataFrame;
 
@@ -25,42 +29,15 @@ public class DataFrameFilterTest
     }
 
     @Test
-    public void simpleSelection()
+    public void selectionOfFlaggedRows()
     {
-        DataFrame filtered = this.dataFrame.selectBy("Foo == \"Def\" or Foo == \"Abc\"");
+        dataFrame.enableBitmap();
 
-        DataFrame expected = new DataFrame("FrameOfData")
-                .addStringColumn("Name").addStringColumn("Foo").addLongColumn("Bar").addDoubleColumn("Baz").addDoubleColumn("Qux")
-                .addRow("Albert",  "Abc",  12L, 12.0, 10.0)
-                .addRow("Bob",     "Def",  13L, 13.0, 25.0)
-                .addRow("Abigail", "Def",  15L, 15.0, 11.0);
+        dataFrame.bitmapSetFlag(0);
+        dataFrame.bitmapSetFlag(2);
+        dataFrame.bitmapSetFlag(3);
 
-        DataFrameUtil.assertEquals(expected, filtered);
-    }
-
-    @Test
-    public void selectionWithComputedFields()
-    {
-        this.dataFrame.addDoubleColumn("BazAndQux", "Baz + Qux");
-
-        DataFrame filtered = this.dataFrame.selectBy("(Foo == \"Def\" or Foo == \"Pqr\") and BazAndQux > 25");
-
-        DataFrame expected = new DataFrame("Expected FrameOfData")
-                .addStringColumn("Name").addStringColumn("Foo").addLongColumn("Bar").addDoubleColumn("Baz").addDoubleColumn("Qux")
-                .addRow("Alice",   "Pqr",  11L, 10.0, 20.0)
-                .addRow("Bob",     "Def",  13L, 13.0, 25.0)
-                .addRow("Abigail", "Def",  15L, 15.0, 11.0);
-        expected.addDoubleColumn("BazAndQux", "Baz + Qux");
-
-        DataFrameUtil.assertEquals(expected, filtered);
-    }
-
-    @Test
-    public void selectionOfMarkedRows()
-    {
-        BooleanList marked = BooleanLists.immutable.of(true, false, true, true, false);
-
-        DataFrame filtered = this.dataFrame.selectMarked(marked);
+        DataFrame filtered = dataFrame.selectFlagged();
 
         DataFrame expected = new DataFrame("Expected FrameOfData")
                 .addStringColumn("Name").addStringColumn("Foo").addLongColumn("Bar").addDoubleColumn("Baz").addDoubleColumn("Qux")
@@ -70,9 +47,9 @@ public class DataFrameFilterTest
                 ;
         DataFrameUtil.assertEquals(expected, filtered);
 
-        BooleanList nothingMarked = BooleanLists.immutable.of(false, false, false);
+        filtered.enableBitmap();
 
-        DataFrame moreFiltered = filtered.selectMarked(nothingMarked);
+        DataFrame moreFiltered = filtered.selectFlagged();
 
         DataFrame nothingExpected = new DataFrame("Nothing Expected FrameOfData")
                 .addStringColumn("Name").addStringColumn("Foo").addLongColumn("Bar").addDoubleColumn("Baz").addDoubleColumn("Qux")
@@ -86,9 +63,13 @@ public class DataFrameFilterTest
     {
         this.dataFrame.sortBy(Lists.immutable.of("Foo"));
 
-        BooleanList marked = BooleanLists.immutable.of(true, false, true, true, false);
+        this.dataFrame.enableBitmap();
 
-        DataFrame filtered = this.dataFrame.selectMarked(marked);
+        this.dataFrame.bitmapSetFlag(0);
+        this.dataFrame.bitmapSetFlag(2);
+        this.dataFrame.bitmapSetFlag(3);
+
+        DataFrame filtered = this.dataFrame.selectFlagged();
 
         DataFrame expected = new DataFrame("Expected FrameOfData")
                 .addStringColumn("Name").addStringColumn("Foo").addLongColumn("Bar").addDoubleColumn("Baz").addDoubleColumn("Qux")
@@ -102,9 +83,12 @@ public class DataFrameFilterTest
     @Test
     public void selectionOfNotMarkedRows()
     {
-        BooleanList marked = BooleanLists.immutable.of(false, true, false, false, true);
+        this.dataFrame.enableBitmap();
 
-        DataFrame filtered = this.dataFrame.selectNotMarked(marked);
+        this.dataFrame.bitmapSetFlag(1);
+        this.dataFrame.bitmapSetFlag(4);
+
+        DataFrame filtered = this.dataFrame.selectNotFlagged();
 
         DataFrame expected = new DataFrame("Expected FrameOfData")
                 .addStringColumn("Name").addStringColumn("Foo").addLongColumn("Bar").addDoubleColumn("Baz").addDoubleColumn("Qux")
@@ -114,9 +98,12 @@ public class DataFrameFilterTest
                 ;
         DataFrameUtil.assertEquals(expected, filtered);
 
-        BooleanList nothingMarked = BooleanLists.immutable.of(true, true, true);
+        filtered.enableBitmap();
+        filtered.bitmapSetFlag(0);
+        filtered.bitmapSetFlag(1);
+        filtered.bitmapSetFlag(2);
 
-        DataFrame moreFiltered = filtered.selectNotMarked(nothingMarked);
+        DataFrame moreFiltered = filtered.selectNotFlagged();
 
         DataFrame nothingExpected = new DataFrame("Nothing Expected FrameOfData")
                 .addStringColumn("Name").addStringColumn("Foo").addLongColumn("Bar").addDoubleColumn("Baz").addDoubleColumn("Qux")
@@ -146,8 +133,11 @@ public class DataFrameFilterTest
     @Test
     public void markRowsBasedOnExpression()
     {
-        BooleanList marked = this.dataFrame.markRowsBy("startsWith(Name, \"A\") and Baz > 11.0");
+        this.dataFrame.flagRowsBy("startsWith(Name, \"A\") and Baz > 11.0");
 
-        Assert.assertEquals(BooleanLists.immutable.of(false, true, false, false, true), marked);
+        BooleanList flags = IntInterval.zeroTo(this.dataFrame.rowCount() - 1)
+                .collectBoolean(this.dataFrame::bitmapIsFlagged, BooleanLists.mutable.of());
+
+        Assert.assertEquals(BooleanLists.immutable.of(false, true, false, false, true), flags);
     }
 }

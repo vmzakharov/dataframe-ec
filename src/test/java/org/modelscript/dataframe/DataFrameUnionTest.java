@@ -105,5 +105,4 @@ public class DataFrameUnionTest
 
         df1.union(df2);
     }
-
 }

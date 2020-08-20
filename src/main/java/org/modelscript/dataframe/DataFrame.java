@@ -34,6 +34,8 @@ public class DataFrame
     private IntList rowIndex = null;
     private boolean poolingEnabled = false;
 
+    private MutableBooleanList bitmap = null;
+
     public DataFrame(String newName)
     {
         this.name = newName;
@@ -283,7 +285,7 @@ public class DataFrame
     /**
      * indicates that no further updates can be made to this data frame.
      */
-    public void seal()
+    public DataFrame seal()
     {
         MutableIntList storedColumnsSizes = this.columns.select(DfColumn::isStored).collectInt(DfColumn::getSize);
         if (storedColumnsSizes.size() == 0)
@@ -301,6 +303,7 @@ public class DataFrame
         }
 
         this.columns.forEach(DfColumn::seal);
+        return this;
     }
 
     public DataFrame sum(ListIterable<String> columnsToSumNames)
@@ -563,5 +566,59 @@ public class DataFrame
 
         dfUnion.seal();
         return dfUnion;
+    }
+
+    public void enableBitmap()
+    {
+        this.bitmap = BooleanArrayList.newWithNValues(this.rowCount, false);
+    }
+
+    public void disableBitmap()
+    {
+        this.bitmap = null;
+    }
+
+    public void bitmapSetFlag(int rowIndex)
+    {
+        this.bitmap.set(rowIndex, true);
+    }
+
+    public boolean bitmapIsFlagged(int rowIndex)
+    {
+        return this.bitmap.get(rowIndex);
+    }
+
+    public DataFrame selectFlagged()
+    {
+        return this.selectByMarkValue(this.bitmap, mark -> mark);
+    }
+
+    public DataFrame selectNotFlagged()
+    {
+        return this.selectByMarkValue(this.bitmap, mark -> !mark);
+    }
+
+    /**
+     * Compute a boolean list (effectively a bitmap) with the values based on the provided expression
+     * @param filterExpressionString the expression to set the flags by
+     * @return a boolean list with values set to what the filter expression evaluates tfor each row
+     */
+    public void flagRowsBy(String filterExpressionString)
+    {
+        this.bitmap = BooleanArrayList.newWithNValues(this.rowCount, false);
+
+        DataFrameEvalContext context = new DataFrameEvalContext(this);
+        Expression filterExpression = ExpressionParserHelper.toExpression(filterExpressionString);
+        InMemoryEvaluationVisitor evaluationVisitor = new InMemoryEvaluationVisitor(context);
+
+        for (int i = 0; i < this.rowCount; i++)
+        {
+            context.setRowIndex(i);
+            BooleanValue evalResult = (BooleanValue) filterExpression.evaluate(evaluationVisitor);
+            if (evalResult.isTrue())
+            {
+                this.bitmap.set(i, true);
+            }
+        }
     }
 }
