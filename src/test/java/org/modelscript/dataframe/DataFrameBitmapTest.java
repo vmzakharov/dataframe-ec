@@ -117,7 +117,6 @@ public class DataFrameBitmapTest
         this.dataFrame.enableBitmap();
         this.dataFrame.setFlag(1);
         this.dataFrame.setFlag(4);
-        BooleanList marked = BooleanLists.immutable.of(false, true, false, false, true);
 
         DataFrame filtered = dataFrame.selectNotFlagged();
 
