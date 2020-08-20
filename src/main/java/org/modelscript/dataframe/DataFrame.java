@@ -324,7 +324,6 @@ public class DataFrame
 
     private ListIterable<DfColumn> getColumnsToAggregate(ListIterable<String> columnNames)
     {
-
         ListIterable<DfColumn> columnsToAggregate = this.columnsNamed(columnNames);
 
         ListIterable<DfColumn> nonNumericColumns = columnsToAggregate.reject(each -> each.getType().isNumber());
@@ -385,60 +384,6 @@ public class DataFrame
         return filtered;
     }
 
-    /**
-     * Compute a boolean list (effectively a bitmap) with the values based on the provided expression
-     * @param filterExpressionString the expression to set the flags by
-     * @return a boolean list with values set to what the filter expression evaluates tfor each row
-     */
-    public BooleanList markRowsBy(String filterExpressionString)
-    {
-        MutableBooleanList marks = BooleanArrayList.newWithNValues(this.rowCount, false);
-
-        DataFrameEvalContext context = new DataFrameEvalContext(this);
-        Expression filterExpression = ExpressionParserHelper.toExpression(filterExpressionString);
-        InMemoryEvaluationVisitor evaluationVisitor = new InMemoryEvaluationVisitor(context);
-
-        for (int i = 0; i < this.rowCount; i++)
-        {
-            context.setRowIndex(i);
-            BooleanValue evalResult = (BooleanValue) filterExpression.evaluate(evaluationVisitor);
-            if (evalResult.isTrue())
-            {
-                marks.set(i, true);
-            }
-        }
-
-        return marks;
-    }
-
-    /**
-     * creates a new data frame, which contain a subset of rows of this data frame for the rows with the index marked
-     * (i.e. set to true) in the boolean list passed as the parameter. This is the behavior the opposite of
-     * {@code selectNotMarked}
-     *
-     * @param marked a boolean list indicating whether to select the row for inclusion into the you data frame (true) or
-     *               not (false)
-     * @return a data frame containing the filtered subset of rows
-     */
-    public DataFrame selectMarked(BooleanList marked)
-    {
-        return this.selectByMarkValue(marked, mark -> mark);
-    }
-
-    /**
-     * creates a new data frame, which contain a subset of rows of this data frame for the rows with the index not marked
-     * (i.e. set to false) in the boolean list passed as the parameter. This is the behavior the opposite of
-     * {@code selectMarked}
-     *
-     * @param marked a boolean list indicating whether to select the row for inclusion into the you data frame (=false) or
-     *               not (true)
-     * @return a data frame containing the filtered subset of rows
-     */
-    public DataFrame selectNotMarked(BooleanList marked)
-    {
-        return this.selectByMarkValue(marked, mark -> !mark);
-    }
-
     private DataFrame selectByMarkValue(BooleanList marked, BooleanPredicate markAtIndexPredicate)
     {
 
@@ -453,7 +398,6 @@ public class DataFrame
         filtered.seal();
         return filtered;
     }
-
 
     private void copyRowFrom(DataFrame source, int rowIndex)
     {
@@ -568,6 +512,9 @@ public class DataFrame
         return dfUnion;
     }
 
+    /**
+     * enables flagging the rows as true or false - effectively creating a bitmap of the data frame
+     */
     public void enableBitmap()
     {
         this.bitmap = BooleanArrayList.newWithNValues(this.rowCount, false);
@@ -578,30 +525,41 @@ public class DataFrame
         this.bitmap = null;
     }
 
-    public void bitmapSetFlag(int rowIndex)
+    public void setFlag(int rowIndex)
     {
         this.bitmap.set(rowIndex, true);
     }
 
-    public boolean bitmapIsFlagged(int rowIndex)
+    public boolean isFlagged(int rowIndex)
     {
         return this.bitmap.get(rowIndex);
     }
 
+    /**
+     * creates a new data frame, which contain a subset of rows of this data frame for the rows with the bitmap flags set
+     * (i.e. equals to true). This is the behavior the opposite of {@code selectNotMarked}
+     *
+     * @return a data frame containing the filtered subset of rows
+     */
     public DataFrame selectFlagged()
     {
         return this.selectByMarkValue(this.bitmap, mark -> mark);
     }
 
+    /**
+     * creates a new data frame, which contain a subset of rows of this data frame for the rows with the btimap flag not
+     * set (i.e. equals to false). This is the behavior the opposite of {@code selectMarked}
+     *
+     * @return a data frame containing the filtered subset of rows
+     */
     public DataFrame selectNotFlagged()
     {
         return this.selectByMarkValue(this.bitmap, mark -> !mark);
     }
 
     /**
-     * Compute a boolean list (effectively a bitmap) with the values based on the provided expression
+     * Tag rows based on whether the provided expression returns true of flase
      * @param filterExpressionString the expression to set the flags by
-     * @return a boolean list with values set to what the filter expression evaluates tfor each row
      */
     public void flagRowsBy(String filterExpressionString)
     {

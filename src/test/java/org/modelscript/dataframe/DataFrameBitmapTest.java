@@ -1,9 +1,6 @@
 package org.modelscript.dataframe;
 
-import org.eclipse.collections.api.collection.primitive.MutableBooleanCollection;
-import org.eclipse.collections.api.list.ImmutableList;
 import org.eclipse.collections.api.list.primitive.BooleanList;
-import org.eclipse.collections.api.list.primitive.MutableBooleanList;
 import org.eclipse.collections.impl.factory.Lists;
 import org.eclipse.collections.impl.factory.primitive.BooleanLists;
 import org.eclipse.collections.impl.list.primitive.IntInterval;
@@ -33,9 +30,9 @@ public class DataFrameBitmapTest
     {
         dataFrame.enableBitmap();
 
-        dataFrame.bitmapSetFlag(0);
-        dataFrame.bitmapSetFlag(2);
-        dataFrame.bitmapSetFlag(3);
+        dataFrame.setFlag(0);
+        dataFrame.setFlag(2);
+        dataFrame.setFlag(3);
 
         DataFrame filtered = dataFrame.selectFlagged();
 
@@ -65,9 +62,9 @@ public class DataFrameBitmapTest
 
         this.dataFrame.enableBitmap();
 
-        this.dataFrame.bitmapSetFlag(0);
-        this.dataFrame.bitmapSetFlag(2);
-        this.dataFrame.bitmapSetFlag(3);
+        this.dataFrame.setFlag(0);
+        this.dataFrame.setFlag(2);
+        this.dataFrame.setFlag(3);
 
         DataFrame filtered = this.dataFrame.selectFlagged();
 
@@ -85,8 +82,8 @@ public class DataFrameBitmapTest
     {
         this.dataFrame.enableBitmap();
 
-        this.dataFrame.bitmapSetFlag(1);
-        this.dataFrame.bitmapSetFlag(4);
+        this.dataFrame.setFlag(1);
+        this.dataFrame.setFlag(4);
 
         DataFrame filtered = this.dataFrame.selectNotFlagged();
 
@@ -99,9 +96,9 @@ public class DataFrameBitmapTest
         DataFrameUtil.assertEquals(expected, filtered);
 
         filtered.enableBitmap();
-        filtered.bitmapSetFlag(0);
-        filtered.bitmapSetFlag(1);
-        filtered.bitmapSetFlag(2);
+        filtered.setFlag(0);
+        filtered.setFlag(1);
+        filtered.setFlag(2);
 
         DataFrame moreFiltered = filtered.selectNotFlagged();
 
@@ -117,9 +114,12 @@ public class DataFrameBitmapTest
     {
         this.dataFrame.sortBy(Lists.immutable.of("Foo"));
 
+        this.dataFrame.enableBitmap();
+        this.dataFrame.setFlag(1);
+        this.dataFrame.setFlag(4);
         BooleanList marked = BooleanLists.immutable.of(false, true, false, false, true);
 
-        DataFrame filtered = dataFrame.selectNotMarked(marked);
+        DataFrame filtered = dataFrame.selectNotFlagged();
 
         DataFrame expected = new DataFrame("Expected FrameOfData")
                 .addStringColumn("Name").addStringColumn("Foo").addLongColumn("Bar").addDoubleColumn("Baz").addDoubleColumn("Qux")
@@ -136,7 +136,7 @@ public class DataFrameBitmapTest
         this.dataFrame.flagRowsBy("startsWith(Name, \"A\") and Baz > 11.0");
 
         BooleanList flags = IntInterval.zeroTo(this.dataFrame.rowCount() - 1)
-                .collectBoolean(this.dataFrame::bitmapIsFlagged, BooleanLists.mutable.of());
+                .collectBoolean(this.dataFrame::isFlagged, BooleanLists.mutable.of());
 
         Assert.assertEquals(BooleanLists.immutable.of(false, true, false, false, true), flags);
     }
