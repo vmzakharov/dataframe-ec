@@ -3,6 +3,7 @@ package org.modelscript.dataframe;
 import org.eclipse.collections.api.factory.Lists;
 import org.junit.Assert;
 import org.junit.Test;
+import org.modelscript.expr.value.DoubleValue;
 
 public class DataFrameSortTest
 {
@@ -81,6 +82,13 @@ public class DataFrameSortTest
                 ;
 
         DataFrameUtil.assertEquals(expected, dataFrame);
+
+        Assert.assertEquals(15.0, dataFrame.getObject("Baz", 2));
+        Assert.assertEquals(15.0, dataFrame.getDouble("Baz", 2), 0.000001);
+        Assert.assertEquals(0, new DoubleValue(15.0).compareTo(dataFrame.getValue("Baz", 2)));
+
+        Assert.assertEquals(15.0, dataFrame.getObject(2, 3));
+        Assert.assertEquals(0, new DoubleValue(15.0).compareTo(dataFrame.getValue(2, 3)));
     }
 
     @Test

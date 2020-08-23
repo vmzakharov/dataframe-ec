@@ -25,6 +25,9 @@ public class BasicDataFrameTest
         Assert.assertEquals(10L, df.getObject(1, 1));
         Assert.assertEquals(56.78, df.getObject(2, 2));
 
+        Assert.assertEquals(11L, df.getObject("Count", 2));
+        Assert.assertEquals("Alice", df.getObject("Name", 0));
+
         Assert.assertEquals(10L, df.getLong("Count", 1));
         Assert.assertEquals(56.78, df.getDouble("Value", 2), 0.0);
 
@@ -33,5 +36,6 @@ public class BasicDataFrameTest
 
         Assert.assertEquals("11", df.getValueAsString(2, 1));
         Assert.assertEquals("11", df.getValueAsStringLiteral(2, 1));
+
     }
 }

@@ -206,10 +206,15 @@ public class DataFrame
     {
         return this.rowIndex != null;
     }
-    
+
     public Object getObject(int rowIndex, int columnIndex)
     {
         return this.columns.get(columnIndex).getObject(this.rowIndexMap(rowIndex));
+    }
+
+    public Object getObject(String columnName, int rowIndex)
+    {
+        return this.columnsByName.get(columnName).getObject(this.rowIndexMap(rowIndex));
     }
 
     public Value getValue(int rowIndex, int columnIndex)
