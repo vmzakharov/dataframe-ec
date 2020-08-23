@@ -32,10 +32,15 @@ extends JPanel
         runButton.addActionListener(e -> {
             Script script = ExpressionParserHelper.toScript(textArea.getText());
             Value result = script.evaluate(new InMemoryEvaluationVisitor(newStoredContext));
+            PrinterFactory.getPrinter().println("DONE: " + result.asStringLiteral());
             this.actionsPostEvaluation.forEach(Runnable::run);
         });
 
         JButton parseButton = new JButton("Parse");
+        runButton.addActionListener(e -> {
+            ExpressionParserHelper.toScript(textArea.getText());
+            this.actionsPostEvaluation.forEach(Runnable::run);
+        });
 
         JButton clearButton = new JButton("Clear");
         clearButton.addActionListener(e -> textArea.setText(""));

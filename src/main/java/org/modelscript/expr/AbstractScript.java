@@ -9,7 +9,7 @@ import org.modelscript.expr.visitor.InMemoryEvaluationVisitor;
 abstract public class AbstractScript
 implements Script
 {
-    private MutableList<Expression> expressions = Lists.mutable.of();
+    private final MutableList<Expression> expressions = Lists.mutable.of();
 
     @Override
     public Expression addStatement(Expression anExpression)

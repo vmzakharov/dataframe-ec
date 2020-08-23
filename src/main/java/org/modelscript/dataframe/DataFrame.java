@@ -152,7 +152,7 @@ public class DataFrame
 
     public DataFrame addRow()
     {
-        columns.forEach(dfColumn -> dfColumn.addEmptyValue());
+        columns.forEach(DfColumn::addEmptyValue);
         rowCount++;
         return this;
     }
@@ -350,12 +350,13 @@ public class DataFrame
 
         ListIterable<DfColumn> accumulatorColumns = summedDataFrame.columnsNamed(columnsToSumNames);
 
-        // todo: implement index as a method on DataFrame;
+        // todo: consider implementing index as a structure in DataFrame
         DfUniqueIndex index = new DfUniqueIndex(summedDataFrame, columnsToGroupByNames);
 
         for (int i = 0; i < this.rowCount; i++)
         {
-            int accIndex = index.getRowIndexFor(this, i);
+            ListIterable<Object> keyValue = index.computeKeyFrom(this, i);
+            int accIndex = index.getRowIndexAtKeyIfAbsentAdd(keyValue);
             for (int colIndex = 0; colIndex < columnsToSum.size(); colIndex++)
             {
                 accumulatorColumns.get(colIndex).incrementFrom(accIndex, columnsToSum.get(colIndex), i);

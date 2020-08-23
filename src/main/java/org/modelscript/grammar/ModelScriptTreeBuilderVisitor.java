@@ -1,8 +1,10 @@
 package org.modelscript.grammar;
 
 import org.antlr.v4.runtime.Token;
+import org.eclipse.collections.api.factory.Stacks;
 import org.eclipse.collections.api.list.ListIterable;
 import org.eclipse.collections.api.list.MutableList;
+import org.eclipse.collections.api.stack.MutableStack;
 import org.eclipse.collections.impl.factory.Lists;
 import org.eclipse.collections.impl.utility.ListIterate;
 import org.modelscript.expr.*;
@@ -16,18 +18,17 @@ import static org.modelscript.grammar.ModelScriptParser.*;
 public class ModelScriptTreeBuilderVisitor
 extends ModelScriptBaseVisitor<Expression>
 {
-    private AnonymousScript script;
-
-    private FunctionScript functionBody;
+    private final MutableStack<Script> scriptStack = Stacks.mutable.of();
 
     public ModelScriptTreeBuilderVisitor()
     {
-        this.script = new AnonymousScript();
+        this.scriptStack.push(new AnonymousScript());
     }
 
     @Override
     public Expression visitScript(ScriptContext ctx)
     {
+        // todo: need it?
         return super.visitScript(ctx);
     }
 
@@ -52,8 +53,7 @@ extends ModelScriptBaseVisitor<Expression>
 
     private Expression addStatementToCurrentScriptContext(Expression expression)
     {
-        Script currentScript = this.functionBody == null ? this.script : this.functionBody;
-        return currentScript.addStatement(expression);
+        return this.getScript().addStatement(expression);
     }
 
     @Override
@@ -188,14 +188,11 @@ extends ModelScriptBaseVisitor<Expression>
         }
 
         FunctionScript functionScript = new FunctionScript(functionName, parameterNames);
+        this.pushScript(functionScript);
+        ListIterate.forEach(ctx.statementSequence().statement(), this::visit);
+        this.popScript();
 
-        this.functionBody = functionScript;
-
-        ListIterate.forEach(ctx.statement(), this::visit);
-
-        this.functionBody = null;
-
-        this.script.addFunctionScript(functionScript);
+        this.getAsAnonymousScript().addFunctionScript(functionScript);
 
         return null;
     }
@@ -242,6 +239,34 @@ extends ModelScriptBaseVisitor<Expression>
     }
 
     @Override
+    public Expression visitConditionExpr(ConditionExprContext ctx)
+    {
+        Expression condition = this.visit(ctx.expr());
+
+        Script ifScript = this.processStatementSequence(ctx.ifBody);
+
+        if (ctx.elseBody == null)
+        {
+            this.addStatementToCurrentScriptContext(new IfElseExpr(condition, ifScript));
+        }
+        else
+        {
+            Script elseScript = this.processStatementSequence(ctx.elseBody);
+
+            this.addStatementToCurrentScriptContext(new IfElseExpr(condition, ifScript, elseScript));
+        }
+
+        return null;
+    }
+
+    private Script processStatementSequence(StatementSequenceContext ctx)
+    {
+        this.pushScript(new StatementSequenceScript());
+        ListIterate.forEach(ctx.statement(), this::visit);
+        return this.popScript();
+    }
+
+    @Override
     public Expression visitProjectionStatement(ProjectionStatementContext ctx)
     {
         ListIterable<Expression> projectionList = ListIterate.collect(ctx.exprList().expr(), this::visit);
@@ -265,8 +290,24 @@ extends ModelScriptBaseVisitor<Expression>
         return aString;
     }
 
-    public AnonymousScript getScript()
+    public Script getScript()
     {
-        return this.script;
+        return this.scriptStack.peek();
+    }
+
+    public AnonymousScript getAsAnonymousScript()
+    {
+        return (AnonymousScript) this.scriptStack.peek();
+    }
+
+    private Script pushScript(Script newScript)
+    {
+        this.scriptStack.push(newScript);
+        return newScript;
+    }
+
+    private Script popScript()
+    {
+        return this.scriptStack.pop();
     }
 }

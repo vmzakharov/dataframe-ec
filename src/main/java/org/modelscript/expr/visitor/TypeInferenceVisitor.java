@@ -138,6 +138,12 @@ implements ExpressionVisitor
     }
 
     @Override
+    public void visitStatementSequenceScript(StatementSequenceScript expr)
+    {
+        expr.getExpressions().forEachWith(Expression::accept, this);
+    }
+
+    @Override
     public void visitFunctionScriptExpr(FunctionScript expr)
     {
         // function definitions are inherited from the containing script
@@ -183,6 +189,13 @@ implements ExpressionVisitor
     {
         // todo: support vectors of types, perhaps?
         this.store(ValueType.VECTOR);
+    }
+
+    @Override
+    public void visitIfElseExpr(IfElseExpr expr)
+    {
+        // todo: implement
+        this.store(ValueType.VOID);
     }
 
     public ValueType getLastExpressionType()

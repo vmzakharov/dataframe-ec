@@ -4,7 +4,8 @@ import org.modelscript.expr.value.Value;
 import org.modelscript.expr.visitor.ExpressionEvaluationVisitor;
 import org.modelscript.expr.visitor.ExpressionVisitor;
 
-public class AssingExpr implements Expression
+public class AssingExpr
+implements Expression
 {
     private final String varName;
     private final Expression expression;

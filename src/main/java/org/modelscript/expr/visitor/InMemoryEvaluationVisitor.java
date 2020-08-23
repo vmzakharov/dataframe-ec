@@ -26,7 +26,7 @@ implements ExpressionEvaluationVisitor
     @Override
     public Value visitAssignExpr(AssingExpr expr)
     {
-        return this.getContext().setVariable(expr.getVarName(), expr.getExpression().evaluate(this));
+        return this.getContext().  setVariable(expr.getVarName(), expr.getExpression().evaluate(this));
     }
 
     @Override
@@ -137,6 +137,29 @@ implements ExpressionEvaluationVisitor
     public Value visitFunctionScriptExpr(FunctionScript expr)
     {
         throw new RuntimeException("Cannot evaluate function declaration by itself. Function " + expr.getName());
+    }
+
+    @Override
+    public Value visitIfElseExpr(IfElseExpr expr)
+    {
+        BooleanValue condValue = (BooleanValue) expr.getCondition().evaluate(this);
+        if (condValue.isTrue())
+        {
+            return expr.getIfScript().evaluate(this);
+        }
+
+        if (expr.hasElseSection())
+        {
+            return expr.getElseScript().evaluate(this);
+        }
+
+        return Value.VOID;
+    }
+
+    @Override
+    public Value visitStatementSequenceScriptExpr(StatementSequenceScript expr)
+    {
+        return this.applyVisitorToScript(this, expr);
     }
 
     @Override

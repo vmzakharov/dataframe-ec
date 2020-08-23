@@ -40,7 +40,7 @@ public class ExpressionParserHelper
         ModelScriptTreeBuilderVisitor visitor = new ModelScriptTreeBuilderVisitor();
         visitor.visit(tree);
 
-        return visitor.getScript();
+        return visitor.getAsAnonymousScript();
     }
 
     static private ModelScriptParser stringToParser(String s)

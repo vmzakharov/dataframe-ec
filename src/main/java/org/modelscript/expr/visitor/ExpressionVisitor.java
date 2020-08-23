@@ -9,9 +9,11 @@ public interface ExpressionVisitor
     void visitBinaryExpr(BinaryExpr expr);
     void visitConstExpr(ConstExpr expr);
     void visitFunctionCallExpr(FunctionCallExpr expr);
+    void visitIfElseExpr(IfElseExpr expr);
     void visitPropertyPathExpr(PropertyPathExpr expr);
     void visitAnonymousScriptExpr(AnonymousScript expr);
     void visitFunctionScriptExpr(FunctionScript expr);
+    void visitStatementSequenceScript(StatementSequenceScript expr);
     void visitVarExpr(VarExpr expr);
     void visitProjectionExpr(ProjectionExpr expr);
     void visitVectorExpr(VectorExpr expr);

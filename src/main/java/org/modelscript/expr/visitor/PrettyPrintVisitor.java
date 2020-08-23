@@ -1,6 +1,7 @@
 package org.modelscript.expr.visitor;
 
 import org.eclipse.collections.api.list.ListIterable;
+import org.eclipse.collections.impl.utility.StringIterate;
 import org.modelscript.expr.*;
 import org.modelscript.util.CollectingPrinter;
 import org.modelscript.util.Printer;
@@ -10,6 +11,9 @@ public class PrettyPrintVisitor
 implements ExpressionVisitor
 {
     final private Printer printer;
+
+    private int offset = 0;
+    private boolean startedNewLine = true;
 
     static public String exprToString(Expression e)
     {
@@ -54,6 +58,17 @@ implements ExpressionVisitor
         this.print(expr.getFunctionName()).print("(").printExpressionList(expr.getParameters()).print(")");
     }
 
+    private PrettyPrintVisitor printExpressionListLn(ListIterable<Expression> expressions)
+    {
+        int count = expressions.size();
+        for (int i = 0; i < count; i++)
+        {
+            expressions.get(i).accept(this);
+            this.newLine();
+        }
+
+        return this;
+    }
 
     private PrettyPrintVisitor printExpressionList(ListIterable<Expression> expressions, String separator)
     {
@@ -90,7 +105,7 @@ implements ExpressionVisitor
     @Override
     public void visitAnonymousScriptExpr(AnonymousScript expr)
     {
-        this.printExpressionList(expr.getExpressions(), "\n").newLine();
+        this.printExpressionListLn(expr.getExpressions());;
     }
 
     @Override
@@ -104,8 +119,14 @@ implements ExpressionVisitor
 
         this.newLine()
             .print("{")
-            .printExpressionList(expr.getExpressions(), "\n")
+            .printExpressionListLn(expr.getExpressions())
             .print("}");
+    }
+
+    @Override
+    public void visitStatementSequenceScript(StatementSequenceScript expr)
+    {
+        this.printExpressionListLn(expr.getExpressions()).newLine();
     }
 
     @Override
@@ -139,15 +160,48 @@ implements ExpressionVisitor
         this.print("[").printExpressionList(expr.getElements()).print("]");
     }
 
+    @Override
+    public void visitIfElseExpr(IfElseExpr expr)
+    {
+        this.print("if ").printExpression(expr.getCondition()).print(" then").newLine();
+        this.tab().printExpressionListLn(expr.getIfScript().getExpressions()).tabBack();
+
+        if (expr.hasElseSection())
+        {
+            this.print("else").newLine();
+            this.tab().printExpressionListLn(expr.getElseScript().getExpressions()).tabBack();
+        }
+
+        this.print("endif");
+    }
+
     private PrettyPrintVisitor print(String s)
     {
+        if (this.startedNewLine)
+        {
+            this.printer.print(StringIterate.repeat(' ', this.offset * 2));
+            this.startedNewLine = false;
+        }
         this.printer.print(s);
+        return this;
+    }
+
+    private PrettyPrintVisitor tab()
+    {
+        this.offset++;
+        return this;
+    }
+
+    private PrettyPrintVisitor tabBack()
+    {
+        this.offset--;
         return this;
     }
 
     private PrettyPrintVisitor newLine()
     {
         this.printer.newLine();
+        this.startedNewLine = true;
         return this;
     }
 }

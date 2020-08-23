@@ -23,7 +23,13 @@ public class DfUniqueIndex
         return this.rowIndexByKey.getIfAbsent(key, -1);
     }
 
-    private int getRowIndexAtKeyIfAbsentAdd(ListIterable<Object> key)
+    /**
+     * Returns the value in the index that matches the index key. If no matching key exists in the index, a new entry
+     * for this key is added to the indexed data frame and its index is returned.
+     * @param key the row in the <code>aDataFrame</code> to compute the key on
+     * @return row id in the <b>the indexed data frame</b>  corresponding to the computed key
+     */
+    public int getRowIndexAtKeyIfAbsentAdd(ListIterable<Object> key)
     {
         int rowIndex = this.getRowIndexAtKey(key);
         if (rowIndex == -1)
@@ -40,13 +46,7 @@ public class DfUniqueIndex
         return rowIndex;
     }
 
-    public int getRowIndexFor(DataFrame aDataFrame, int rowIndex)
-    {
-        ListIterable<Object> keyValue = this.getKeyValueFrom(aDataFrame, rowIndex);
-        return this.getRowIndexAtKeyIfAbsentAdd(keyValue);
-    }
-
-    private ListIterable<Object> getKeyValueFrom(DataFrame aDataFrame, int rowIndex)
+    public ListIterable<Object> computeKeyFrom(DataFrame aDataFrame, int rowIndex)
     {
         MutableList<Object> key = Lists.fixedSize.of(new Object[this.indexByColumns.size()]);
 

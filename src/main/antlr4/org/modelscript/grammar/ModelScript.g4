@@ -2,19 +2,25 @@ grammar ModelScript;
 
 script :
       functionDeclarationExpr*
-      (statement)*
+      statementSequence
       projectionStatement?
     ;
 
 functionDeclarationExpr :
     'function' ID ('(' idList ')' | '(' ')')?
     '{'
-        (statement)*
+        statementSequence
     '}'
     ;
 
+statementSequence: (statement)*;
+
 statement :
       ID '=' expr     #assignExpr
+    | IF expr
+      THEN ifBody=statementSequence
+      (ELSE elseBody=statementSequence)?
+      ENDIF           #conditionExpr
     | expr            #freeExp
     ;
 
@@ -60,11 +66,16 @@ LTE : '<=' ;
 EQ  : '==';
 NE  : '!=';
 
-IN  : 'in' ;
+IN  : 'in' | 'IN' ;
 
-AND  : 'and' ;
-OR   : 'or' ;
-XOR  : 'xor' ;
+AND  : 'and' | 'AND';
+OR   : 'or' | 'OR';
+XOR  : 'xor' | 'XOR';
+
+IF    : 'if' | 'IF';
+THEN  : 'then' | 'THEN';
+ELSE  : 'else' | 'ELSE';
+ENDIF : 'endif' | 'ENDIF';
 
 ID : LETTER (LETTER|DIGIT)*;
 INT : DIGIT+;
@@ -75,6 +86,6 @@ NL : [\n\r] -> skip;
 STRING : '"' ( ESC | . )*? '"' ;
 
 fragment
-ESC : '\\' [btnr"\\] ;
-LETTER : [a-zA-Z\u0080-\u00FF_] ;
-DIGIT  : [0-9] ;
+ESC : '\\' [btnr"\\];
+LETTER : [a-zA-Z\u0080-\u00FF_];
+DIGIT  : [0-9];

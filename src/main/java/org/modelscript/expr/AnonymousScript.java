@@ -9,7 +9,7 @@ import org.modelscript.expr.visitor.ExpressionVisitor;
 public class AnonymousScript
 extends AbstractScript
 {
-    private MutableMap<String, FunctionScript> functions = Maps.mutable.of();
+    private final MutableMap<String, FunctionScript> functions = Maps.mutable.of();
 
     public AnonymousScript()
     {
