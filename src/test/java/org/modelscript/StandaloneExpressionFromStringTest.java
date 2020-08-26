@@ -63,7 +63,6 @@ public class StandaloneExpressionFromStringTest
         Assert.assertTrue(ExpressionTestUtil.evaluateToBoolean("7 > (3 + 1) and (5 <= 6)"));
     }
 
-
     @Test
     public void inOperation()
     {
@@ -75,5 +74,14 @@ public class StandaloneExpressionFromStringTest
         Assert.assertFalse(ExpressionTestUtil.evaluateToBoolean("\"abc\" in []"));
     }
 
-
+    @Test
+    public void notInOperation()
+    {
+        Assert.assertFalse(ExpressionTestUtil.evaluateToBoolean("\"foo\" not in [\"foo\", \"bar\", \"baz\"]"));
+        Assert.assertTrue(ExpressionTestUtil.evaluateToBoolean("\"foo\" not in [\"qux\", \"bar\", \"baz\"]"));
+        Assert.assertFalse(ExpressionTestUtil.evaluateToBoolean("123 not in [456, 567, 123]"));
+        Assert.assertTrue(ExpressionTestUtil.evaluateToBoolean("123 not in [456, 567, 789]"));
+        Assert.assertTrue(ExpressionTestUtil.evaluateToBoolean("123 not in []"));
+        Assert.assertTrue(ExpressionTestUtil.evaluateToBoolean("\"abc\" not in []"));
+    }
 }

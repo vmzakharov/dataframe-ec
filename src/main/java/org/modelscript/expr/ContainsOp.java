@@ -22,6 +22,21 @@ extends BinaryOp
         }
     };
 
+    ContainsOp NOT_IN = new ContainsOp()
+    {
+        @Override
+        public BooleanValue apply(Value value, VectorValue vectorValue)
+        {
+            return BooleanValue.valueOf(vectorValue.getElements().allSatisfy(e -> e.compareTo(value) != 0));
+        }
+
+        @Override
+        public String asString()
+        {
+            return "not in";
+        }
+    };
+
     @Override
     default Value apply(Value operand1, Value operand2)
     {

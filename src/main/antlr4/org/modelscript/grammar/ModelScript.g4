@@ -34,13 +34,13 @@ expr :
     | ID ('(' exprList ')' | '(' ')') #functionCallExpr
     | '(' expr ')'             #parenExpr
     | '-' expr                 #unaryMinusExpr
-    | '!' expr                 #notExpr
+    | NOT expr                 #notExpr
     | expr op=(MUL | DIV) expr #mulDivExpr
     | expr op=(ADD | SUB) expr #addSubExpr
     | expr op=(GT | GTE | LT | LTE | EQ | NE) expr #compareExpr
     | expr op=AND expr         #andExpr
     | expr op=(OR | XOR) expr  #orExpr
-    | expr IN vectorExpr       #inExpr
+    | expr (NOT_IN | IN) vectorExpr #inExpr
     | vectorExpr               #standaloneVectorExpr
     | INT                      #intLiteralExpr
     | DOUBLE                   #doubleLiteralExpr
@@ -66,11 +66,14 @@ LTE : '<=' ;
 EQ  : '==';
 NE  : '!=';
 
+NOT_IN  : 'not in' | 'NOT IN' ;
 IN  : 'in' | 'IN' ;
 
 AND  : 'and' | 'AND';
 OR   : 'or' | 'OR';
 XOR  : 'xor' | 'XOR';
+
+NOT : 'not' | 'NOT' | '!';
 
 IF    : 'if' | 'IF';
 THEN  : 'then' | 'THEN';

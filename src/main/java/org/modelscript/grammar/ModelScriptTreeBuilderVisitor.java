@@ -203,7 +203,7 @@ extends ModelScriptBaseVisitor<Expression>
         return new BinaryExpr(
                 this.visit(ctx.expr()),
                 this.visit(ctx.vectorExpr()),
-                ContainsOp.IN);
+                ctx.IN() == null ? ContainsOp.NOT_IN : ContainsOp.IN);
     }
 
     @Override
