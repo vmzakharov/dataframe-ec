@@ -8,6 +8,10 @@ import org.modelscript.expr.value.*;
 import org.modelscript.util.Printer;
 import org.modelscript.util.PrinterFactory;
 
+import java.time.LocalDate;
+import java.time.Period;
+import java.time.format.DateTimeFormatter;
+
 public class BuiltInFunctions
 {
     private static final ImmutableList<IntrinsicFunctionDescriptor> FUNCTIONS = Lists.immutable.of(
@@ -85,6 +89,56 @@ public class BuiltInFunctions
             public String usageString()
             {
                 return "Usage: " + this.getName() + "(aString, beginIndex[, endIndex])";
+            }
+        },
+
+        new IntrinsicFunctionDescriptor("toDate") {
+            @Override
+            public Value evaluate(EvalContext context)
+            {
+                VectorValue parameters = (VectorValue) context.getVariableOrDefault(magicalParameterName(), VectorValue.EMPTY);
+
+                if (parameters.size() != 1)
+                {
+                    throw new RuntimeException("Invalid number of parameters in a call to '" + this.getName() + "'. " + this.usageString());
+                }
+
+                String aString = parameters.get(0).stringValue();
+
+                return new DateValue(LocalDate.parse(aString, DateTimeFormatter.ISO_DATE));
+            }
+
+            @Override
+            public String usageString()
+            {
+                return "Usage: " + this.getName() + "(yyyy-mm-dd)";
+            }
+        },
+
+        new IntrinsicFunctionDescriptor("withinDays") {
+            @Override
+            public Value evaluate(EvalContext context)
+            {
+                VectorValue parameters = (VectorValue) context.getVariableOrDefault(magicalParameterName(), VectorValue.EMPTY);
+
+                if (parameters.size() != 3)
+                {
+                    throw new RuntimeException("Invalid number of parameters in a call to '" + this.getName() + "'. " + this.usageString());
+                }
+
+                LocalDate date1 = ((DateValue) parameters.get(0)).dateValue();
+                LocalDate date2 = ((DateValue) parameters.get(1)).dateValue();
+                long numberOfDays = ((LongValue) parameters.get(2)).longValue();
+
+                Period period = Period.between(date1, date2);
+
+                return BooleanValue.valueOf(period.getDays() <= numberOfDays);
+            }
+
+            @Override
+            public String usageString()
+            {
+                return "Usage: " + this.getName() + "(date1, date2, numberOfDays)";
             }
         }
     );

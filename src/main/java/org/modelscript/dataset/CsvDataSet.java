@@ -1,13 +1,17 @@
 package org.modelscript.dataset;
 
+import org.eclipse.collections.api.list.ListIterable;
 import org.eclipse.collections.api.list.MutableList;
 import org.eclipse.collections.impl.factory.Lists;
-import org.eclipse.collections.impl.utility.ArrayIterate;
 import org.eclipse.collections.impl.utility.ListIterate;
 import org.modelscript.dataframe.*;
 import org.modelscript.expr.value.ValueType;
 
 import java.io.*;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
+import java.time.format.ResolverStyle;
 
 public class CsvDataSet
 extends DataSetAbstract
@@ -20,6 +24,7 @@ extends DataSetAbstract
     private final String dataFileName;
 
     private boolean convertEmptyElementsToNulls = false;
+    private DateTimeFormatter dateTimeFormatter;
 
     public CsvDataSet(String dataFileName, String newName)
     {
@@ -101,7 +106,7 @@ extends DataSetAbstract
         return new FileWriter(this.dataFileName);
     }
 
-    private Reader createReader()
+    protected Reader createReader()
     throws IOException
     {
         return new FileReader(this.dataFileName);
@@ -150,6 +155,10 @@ extends DataSetAbstract
                 {
                     guessedType = ValueType.DOUBLE;
                 }
+                else if (this.canParseAsDate(element))
+                {
+                    guessedType = ValueType.DATE;
+                }
                 else
                 {
                     guessedType = ValueType.STRING;
@@ -197,6 +206,9 @@ extends DataSetAbstract
                 case STRING:
                     ((DfStringColumnStored) column).addString(this.stripQuotesIfAny(element));
                     break;
+                case DATE:
+                    ((DfDateColumnStored) column).addDate(this.parseDateNullIfEmpty(element));
+                    break;
                 default:
                     throw new RuntimeException("Don't know what to do with the column type: " + columnType);
             }
@@ -237,6 +249,42 @@ extends DataSetAbstract
         {
             return false;
         }
+    }
+
+    private boolean canParseAsDate(String aString)
+    {
+        ListIterable<String> dateFormats = Lists.immutable.of(
+                "uuuu/MM/dd", "uuuu-MM-dd", "mm/DD/uuuu"
+        );
+
+        for (int i = 0; i < dateFormats.size(); i++)
+        {
+            String pattern = dateFormats.get(i);
+
+            try
+            {
+                DateTimeFormatter candidateFormatter = DateTimeFormatter.ofPattern(pattern).withResolverStyle(ResolverStyle.STRICT);
+                LocalDate.parse(aString, candidateFormatter);
+                this.dateTimeFormatter = candidateFormatter;
+                return true;
+            }
+            catch (DateTimeParseException e)
+            {
+                // ignore
+            }
+        }
+
+        return false;
+    }
+
+    private LocalDate parseDateNullIfEmpty(String aString)
+    {
+        if (aString == null || aString.length() == 0)
+        {
+            return null;
+        }
+
+        return LocalDate.parse(aString, this.dateTimeFormatter);
     }
 
     private boolean surroundedByQuotes(String aString)

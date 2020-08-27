@@ -3,7 +3,7 @@ package org.modelscript.dataset;
 abstract public class DataSetAbstract
 implements DataSet
 {
-    private String name;
+    private final String name;
 
     public DataSetAbstract(String newName)
     {

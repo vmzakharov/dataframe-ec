@@ -7,7 +7,7 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-public class TextParsing
+public class SeparatedTextSplittingTest
 {
     private CsvDataSet dataSet;
 
@@ -87,18 +87,6 @@ public class TextParsing
         MutableList<String> result = Lists.mutable.of();
         this.dataSet.splitMindingQsInto(input, result);
 
-//        System.out.println("----------");
-//        System.out.println("i> [" + input + "]");
-//        System.out.print("e> ");
-//        printArray(expected);
-//        System.out.print("a> ");
-//        printArray(result);
-
         Assert.assertArrayEquals(expected, result.toArray());
-    }
-    
-    public void printArray(String[] a)
-    {
-        System.out.println(ArrayIterate.collect(a, e -> (e == null) ? "null" : ('[' + e + ']')).makeString());
     }
 }

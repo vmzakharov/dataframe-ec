@@ -4,7 +4,7 @@ import org.junit.Assert;
 
 public class DataFrameUtil
 {
-    static void assertEquals(DataFrame expected, DataFrame actual)
+    static public void assertEquals(DataFrame expected, DataFrame actual)
     {
 
         if (expected.rowCount() != actual.rowCount() || expected.columnCount() != actual.columnCount())
@@ -26,10 +26,8 @@ public class DataFrameUtil
         }
     }
 
-    static public boolean assertEqualsIgnoreOrder(DataFrame expected, DataFrame actual)
+    static public void assertEqualsIgnoreOrder(DataFrame expected, DataFrame actual)
     {
-
         Assert.fail("assert method not implemented");
-        return false;
     }
 }

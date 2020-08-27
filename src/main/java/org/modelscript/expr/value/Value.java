@@ -40,13 +40,15 @@ extends Comparable<Value>
 
     ValueType getType();
 
-    default boolean isVoid()    { return this == VOID; }
-    default boolean isBoolean() { return this.getType().isBoolean(); }
-    default boolean isLong()    { return this.getType().isLong(); }
-    default boolean isDouble()  { return this.getType().isDouble(); }
-    default boolean isNumber()  { return this.getType().isNumber(); }
-    default boolean isString()  { return this.getType().isString(); }
-    default boolean isVector()  { return this.getType().isVector(); }
-    default boolean isDataFrame()  { return this.getType().isString(); }
+    default boolean isVoid()      { return this == VOID; }
+    default boolean isBoolean()   { return this.getType().isBoolean(); }
+    default boolean isLong()      { return this.getType().isLong(); }
+    default boolean isDouble()    { return this.getType().isDouble(); }
+    default boolean isNumber()    { return this.getType().isNumber(); }
+    default boolean isString()    { return this.getType().isString(); }
+    default boolean isDate()      { return this.getType().isDate(); }
+    default boolean isDateTime()  { return this.getType().isDateTime(); }
+    default boolean isVector()    { return this.getType().isVector(); }
+    default boolean isDataFrame() { return this.getType().isString(); }
 }
 

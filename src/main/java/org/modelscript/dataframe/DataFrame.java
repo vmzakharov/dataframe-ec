@@ -72,6 +72,16 @@ public class DataFrame
         return this.addColumn(new DfDoubleColumnComputed(this, newColumnName, expressionAsString));
     }
 
+    public DataFrame addDateColumn(String newColumnName)
+    {
+        return this.addColumn(new DfDateColumnStored(this, newColumnName));
+    }
+
+    public DataFrame addDateColumn(String newColumnName, String expressionAsString)
+    {
+        throw new UnsupportedOperationException("Cannot add calculated date columns... yet");
+    }
+
     public DataFrame addColumn(DfColumn newColumn)
     {
         // todo: would like to make it impossible in the first place
@@ -186,6 +196,9 @@ public class DataFrame
                 break;
             case STRING:
                 this.addStringColumn(name);
+                break;
+            case DATE:
+                this.addDateColumn(name);
                 break;
             default:
                 throw new RuntimeException("Cannot add a column for values of type " + type);
@@ -564,7 +577,7 @@ public class DataFrame
     }
 
     /**
-     * Tag rows based on whether the provided expression returns true of flase
+     * Tag rows based on whether the provided expression returns true of false
      * @param filterExpressionString the expression to set the flags by
      */
     public void flagRowsBy(String filterExpressionString)

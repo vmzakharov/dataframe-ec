@@ -16,10 +16,9 @@ import java.io.File;
 import java.io.IOException;
 
 public class AvroDataSet
-implements DataSet
+extends DataSetAbstract
 {
     private final Schema schema;
-    private final String name;
     private final String dataFileName;
 
     private GenericRecord currentRecord;
@@ -27,8 +26,8 @@ implements DataSet
 
     public AvroDataSet(String schemaDefinitionFileName, String newName, String newDataFileName)
     {
+        super(newName);
         this.schema = this.loadSchema(schemaDefinitionFileName);
-        this.name = newName;
         this.dataFileName = newDataFileName;
     }
 
@@ -99,12 +98,6 @@ implements DataSet
         {
             throw new RuntimeException("Unable to create a reader for file '" + this.dataFileName + "'", e);
         }
-    }
-
-    @Override
-    public String getName()
-    {
-        return this.name;
     }
 
     public Object getValue(String propertyChainString)

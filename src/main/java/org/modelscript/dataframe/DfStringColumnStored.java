@@ -123,11 +123,10 @@ implements DfColumnStored
     @Override
     public DfColumn mergeWithInto(DfColumn other, DataFrame target)
     {
-        ErrorReporter.reportAndThrow(!this.getClass().equals(other.getClass()), "Attempting to merge colums of different types");
+        ErrorReporter.reportAndThrow(!this.getClass().equals(other.getClass()), "Attempting to merge columns of different types");
 
         DfStringColumnStored mergedCol = (DfStringColumnStored) this.cloneSchemaAndAttachTo(target);
 
-//        ((FastList<String>) mergedCol.values).ensureCapacity(this.getSize() + other.getSize());
         mergedCol.values = Lists.mutable.withInitialCapacity(this.getSize() + other.getSize());
 
         mergedCol.values.addAll(this.values);
