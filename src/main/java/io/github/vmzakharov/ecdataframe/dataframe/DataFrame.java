@@ -302,6 +302,7 @@ public class DataFrame
 
     /**
      * indicates that no further updates can be made to this data frame.
+     * @return the data frame
      */
     public DataFrame seal()
     {
