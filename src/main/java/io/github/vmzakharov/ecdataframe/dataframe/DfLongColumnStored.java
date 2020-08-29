@@ -1,7 +1,7 @@
 package io.github.vmzakharov.ecdataframe.dataframe;
 
-import io.github.vmzakharov.ecdataframe.expr.value.LongValue;
-import io.github.vmzakharov.ecdataframe.expr.value.Value;
+import io.github.vmzakharov.ecdataframe.dsl.value.LongValue;
+import io.github.vmzakharov.ecdataframe.dsl.value.Value;
 import org.eclipse.collections.api.list.primitive.ImmutableLongList;
 import org.eclipse.collections.api.list.primitive.MutableLongList;
 import org.eclipse.collections.impl.factory.primitive.LongLists;

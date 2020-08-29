@@ -1,10 +1,10 @@
 package io.github.vmzakharov.ecdataframe.dataframe;
 
-import io.github.vmzakharov.ecdataframe.expr.DataFrameEvalContext;
-import io.github.vmzakharov.ecdataframe.expr.Expression;
-import io.github.vmzakharov.ecdataframe.expr.value.DoubleValue;
-import io.github.vmzakharov.ecdataframe.expr.value.Value;
-import io.github.vmzakharov.ecdataframe.expr.visitor.InMemoryEvaluationVisitor;
+import io.github.vmzakharov.ecdataframe.dsl.DataFrameEvalContext;
+import io.github.vmzakharov.ecdataframe.dsl.Expression;
+import io.github.vmzakharov.ecdataframe.dsl.value.DoubleValue;
+import io.github.vmzakharov.ecdataframe.dsl.value.Value;
+import io.github.vmzakharov.ecdataframe.dsl.visitor.InMemoryEvaluationVisitor;
 import io.github.vmzakharov.ecdataframe.util.ExpressionParserHelper;
 import org.eclipse.collections.api.list.primitive.ImmutableDoubleList;
 import org.eclipse.collections.impl.list.Interval;

@@ -1,7 +1,7 @@
 package io.github.vmzakharov.ecdataframe.dataframe;
 
-import io.github.vmzakharov.ecdataframe.expr.value.Value;
-import io.github.vmzakharov.ecdataframe.expr.value.ValueType;
+import io.github.vmzakharov.ecdataframe.dsl.value.Value;
+import io.github.vmzakharov.ecdataframe.dsl.value.ValueType;
 
 public interface DfColumn
 {

@@ -1,16 +1,16 @@
 package io.github.vmzakharov.ecdataframe;
 
-import io.github.vmzakharov.ecdataframe.expr.ProjectionExpr;
-import io.github.vmzakharov.ecdataframe.expr.value.ValueType;
-import io.github.vmzakharov.ecdataframe.expr.visitor.TypeInferenceVisitor;
+import io.github.vmzakharov.ecdataframe.dsl.ProjectionExpr;
+import io.github.vmzakharov.ecdataframe.dsl.value.ValueType;
+import io.github.vmzakharov.ecdataframe.dsl.visitor.TypeInferenceVisitor;
 import org.eclipse.collections.api.list.ListIterable;
 import org.eclipse.collections.impl.factory.Lists;
 import org.junit.Assert;
 import org.junit.Test;
 import io.github.vmzakharov.ecdataframe.dataset.AvroDataSet;
-import io.github.vmzakharov.ecdataframe.expr.EvalContext;
-import io.github.vmzakharov.ecdataframe.expr.Expression;
-import io.github.vmzakharov.ecdataframe.expr.SimpleEvalContext;
+import io.github.vmzakharov.ecdataframe.dsl.EvalContext;
+import io.github.vmzakharov.ecdataframe.dsl.Expression;
+import io.github.vmzakharov.ecdataframe.dsl.SimpleEvalContext;
 import io.github.vmzakharov.ecdataframe.util.ExpressionParserHelper;
 
 public class TypeInference

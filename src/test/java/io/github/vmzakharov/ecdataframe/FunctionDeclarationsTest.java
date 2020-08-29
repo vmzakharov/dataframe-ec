@@ -1,8 +1,8 @@
 package io.github.vmzakharov.ecdataframe;
 
-import io.github.vmzakharov.ecdataframe.expr.AnonymousScript;
-import io.github.vmzakharov.ecdataframe.expr.value.LongValue;
-import io.github.vmzakharov.ecdataframe.expr.value.Value;
+import io.github.vmzakharov.ecdataframe.dsl.AnonymousScript;
+import io.github.vmzakharov.ecdataframe.dsl.value.LongValue;
+import io.github.vmzakharov.ecdataframe.dsl.value.Value;
 import io.github.vmzakharov.ecdataframe.util.ExpressionParserHelper;
 import org.junit.Assert;
 import org.junit.Test;

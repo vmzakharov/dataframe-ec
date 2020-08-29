@@ -1,6 +1,6 @@
 package io.github.vmzakharov.ecdataframe.dataframe;
 
-import io.github.vmzakharov.ecdataframe.expr.value.DoubleValue;
+import io.github.vmzakharov.ecdataframe.dsl.value.DoubleValue;
 import org.eclipse.collections.api.factory.Lists;
 import org.junit.Assert;
 import org.junit.Test;

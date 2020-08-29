@@ -1,9 +1,9 @@
 package io.github.vmzakharov.ecdataframe.ui;
 
-import io.github.vmzakharov.ecdataframe.expr.EvalContext;
-import io.github.vmzakharov.ecdataframe.expr.Script;
-import io.github.vmzakharov.ecdataframe.expr.value.Value;
-import io.github.vmzakharov.ecdataframe.expr.visitor.InMemoryEvaluationVisitor;
+import io.github.vmzakharov.ecdataframe.dsl.EvalContext;
+import io.github.vmzakharov.ecdataframe.dsl.Script;
+import io.github.vmzakharov.ecdataframe.dsl.value.Value;
+import io.github.vmzakharov.ecdataframe.dsl.visitor.InMemoryEvaluationVisitor;
 import io.github.vmzakharov.ecdataframe.util.ExpressionParserHelper;
 import io.github.vmzakharov.ecdataframe.util.PrinterFactory;
 import org.eclipse.collections.api.list.MutableList;

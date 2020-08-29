@@ -1,7 +1,7 @@
 package io.github.vmzakharov.ecdataframe.util;
 
-import io.github.vmzakharov.ecdataframe.expr.AnonymousScript;
-import io.github.vmzakharov.ecdataframe.expr.Expression;
+import io.github.vmzakharov.ecdataframe.dsl.AnonymousScript;
+import io.github.vmzakharov.ecdataframe.dsl.Expression;
 import io.github.vmzakharov.ecdataframe.grammar.ModelScriptLexer;
 import io.github.vmzakharov.ecdataframe.grammar.ModelScriptParser;
 import io.github.vmzakharov.ecdataframe.grammar.ModelScriptTreeBuilderVisitor;

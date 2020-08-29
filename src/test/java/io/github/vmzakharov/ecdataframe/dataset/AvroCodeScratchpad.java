@@ -1,11 +1,11 @@
 package io.github.vmzakharov.ecdataframe.dataset;
 
-import io.github.vmzakharov.ecdataframe.expr.Script;
-import io.github.vmzakharov.ecdataframe.expr.value.Value;
+import io.github.vmzakharov.ecdataframe.dsl.Script;
+import io.github.vmzakharov.ecdataframe.dsl.value.Value;
 import org.apache.avro.generic.GenericRecord;
 import org.eclipse.collections.api.list.MutableList;
 import org.eclipse.collections.impl.factory.Lists;
-import io.github.vmzakharov.ecdataframe.expr.visitor.InMemoryEvaluationVisitor;
+import io.github.vmzakharov.ecdataframe.dsl.visitor.InMemoryEvaluationVisitor;
 import io.github.vmzakharov.ecdataframe.util.ExpressionParserHelper;
 
 public class AvroCodeScratchpad

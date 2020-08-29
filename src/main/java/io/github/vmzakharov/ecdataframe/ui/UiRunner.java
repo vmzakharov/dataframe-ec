@@ -1,7 +1,7 @@
 package io.github.vmzakharov.ecdataframe.ui;
 
-import io.github.vmzakharov.ecdataframe.expr.EvalContext;
-import io.github.vmzakharov.ecdataframe.expr.SimpleEvalContext;
+import io.github.vmzakharov.ecdataframe.dsl.EvalContext;
+import io.github.vmzakharov.ecdataframe.dsl.SimpleEvalContext;
 import io.github.vmzakharov.ecdataframe.util.PrinterFactory;
 
 import javax.swing.*;

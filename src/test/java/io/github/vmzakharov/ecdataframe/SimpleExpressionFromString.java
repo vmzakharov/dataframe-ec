@@ -1,8 +1,8 @@
 package io.github.vmzakharov.ecdataframe;
 
-import io.github.vmzakharov.ecdataframe.expr.*;
-import io.github.vmzakharov.ecdataframe.expr.value.LongValue;
-import io.github.vmzakharov.ecdataframe.expr.visitor.InMemoryEvaluationVisitor;
+import io.github.vmzakharov.ecdataframe.dsl.*;
+import io.github.vmzakharov.ecdataframe.dsl.value.LongValue;
+import io.github.vmzakharov.ecdataframe.dsl.visitor.InMemoryEvaluationVisitor;
 import io.github.vmzakharov.ecdataframe.util.ExpressionParserHelper;
 import org.eclipse.collections.impl.factory.Lists;
 import org.junit.Assert;

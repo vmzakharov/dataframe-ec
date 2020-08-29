@@ -1,7 +1,7 @@
 package io.github.vmzakharov.ecdataframe.dataframe;
 
-import io.github.vmzakharov.ecdataframe.expr.SimpleEvalContext;
-import io.github.vmzakharov.ecdataframe.expr.value.LongValue;
+import io.github.vmzakharov.ecdataframe.dsl.SimpleEvalContext;
+import io.github.vmzakharov.ecdataframe.dsl.value.LongValue;
 import org.eclipse.collections.api.factory.Lists;
 import org.eclipse.collections.impl.factory.primitive.DoubleLists;
 import org.eclipse.collections.impl.factory.primitive.LongLists;

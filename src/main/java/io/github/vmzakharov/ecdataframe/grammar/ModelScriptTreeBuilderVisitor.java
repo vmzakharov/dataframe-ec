@@ -1,9 +1,9 @@
 package io.github.vmzakharov.ecdataframe.grammar;
 
-import io.github.vmzakharov.ecdataframe.expr.*;
-import io.github.vmzakharov.ecdataframe.expr.value.DoubleValue;
-import io.github.vmzakharov.ecdataframe.expr.value.LongValue;
-import io.github.vmzakharov.ecdataframe.expr.value.StringValue;
+import io.github.vmzakharov.ecdataframe.dsl.*;
+import io.github.vmzakharov.ecdataframe.dsl.value.DoubleValue;
+import io.github.vmzakharov.ecdataframe.dsl.value.LongValue;
+import io.github.vmzakharov.ecdataframe.dsl.value.StringValue;
 import org.antlr.v4.runtime.Token;
 import org.eclipse.collections.api.factory.Stacks;
 import org.eclipse.collections.api.list.ListIterable;

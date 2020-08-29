@@ -1,6 +1,6 @@
 package io.github.vmzakharov.ecdataframe.dataframe;
 
-import io.github.vmzakharov.ecdataframe.expr.value.LongValue;
+import io.github.vmzakharov.ecdataframe.dsl.value.LongValue;
 import org.eclipse.collections.api.factory.Lists;
 import org.eclipse.collections.api.list.ImmutableList;
 import org.eclipse.collections.api.list.primitive.MutableLongList;
@@ -9,7 +9,7 @@ import org.eclipse.collections.impl.list.primitive.IntInterval;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import io.github.vmzakharov.ecdataframe.expr.Expression;
+import io.github.vmzakharov.ecdataframe.dsl.Expression;
 import io.github.vmzakharov.ecdataframe.util.ExpressionParserHelper;
 
 public class DataFrameExpressionTest

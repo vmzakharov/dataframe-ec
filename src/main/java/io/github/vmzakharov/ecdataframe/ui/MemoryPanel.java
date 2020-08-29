@@ -1,6 +1,6 @@
 package io.github.vmzakharov.ecdataframe.ui;
 
-import io.github.vmzakharov.ecdataframe.expr.EvalContext;
+import io.github.vmzakharov.ecdataframe.dsl.EvalContext;
 import org.eclipse.collections.api.list.MutableList;
 
 import javax.swing.*;

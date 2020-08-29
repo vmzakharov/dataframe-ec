@@ -54,15 +54,15 @@ implements DfColumn
         DfColumn clonedColumn;
         try
         {
-            Class myClass = this.getClass();
+            Class<?> myClass = this.getClass();
             if (this.isStored())
             {
-                Constructor nameConstructor = myClass.getDeclaredConstructor(DataFrame.class, String.class);
+                Constructor<?> nameConstructor = myClass.getDeclaredConstructor(DataFrame.class, String.class);
                 clonedColumn = (DfColumn) nameConstructor.newInstance(attachTo, this.getName());
             }
             else
             {
-                Constructor nameConstructor = myClass.getDeclaredConstructor(DataFrame.class, String.class, String.class);
+                Constructor<?> nameConstructor = myClass.getDeclaredConstructor(DataFrame.class, String.class, String.class);
                 clonedColumn = (DfColumn) nameConstructor.newInstance(attachTo, this.getName(), ((DfColumnComputed) this).getExpressionAsString());
             }
         }

@@ -1,16 +1,16 @@
 package io.github.vmzakharov.ecdataframe;
 
-import io.github.vmzakharov.ecdataframe.expr.ArithmeticOp;
-import io.github.vmzakharov.ecdataframe.expr.BinaryExpr;
-import io.github.vmzakharov.ecdataframe.expr.ConstExpr;
-import io.github.vmzakharov.ecdataframe.expr.value.DoubleValue;
-import io.github.vmzakharov.ecdataframe.expr.value.LongValue;
-import io.github.vmzakharov.ecdataframe.expr.value.StringValue;
-import io.github.vmzakharov.ecdataframe.expr.value.Value;
+import io.github.vmzakharov.ecdataframe.dsl.ArithmeticOp;
+import io.github.vmzakharov.ecdataframe.dsl.BinaryExpr;
+import io.github.vmzakharov.ecdataframe.dsl.ConstExpr;
+import io.github.vmzakharov.ecdataframe.dsl.value.DoubleValue;
+import io.github.vmzakharov.ecdataframe.dsl.value.LongValue;
+import io.github.vmzakharov.ecdataframe.dsl.value.StringValue;
+import io.github.vmzakharov.ecdataframe.dsl.value.Value;
 import org.junit.Before;
 import org.junit.Assert;
 import org.junit.Test;
-import io.github.vmzakharov.ecdataframe.expr.visitor.InMemoryEvaluationVisitor;
+import io.github.vmzakharov.ecdataframe.dsl.visitor.InMemoryEvaluationVisitor;
 
 public class HandcraftedExpressions
 {

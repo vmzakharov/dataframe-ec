@@ -1,6 +1,6 @@
 package io.github.vmzakharov.ecdataframe.dataset;
 
-import io.github.vmzakharov.ecdataframe.expr.value.ValueType;
+import io.github.vmzakharov.ecdataframe.dsl.value.ValueType;
 import org.apache.avro.Schema;
 import org.apache.avro.file.DataFileReader;
 import org.apache.avro.file.DataFileWriter;

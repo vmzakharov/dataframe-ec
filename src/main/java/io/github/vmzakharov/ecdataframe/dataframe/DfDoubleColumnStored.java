@@ -1,9 +1,9 @@
 package io.github.vmzakharov.ecdataframe.dataframe;
 
-import io.github.vmzakharov.ecdataframe.expr.value.DoubleValue;
-import io.github.vmzakharov.ecdataframe.expr.value.NumberValue;
-import io.github.vmzakharov.ecdataframe.expr.value.Value;
-import io.github.vmzakharov.ecdataframe.expr.value.ValueType;
+import io.github.vmzakharov.ecdataframe.dsl.value.DoubleValue;
+import io.github.vmzakharov.ecdataframe.dsl.value.NumberValue;
+import io.github.vmzakharov.ecdataframe.dsl.value.Value;
+import io.github.vmzakharov.ecdataframe.dsl.value.ValueType;
 import org.eclipse.collections.api.list.primitive.ImmutableDoubleList;
 import org.eclipse.collections.api.list.primitive.MutableDoubleList;
 import org.eclipse.collections.impl.factory.primitive.DoubleLists;
