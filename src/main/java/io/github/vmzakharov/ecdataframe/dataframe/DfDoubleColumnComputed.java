@@ -2,6 +2,7 @@ package io.github.vmzakharov.ecdataframe.dataframe;
 
 import io.github.vmzakharov.ecdataframe.dsl.DataFrameEvalContext;
 import io.github.vmzakharov.ecdataframe.dsl.Expression;
+import io.github.vmzakharov.ecdataframe.dsl.Script;
 import io.github.vmzakharov.ecdataframe.dsl.value.DoubleValue;
 import io.github.vmzakharov.ecdataframe.dsl.value.Value;
 import io.github.vmzakharov.ecdataframe.dsl.visitor.InMemoryEvaluationVisitor;
@@ -20,7 +21,8 @@ implements DfColumnComputed
     {
         super(newDataFrame, newName);
         this.expressionAsString = newExpressionAsString;
-        this.expression = ExpressionParserHelper.toExpression(expressionAsString);
+
+        this.expression = ExpressionParserHelper.toExpressionOrScript(expressionAsString);
     }
 
     @Override

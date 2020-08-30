@@ -11,28 +11,33 @@ public class ExpressionTestUtil
 {
     static public long evaluateToInt(String s)
     {
-        return ((LongValue) ExpressionParserHelper.toExpression(s).evaluate(new InMemoryEvaluationVisitor())).longValue();
+        return ((LongValue) evaluate(s)).longValue();
+    }
+
+    public static Value evaluate(String s)
+    {
+        return ExpressionParserHelper.toExpression(s).evaluate(new InMemoryEvaluationVisitor());
     }
 
     static public double evaluateToDouble(String s)
     {
-        return ((DoubleValue) ExpressionParserHelper.toExpression(s).evaluate(new InMemoryEvaluationVisitor())).doubleValue();
+        return ((DoubleValue) evaluate(s)).doubleValue();
     }
 
     static public boolean evaluateToBoolean(String s)
     {
-        return ((BooleanValue) ExpressionParserHelper.toExpression(s).evaluate(new InMemoryEvaluationVisitor())).isTrue();
+        return ((BooleanValue) evaluate(s)).isTrue();
     }
 
     public static String evaluateToString(String s)
     {
-        Value result = ExpressionParserHelper.toExpression(s).evaluate(new InMemoryEvaluationVisitor());
+        Value result = evaluate(s);
         Assert.assertTrue(result.isString());
         return result.stringValue();
     }
 
     public static LocalDate evaluateToDate(String s)
     {
-        return ((DateValue) ExpressionParserHelper.toExpression(s).evaluate(new InMemoryEvaluationVisitor())).dateValue();
+        return ((DateValue) evaluate(s)).dateValue();
     }
 }

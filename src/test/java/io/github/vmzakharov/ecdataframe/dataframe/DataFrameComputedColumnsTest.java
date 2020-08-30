@@ -1,7 +1,11 @@
 package io.github.vmzakharov.ecdataframe.dataframe;
 
+import io.github.vmzakharov.ecdataframe.ExpressionTestUtil;
+import io.github.vmzakharov.ecdataframe.dsl.AnonymousScript;
+import io.github.vmzakharov.ecdataframe.dsl.EvalContext;
 import io.github.vmzakharov.ecdataframe.dsl.SimpleEvalContext;
 import io.github.vmzakharov.ecdataframe.dsl.value.LongValue;
+import io.github.vmzakharov.ecdataframe.util.ExpressionParserHelper;
 import org.eclipse.collections.api.factory.Lists;
 import org.eclipse.collections.impl.factory.primitive.DoubleLists;
 import org.eclipse.collections.impl.factory.primitive.LongLists;
@@ -102,5 +106,94 @@ public class DataFrameComputedColumnsTest
         this.df.addStringColumn("Nickname", "substr(Name, 0, 3) + \"ka\"");
 
         Assert.assertEquals(Lists.immutable.of("Alika", "Bobka", "Carka", "Danka"), this.df.getStringColumn("Nickname").toList());
+    }
+
+    @Test
+    public void computedColumnUsingSimpleScript()
+    {
+        this.df = new DataFrame("this.df1")
+                .addStringColumn("Name").addLongColumn("Count").addDoubleColumn("Value");
+
+        this.df
+                .addRow("Alice",  5, 23.45)
+                .addRow("Bob",   10, 12.34)
+                .addRow("Carol", 11, 56.78)
+                .addRow("Dan",    0,  7.89);
+
+        String script =
+                "if Count > 7 then\n" +
+                "  Value * 2\n" +
+                "else\n" +
+                "  Value + 2\n" +
+                "endif";
+
+        this.df.addDoubleColumn("Complication", script);
+
+        Assert.assertEquals(DoubleLists.immutable.of(25.45, 24.68, 113.56, 9.89), this.df.getDoubleColumn("Complication").toDoubleList());
+    }
+
+    @Test
+    public void usingScriptWithVariables()
+    {
+        String script =
+                "a = 7\n" +
+                "if Count > a then\n" +
+                "  Value * 2\n" +
+                "else\n" +
+                "  Value + 2\n" +
+                "endif";
+        this.df.addDoubleColumn("Complication", script);
+
+        Assert.assertEquals(DoubleLists.immutable.of(25.45, 24.68, 113.56, 9.89), this.df.getDoubleColumn("Complication").toDoubleList());
+    }
+
+    @Test
+    public void usingScriptWithFunctionDeclaration()
+    {
+        String script =
+                "function bigEnough(value)\n" +
+                "{\n" +
+                "   value > 7\n" +
+                "}\n" +
+                "\n" +
+                "if bigEnough(Count) then\n" +
+                "  Value * 2\n" +
+                "else\n" +
+                "  Value + 2\n" +
+                "endif";
+
+        this.df.addDoubleColumn("Complication", script);
+
+        Assert.assertEquals(DoubleLists.immutable.of(25.45, 24.68, 113.56, 9.89), this.df.getDoubleColumn("Complication").toDoubleList());
+    }
+
+    @Test
+    public void usingScriptWithOutsideContext()
+    {
+        String script =
+                "if inTheList(Count, numbers) then\n" +
+                "  Value * 2\n" +
+                "else\n" +
+                "  Value + 2\n" +
+                "endif";
+
+        this.df.addDoubleColumn("Complication", script);
+
+        String outerScriptString = "" +
+                "function inTheList(item, list)\n" +
+                "{\n" +
+                "  item in [5, 10]\n" +
+                "}\n"
+        ;
+
+        AnonymousScript outerScript = ExpressionParserHelper.toScript(outerScriptString);
+
+        SimpleEvalContext outerContext = new SimpleEvalContext();
+        outerContext.setDeclaredFunctions(outerScript.getFunctions());
+        outerContext.setVariable("numbers", ExpressionTestUtil.evaluate("[5, 10]"));
+
+        this.df.getEvalContext().setNestedContext(outerContext);
+
+        Assert.assertEquals(DoubleLists.immutable.of(46.9, 24.68, 58.78, 9.89), this.df.getDoubleColumn("Complication").toDoubleList());
     }
 }

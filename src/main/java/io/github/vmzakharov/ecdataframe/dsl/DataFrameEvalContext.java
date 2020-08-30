@@ -10,7 +10,7 @@ import org.eclipse.collections.api.map.MutableMap;
 import org.eclipse.collections.impl.factory.Maps;
 
 public class DataFrameEvalContext
-implements EvalContext
+extends EvalContextAbstract
 {
     final private DataFrame dataFrame;
     private EvalContext nestedContext;
@@ -18,7 +18,7 @@ implements EvalContext
 
     private final MutableMap<String, ValueGetter> resolvedVariables = Maps.mutable.of();
 
-    private static interface ValueGetter
+    private interface ValueGetter
     {
         Value getValue();
     }
@@ -45,15 +45,8 @@ implements EvalContext
     }
 
     @Override
-    public Value setVariable(String newVarName, Value newEvaluate)
-    {
-        throw new UnsupportedOperationException("Cannot assign values to variables for Data Frame based expressions");
-    }
-
-    @Override
     public Value getVariable(String variableName)
     {
-        // todo: SORT OUT ROW INDEX!!!
         ValueGetter valueGetter = this.resolvedVariables.get(variableName);
 
         if (valueGetter == null)
@@ -61,6 +54,10 @@ implements EvalContext
             if (this.getDataFrame().hasColumn(variableName))
             {
                 valueGetter = () -> dataFrame.getValueAtPhysicalRow(variableName, this.getRowIndex());
+            }
+            else if (this.getContextVariables().containsKey(variableName))
+            {
+                valueGetter = () -> this.getContextVariables().get(variableName);
             }
             else
             {
@@ -76,12 +73,9 @@ implements EvalContext
     @Override
     public Value getVariableOrDefault(String variableName, Value defaultValue)
     {
-        // TODO... throw?
-        DfColumn column = this.getDataFrame().getColumnNamed(variableName);
+        Value value = this.getVariable(variableName);
 
-        return (column != null) ?
-                column.getValue(this.getRowIndex()) :
-                this.getNestedContext().getVariableOrDefault(variableName, defaultValue);
+        return value == Value.VOID ? defaultValue : value;
     }
 
     @Override
@@ -103,9 +97,15 @@ implements EvalContext
     }
 
     @Override
-    public void setDeclaredFunctions(MutableMap<String, FunctionScript> newDeclaredFunctions)
+    public FunctionScript getDeclaredFunction(String functionName)
     {
-        throw new UnsupportedOperationException("Cannot add a function declaration to a data frame evaluation context");
+        FunctionScript functionScript =  super.getDeclaredFunction(functionName);
+        if (functionScript == null)
+        {
+            functionScript = this.getNestedContext().getDeclaredFunction(functionName);
+        }
+
+        return functionScript;
     }
 
     @Override

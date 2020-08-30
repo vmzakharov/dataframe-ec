@@ -22,6 +22,8 @@ public interface EvalContext
 
     void setDeclaredFunctions(MutableMap<String, FunctionScript> newDeclaredFunctions);
 
+    FunctionScript getDeclaredFunction(String functionName);
+
     void addDataSet(AvroDataSet dataSet);
 
     AvroDataSet getDataSet(String dataSetName);

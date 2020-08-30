@@ -50,7 +50,7 @@ implements ExpressionEvaluationVisitor
         SimpleEvalContext localContext = new SimpleEvalContext();
         ListIterable<Value> parameterValues = expr.getParameters().collectWith(Expression::evaluate, this);
 
-        FunctionScript functionScript = this.getContext().getDeclaredFunctions().get(functionName);
+        FunctionScript functionScript = this.getContext().getDeclaredFunction(functionName);
 
         if (functionScript != null)
         {

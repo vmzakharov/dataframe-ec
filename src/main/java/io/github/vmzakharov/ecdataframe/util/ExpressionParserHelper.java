@@ -2,6 +2,7 @@ package io.github.vmzakharov.ecdataframe.util;
 
 import io.github.vmzakharov.ecdataframe.dsl.AnonymousScript;
 import io.github.vmzakharov.ecdataframe.dsl.Expression;
+import io.github.vmzakharov.ecdataframe.dsl.Script;
 import io.github.vmzakharov.ecdataframe.grammar.ModelScriptLexer;
 import io.github.vmzakharov.ecdataframe.grammar.ModelScriptParser;
 import io.github.vmzakharov.ecdataframe.grammar.ModelScriptTreeBuilderVisitor;
@@ -30,6 +31,18 @@ public class ExpressionParserHelper
         ModelScriptTreeBuilderVisitor visitor = new ModelScriptTreeBuilderVisitor();
 
         return visitor.visit(tree);
+    }
+
+    static public Expression toExpressionOrScript(String s)
+    {
+        AnonymousScript script = toScript(s);
+
+        if (script.getExpressions().size() == 1 && script.getFunctions().size() == 0)
+        {
+            return script.getExpressions().get(0);
+        }
+
+        return script;
     }
 
     static public AnonymousScript toScript(String s)
