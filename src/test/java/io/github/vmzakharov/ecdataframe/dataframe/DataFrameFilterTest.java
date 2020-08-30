@@ -1,5 +1,6 @@
 package io.github.vmzakharov.ecdataframe.dataframe;
 
+import org.eclipse.collections.api.tuple.Twin;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -46,8 +47,31 @@ public class DataFrameFilterTest
                 .addRow("Alice",   "Pqr",  11L, 10.0, 20.0)
                 .addRow("Bob",     "Def",  13L, 13.0, 25.0)
                 .addRow("Abigail", "Def",  15L, 15.0, 11.0);
+
         expected.addDoubleColumn("BazAndQux", "Baz + Qux");
 
         DataFrameUtil.assertEquals(expected, filtered);
+    }
+
+    @Test
+    public void selectAndReject()
+    {
+        Twin<DataFrame> selectedAndRejected = this.dataFrame.selectAndRejectBy("Foo == \"Def\" or Foo == \"Abc\"");
+
+        DataFrame expectedSelected = new DataFrame("FrameOfData")
+                .addStringColumn("Name").addStringColumn("Foo").addLongColumn("Bar").addDoubleColumn("Baz").addDoubleColumn("Qux")
+                .addRow("Albert",  "Abc",  12L, 12.0, 10.0)
+                .addRow("Bob",     "Def",  13L, 13.0, 25.0)
+                .addRow("Abigail", "Def",  15L, 15.0, 11.0)
+                ;
+
+        DataFrame expectedRejected = new DataFrame("FrameOfData")
+                .addStringColumn("Name").addStringColumn("Foo").addLongColumn("Bar").addDoubleColumn("Baz").addDoubleColumn("Qux")
+                .addRow("Alice",   "Pqr",  11L, 10.0, 20.0)
+                .addRow("Carol",   "Xyz",  14L, 14.0, 40.0)
+                ;
+
+        DataFrameUtil.assertEquals(expectedSelected, selectedAndRejected.getOne());
+        DataFrameUtil.assertEquals(expectedRejected, selectedAndRejected.getTwo());
     }
 }

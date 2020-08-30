@@ -16,11 +16,13 @@ import org.eclipse.collections.api.list.primitive.IntList;
 import org.eclipse.collections.api.list.primitive.MutableBooleanList;
 import org.eclipse.collections.api.list.primitive.MutableIntList;
 import org.eclipse.collections.api.map.MutableMap;
+import org.eclipse.collections.api.tuple.Twin;
 import org.eclipse.collections.impl.factory.Lists;
 import org.eclipse.collections.impl.factory.Maps;
 import org.eclipse.collections.impl.factory.primitive.IntLists;
 import org.eclipse.collections.impl.list.mutable.primitive.BooleanArrayList;
 import org.eclipse.collections.impl.list.primitive.IntInterval;
+import org.eclipse.collections.impl.tuple.Tuples;
 import org.eclipse.collections.impl.utility.ArrayIterate;
 
 public class DataFrame
@@ -383,6 +385,35 @@ public class DataFrame
         }
 
         return summedDataFrame;
+    }
+
+    public Twin<DataFrame> selectAndRejectBy(String filterExpressionString)
+    {
+        DataFrame selected = this.cloneStructure(this.name+"-selected");
+        DataFrame rejected = this.cloneStructure(this.name+"-rejected");
+
+        DataFrameEvalContext context = new DataFrameEvalContext(this);
+        Expression filterExpression = ExpressionParserHelper.toExpression(filterExpressionString);
+        InMemoryEvaluationVisitor evaluationVisitor = new InMemoryEvaluationVisitor(context);
+
+        for (int i = 0; i < this.rowCount; i++)
+        {
+            context.setRowIndex(i);
+            Value select = filterExpression.evaluate(evaluationVisitor);
+            if (((BooleanValue) select).isTrue())
+            {
+                selected.copyRowFrom(this, i);
+            }
+            else
+            {
+                rejected.copyRowFrom(this, i);
+            }
+        }
+
+        selected.seal();
+        rejected.seal();
+
+        return Tuples.twin(selected, rejected);
     }
 
     public DataFrame selectBy(String filterExpressionString)
