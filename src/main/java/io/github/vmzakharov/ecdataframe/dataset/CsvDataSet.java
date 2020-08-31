@@ -147,6 +147,10 @@ extends DataSetAbstract
                 {
                     guessedType = ValueType.STRING;
                 }
+                else if (this.canParseAsDate(element))
+                {
+                    guessedType = ValueType.DATE;
+                }
                 else if (this.canParseAsLong(element))
                 {
                     guessedType = ValueType.LONG;
@@ -154,10 +158,6 @@ extends DataSetAbstract
                 else if (this.canParseAsDouble(element))
                 {
                     guessedType = ValueType.DOUBLE;
-                }
-                else if (this.canParseAsDate(element))
-                {
-                    guessedType = ValueType.DATE;
                 }
                 else
                 {
@@ -254,9 +254,10 @@ extends DataSetAbstract
     private boolean canParseAsDate(String aString)
     {
         ListIterable<String> dateFormats = Lists.immutable.of(
-                "uuuu/MM/dd", "uuuu-MM-dd", "mm/DD/uuuu"
+                "uuuu/M/d", "uuuu-M-d", "M/d/uuuu"
         );
 
+        String trimmed = aString.trim();
         for (int i = 0; i < dateFormats.size(); i++)
         {
             String pattern = dateFormats.get(i);
@@ -264,7 +265,7 @@ extends DataSetAbstract
             try
             {
                 DateTimeFormatter candidateFormatter = DateTimeFormatter.ofPattern(pattern).withResolverStyle(ResolverStyle.STRICT);
-                LocalDate.parse(aString, candidateFormatter);
+                LocalDate.parse(trimmed, candidateFormatter);
                 this.dateTimeFormatter = candidateFormatter;
                 return true;
             }
@@ -279,12 +280,14 @@ extends DataSetAbstract
 
     private LocalDate parseDateNullIfEmpty(String aString)
     {
-        if (aString == null || aString.length() == 0)
+        if (aString == null)
         {
             return null;
         }
 
-        return LocalDate.parse(aString, this.dateTimeFormatter);
+        String trimmed = aString.trim();
+
+        return trimmed.length() == 0 ? null : LocalDate.parse(trimmed, this.dateTimeFormatter);
     }
 
     private boolean surroundedByQuotes(String aString)
