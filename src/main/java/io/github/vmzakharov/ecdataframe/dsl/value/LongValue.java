@@ -2,6 +2,7 @@ package io.github.vmzakharov.ecdataframe.dsl.value;
 
 import io.github.vmzakharov.ecdataframe.dsl.ArithmeticOp;
 import io.github.vmzakharov.ecdataframe.dsl.ComparisonOp;
+import io.github.vmzakharov.ecdataframe.dsl.UnaryOp;
 
 public class LongValue
 extends AbstractValue
@@ -39,6 +40,12 @@ implements NumberValue
             return operation.applyDouble(this.doubleValue(), ((DoubleValue) another).doubleValue());
         }
         return operation.applyLong(this.longValue(), ((LongValue) another).longValue());
+    }
+
+    @Override
+    public Value apply(UnaryOp operation)
+    {
+        return operation.applyLong(this.value);
     }
 
     @Override

@@ -38,6 +38,12 @@ implements ExpressionEvaluationVisitor
     }
 
     @Override
+    public Value visitUnaryExpr(UnaryExpr expr)
+    {
+        return expr.getOperation().apply(expr.getOperand().evaluate(this));
+    }
+
+    @Override
     public Value visitConstExpr(ConstExpr expr)
     {
         return expr.getValue();

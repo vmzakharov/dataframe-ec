@@ -1,6 +1,7 @@
 package io.github.vmzakharov.ecdataframe.dsl.value;
 
 import io.github.vmzakharov.ecdataframe.dsl.ArithmeticOp;
+import io.github.vmzakharov.ecdataframe.dsl.UnaryOp;
 
 abstract public class BooleanValue
 extends AbstractValue
@@ -45,6 +46,12 @@ implements Value
     public Value apply(Value another, ArithmeticOp operation)
     {
         throw new UnsupportedOperationException("Cannot apply " + operation.asString() + " to a boolean");
+    }
+
+    @Override
+    public Value apply(UnaryOp operation)
+    {
+        return operation.applyBoolean(this.isTrue());
     }
 
     abstract public boolean isTrue();

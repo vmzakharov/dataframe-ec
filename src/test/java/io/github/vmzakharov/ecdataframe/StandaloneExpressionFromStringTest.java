@@ -8,16 +8,28 @@ public class StandaloneExpressionFromStringTest
     private static final double TOLERANCE = 0.00000001;
 
     @Test
+    public void numbers()
+    {
+        Assert.assertEquals(1, ExpressionTestUtil.evaluateToLong("1"));
+        Assert.assertEquals(-1, ExpressionTestUtil.evaluateToLong("-1"));
+        Assert.assertEquals(10.12, ExpressionTestUtil.evaluateToDouble("10.12"), TOLERANCE);
+        Assert.assertEquals(-11.13, ExpressionTestUtil.evaluateToDouble("-11.13"), TOLERANCE);
+    }
+
+    @Test
     public void operationOrder()
     {
-        Assert.assertEquals(13, ExpressionTestUtil.evaluateToInt("3 + 5 * 2"));
-        Assert.assertEquals(17, ExpressionTestUtil.evaluateToInt("3 * 5 + 2"));
-        Assert.assertEquals(16, ExpressionTestUtil.evaluateToInt("(3 + 5) * 2"));
-        Assert.assertEquals(-8, ExpressionTestUtil.evaluateToInt("(3 + 5) * (2 - 4) / 2"));
-        Assert.assertEquals( 6, ExpressionTestUtil.evaluateToInt("(3 + 5) / 4 * 3"));
-        Assert.assertEquals( 6, ExpressionTestUtil.evaluateToInt("(3 + 5) * 3 / 4"));
+        Assert.assertEquals(13, ExpressionTestUtil.evaluateToLong("3 + 5 * 2"));
+        Assert.assertEquals(17, ExpressionTestUtil.evaluateToLong("3 * 5 + 2"));
+        Assert.assertEquals(16, ExpressionTestUtil.evaluateToLong("(3 + 5) * 2"));
+        Assert.assertEquals(-8, ExpressionTestUtil.evaluateToLong("(3 + 5) * (2 - 4) / 2"));
+        Assert.assertEquals( 6, ExpressionTestUtil.evaluateToLong("(3 + 5) / 4 * 3"));
+        Assert.assertEquals( 6, ExpressionTestUtil.evaluateToLong("(3 + 5) * 3 / 4"));
 
-        Assert.assertEquals(-8, ExpressionTestUtil.evaluateToInt("(3+ 5) * (2 -4)/(1+1)"));
+        Assert.assertEquals(-8, ExpressionTestUtil.evaluateToLong("(3+ 5) * (2 -4)/(1+1)"));
+
+        // looks bad, but parses...
+        Assert.assertEquals(-7, ExpressionTestUtil.evaluateToLong("3 + -5 * 2"));
     }
 
     @Test

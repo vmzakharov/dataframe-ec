@@ -9,7 +9,7 @@ import java.time.LocalDate;
 
 public class ExpressionTestUtil
 {
-    static public long evaluateToInt(String s)
+    static public long evaluateToLong(String s)
     {
         return ((LongValue) evaluate(s)).longValue();
     }

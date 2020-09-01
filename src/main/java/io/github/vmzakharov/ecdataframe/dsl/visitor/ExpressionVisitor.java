@@ -7,6 +7,7 @@ public interface ExpressionVisitor
     void visitAliasExpr(AliasExpr expr);
     void visitAssignExpr(AssingExpr expr);
     void visitBinaryExpr(BinaryExpr expr);
+    void visitUnaryExpr(UnaryExpr expr);
     void visitConstExpr(ConstExpr expr);
     void visitFunctionCallExpr(FunctionCallExpr expr);
     void visitIfElseExpr(IfElseExpr expr);

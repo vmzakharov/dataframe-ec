@@ -2,6 +2,7 @@ package io.github.vmzakharov.ecdataframe.dsl.value;
 
 import io.github.vmzakharov.ecdataframe.dsl.ArithmeticOp;
 import io.github.vmzakharov.ecdataframe.dsl.ComparisonOp;
+import io.github.vmzakharov.ecdataframe.dsl.UnaryOp;
 
 public interface Value
 extends Comparable<Value>
@@ -29,6 +30,11 @@ extends Comparable<Value>
     String asStringLiteral();
 
     default Value apply(Value another, ArithmeticOp operation)
+    {
+        throw new UnsupportedOperationException("Undefined operation " + operation.asString() + " on " + this.asStringLiteral());
+    }
+
+    default Value apply(UnaryOp operation)
     {
         throw new UnsupportedOperationException("Undefined operation " + operation.asString() + " on " + this.asStringLiteral());
     }

@@ -93,6 +93,12 @@ implements ExpressionVisitor
         this.store(resultType);
     }
 
+    @Override
+    public void visitUnaryExpr(UnaryExpr expr)
+    {
+        expr.getOperand().accept(this);
+    }
+
     private void store(ValueType valueType)
     {
         this.expressionTypeStack.push(valueType);

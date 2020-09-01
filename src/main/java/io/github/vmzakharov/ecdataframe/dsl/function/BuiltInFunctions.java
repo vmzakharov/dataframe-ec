@@ -92,7 +92,40 @@ public class BuiltInFunctions
             }
         },
 
-        new IntrinsicFunctionDescriptor("toDate") {
+            new IntrinsicFunctionDescriptor("abs") {
+                @Override
+                public Value evaluate(EvalContext context)
+                {
+                    VectorValue parameters = (VectorValue) context.getVariableOrDefault(magicalParameterName(), VectorValue.EMPTY);
+
+                    if (parameters.size() != 1)
+                    {
+                        throw new RuntimeException("Invalid number of parameters in a call to '" + this.getName() + "'. " + this.usageString());
+                    }
+
+                    Value value = parameters.get(0);
+                    if (value.isDouble())
+                    {
+                        return new DoubleValue(Math.abs(((DoubleValue) value).doubleValue()));
+                    }
+                    else if (value.isLong())
+                    {
+                        return new LongValue(Math.abs(((LongValue) value).longValue()));
+                    }
+                    else
+                    {
+                        throw new RuntimeException("Invalid parameter type (" + value.getType() + ") in a call to '" + this.getName() + "'. " + this.usageString());
+                    }
+                }
+
+                @Override
+                public String usageString()
+                {
+                    return "Usage: " + this.getName() + "(number)";
+                }
+            },
+
+            new IntrinsicFunctionDescriptor("toDate") {
             @Override
             public Value evaluate(EvalContext context)
             {

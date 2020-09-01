@@ -8,8 +8,18 @@ import org.eclipse.collections.impl.factory.Lists;
 import org.junit.Assert;
 import org.junit.Test;
 
-public class SimpleExpressionFromString
+public class SimpleExpressionParsingTest
 {
+    @Test
+    public void negativeNumber()
+    {
+        Expression expression = ExpressionParserHelper.toExpression("-1\n");
+
+        Assert.assertEquals(UnaryExpr.class, expression.getClass());
+        UnaryExpr unaryExpr = (UnaryExpr) expression;
+        Assert.assertEquals(ArithmeticUnaryOp.MINUS, unaryExpr.getOperation());
+    }
+
     @Test
     public void assignment()
     {

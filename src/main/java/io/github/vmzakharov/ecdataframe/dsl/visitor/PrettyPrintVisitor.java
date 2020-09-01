@@ -47,6 +47,12 @@ implements ExpressionVisitor
     }
 
     @Override
+    public void visitUnaryExpr(UnaryExpr expr)
+    {
+        this.print(expr.getOperation().asString()).print("(").printExpression(expr.getOperand()).print(")");
+    }
+
+    @Override
     public void visitConstExpr(ConstExpr expr)
     {
         this.print(expr.getValue().asStringLiteral());

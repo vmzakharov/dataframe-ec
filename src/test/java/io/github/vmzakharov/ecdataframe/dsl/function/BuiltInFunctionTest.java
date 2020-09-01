@@ -59,4 +59,13 @@ public class BuiltInFunctionTest
         Assert.assertFalse(ExpressionTestUtil.evaluateToBoolean("startsWith(\"Hello, there!\", \"Hola\")"));
         Assert.assertFalse(ExpressionTestUtil.evaluateToBoolean("startsWith(\"Hello, there!\", \"there\")"));
     }
+
+    @Test
+    public void abs()
+    {
+        Assert.assertEquals(10, ExpressionTestUtil.evaluateToLong("abs(-10)"));
+        Assert.assertEquals(10, ExpressionTestUtil.evaluateToLong("abs(10)"));
+        Assert.assertEquals(10.0, ExpressionTestUtil.evaluateToDouble("abs(-10.0)"), 0.0);
+        Assert.assertEquals(10.0, ExpressionTestUtil.evaluateToDouble("abs(10.0)"), 0.0);
+    }
 }

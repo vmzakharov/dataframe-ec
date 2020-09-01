@@ -7,6 +7,7 @@ public interface ExpressionEvaluationVisitor
 {
     Value visitAssignExpr(AssingExpr expr);
     Value visitBinaryExpr(BinaryExpr expr);
+    Value visitUnaryExpr(UnaryExpr expr);
     Value visitConstExpr(ConstExpr expr);
     Value visitFunctionCallExpr(FunctionCallExpr expr);
     Value visitIfElseExpr(IfElseExpr expr);

@@ -2,6 +2,7 @@ package io.github.vmzakharov.ecdataframe.dsl.value;
 
 import io.github.vmzakharov.ecdataframe.dsl.ArithmeticOp;
 import io.github.vmzakharov.ecdataframe.dsl.ComparisonOp;
+import io.github.vmzakharov.ecdataframe.dsl.UnaryOp;
 
 public class DoubleValue
 extends AbstractValue
@@ -29,6 +30,12 @@ implements NumberValue
     public Value apply(Value another, ArithmeticOp operation)
     {
         return operation.applyDouble(this.doubleValue(), ((NumberValue) another).doubleValue());
+    }
+
+    @Override
+    public Value apply(UnaryOp operation)
+    {
+        return operation.applyDouble(this.value);
     }
 
     @Override
