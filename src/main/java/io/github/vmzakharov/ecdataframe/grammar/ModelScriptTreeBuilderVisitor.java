@@ -197,7 +197,13 @@ extends ModelScriptBaseVisitor<Expression>
     @Override
     public Expression visitUnaryMinusExpr(ModelScriptParser.UnaryMinusExprContext ctx)
     {
-        return new UnaryExpr(ArithmeticUnaryOp.MINUS, this.visit(ctx.expr()));
+        return new UnaryExpr(UnaryOp.MINUS, this.visit(ctx.expr()));
+    }
+
+    @Override
+    public Expression visitNotExpr(ModelScriptParser.NotExprContext ctx)
+    {
+        return new UnaryExpr(UnaryOp.NOT, this.visit(ctx.expr()));
     }
 
     @Override

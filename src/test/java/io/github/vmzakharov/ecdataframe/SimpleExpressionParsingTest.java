@@ -17,7 +17,7 @@ public class SimpleExpressionParsingTest
 
         Assert.assertEquals(UnaryExpr.class, expression.getClass());
         UnaryExpr unaryExpr = (UnaryExpr) expression;
-        Assert.assertEquals(ArithmeticUnaryOp.MINUS, unaryExpr.getOperation());
+        Assert.assertEquals(UnaryOp.MINUS, unaryExpr.getOperation());
     }
 
     @Test

@@ -7,6 +7,29 @@ import io.github.vmzakharov.ecdataframe.dsl.value.Value;
 
 public interface UnaryOp
 {
+    UnaryOp MINUS = new UnaryOp()
+    {
+        @Override
+        public LongValue applyLong(long operand) { return new LongValue(-operand); }
+
+        @Override
+        public DoubleValue applyDouble(double operand) { return new DoubleValue(-operand); }
+
+        @Override
+        public String asString() { return "-"; }
+    };
+
+    UnaryOp NOT = new UnaryOp()
+    {
+        @Override
+        public BooleanValue applyBoolean(boolean operand)
+        {
+            return BooleanValue.valueOf(!operand);
+        }
+
+        public String asString() { return "!"; }
+    };
+
     String asString();
 
     default BooleanValue applyBoolean(boolean operand)

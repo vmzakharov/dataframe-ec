@@ -76,6 +76,13 @@ public class StandaloneExpressionFromStringTest
     }
 
     @Test
+    public void notOperation()
+    {
+        Assert.assertTrue(ExpressionTestUtil.evaluateToBoolean("not (1 > 2"));
+        Assert.assertFalse(ExpressionTestUtil.evaluateToBoolean("not (123 not in [])"));
+    }
+
+    @Test
     public void inOperation()
     {
         Assert.assertTrue(ExpressionTestUtil.evaluateToBoolean("\"foo\" in [\"foo\", \"bar\", \"baz\"]"));
