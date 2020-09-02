@@ -1,7 +1,10 @@
 package io.github.vmzakharov.ecdataframe.dataframe;
 
+import io.github.vmzakharov.ecdataframe.dsl.value.ValueType;
 import org.junit.Assert;
 import org.junit.Test;
+
+import java.time.LocalDate;
 
 public class BasicDataFrameTest
 {
@@ -36,6 +39,30 @@ public class BasicDataFrameTest
 
         Assert.assertEquals("11", df.getValueAsString(2, 1));
         Assert.assertEquals("11", df.getValueAsStringLiteral(2, 1));
+    }
 
+    @Test
+    public void addColumn()
+    {
+        DataFrame dataFrame = new DataFrame("df1")
+                .addColumn("String", ValueType.STRING)
+                .addColumn("Long", ValueType.LONG)
+                .addColumn("Double", ValueType.DOUBLE)
+                .addColumn("Date", ValueType.DATE)
+                .addColumn("StringComp", ValueType.STRING, "String + \"-meep\"")
+                .addColumn("LongComp", ValueType.LONG, "Long * 2")
+                .addColumn("DoubleComp", ValueType.DOUBLE, "Double + 10.0")
+//                .addColumn("DateComp", ValueType.DATE, "Date")
+                ;
+
+        dataFrame.addRow("Beep", 10, 20.0, LocalDate.of(2020, 10, 20));
+
+        Assert.assertEquals("Beep", dataFrame.getString("String", 0));
+        Assert.assertEquals("Beep-meep", dataFrame.getString("StringComp", 0));
+        Assert.assertEquals(10, dataFrame.getLong("Long", 0));
+        Assert.assertEquals(20, dataFrame.getLong("LongComp", 0));
+        Assert.assertEquals(20.0, dataFrame.getDouble("Double", 0), 0.000001);
+        Assert.assertEquals(30.0, dataFrame.getDouble("DoubleComp", 0), 0.000001);
+        Assert.assertEquals(LocalDate.of(2020, 10, 20), dataFrame.getDate("Date", 0));
     }
 }

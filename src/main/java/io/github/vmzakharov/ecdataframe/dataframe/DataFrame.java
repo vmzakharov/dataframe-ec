@@ -25,6 +25,8 @@ import org.eclipse.collections.impl.list.primitive.IntInterval;
 import org.eclipse.collections.impl.tuple.Tuples;
 import org.eclipse.collections.impl.utility.ArrayIterate;
 
+import java.time.LocalDate;
+
 public class DataFrame
 {
     private final String name;
@@ -208,6 +210,28 @@ public class DataFrame
         return this;
     }
 
+    public DataFrame addColumn(String name, ValueType type, String expressionAsString)
+    {
+        switch (type)
+        {
+            case LONG:
+                this.addLongColumn(name, expressionAsString);
+                break;
+            case DOUBLE:
+                this.addDoubleColumn(name, expressionAsString);
+                break;
+            case STRING:
+                this.addStringColumn(name, expressionAsString);
+                break;
+            case DATE:
+                this.addDateColumn(name, expressionAsString);
+                break;
+            default:
+                throw new RuntimeException("Cannot add a column for values of type " + type);
+        }
+        return this;
+    }
+
     private int rowIndexMap(int virtualRowIndex)
     {
         if (this.isIndexed())
@@ -272,6 +296,11 @@ public class DataFrame
         return this.getDoubleColumn(columnName).getDouble(this.rowIndexMap(rowIndex));
     }
 
+    public LocalDate getDate(String columnName, int rowIndex)
+    {
+        return this.getDateColumn(columnName).getDate(this.rowIndexMap(rowIndex));
+    }
+
     public DfLongColumn getLongColumn(String columnName)
     {
         return (DfLongColumn) this.getColumnNamed(columnName);
@@ -280,6 +309,11 @@ public class DataFrame
     public DfDoubleColumn getDoubleColumn(String columnName)
     {
         return (DfDoubleColumn) this.getColumnNamed(columnName);
+    }
+
+    public DfDateColumn getDateColumn(String columnName)
+    {
+        return (DfDateColumn) this.getColumnNamed(columnName);
     }
 
     public DfStringColumn getStringColumn(String columnName)
