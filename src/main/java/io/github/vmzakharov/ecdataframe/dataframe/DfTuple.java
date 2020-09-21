@@ -45,6 +45,15 @@ implements Comparable<DfTuple>
             Object thisItem = these[i];
             Object thatItem = others[i];
 
+            if (thisItem == null)
+            {
+                return (thatItem == null) ? 0 : -1;
+            }
+
+            if (thatItem == null)
+            {
+                return 1;
+            }
 
             int result = ((Comparable) thisItem).compareTo(thatItem);
             if (result != 0)

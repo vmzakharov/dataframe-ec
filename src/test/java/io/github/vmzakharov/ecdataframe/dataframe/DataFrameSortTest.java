@@ -5,6 +5,8 @@ import org.eclipse.collections.api.factory.Lists;
 import org.junit.Assert;
 import org.junit.Test;
 
+import java.time.LocalDate;
+
 public class DataFrameSortTest
 {
     @Test
@@ -211,6 +213,60 @@ public class DataFrameSortTest
                 ;
 
 //        expected.addDoubleColumn("Xxx", "Bar * 2 + Baz");
+
+        DataFrameUtil.assertEquals(expected, dataFrame);
+    }
+
+    @Test
+    public void multiColumnSortWithNulls()
+    {
+        DataFrame dataFrame = new DataFrame("FrameOfData")
+                .addStringColumn("Name").addStringColumn("Foo").addLongColumn("Bar").addDoubleColumn("Baz").addDoubleColumn("Qux")
+                .addRow(null,      "456",  11L, 10.0, 20.0)
+                .addRow("Carol",   "Xyz",  15L, 28.0, 40.0)
+                .addRow(null,      "123",  15L, 15.0, 10.0)
+                .addRow("Bob",     "Def",  13L, 13.0, 25.0)
+                .addRow("Carol",   "Zzz",  14L, 14.0, 40.0)
+                .addRow("Abigail", "789",  12L, 12.0, 11.0);
+
+        dataFrame.sortBy(Lists.immutable.of("Name", "Bar"));
+
+        DataFrame expected = new DataFrame("Expected FrameOfData")
+                .addStringColumn("Name").addStringColumn("Foo").addLongColumn("Bar").addDoubleColumn("Baz").addDoubleColumn("Qux")
+                .addRow(null,      "456",  11L, 10.0, 20.0)
+                .addRow(null,      "123",  15L, 15.0, 10.0)
+                .addRow("Abigail", "789",  12L, 12.0, 11.0)
+                .addRow("Bob",     "Def",  13L, 13.0, 25.0)
+                .addRow("Carol",   "Zzz",  14L, 14.0, 40.0)
+                .addRow("Carol",   "Xyz",  15L, 28.0, 40.0)
+                ;
+
+        DataFrameUtil.assertEquals(expected, dataFrame);
+    }
+
+    @Test
+    public void sortByDate()
+    {
+        DataFrame dataFrame = new DataFrame("FrameOfData")
+                .addStringColumn("Name").addDateColumn("Date")
+                .addRow("Abigail", LocalDate.of(2020, 9, 11))
+                .addRow("Carol",   LocalDate.of(2020, 9, 14))
+                .addRow("Abigail", LocalDate.of(2020, 9, 10))
+                .addRow("Bob",     LocalDate.of(2020, 9, 13))
+                .addRow("Carol",                        null)
+                .addRow("Abigail",                      null);
+
+        dataFrame.sortBy(Lists.immutable.of("Name", "Date"));
+
+        DataFrame expected = new DataFrame("Expected FrameOfData")
+                .addStringColumn("Name").addDateColumn("Date")
+                .addRow("Abigail",                      null)
+                .addRow("Abigail", LocalDate.of(2020, 9, 10))
+                .addRow("Abigail", LocalDate.of(2020, 9, 11))
+                .addRow("Bob",     LocalDate.of(2020, 9, 13))
+                .addRow("Carol",                        null)
+                .addRow("Carol",   LocalDate.of(2020, 9, 14))
+                ;
 
         DataFrameUtil.assertEquals(expected, dataFrame);
     }

@@ -3,7 +3,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>io.github.vmzakharov</groupId>
     <artifactId>dataframe-ec</artifactId>
-    <version>0.1.0-SNAPSHOT</version>
+    <version>0.2.1-SNAPSHOT</version>
     <packaging>jar</packaging>
     <name>dataframe-ec</name>
     <description>A tabular data structure based on the Eclipse Collections framework</description>
@@ -33,7 +33,7 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <eclipseCollections.version>10.3.0</eclipseCollections.version>
+        <eclipseCollections.version>10.4.0</eclipseCollections.version>
     </properties>
 
     <dependencies>
@@ -74,13 +74,6 @@
                     <target>1.8</target>
                 </configuration>
             </plugin>
-            <!-- Plugin to compile the g4 files ahead of the java files
-                 See https://github.com/antlr/antlr4/blob/master/antlr4-maven-plugin/src/site/apt/examples/simple.apt.vm
-                 Except that the grammar does not need to contain the package declaration as stated in the documentation (I do not know why)
-                 To use this plugin, type:
-                   mvn antlr4:antlr4
-                 In any case, Maven will invoke this plugin before the Java source is compiled
-              -->
             <plugin>
                 <groupId>org.antlr</groupId>
                 <artifactId>antlr4-maven-plugin</artifactId>
@@ -93,27 +86,6 @@
                     <execution>
                         <goals>
                             <goal>antlr4</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-            <!-- plugin to create a self-contained portable package
-                 This allows us to execute our application like this:
-                 java -cp target/array-init-1.0-jar-with-dependencies.jar org.abcd.examples.ArrayInit.ArrayInit
-               -->
-            <plugin>
-                <artifactId>maven-assembly-plugin</artifactId>
-                <configuration>
-                    <descriptorRefs>
-                        <descriptorRef>jar-with-dependencies</descriptorRef>
-                    </descriptorRefs>
-                </configuration>
-                <executions>
-                    <execution>
-                        <id>simple-command</id>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>attached</goal>
                         </goals>
                     </execution>
                 </executions>

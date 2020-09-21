@@ -1,12 +1,14 @@
 package io.github.vmzakharov.ecdataframe.dsl.value;
 
+import io.github.vmzakharov.ecdataframe.dsl.ComparisonOp;
+
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 
 public class DateValue
 extends AbstractValue
 {
-    static private final DateTimeFormatter formatter = DateTimeFormatter.ISO_DATE;
+    static private final DateTimeFormatter FORMATTER = DateTimeFormatter.ISO_DATE;
 
     private final LocalDate value;
 
@@ -21,9 +23,15 @@ extends AbstractValue
         return this.value.format(this.getFormatter());
     }
 
+    @Override
+    public BooleanValue applyComparison(Value another, ComparisonOp operation)
+    {
+        return operation.applyDate(this.dateValue(), ((DateValue) another).dateValue());
+    }
+
     private DateTimeFormatter getFormatter()
     {
-        return this.formatter;
+        return this.FORMATTER;
     }
 
     @Override

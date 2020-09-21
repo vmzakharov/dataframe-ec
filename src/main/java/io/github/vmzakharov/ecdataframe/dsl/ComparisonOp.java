@@ -3,6 +3,8 @@ package io.github.vmzakharov.ecdataframe.dsl;
 import io.github.vmzakharov.ecdataframe.dsl.value.BooleanValue;
 import io.github.vmzakharov.ecdataframe.dsl.value.Value;
 
+import java.time.LocalDate;
+
 public interface ComparisonOp
 extends BinaryOp
 {
@@ -11,8 +13,25 @@ extends BinaryOp
         @Override
         public BooleanValue applyString(String operand1, String operand2)
         {
+            if (operand1 == null)
+            {
+                return BooleanValue.valueOf(operand2 == null);
+            }
+
             return BooleanValue.valueOf(operand1.equals(operand2));
         }
+
+        @Override
+        public BooleanValue applyDate(LocalDate operand1, LocalDate operand2)
+        {
+            if (operand1 == null)
+            {
+                return BooleanValue.valueOf(operand2 == null);
+            }
+
+            return BooleanValue.valueOf(operand1.equals(operand2));
+        }
+
         @Override
         public BooleanValue applyLong(long operand1, long operand2)
         {
@@ -36,6 +55,13 @@ extends BinaryOp
         {
             return BooleanValue.valueOf(!operand1.equals(operand2));
         }
+
+        @Override
+        public BooleanValue applyDate(LocalDate operand1, LocalDate operand2)
+        {
+            return BooleanValue.valueOf(!operand1.equals(operand2));
+        }
+
         @Override
         public BooleanValue applyLong(long operand1, long operand2)
         {
@@ -57,8 +83,35 @@ extends BinaryOp
         @Override
         public BooleanValue applyString(String operand1, String operand2)
         {
+            if (operand2 == null)
+            {
+                return BooleanValue.FALSE;
+            }
+
+            if (operand1 == null)
+            {
+                return BooleanValue.TRUE;
+            }
+
             return BooleanValue.valueOf(operand1.compareTo(operand2) < 0);
         }
+
+        @Override
+        public BooleanValue applyDate(LocalDate operand1, LocalDate operand2)
+        {
+            if (operand2 == null)
+            {
+                return BooleanValue.FALSE;
+            }
+
+            if (operand1 == null)
+            {
+                return BooleanValue.TRUE;
+            }
+
+            return BooleanValue.valueOf(operand1.compareTo(operand2) < 0);
+        }
+
         @Override
         public BooleanValue applyLong(long operand1, long operand2)
         {
@@ -80,8 +133,35 @@ extends BinaryOp
         @Override
         public BooleanValue applyString(String operand1, String operand2)
         {
+            if (operand1 == null)
+            {
+                return BooleanValue.TRUE;
+            }
+
+            if (operand2 == null)
+            {
+                return BooleanValue.FALSE;
+            }
+
             return BooleanValue.valueOf(operand1.compareTo(operand2) <= 0);
         }
+
+        @Override
+        public BooleanValue applyDate(LocalDate operand1, LocalDate operand2)
+        {
+            if (operand1 == null)
+            {
+                return BooleanValue.TRUE;
+            }
+
+            if (operand2 == null)
+            {
+                return BooleanValue.FALSE;
+            }
+
+            return BooleanValue.valueOf(operand1.compareTo(operand2) <= 0);
+        }
+
         @Override
         public BooleanValue applyLong(long operand1, long operand2)
         {
@@ -103,8 +183,35 @@ extends BinaryOp
         @Override
         public BooleanValue applyString(String operand1, String operand2)
         {
+            if (operand1 == null)
+            {
+                return BooleanValue.FALSE;
+            }
+
+            if (operand2 == null)
+            {
+                return BooleanValue.TRUE;
+            }
+
             return BooleanValue.valueOf(operand1.compareTo(operand2) > 0);
         }
+
+        @Override
+        public BooleanValue applyDate(LocalDate operand1, LocalDate operand2)
+        {
+            if (operand1 == null)
+            {
+                return BooleanValue.FALSE;
+            }
+
+            if (operand2 == null)
+            {
+                return BooleanValue.TRUE;
+            }
+
+            return BooleanValue.valueOf(operand1.compareTo(operand2) > 0);
+        }
+
         @Override
         public BooleanValue applyLong(long operand1, long operand2)
         {
@@ -126,8 +233,35 @@ extends BinaryOp
         @Override
         public BooleanValue applyString(String operand1, String operand2)
         {
+            if (operand2 == null)
+            {
+                return BooleanValue.TRUE;
+            }
+
+            if (operand1 == null)
+            {
+                return BooleanValue.FALSE;
+            }
+
             return BooleanValue.valueOf(operand1.compareTo(operand2) >= 0);
         }
+
+        @Override
+        public BooleanValue applyDate(LocalDate operand1, LocalDate operand2)
+        {
+            if (operand2 == null)
+            {
+                return BooleanValue.TRUE;
+            }
+
+            if (operand1 == null)
+            {
+                return BooleanValue.FALSE;
+            }
+
+            return BooleanValue.valueOf(operand1.compareTo(operand2) >= 0);
+        }
+
         @Override
         public BooleanValue applyLong(long operand1, long operand2)
         {
@@ -150,6 +284,8 @@ extends BinaryOp
     }
 
     BooleanValue applyString(String operand1, String operand2);
+
+    BooleanValue applyDate(LocalDate operand1, LocalDate operand2);
 
     BooleanValue applyLong(long operand1, long operand2);
 

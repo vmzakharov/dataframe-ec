@@ -38,9 +38,9 @@ expr :
     | expr op=(MUL | DIV) expr #mulDivExpr
     | expr op=(ADD | SUB) expr #addSubExpr
     | expr op=(GT | GTE | LT | LTE | EQ | NE) expr #compareExpr
+    | expr (NOT_IN | IN) vectorExpr #inExpr
     | expr op=AND expr         #andExpr
     | expr op=(OR | XOR) expr  #orExpr
-    | expr (NOT_IN | IN) vectorExpr #inExpr
     | vectorExpr               #standaloneVectorExpr
     | INT                      #intLiteralExpr
     | DOUBLE                   #doubleLiteralExpr
@@ -85,7 +85,6 @@ INT : DIGIT+;
 DOUBLE : ('.' DIGIT+ | DIGIT+ ('.' DIGIT*)? ) ;
 WS : [ \t]+ -> skip;
 NL : [\n\r] -> skip;
-//NL : [\n\r];
 STRING : '"' ( ESC | . )*? '"' ;
 
 fragment
