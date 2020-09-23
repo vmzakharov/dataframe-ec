@@ -47,6 +47,17 @@ extends AbstractValue
     public int compareTo(Value other)
     {
         this.checkSameTypeForComparison(other);
+
+        if (this.stringValue() == null)
+        {
+            return other.stringValue() == null ? 0 : -1;
+        }
+
+        if (other.stringValue() == null)
+        {
+            return 1;
+        }
+
         return other.isVoid() ? 1 : this.stringValue().compareTo(other.stringValue());
     }
 }

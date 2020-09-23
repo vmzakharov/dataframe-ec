@@ -1,5 +1,9 @@
 package io.github.vmzakharov.ecdataframe;
 
+import io.github.vmzakharov.ecdataframe.dsl.BinaryExpr;
+import io.github.vmzakharov.ecdataframe.dsl.BinaryOp;
+import io.github.vmzakharov.ecdataframe.dsl.ConstExpr;
+import io.github.vmzakharov.ecdataframe.dsl.Expression;
 import io.github.vmzakharov.ecdataframe.dsl.value.*;
 import io.github.vmzakharov.ecdataframe.dsl.visitor.InMemoryEvaluationVisitor;
 import io.github.vmzakharov.ecdataframe.util.ExpressionParserHelper;
@@ -39,5 +43,12 @@ public class ExpressionTestUtil
     public static LocalDate evaluateToDate(String s)
     {
         return ((DateValue) evaluate(s)).dateValue();
+    }
+
+    public static boolean evaluate(BinaryOp op, Value value1, Value value2)
+    {
+        InMemoryEvaluationVisitor evaluationVisitor = new InMemoryEvaluationVisitor();
+        Expression expression = new BinaryExpr(new ConstExpr(value1), new ConstExpr(value2), op);
+        return ((BooleanValue) expression.evaluate(evaluationVisitor)).isTrue();
     }
 }

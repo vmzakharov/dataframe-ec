@@ -46,8 +46,22 @@ extends AbstractValue
     }
 
     @Override
-    public int compareTo(Value o)
+    public int compareTo(Value other)
     {
-        return 0;
+        this.checkSameTypeForComparison(other);
+
+        DateValue otherDate = (DateValue) other;
+
+        if (this.dateValue() == null)
+        {
+            return otherDate.dateValue() == null ? 0 : -1;
+        }
+
+        if (otherDate.dateValue() == null)
+        {
+            return 1;
+        }
+
+        return other.isVoid() ? 1 : this.dateValue().compareTo(otherDate.dateValue());
     }
 }
