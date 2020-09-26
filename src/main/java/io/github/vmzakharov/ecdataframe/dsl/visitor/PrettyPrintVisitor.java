@@ -163,7 +163,13 @@ implements ExpressionVisitor
     @Override
     public void visitVectorExpr(VectorExpr expr)
     {
-        this.print("[").printExpressionList(expr.getElements()).print("]");
+        this.print("(").printExpressionList(expr.getElements()).print(")");
+    }
+
+    @Override
+    public void visitIndexExpr(IndexExpr expr)
+    {
+        this.printExpression(expr.getVectorExpr()).print("[").printExpression(expr.getIndexExpr()).print("]");
     }
 
     @Override

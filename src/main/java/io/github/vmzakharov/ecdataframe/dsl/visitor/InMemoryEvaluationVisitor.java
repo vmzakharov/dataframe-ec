@@ -214,6 +214,14 @@ implements ExpressionEvaluationVisitor
         );
     }
 
+    @Override
+    public Value visitIndexExpr(IndexExpr expr)
+    {
+        VectorValue vector = (VectorValue) expr.getVectorExpr().evaluate(this);
+        LongValue index = (LongValue) expr.getIndexExpr().evaluate(this);
+        return vector.get((int) index.longValue());
+    }
+
     public EvalContext getContext()
     {
         return this.context;

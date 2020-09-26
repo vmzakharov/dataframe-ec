@@ -231,6 +231,15 @@ extends ModelScriptBaseVisitor<Expression>
     }
 
     @Override
+    public Expression visitIndexVectorExpr(ModelScriptParser.IndexVectorExprContext ctx)
+    {
+        return new IndexExpr(
+            this.visit(ctx.expr(0)),
+            this.visit(ctx.expr(1))
+        );
+    }
+
+    @Override
     public Expression visitFunctionCallExpr(ModelScriptParser.FunctionCallExprContext ctx)
     {
         String functionName = ctx.ID().toString();

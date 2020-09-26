@@ -35,13 +35,13 @@ expr :
     | '(' expr ')'             #parenExpr
     | '-' expr                 #unaryMinusExpr
     | NOT expr                 #notExpr
+    | expr '[' expr ']'        #indexVectorExpr
     | expr op=(MUL | DIV) expr #mulDivExpr
     | expr op=(ADD | SUB) expr #addSubExpr
     | expr op=(GT | GTE | LT | LTE | EQ | NE) expr #compareExpr
-    | expr (NOT_IN | IN) expr #inExpr
+    | expr (NOT_IN | IN) expr  #inExpr
     | expr op=AND expr         #andExpr
     | expr op=(OR | XOR) expr  #orExpr
-    | vectorExpr '[' expr ']'   #indexVectorExpr
     | vectorExpr               #standaloneVectorExpr
     | INT                      #intLiteralExpr
     | DOUBLE                   #doubleLiteralExpr

@@ -198,6 +198,13 @@ implements ExpressionVisitor
     }
 
     @Override
+    public void visitIndexExpr(IndexExpr expr)
+    {
+        // see the todo above
+        this.store(ValueType.VOID);
+    }
+
+    @Override
     public void visitIfElseExpr(IfElseExpr expr)
     {
         // todo: implement

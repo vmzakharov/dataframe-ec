@@ -18,4 +18,5 @@ public interface ExpressionEvaluationVisitor
     Value visitVarExpr(VarExpr expr);
     Value visitProjectionExpr(ProjectionExpr expr);
     Value visitVectorExpr(VectorExpr expr);
+    Value visitIndexExpr(IndexExpr expr);
 }

@@ -18,4 +18,5 @@ public interface ExpressionVisitor
     void visitVarExpr(VarExpr expr);
     void visitProjectionExpr(ProjectionExpr expr);
     void visitVectorExpr(VectorExpr expr);
+    void visitIndexExpr(IndexExpr expr);
 }
