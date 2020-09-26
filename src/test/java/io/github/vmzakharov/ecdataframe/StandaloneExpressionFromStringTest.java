@@ -79,28 +79,28 @@ public class StandaloneExpressionFromStringTest
     public void notOperation()
     {
         Assert.assertTrue(ExpressionTestUtil.evaluateToBoolean("not (1 > 2)"));
-        Assert.assertFalse(ExpressionTestUtil.evaluateToBoolean("not (123 not in [])"));
+        Assert.assertFalse(ExpressionTestUtil.evaluateToBoolean("not (123 not in ())"));
     }
 
     @Test
     public void inOperation()
     {
-        Assert.assertTrue(ExpressionTestUtil.evaluateToBoolean("\"foo\" in [\"foo\", \"bar\", \"baz\"]"));
-        Assert.assertFalse(ExpressionTestUtil.evaluateToBoolean("\"foo\" in [\"qux\", \"bar\", \"baz\"]"));
-        Assert.assertTrue(ExpressionTestUtil.evaluateToBoolean("123 in [456, 567, 123]"));
-        Assert.assertFalse(ExpressionTestUtil.evaluateToBoolean("123 in [456, 567, 789]"));
-        Assert.assertFalse(ExpressionTestUtil.evaluateToBoolean("123 in []"));
-        Assert.assertFalse(ExpressionTestUtil.evaluateToBoolean("\"abc\" in []"));
+        Assert.assertTrue(ExpressionTestUtil.evaluateToBoolean("\"foo\" in (\"foo\", \"bar\", \"baz\")"));
+        Assert.assertFalse(ExpressionTestUtil.evaluateToBoolean("\"foo\" in (\"qux\", \"bar\", \"baz\")"));
+        Assert.assertTrue(ExpressionTestUtil.evaluateToBoolean("123 in (456, 567, 123)"));
+        Assert.assertFalse(ExpressionTestUtil.evaluateToBoolean("123 in (456, 567, 789)"));
+        Assert.assertFalse(ExpressionTestUtil.evaluateToBoolean("123 in ()"));
+        Assert.assertFalse(ExpressionTestUtil.evaluateToBoolean("\"abc\" in ()"));
     }
 
     @Test
     public void notInOperation()
     {
-        Assert.assertFalse(ExpressionTestUtil.evaluateToBoolean("\"foo\" not in [\"foo\", \"bar\", \"baz\"]"));
-        Assert.assertTrue(ExpressionTestUtil.evaluateToBoolean("\"foo\" not in [\"qux\", \"bar\", \"baz\"]"));
-        Assert.assertFalse(ExpressionTestUtil.evaluateToBoolean("123 not in [456, 567, 123]"));
-        Assert.assertTrue(ExpressionTestUtil.evaluateToBoolean("123 not in [456, 567, 789]"));
-        Assert.assertTrue(ExpressionTestUtil.evaluateToBoolean("123 not in []"));
-        Assert.assertTrue(ExpressionTestUtil.evaluateToBoolean("\"abc\" not in []"));
+        Assert.assertFalse(ExpressionTestUtil.evaluateToBoolean("\"foo\" not in (\"foo\", \"bar\", \"baz\")"));
+        Assert.assertTrue(ExpressionTestUtil.evaluateToBoolean("\"foo\" not in (\"qux\", \"bar\", \"baz\")"));
+        Assert.assertFalse(ExpressionTestUtil.evaluateToBoolean("123 not in (456, 567, 123)"));
+        Assert.assertTrue(ExpressionTestUtil.evaluateToBoolean("123 not in (456, 567, 789)"));
+        Assert.assertTrue(ExpressionTestUtil.evaluateToBoolean("123 not in ()"));
+        Assert.assertTrue(ExpressionTestUtil.evaluateToBoolean("\"abc\" not in ()"));
     }
 }

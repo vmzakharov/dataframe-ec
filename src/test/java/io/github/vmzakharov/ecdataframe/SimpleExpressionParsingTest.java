@@ -103,7 +103,7 @@ public class SimpleExpressionParsingTest
     @Test
     public void vectorExpression()
     {
-        Script script = ExpressionParserHelper.toScript("[\"a\", \"b\", \"c\"]");
+        Script script = ExpressionParserHelper.toScript("(\"a\", \"b\", \"c\")");
 
         Expression expression = script.getExpressions().get(0);
 

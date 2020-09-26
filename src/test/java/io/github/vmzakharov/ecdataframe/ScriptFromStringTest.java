@@ -44,7 +44,7 @@ public class ScriptFromStringTest
         AnonymousScript script = ExpressionParserHelper.toScript(
                 "x = 1\n" +
                 "y = 1\n" +
-                "x in [3, 2, y]");
+                "x in (3, 2, y)");
         Value result = script.evaluate();
         Assert.assertTrue(result.isBoolean());
         Assert.assertTrue(((BooleanValue) result).isTrue());
@@ -53,7 +53,7 @@ public class ScriptFromStringTest
                 "x= \"a\"\n" +
                 "y= \"b\"\n" +
                 "q= \"c\"\n" +
-                "x in [\"b\", y, q]");
+                "x in (\"b\", y, q)");
         result = script.evaluate();
         Assert.assertTrue(result.isBoolean());
         Assert.assertFalse(((BooleanValue) result).isTrue());
@@ -61,7 +61,7 @@ public class ScriptFromStringTest
         script = ExpressionParserHelper.toScript(
                 "y= \"b\"\n" +
                 "q= \"c\"\n" +
-                "\"c\" in [\"b\", y, q]");
+                "\"c\" in (\"b\", y, q)");
         result = script.evaluate();
         Assert.assertTrue(result.isBoolean());
         Assert.assertTrue(((BooleanValue) result).isTrue());
@@ -72,7 +72,7 @@ public class ScriptFromStringTest
     {
         AnonymousScript script = ExpressionParserHelper.toScript(
                 "x = \"a\"\n" +
-                "if x in [\"a\", \"b\", \"c\"]\n" +
+                "if x in (\"a\", \"b\", \"c\")\n" +
                 "then\n" +
                 "   result = \"in\"\n" +
                 "else\n" +
@@ -90,7 +90,7 @@ public class ScriptFromStringTest
     {
         AnonymousScript script = ExpressionParserHelper.toScript(
                 "x = \"a\"\n" +
-                "if x in [\"a\", \"b\", \"c\"]\n" +
+                "if x in (\"a\", \"b\", \"c\")\n" +
                 "then\n" +
                 "  2 + 2\n" +
                 "  result = \"in\"\n" +
@@ -114,7 +114,7 @@ public class ScriptFromStringTest
     {
         AnonymousScript script = ExpressionParserHelper.toScript(
                 "x = \"aa\"\n" +
-                "if x in [\"a\", \"b\", \"c\"]\n" +
+                "if x in (\"a\", \"b\", \"c\")\n" +
                 "then\n" +
                 "   result = \"in\"\n" +
                 "else\n" +
@@ -130,7 +130,7 @@ public class ScriptFromStringTest
     {
         AnonymousScript script = ExpressionParserHelper.toScript(
                 "x = \"a\"\n" +
-                "if x in [\"a\", \"b\", \"c\"]\n" +
+                "if x in (\"a\", \"b\", \"c\")\n" +
                 "then\n" +
                 "  2 + 2\n" +
                 "  if x == \"b\" then 5 else 6 endif\n" +

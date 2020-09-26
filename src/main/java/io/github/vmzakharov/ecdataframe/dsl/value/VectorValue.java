@@ -18,7 +18,7 @@ implements Value
     @Override
     public String asStringLiteral()
     {
-        return this.elements.collect(Value::asStringLiteral).makeString("[", ", ", "]");
+        return this.elements.collect(Value::asStringLiteral).makeString("(", ", ", ")");
     }
 
     @Override

@@ -210,8 +210,8 @@ extends ModelScriptBaseVisitor<Expression>
     public Expression visitInExpr(ModelScriptParser.InExprContext ctx)
     {
         return new BinaryExpr(
-                this.visit(ctx.expr()),
-                this.visit(ctx.vectorExpr()),
+                this.visit(ctx.expr(0)),
+                this.visit(ctx.expr(1)),
                 ctx.IN() == null ? ContainsOp.NOT_IN : ContainsOp.IN);
     }
 

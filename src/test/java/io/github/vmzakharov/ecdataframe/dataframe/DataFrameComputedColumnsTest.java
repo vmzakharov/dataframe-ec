@@ -182,7 +182,7 @@ public class DataFrameComputedColumnsTest
         String outerScriptString = "" +
                 "function inTheList(item, list)\n" +
                 "{\n" +
-                "  item in [5, 10]\n" +
+                "  item in list\n" +
                 "}\n"
         ;
 
@@ -190,7 +190,7 @@ public class DataFrameComputedColumnsTest
 
         SimpleEvalContext outerContext = new SimpleEvalContext();
         outerContext.setDeclaredFunctions(outerScript.getFunctions());
-        outerContext.setVariable("numbers", ExpressionTestUtil.evaluate("[5, 10]"));
+        outerContext.setVariable("numbers", ExpressionTestUtil.evaluate("(5, 10)"));
 
         this.df.getEvalContext().setNestedContext(outerContext);
 

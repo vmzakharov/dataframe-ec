@@ -38,9 +38,10 @@ expr :
     | expr op=(MUL | DIV) expr #mulDivExpr
     | expr op=(ADD | SUB) expr #addSubExpr
     | expr op=(GT | GTE | LT | LTE | EQ | NE) expr #compareExpr
-    | expr (NOT_IN | IN) vectorExpr #inExpr
+    | expr (NOT_IN | IN) expr #inExpr
     | expr op=AND expr         #andExpr
     | expr op=(OR | XOR) expr  #orExpr
+    | vectorExpr '[' expr ']'   #indexVectorExpr
     | vectorExpr               #standaloneVectorExpr
     | INT                      #intLiteralExpr
     | DOUBLE                   #doubleLiteralExpr
@@ -48,7 +49,7 @@ expr :
     | ID                       #varExpr
     ;
 
-vectorExpr : '[' exprList ']' | '[' ']';
+vectorExpr : '(' exprList ')' | '(' ')';
 
 exprList :  expr ( ',' expr )*;
 
@@ -68,6 +69,7 @@ NE  : '!=';
 
 NOT_IN  : 'not in' | 'NOT IN' ;
 IN  : 'in' | 'IN' ;
+IS_EMPTY  : 'is empty' | 'IS EMPTY' ;
 
 AND  : 'and' | 'AND';
 OR   : 'or' | 'OR';
