@@ -1,6 +1,7 @@
 package io.github.vmzakharov.ecdataframe.dsl.value;
 
 import io.github.vmzakharov.ecdataframe.dsl.ComparisonOp;
+import io.github.vmzakharov.ecdataframe.dsl.UnaryOp;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -21,6 +22,12 @@ extends AbstractValue
     public String asStringLiteral()
     {
         return this.value.format(this.getFormatter());
+    }
+
+    @Override
+    public Value apply(UnaryOp operation)
+    {
+        return operation.applyDate(this.value);
     }
 
     @Override

@@ -34,6 +34,8 @@ expr :
     | ID ('(' exprList ')' | '(' ')') #functionCallExpr
     | '(' expr ')'             #parenExpr
     | '-' expr                 #unaryMinusExpr
+    | expr IS_NOT_EMPTY        #isNotEmptyExpr
+    | expr IS_EMPTY            #isEmptyExpr
     | NOT expr                 #notExpr
     | expr '[' expr ']'        #indexVectorExpr
     | expr op=(MUL | DIV) expr #mulDivExpr
@@ -70,6 +72,7 @@ NE  : '!=';
 NOT_IN  : 'not in' | 'NOT IN' ;
 IN  : 'in' | 'IN' ;
 IS_EMPTY  : 'is empty' | 'IS EMPTY' ;
+IS_NOT_EMPTY  : 'is not empty' | 'IS NOT EMPTY' ;
 
 AND  : 'and' | 'AND';
 OR   : 'or' | 'OR';

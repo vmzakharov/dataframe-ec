@@ -49,7 +49,14 @@ implements ExpressionVisitor
     @Override
     public void visitUnaryExpr(UnaryExpr expr)
     {
-        this.print(expr.getOperation().asString()).print("(").printExpression(expr.getOperand()).print(")");
+        if (expr.getOperation().isPrefix())
+        {
+            this.print(expr.getOperation().asString()).print("(").printExpression(expr.getOperand()).print(")");
+        }
+        else
+        {
+            this.print("(").printExpression(expr.getOperand()).print(") ").print(expr.getOperation().asString());
+        }
     }
 
     @Override

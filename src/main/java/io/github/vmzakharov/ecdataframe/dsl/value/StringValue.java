@@ -2,6 +2,7 @@ package io.github.vmzakharov.ecdataframe.dsl.value;
 
 import io.github.vmzakharov.ecdataframe.dsl.ArithmeticOp;
 import io.github.vmzakharov.ecdataframe.dsl.ComparisonOp;
+import io.github.vmzakharov.ecdataframe.dsl.UnaryOp;
 
 public class StringValue
 extends AbstractValue
@@ -17,6 +18,12 @@ extends AbstractValue
     public Value apply(Value another, ArithmeticOp operation)
     {
         return operation.applyString(this.stringValue(), another.stringValue());
+    }
+
+    @Override
+    public Value apply(UnaryOp operation)
+    {
+        return operation.applyString(this.value);
     }
 
     @Override

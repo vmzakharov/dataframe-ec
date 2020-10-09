@@ -1,5 +1,6 @@
 package io.github.vmzakharov.ecdataframe.dsl.value;
 
+import io.github.vmzakharov.ecdataframe.dsl.UnaryOp;
 import org.eclipse.collections.api.list.ListIterable;
 import org.eclipse.collections.impl.factory.Lists;
 
@@ -40,6 +41,12 @@ implements Value
     public Value get(int index)
     {
         return this.elements.get(index);
+    }
+
+    @Override
+    public Value apply(UnaryOp operation)
+    {
+        return operation.applyVector(this.elements);
     }
 
     @Override

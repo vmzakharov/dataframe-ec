@@ -216,6 +216,18 @@ extends ModelScriptBaseVisitor<Expression>
     }
 
     @Override
+    public Expression visitIsEmptyExpr(ModelScriptParser.IsEmptyExprContext ctx)
+    {
+        return new UnaryExpr(UnaryOp.IS_EMPTY, this.visit(ctx.expr()));
+    }
+
+    @Override
+    public Expression visitIsNotEmptyExpr(ModelScriptParser.IsNotEmptyExprContext ctx)
+    {
+        return new UnaryExpr(UnaryOp.IS_NOT_EMPTY, this.visit(ctx.expr()));
+    }
+
+    @Override
     public Expression visitVectorExpr(ModelScriptParser.VectorExprContext ctx)
     {
         ListIterable<Expression> elements;
