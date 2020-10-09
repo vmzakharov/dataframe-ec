@@ -317,6 +317,11 @@ extends ModelScriptBaseVisitor<Expression>
             return aString.substring(1, aString.length()-1);
         }
 
+        if (aString.charAt(0) == '\'' && aString.charAt(aString.length()-1) == '\'')
+        {
+            return aString.substring(1, aString.length()-1);
+        }
+
         return aString;
     }
 

@@ -90,7 +90,7 @@ INT : DIGIT+;
 DOUBLE : ('.' DIGIT+ | DIGIT+ ('.' DIGIT*)? ) ;
 WS : [ \t]+ -> skip;
 NL : [\n\r] -> skip;
-STRING : '"' ( ESC | . )*? '"' ;
+STRING : '"' ( ESC | . )*? '"' | '\'' ( ESC | . )*? '\'';
 
 fragment
 ESC : '\\' [btnr"\\];

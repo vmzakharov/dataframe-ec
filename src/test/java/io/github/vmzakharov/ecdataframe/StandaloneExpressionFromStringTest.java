@@ -58,6 +58,18 @@ public class StandaloneExpressionFromStringTest
     }
 
     @Test
+    public void stringParsing()
+    {
+        Assert.assertEquals("ABC", ExpressionTestUtil.evaluateToString("\"ABC\""));
+        Assert.assertEquals("A'B'C", ExpressionTestUtil.evaluateToString("\"A'B'C\""));
+
+        Assert.assertEquals("ABC", ExpressionTestUtil.evaluateToString("'ABC'"));
+        Assert.assertEquals("A\"B\"C", ExpressionTestUtil.evaluateToString("'A\"B\"C'"));
+
+        Assert.assertEquals("A'B'CA\"B\"C", ExpressionTestUtil.evaluateToString("\"A'B'C\" + 'A\"B\"C'"));
+    }
+
+    @Test
     public void stringComparisonOperations()
     {
         Assert.assertTrue(ExpressionTestUtil.evaluateToBoolean("\"B\" > \"A\""));
@@ -87,6 +99,7 @@ public class StandaloneExpressionFromStringTest
     {
         Assert.assertTrue(ExpressionTestUtil.evaluateToBoolean("\"foo\" in (\"foo\", \"bar\", \"baz\")"));
         Assert.assertFalse(ExpressionTestUtil.evaluateToBoolean("\"foo\" in (\"qux\", \"bar\", \"baz\")"));
+        Assert.assertFalse(ExpressionTestUtil.evaluateToBoolean("'foo' in ('qux', 'bar', 'baz')"));
         Assert.assertTrue(ExpressionTestUtil.evaluateToBoolean("123 in (456, 567, 123)"));
         Assert.assertFalse(ExpressionTestUtil.evaluateToBoolean("123 in (456, 567, 789)"));
         Assert.assertFalse(ExpressionTestUtil.evaluateToBoolean("123 in ()"));
