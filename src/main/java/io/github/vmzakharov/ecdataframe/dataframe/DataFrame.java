@@ -16,6 +16,7 @@ import org.eclipse.collections.api.list.primitive.IntList;
 import org.eclipse.collections.api.list.primitive.MutableBooleanList;
 import org.eclipse.collections.api.list.primitive.MutableIntList;
 import org.eclipse.collections.api.map.MutableMap;
+import org.eclipse.collections.api.tuple.Pair;
 import org.eclipse.collections.api.tuple.Twin;
 import org.eclipse.collections.impl.factory.Lists;
 import org.eclipse.collections.impl.factory.Maps;
@@ -419,6 +420,47 @@ public class DataFrame
         }
 
         return summedDataFrame;
+    }
+
+    public Pair<DataFrame, MutableList<MutableIntList>> sumByWithIndex(ListIterable<String> columnsToSumNames, ListIterable<String> columnsToGroupByNames)
+    {
+        MutableList<MutableIntList> sumIndex = Lists.mutable.of();
+
+        ListIterable<DfColumn> columnsToSum = this.getColumnsToAggregate(columnsToSumNames);
+
+        DataFrame summedDataFrame = new DataFrame("Sum Of " + this.getName());
+
+        columnsToGroupByNames
+                .collect(this::getColumnNamed)
+                .forEachWith(DfColumn::cloneSchemaAndAttachTo, summedDataFrame);
+
+        columnsToSum
+                .forEachWith(DfColumn::cloneSchemaAndAttachTo, summedDataFrame);
+
+        ListIterable<DfColumn> accumulatorColumns = summedDataFrame.columnsNamed(columnsToSumNames);
+
+        // todo: consider implementing index as a structure in DataFrame
+        DfUniqueIndex index = new DfUniqueIndex(summedDataFrame, columnsToGroupByNames);
+
+        for (int i = 0; i < this.rowCount; i++)
+        {
+            ListIterable<Object> keyValue = index.computeKeyFrom(this, i);
+            int accIndex = index.getRowIndexAtKeyIfAbsentAdd(keyValue);
+
+            while (sumIndex.size() <= accIndex)
+            {
+                 sumIndex.add(IntLists.mutable.of());
+            }
+
+            sumIndex.get(accIndex).add(i);
+
+            for (int colIndex = 0; colIndex < columnsToSum.size(); colIndex++)
+            {
+                accumulatorColumns.get(colIndex).incrementFrom(accIndex, columnsToSum.get(colIndex), i);
+            }
+        }
+
+        return Tuples.pair(summedDataFrame, sumIndex);
     }
 
     public Twin<DataFrame> selectAndRejectBy(String filterExpressionString)
