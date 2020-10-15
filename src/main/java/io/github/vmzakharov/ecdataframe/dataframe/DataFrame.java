@@ -16,7 +16,6 @@ import org.eclipse.collections.api.list.primitive.IntList;
 import org.eclipse.collections.api.list.primitive.MutableBooleanList;
 import org.eclipse.collections.api.list.primitive.MutableIntList;
 import org.eclipse.collections.api.map.MutableMap;
-import org.eclipse.collections.api.tuple.Pair;
 import org.eclipse.collections.api.tuple.Twin;
 import org.eclipse.collections.impl.factory.Lists;
 import org.eclipse.collections.impl.factory.Maps;
@@ -40,6 +39,8 @@ public class DataFrame
     private boolean poolingEnabled = false;
 
     private MutableBooleanList bitmap = null;
+
+    private MutableList<MutableIntList> aggregateIndex = null;
 
     public DataFrame(String newName)
     {
@@ -247,6 +248,21 @@ public class DataFrame
         return this.rowIndex != null;
     }
 
+    public IntList getAggregateIndex(int rowIndex)
+    {
+        if (this.isAggregateWithIndex())
+        {
+            return this.aggregateIndex.get(this.rowIndexMap(rowIndex));
+        }
+
+        return IntLists.immutable.empty();
+    }
+
+    private boolean isAggregateWithIndex()
+    {
+        return this.aggregateIndex != null;
+    }
+
     public Object getObject(int rowIndex, int columnIndex)
     {
         return this.columns.get(columnIndex).getObject(this.rowIndexMap(rowIndex));
@@ -422,7 +438,7 @@ public class DataFrame
         return summedDataFrame;
     }
 
-    public Pair<DataFrame, MutableList<MutableIntList>> sumByWithIndex(ListIterable<String> columnsToSumNames, ListIterable<String> columnsToGroupByNames)
+    public DataFrame sumByWithIndex(ListIterable<String> columnsToSumNames, ListIterable<String> columnsToGroupByNames)
     {
         MutableList<MutableIntList> sumIndex = Lists.mutable.of();
 
@@ -439,7 +455,6 @@ public class DataFrame
 
         ListIterable<DfColumn> accumulatorColumns = summedDataFrame.columnsNamed(columnsToSumNames);
 
-        // todo: consider implementing index as a structure in DataFrame
         DfUniqueIndex index = new DfUniqueIndex(summedDataFrame, columnsToGroupByNames);
 
         for (int i = 0; i < this.rowCount; i++)
@@ -460,10 +475,12 @@ public class DataFrame
             }
         }
 
-        return Tuples.pair(summedDataFrame, sumIndex);
+        summedDataFrame.aggregateIndex = sumIndex;
+
+        return summedDataFrame;
     }
 
-    public Twin<DataFrame> selectAndRejectBy(String filterExpressionString)
+      public Twin<DataFrame> selectAndRejectBy(String filterExpressionString)
     {
         DataFrame selected = this.cloneStructure(this.name+"-selected");
         DataFrame rejected = this.cloneStructure(this.name+"-rejected");
