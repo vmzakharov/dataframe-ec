@@ -131,12 +131,23 @@ extends DataSetAbstract
          */
         try (BufferedReader reader = new BufferedReader(this.createReader(), BUFFER_SIZE))
         {
-            String headerLine = reader.readLine();
-            String line = reader.readLine();
+            MutableList<String> headers = this.splitMindingQs(reader.readLine());
+            String dataRow = reader.readLine();
+            MutableList<String> firstRowElements = this.splitMindingQs(dataRow);
+
+            ErrorReporter.reportAndThrow(headers.size() != firstRowElements.size(),
+                    "The number of elements in the header does not match the number of elements in the first data row ("
+                    + headers.size() + ", " + firstRowElements.size() + ")");
 
             if (this.schemaIsNotDefined())
             {
-                this.inferSchema(headerLine, line);
+                this.inferSchema(headers, firstRowElements);
+            }
+            else
+            {
+                ErrorReporter.reportAndThrow(this.getSchema().columnCount() != firstRowElements.size(),
+                        "The number of columns in the schema does not match the number of elements in the first data row ("
+                        + this.getSchema().columnCount() + ", " + firstRowElements.size() + ")");
             }
 
             this.getSchema().getColumns().forEach(col -> df.addColumn(col.getName(), col.getType()));
@@ -144,10 +155,10 @@ extends DataSetAbstract
             int columnCount = this.getSchema().columnCount();
             MutableList<String> lineElements = Lists.mutable.withInitialCapacity(columnCount);
 
-            this.parseAndAddLineToDataFrame(df, line, lineElements, columnCount);
-            while ((line = reader.readLine()) != null)
+            this.parseAndAddLineToDataFrame(df, dataRow, lineElements, columnCount);
+            while ((dataRow = reader.readLine()) != null)
             {
-                this.parseAndAddLineToDataFrame(df, line, lineElements, columnCount);
+                this.parseAndAddLineToDataFrame(df, dataRow, lineElements, columnCount);
             }
 
             df.seal();
@@ -160,14 +171,8 @@ extends DataSetAbstract
         return df;
     }
 
-    private void inferSchema(String headerLine, String firstDataLine)
+    private void inferSchema(MutableList<String> headers, MutableList<String> elements)
     {
-        MutableList<String> headers = Lists.mutable.of();
-        this.splitMindingQsInto(headerLine, headers);
-
-        MutableList<String> elements = Lists.mutable.of();
-        this.splitMindingQsInto(firstDataLine, elements);
-
         int columnCount = elements.size();
 
         this.schema = new CsvSchema();
@@ -319,6 +324,15 @@ extends DataSetAbstract
         }
 
         return (aString.charAt(0) == QUOTE_CHARACTER) && (aString.charAt(aString.length() - 1) == QUOTE_CHARACTER);
+    }
+
+
+
+    private MutableList<String> splitMindingQs(String aString)
+    {
+        MutableList<String> elements = Lists.mutable.of();
+        this.splitMindingQsInto(aString, elements);
+        return elements;
     }
 
     public void splitMindingQsInto(String aString, MutableList<String> elements)

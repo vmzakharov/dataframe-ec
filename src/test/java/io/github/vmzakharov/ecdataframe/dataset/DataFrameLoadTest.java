@@ -2,6 +2,7 @@ package io.github.vmzakharov.ecdataframe.dataset;
 
 import io.github.vmzakharov.ecdataframe.dataframe.DataFrame;
 import io.github.vmzakharov.ecdataframe.dsl.value.ValueType;
+import org.junit.Assert;
 import org.junit.Test;
 import io.github.vmzakharov.ecdataframe.dataframe.DataFrameUtil;
 
@@ -175,5 +176,70 @@ public class DataFrameLoadTest
                 ;
 
         DataFrameUtil.assertEquals(expected, loaded);
+    }
+
+    @Test(expected = RuntimeException.class)
+    public void headerDataMismatchThrowsException()
+    {
+        CsvDataSet dataSet = new StringBasedCsvDataSet("Foo", "Dates",
+                "Name,Date\n" +
+                        "\"Alice\",1-Jan-2020,10\n" +
+                        "\"Bob\",01-Jan-2010,11\n" +
+                        "\"Carl\",21-Nov-2005,12\n" +
+                        "\"Diane\",2-Sep-2012,13\n" +
+                        "\"Ed\","
+        );
+
+        DataFrame loaded = dataSet.loadAsDataFrame();
+
+        Assert.assertNotNull(loaded);
+        Assert.fail("Didn't throw");
+    }
+
+    @Test(expected = RuntimeException.class)
+    public void schemaDataMismatchThrowsException()
+    {
+
+        CsvSchema schema = new CsvSchema();
+        schema.addColumn("Name",   ValueType.STRING);
+        schema.addColumn("Date",   ValueType.DATE, "d-MMM-uuuu");
+        schema.addColumn("Number", ValueType.LONG);
+
+        CsvDataSet dataSet = new StringBasedCsvDataSet("Foo", "Dates", schema,
+                "Name,Date\n" +
+                        "\"Alice\",1-Jan-2020\n" +
+                        "\"Bob\",01-Jan-2010\n" +
+                        "\"Carl\",21-Nov-2005\n" +
+                        "\"Diane\",2-Sep-2012\n" +
+                        "\"Ed\","
+        );
+
+        DataFrame loaded = dataSet.loadAsDataFrame();
+
+        Assert.assertNotNull(loaded);
+        Assert.fail("Didn't throw");
+    }
+
+    @Test(expected = RuntimeException.class)
+    public void schemaHeaderMismatchThrowsException()
+    {
+
+        CsvSchema schema = new CsvSchema();
+        schema.addColumn("Name",   ValueType.STRING);
+        schema.addColumn("Date",   ValueType.DATE, "d-MMM-uuuu");
+
+        CsvDataSet dataSet = new StringBasedCsvDataSet("Foo", "Dates", schema,
+                "Name,Date,Number\n" +
+                        "\"Alice\",1-Jan-2020,123\n" +
+                        "\"Bob\",01-Jan-2010,123\n" +
+                        "\"Carl\",21-Nov-2005,123\n" +
+                        "\"Diane\",2-Sep-2012,123\n" +
+                        "\"Ed\","
+        );
+
+        DataFrame loaded = dataSet.loadAsDataFrame();
+
+        Assert.assertNotNull(loaded);
+        Assert.fail("Didn't throw");
     }
 }
