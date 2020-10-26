@@ -5,7 +5,6 @@ import io.github.vmzakharov.ecdataframe.dsl.value.ValueType;
 import org.eclipse.collections.api.list.ListIterable;
 import org.eclipse.collections.api.list.MutableList;
 import org.eclipse.collections.impl.factory.Lists;
-import org.eclipse.collections.impl.utility.ListIterate;
 
 import java.io.*;
 import java.time.LocalDate;
@@ -23,13 +22,21 @@ extends DataSetAbstract
 
     private final String dataFileName;
 
-    private boolean convertEmptyElementsToNulls = false;
-    private DateTimeFormatter dateTimeFormatter;
+    private boolean emptyElementsConvertedToNulls = false;
+
+    private CsvSchema schema;
+    private String columnFormatPattern; // todo: refactor so that this is not required
 
     public CsvDataSet(String dataFileName, String newName)
     {
+        this(dataFileName, newName, null);
+    }
+
+    public CsvDataSet(String dataFileName, String newName, CsvSchema newSchema)
+    {
         super(newName);
         this.dataFileName = dataFileName;
+        this.schema = newSchema;
     }
 
     @Override
@@ -40,7 +47,7 @@ extends DataSetAbstract
 
     public void convertEmptyElementsToNulls()
     {
-        this.convertEmptyElementsToNulls = true;
+        this.emptyElementsConvertedToNulls = true;
     }
 
     @Override
@@ -124,52 +131,18 @@ extends DataSetAbstract
          */
         try (BufferedReader reader = new BufferedReader(this.createReader(), BUFFER_SIZE))
         {
-            String line;
-            line = reader.readLine();
+            String headerLine = reader.readLine();
+            String line = reader.readLine();
 
-            MutableList<String> headers = Lists.mutable.of();
-            this.splitMindingQsInto(line, headers);
-
-            line = reader.readLine();
-
-            MutableList<String> elements = Lists.mutable.of();
-            this.splitMindingQsInto(line, elements);
-
-            MutableList<ValueType> types = Lists.mutable.of();
-
-            int columnCount = elements.size();
-
-            for (int i = 0; i < columnCount; i++)
+            if (this.schemaIsNotDefined())
             {
-                String element = elements.get(i);
-                ValueType guessedType;
-                if (this.surroundedByQuotes(element))
-                {
-                    guessedType = ValueType.STRING;
-                }
-                else if (this.canParseAsDate(element))
-                {
-                    guessedType = ValueType.DATE;
-                }
-                else if (this.canParseAsLong(element))
-                {
-                    guessedType = ValueType.LONG;
-                }
-                else if (this.canParseAsDouble(element))
-                {
-                    guessedType = ValueType.DOUBLE;
-                }
-                else
-                {
-                    guessedType = ValueType.STRING;
-                }
-
-                types.add(guessedType);
+                this.inferSchema(headerLine, line);
             }
 
-            ListIterate.forEachInBoth(headers, types, df::addColumn);
+            this.getSchema().getColumns().forEach(col -> df.addColumn(col.getName(), col.getType()));
 
-            MutableList<String> lineElements = Lists.mutable.withInitialCapacity(headers.size());
+            int columnCount = this.getSchema().columnCount();
+            MutableList<String> lineElements = Lists.mutable.withInitialCapacity(columnCount);
 
             this.parseAndAddLineToDataFrame(df, line, lineElements, columnCount);
             while ((line = reader.readLine()) != null)
@@ -187,14 +160,76 @@ extends DataSetAbstract
         return df;
     }
 
+    private void inferSchema(String headerLine, String firstDataLine)
+    {
+        MutableList<String> headers = Lists.mutable.of();
+        this.splitMindingQsInto(headerLine, headers);
+
+        MutableList<String> elements = Lists.mutable.of();
+        this.splitMindingQsInto(firstDataLine, elements);
+
+        int columnCount = elements.size();
+
+        this.schema = new CsvSchema();
+
+        for (int i = 0; i < columnCount; i++)
+        {
+            String element = elements.get(i);
+            ValueType guessedType;
+            if (this.surroundedByQuotes(element))
+            {
+                guessedType = ValueType.STRING;
+            }
+            else if (this.canParseAsDate(element))
+            {
+                guessedType = ValueType.DATE;
+            }
+            else if (this.canParseAsLong(element))
+            {
+                guessedType = ValueType.LONG;
+            }
+            else if (this.canParseAsDouble(element))
+            {
+                guessedType = ValueType.DOUBLE;
+            }
+            else
+            {
+                guessedType = ValueType.STRING;
+            }
+
+            if (this.columnFormatPattern != null)
+            {
+                this.schema.addColumn(headers.get(i), guessedType, this.columnFormatPattern);
+                this.columnFormatPattern = null;
+            }
+            else
+            {
+                this.schema.addColumn(headers.get(i), guessedType);
+            }
+        }
+    }
+
+    private boolean schemaIsNotDefined()
+    {
+        return this.schema == null;
+    }
+
+    public CsvSchema getSchema()
+    {
+        return this.schema;
+    }
+
     private void parseAndAddLineToDataFrame(DataFrame dataFrame, String line, MutableList<String> elements, int columnCount)
     {
         this.splitMindingQsInto(line, elements);
         for (int i = 0; i < columnCount; i++)
         {
-            DfColumn column = dataFrame.getColumnAt(i);
-            ValueType columnType = column.getType();
             String element = elements.get(i);
+            DfColumn column = dataFrame.getColumnAt(i);
+
+            CsvSchema.Column dataSetColumn = this.getSchema().getColumnAt(i);
+
+            ValueType columnType = dataSetColumn.getType();
             switch (columnType)
             {
                 case LONG:
@@ -207,7 +242,7 @@ extends DataSetAbstract
                     ((DfStringColumnStored) column).addString(this.stripQuotesIfAny(element));
                     break;
                 case DATE:
-                    ((DfDateColumnStored) column).addDate(this.parseDateNullIfEmpty(element));
+                    ((DfDateColumnStored) column).addDate(dataSetColumn.parseAsLocalDate(element));
                     break;
                 default:
                     throw new RuntimeException("Don't know what to do with the column type: " + columnType);
@@ -253,9 +288,7 @@ extends DataSetAbstract
 
     private boolean canParseAsDate(String aString)
     {
-        ListIterable<String> dateFormats = Lists.immutable.of(
-                "uuuu/M/d", "uuuu-M-d", "M/d/uuuu"
-        );
+        ListIterable<String> dateFormats = Lists.immutable.of("uuuu/M/d", "uuuu-M-d", "M/d/uuuu");
 
         String trimmed = aString.trim();
         for (int i = 0; i < dateFormats.size(); i++)
@@ -266,7 +299,7 @@ extends DataSetAbstract
             {
                 DateTimeFormatter candidateFormatter = DateTimeFormatter.ofPattern(pattern).withResolverStyle(ResolverStyle.STRICT);
                 LocalDate.parse(trimmed, candidateFormatter);
-                this.dateTimeFormatter = candidateFormatter;
+                this.columnFormatPattern = pattern;
                 return true;
             }
             catch (DateTimeParseException e)
@@ -276,18 +309,6 @@ extends DataSetAbstract
         }
 
         return false;
-    }
-
-    private LocalDate parseDateNullIfEmpty(String aString)
-    {
-        if (aString == null)
-        {
-            return null;
-        }
-
-        String trimmed = aString.trim();
-
-        return trimmed.length() == 0 ? null : LocalDate.parse(trimmed, this.dateTimeFormatter);
     }
 
     private boolean surroundedByQuotes(String aString)
@@ -392,6 +413,6 @@ extends DataSetAbstract
             return aString.substring(beginIndex, endIndex);
         }
 
-        return this.convertEmptyElementsToNulls ? null : "";
+        return this.emptyElementsConvertedToNulls ? null : "";
     }
 }
