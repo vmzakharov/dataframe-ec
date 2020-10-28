@@ -178,6 +178,38 @@ public class DataFrameLoadTest
         DataFrameUtil.assertEquals(expected, loaded);
     }
 
+    @Test
+    public void dateParsingWithSchemaFormat2()
+    {
+        CsvSchema schema = new CsvSchema();
+        schema.addColumn("Name",   ValueType.STRING);
+        schema.addColumn("Date",   ValueType.DATE, "M/d/uuuu h:m:s a");
+
+        CsvDataSet dataSet = new StringBasedCsvDataSet("Foo", "Dates", schema,
+                "Name,Date\n" +
+                "\"Alice\",11/11/2020 11:11:11 AM\n" +
+                "\"Bob\",01/31/2010 12:12:00 PM\n" +
+                "\"Carl\",1/5/2005 12:00:00 AM\n" +
+                "\"Diane\",2/09/2012 4:55:15 PM\n" +
+                "\"Ed\",\n" +
+                "\"Frank\",2/19/2012 04:05:15 PM\n"
+        );
+
+        DataFrame loaded = dataSet.loadAsDataFrame();
+
+        DataFrame expected = new DataFrame("Expected")
+                .addStringColumn("Name").addDateColumn("Date")
+                .addRow("Alice", LocalDate.of(2020, 11, 11))
+                .addRow("Bob",   LocalDate.of(2010,  1, 31))
+                .addRow("Carl",  LocalDate.of(2005,  1,  5))
+                .addRow("Diane", LocalDate.of(2012,  2,  9))
+                .addRow("Ed",    null)
+                .addRow("Frank", LocalDate.of(2012,  2, 19))
+                ;
+
+        DataFrameUtil.assertEquals(expected, loaded);
+    }
+
     @Test(expected = RuntimeException.class)
     public void headerDataMismatchThrowsException()
     {
@@ -230,10 +262,10 @@ public class DataFrameLoadTest
 
         CsvDataSet dataSet = new StringBasedCsvDataSet("Foo", "Dates", schema,
                 "Name,Date,Number\n" +
-                        "\"Alice\",1-Jan-2020,123\n" +
-                        "\"Bob\",01-Jan-2010,123\n" +
-                        "\"Carl\",21-Nov-2005,123\n" +
-                        "\"Diane\",2-Sep-2012,123\n" +
+                        "\"Alice\",1-Jan-2020\n" +
+                        "\"Bob\",01-Jan-2010\n" +
+                        "\"Carl\",21-Nov-2005\n" +
+                        "\"Diane\",2-Sep-2012\n" +
                         "\"Ed\","
         );
 
