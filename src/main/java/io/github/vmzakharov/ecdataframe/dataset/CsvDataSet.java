@@ -181,7 +181,7 @@ extends DataSetAbstract
         return df;
     }
 
-    private void addDataFrameColumn(DataFrame df, CsvSchema.Column col, MutableList<Procedure<String>> columnPopulators)
+    private void addDataFrameColumn(DataFrame df, CsvSchemaColumn col, MutableList<Procedure<String>> columnPopulators)
     {
         ValueType columnType = col.getType();
 

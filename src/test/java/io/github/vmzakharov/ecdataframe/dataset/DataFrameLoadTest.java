@@ -277,10 +277,10 @@ public class DataFrameLoadTest
     @Test
     public void loadWithSchema()
     {
-        CsvSchema schema = new CsvSchema();
-        schema.separator('|');
-        schema.quoteCharacter('\'');
-        schema.nullMarker("-NULL-");
+        CsvSchema schema = new CsvSchema()
+            .separator('|')
+            .quoteCharacter('\'')
+            .nullMarker("-NULL-");
         schema.addColumn("Name",       ValueType.STRING);
         schema.addColumn("EmployeeId", ValueType.LONG);
         schema.addColumn("HireDate",   ValueType.DATE);
