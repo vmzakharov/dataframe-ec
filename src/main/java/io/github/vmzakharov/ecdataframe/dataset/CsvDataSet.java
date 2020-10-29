@@ -17,9 +17,6 @@ extends DataSetAbstract
 {
     public static int BUFFER_SIZE = 65_536;
 
-    public static final char SEPARATOR = ',';
-    public static final char QUOTE_CHARACTER = '"';
-
     private final String dataFileName;
 
     private boolean emptyElementsConvertedToNulls = false;
@@ -70,6 +67,11 @@ extends DataSetAbstract
 
     public void write(DataFrame dataFrame)
     {
+        if (this.schemaIsNotDefined())
+        {
+            this.schema = new CsvSchema();
+        }
+
         try (BufferedWriter writer = new BufferedWriter(this.createWriter(), BUFFER_SIZE))
         {
             int columnCount = dataFrame.columnCount();
@@ -80,7 +82,7 @@ extends DataSetAbstract
 
                 if (columnIndex < columnCount - 1)
                 {
-                    writer.write(SEPARATOR);
+                    writer.write(this.getSchema().getSeparator());
                 }
             }
             writer.write('\n');
@@ -95,7 +97,7 @@ extends DataSetAbstract
 
                     if (columnIndex < columnCount - 1)
                     {
-                        writer.write(SEPARATOR);
+                        writer.write(this.getSchema().getSeparator());
                     }
                 }
                 writer.write('\n');
@@ -129,6 +131,11 @@ extends DataSetAbstract
           header1,header2,header3,...
           "String",123,45.67,...
          */
+        if (this.schemaIsNotDefined())
+        {
+            this.schema = new CsvSchema();
+        }
+
         try (BufferedReader reader = new BufferedReader(this.createReader(), BUFFER_SIZE))
         {
             MutableList<String> headers = this.splitMindingQs(reader.readLine());
@@ -139,7 +146,7 @@ extends DataSetAbstract
                     "The number of elements in the header does not match the number of elements in the first data row ("
                     + headers.size() + ", " + firstRowElements.size() + ")");
 
-            if (this.schemaIsNotDefined())
+            if (this.getSchema().columnCount() == 0)
             {
                 this.inferSchema(headers, firstRowElements);
             }
@@ -174,8 +181,6 @@ extends DataSetAbstract
     private void inferSchema(MutableList<String> headers, MutableList<String> elements)
     {
         int columnCount = elements.size();
-
-        this.schema = new CsvSchema();
 
         for (int i = 0; i < columnCount; i++)
         {
@@ -230,18 +235,26 @@ extends DataSetAbstract
         for (int i = 0; i < columnCount; i++)
         {
             String element = elements.get(i);
+
+            if (this.getSchema().hasNullMarker())
+            {
+                if (this.getSchema().getNullMarker().equals(element))
+                element = null;
+            }
+
             DfColumn column = dataFrame.getColumnAt(i);
 
             CsvSchema.Column dataSetColumn = this.getSchema().getColumnAt(i);
 
             ValueType columnType = dataSetColumn.getType();
+
             switch (columnType)
             {
                 case LONG:
-                    ((DfLongColumnStored) column).addLong(Long.parseLong(element));
+                    ((DfLongColumnStored) column).addLong(dataSetColumn.parseAsLong(element));
                     break;
                 case DOUBLE:
-                    ((DfDoubleColumnStored) column).addDouble(Double.parseDouble(element));
+                    ((DfDoubleColumnStored) column).addDouble(dataSetColumn.parseAsDouble(element));
                     break;
                 case STRING:
                     ((DfStringColumnStored) column).addString(this.stripQuotesIfAny(element));
@@ -323,7 +336,7 @@ extends DataSetAbstract
             return false;
         }
 
-        return (aString.charAt(0) == QUOTE_CHARACTER) && (aString.charAt(aString.length() - 1) == QUOTE_CHARACTER);
+        return (aString.charAt(0) == this.getSchema().getQuoteCharacter()) && (aString.charAt(aString.length() - 1) == this.getSchema().getQuoteCharacter());
     }
 
 
@@ -412,12 +425,12 @@ extends DataSetAbstract
 
     private boolean isTokenSeparator(char aChar)
     {
-        return aChar == SEPARATOR;
+        return aChar == this.getSchema().getSeparator();
     }
 
     private boolean isQuote(char aChar)
     {
-        return aChar == QUOTE_CHARACTER;
+        return aChar == this.getSchema().getQuoteCharacter();
     }
 
     private String substringOrNull(String aString, int beginIndex, int endIndex)

@@ -10,7 +10,49 @@ import java.time.format.ResolverStyle;
 
 public class CsvSchema
 {
-    private MutableList<Column> columns = Lists.mutable.of();
+    private String nullMarker;
+    private char separator = ',';
+    private char quoteCharacter = '"';
+
+    private final MutableList<Column> columns = Lists.mutable.of();
+
+    public String getNullMarker()
+    {
+        return this.nullMarker;
+    }
+
+    public CsvSchema nullMarker(String nullMarker)
+    {
+        this.nullMarker = nullMarker;
+        return this;
+    }
+
+    public boolean hasNullMarker()
+    {
+        return this.nullMarker != null;
+    }
+
+    public char getSeparator()
+    {
+        return this.separator;
+    }
+
+    public CsvSchema separator(char separator)
+    {
+        this.separator = separator;
+        return this;
+    }
+
+    public char getQuoteCharacter()
+    {
+        return this.quoteCharacter;
+    }
+
+    public CsvSchema quoteCharacter(char quoteCharacter)
+    {
+        this.quoteCharacter = quoteCharacter;
+        return this;
+    }
 
     public void addColumn(String name, ValueType type)
     {
@@ -32,7 +74,7 @@ public class CsvSchema
         return this.columns.get(i);
     }
 
-    public class Column
+    static public class Column
     {
         private final String name;
         private final ValueType type;
@@ -48,7 +90,7 @@ public class CsvSchema
         {
             this.name = newName;
             this.type = newType;
-            this.pattern = newPattern;
+            this.pattern = newPattern == null ? "uuuu-MM-dd" : newPattern;
 
             if (this.type.isDate() || this.type.isDateTime())
             {
@@ -81,6 +123,26 @@ public class CsvSchema
             String trimmed = aString.trim();
 
             return trimmed.length() == 0 ? null : LocalDate.parse(trimmed, this.dateTimeFormatter);
+        }
+
+        public double parseAsDouble(String aString)
+        {
+            if (aString == null || aString.length() == 0)
+            {
+                return 0.0;
+            }
+
+            return Double.parseDouble(aString);
+        }
+
+        public long parseAsLong(String aString)
+        {
+            if (aString == null || aString.length() == 0)
+            {
+                return 0L;
+            }
+
+            return Long.parseLong(aString);
         }
     }
 

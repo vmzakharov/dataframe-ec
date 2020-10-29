@@ -13,7 +13,7 @@ public class SeparatedTextSplittingTest
     @Before
     public void configureDataSet()
     {
-        this.dataSet = new CsvDataSet("Foo", "Bar");
+        this.dataSet = new CsvDataSet("Foo", "Bar", new CsvSchema());
     }
 
     @Test
