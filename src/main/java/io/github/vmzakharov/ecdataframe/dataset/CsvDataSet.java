@@ -2,6 +2,7 @@ package io.github.vmzakharov.ecdataframe.dataset;
 
 import io.github.vmzakharov.ecdataframe.dataframe.*;
 import io.github.vmzakharov.ecdataframe.dsl.value.ValueType;
+import org.eclipse.collections.api.block.procedure.Procedure;
 import org.eclipse.collections.api.list.ListIterable;
 import org.eclipse.collections.api.list.MutableList;
 import org.eclipse.collections.impl.factory.Lists;
@@ -157,16 +158,18 @@ extends DataSetAbstract
                         + this.getSchema().columnCount() + ", " + firstRowElements.size() + ")");
             }
 
-            this.getSchema().getColumns().forEach(col -> df.addColumn(col.getName(), col.getType()));
+
+            MutableList<Procedure<String>> columnPopulators = Lists.mutable.of();
+            this.getSchema().getColumns().forEach(col -> addDataFrameColumn(df, col, columnPopulators));
 
             int columnCount = this.getSchema().columnCount();
             MutableList<String> lineElements = Lists.mutable.withInitialCapacity(columnCount);
 
-            this.parseAndAddLineToDataFrame(df, dataRow, lineElements, columnCount);
-            while ((dataRow = reader.readLine()) != null)
+            do
             {
-                this.parseAndAddLineToDataFrame(df, dataRow, lineElements, columnCount);
+                this.parseAndAddLineToDataFrame(dataRow, lineElements, columnCount, columnPopulators);
             }
+            while ((dataRow = reader.readLine()) != null);
 
             df.seal();
         }
@@ -178,6 +181,33 @@ extends DataSetAbstract
         return df;
     }
 
+    private void addDataFrameColumn(DataFrame df, CsvSchema.Column col, MutableList<Procedure<String>> columnPopulators)
+    {
+        ValueType columnType = col.getType();
+
+        df.addColumn(col.getName(), col.getType());
+
+        DfColumn lastColumn = df.getColumnAt(df.columnCount() - 1);
+
+        switch (columnType)
+        {
+            case LONG:
+                columnPopulators.add(s -> ((DfLongColumnStored) lastColumn).addLong(col.parseAsLong(s)));
+                break;
+            case DOUBLE:
+                columnPopulators.add(s -> ((DfDoubleColumnStored) lastColumn).addDouble(col.parseAsDouble(s)));
+                break;
+            case STRING:
+                columnPopulators.add(s -> ((DfStringColumnStored) lastColumn).addString(col.parseAsString(s)));
+                break;
+            case DATE:
+                columnPopulators.add(s -> ((DfDateColumnStored) lastColumn).addDate(col.parseAsLocalDate(s)));
+                break;
+            default:
+                throw new RuntimeException("Don't know what to do with the column type: " + columnType);
+        }
+    }
+
     private void inferSchema(MutableList<String> headers, MutableList<String> elements)
     {
         int columnCount = elements.size();
@@ -186,7 +216,8 @@ extends DataSetAbstract
         {
             String element = elements.get(i);
             ValueType guessedType;
-            if (this.surroundedByQuotes(element))
+
+            if (this.getSchema().surroundedByQuotes(element))
             {
                 guessedType = ValueType.STRING;
             }
@@ -229,7 +260,7 @@ extends DataSetAbstract
         return this.schema;
     }
 
-    private void parseAndAddLineToDataFrame(DataFrame dataFrame, String line, MutableList<String> elements, int columnCount)
+    private void parseAndAddLineToDataFrame(String line, MutableList<String> elements, int columnCount, MutableList<Procedure<String>> columnPopulators)
     {
         this.splitMindingQsInto(line, elements);
         for (int i = 0; i < columnCount; i++)
@@ -242,40 +273,8 @@ extends DataSetAbstract
                 element = null;
             }
 
-            DfColumn column = dataFrame.getColumnAt(i);
-
-            CsvSchema.Column dataSetColumn = this.getSchema().getColumnAt(i);
-
-            ValueType columnType = dataSetColumn.getType();
-
-            switch (columnType)
-            {
-                case LONG:
-                    ((DfLongColumnStored) column).addLong(dataSetColumn.parseAsLong(element));
-                    break;
-                case DOUBLE:
-                    ((DfDoubleColumnStored) column).addDouble(dataSetColumn.parseAsDouble(element));
-                    break;
-                case STRING:
-                    ((DfStringColumnStored) column).addString(this.stripQuotesIfAny(element));
-                    break;
-                case DATE:
-                    ((DfDateColumnStored) column).addDate(dataSetColumn.parseAsLocalDate(element));
-                    break;
-                default:
-                    throw new RuntimeException("Don't know what to do with the column type: " + columnType);
-            }
+            columnPopulators.get(i).accept(element);
         }
-    }
-
-    private String stripQuotesIfAny(String aString)
-    {
-        if (aString == null || !this.surroundedByQuotes(aString))
-        {
-            return aString;
-        }
-
-        return aString.substring(1, aString.length() - 1);
     }
 
     private boolean canParseAsLong(String aString)
@@ -328,18 +327,6 @@ extends DataSetAbstract
 
         return false;
     }
-
-    private boolean surroundedByQuotes(String aString)
-    {
-        if (aString.length() < 2)
-        {
-            return false;
-        }
-
-        return (aString.charAt(0) == this.getSchema().getQuoteCharacter()) && (aString.charAt(aString.length() - 1) == this.getSchema().getQuoteCharacter());
-    }
-
-
 
     private MutableList<String> splitMindingQs(String aString)
     {

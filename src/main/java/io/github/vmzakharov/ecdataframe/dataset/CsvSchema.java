@@ -74,7 +74,7 @@ public class CsvSchema
         return this.columns.get(i);
     }
 
-    static public class Column
+    public class Column
     {
         private final String name;
         private final ValueType type;
@@ -144,10 +144,35 @@ public class CsvSchema
 
             return Long.parseLong(aString);
         }
+
+        public String parseAsString(String aString)
+        {
+            return stripQuotesIfAny(aString);
+        }
     }
 
     public int columnCount()
     {
         return this.columns.size();
+    }
+
+    public String stripQuotesIfAny(String aString)
+    {
+        if (aString == null || !this.surroundedByQuotes(aString))
+        {
+            return aString;
+        }
+
+        return aString.substring(1, aString.length() - 1);
+    }
+
+    public boolean surroundedByQuotes(String aString)
+    {
+        if (aString.length() < 2)
+        {
+            return false;
+        }
+
+        return (aString.charAt(0) == this.getQuoteCharacter()) && (aString.charAt(aString.length() - 1) == this.getQuoteCharacter());
     }
 }
