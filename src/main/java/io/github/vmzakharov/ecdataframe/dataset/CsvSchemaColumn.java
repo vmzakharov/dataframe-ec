@@ -20,7 +20,7 @@ public class CsvSchemaColumn
         this.csvSchema = newCsvSchema;
         this.name = newName;
         this.type = newType;
-        this.pattern = newPattern == null ? "uuuu-MM-dd" : newPattern;
+        this.pattern = (this.type.isDate() && newPattern == null) ? "uuuu-MM-dd" : newPattern;
 
         if (this.type.isDate() || this.type.isDateTime())
         {
