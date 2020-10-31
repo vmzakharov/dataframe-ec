@@ -38,30 +38,47 @@ public class BuiltInFunctions
             }
         },
 
-            new IntrinsicFunctionDescriptor("startsWith") {
-                @Override
-                public Value evaluate(EvalContext context)
-                {
-                    VectorValue parameters = (VectorValue) context.getVariableOrDefault(magicalParameterName(), VectorValue.EMPTY);
+        new IntrinsicFunctionDescriptor("startsWith") {
+            @Override
+            public Value evaluate(EvalContext context)
+            {
+                VectorValue parameters = (VectorValue) context.getVariableOrDefault(magicalParameterName(), VectorValue.EMPTY);
 
-                    int parameterCount = parameters.size();
-                    if (parameterCount != 2)
-                    {
-                        throw new RuntimeException("Invalid number of parameters in a call to '" + this.getName() + "'. " + this.usageString());
-                    }
+                this.assertParameterCount(parameters.size(), 2);
 
-                    String aString = parameters.get(0).stringValue();
-                    String aPrefix = parameters.get(1).stringValue();
+                String aString = parameters.get(0).stringValue();
+                String aPrefix = parameters.get(1).stringValue();
 
-                    return BooleanValue.valueOf(aString.startsWith(aPrefix));
-                }
+                return BooleanValue.valueOf(aString.startsWith(aPrefix));
+            }
 
-                @Override
-                public String usageString()
-                {
-                    return "Usage: " + this.getName() + "(aString, aPrefix)";
-                }
-            },
+            @Override
+            public String usageString()
+            {
+                return "Usage: " + this.getName() + "(string, prefix)";
+            }
+        },
+
+        new IntrinsicFunctionDescriptor("contains") {
+            @Override
+            public Value evaluate(EvalContext context)
+            {
+                VectorValue parameters = (VectorValue) context.getVariableOrDefault(magicalParameterName(), VectorValue.EMPTY);
+
+                this.assertParameterCount(parameters.size(), 2);
+
+                String aString = parameters.get(0).stringValue();
+                String substring = parameters.get(1).stringValue();
+
+                return BooleanValue.valueOf(aString.contains(substring));
+            }
+
+            @Override
+            public String usageString()
+            {
+                return "Usage: " + this.getName() + "(string, substring)";
+            }
+        },
 
         new IntrinsicFunctionDescriptor("substr") {
             @Override
@@ -88,53 +105,47 @@ public class BuiltInFunctions
             @Override
             public String usageString()
             {
-                return "Usage: " + this.getName() + "(aString, beginIndex[, endIndex])";
+                return "Usage: " + this.getName() + "(string, beginIndex[, endIndex])";
             }
         },
 
-            new IntrinsicFunctionDescriptor("abs") {
-                @Override
-                public Value evaluate(EvalContext context)
-                {
-                    VectorValue parameters = (VectorValue) context.getVariableOrDefault(magicalParameterName(), VectorValue.EMPTY);
-
-                    if (parameters.size() != 1)
-                    {
-                        throw new RuntimeException("Invalid number of parameters in a call to '" + this.getName() + "'. " + this.usageString());
-                    }
-
-                    Value value = parameters.get(0);
-                    if (value.isDouble())
-                    {
-                        return new DoubleValue(Math.abs(((DoubleValue) value).doubleValue()));
-                    }
-                    else if (value.isLong())
-                    {
-                        return new LongValue(Math.abs(((LongValue) value).longValue()));
-                    }
-                    else
-                    {
-                        throw new RuntimeException("Invalid parameter type (" + value.getType() + ") in a call to '" + this.getName() + "'. " + this.usageString());
-                    }
-                }
-
-                @Override
-                public String usageString()
-                {
-                    return "Usage: " + this.getName() + "(number)";
-                }
-            },
-
-            new IntrinsicFunctionDescriptor("toDate") {
+        new IntrinsicFunctionDescriptor("abs") {
             @Override
             public Value evaluate(EvalContext context)
             {
                 VectorValue parameters = (VectorValue) context.getVariableOrDefault(magicalParameterName(), VectorValue.EMPTY);
 
-                if (parameters.size() != 1)
+                this.assertParameterCount(1, parameters.size());
+
+                Value value = parameters.get(0);
+                if (value.isDouble())
                 {
-                    throw new RuntimeException("Invalid number of parameters in a call to '" + this.getName() + "'. " + this.usageString());
+                    return new DoubleValue(Math.abs(((DoubleValue) value).doubleValue()));
                 }
+                else if (value.isLong())
+                {
+                    return new LongValue(Math.abs(((LongValue) value).longValue()));
+                }
+                else
+                {
+                    throw new RuntimeException("Invalid parameter type (" + value.getType() + ") in a call to '" + this.getName() + "'. " + this.usageString());
+                }
+            }
+
+            @Override
+            public String usageString()
+            {
+                return "Usage: " + this.getName() + "(number)";
+            }
+        },
+
+        new IntrinsicFunctionDescriptor("toDate") {
+            @Override
+            public Value evaluate(EvalContext context)
+            {
+                VectorValue parameters = (VectorValue) context.getVariableOrDefault(magicalParameterName(), VectorValue.EMPTY);
+
+                this.assertParameterCount(1, parameters.size());
 
                 String aString = parameters.get(0).stringValue();
 
@@ -154,10 +165,7 @@ public class BuiltInFunctions
             {
                 VectorValue parameters = (VectorValue) context.getVariableOrDefault(magicalParameterName(), VectorValue.EMPTY);
 
-                if (parameters.size() != 3)
-                {
-                    throw new RuntimeException("Invalid number of parameters in a call to '" + this.getName() + "'. " + this.usageString());
-                }
+                this.assertParameterCount(3, parameters.size());
 
                 LocalDate date1 = ((DateValue) parameters.get(0)).dateValue();
                 LocalDate date2 = ((DateValue) parameters.get(1)).dateValue();

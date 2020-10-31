@@ -61,6 +61,15 @@ public class BuiltInFunctionTest
     }
 
     @Test
+    public void stringContains()
+    {
+        Assert.assertTrue(ExpressionTestUtil.evaluateToBoolean("contains(\"Hello, there!\", \"Hello\")"));
+        Assert.assertTrue(ExpressionTestUtil.evaluateToBoolean("contains(\"Hello, there!\", \"lo, th\")"));
+        Assert.assertTrue(ExpressionTestUtil.evaluateToBoolean("contains(\"Hello, there!\", \"there!\")"));
+        Assert.assertFalse(ExpressionTestUtil.evaluateToBoolean("contains(\"Hello, there!\", \"Hola\")"));
+    }
+
+    @Test
     public void abs()
     {
         Assert.assertEquals(10, ExpressionTestUtil.evaluateToLong("abs(-10)"));

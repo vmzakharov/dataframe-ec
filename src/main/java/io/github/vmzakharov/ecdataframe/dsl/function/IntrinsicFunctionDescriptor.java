@@ -1,5 +1,6 @@
 package io.github.vmzakharov.ecdataframe.dsl.function;
 
+import io.github.vmzakharov.ecdataframe.dataframe.ErrorReporter;
 import io.github.vmzakharov.ecdataframe.dsl.EvalContext;
 import io.github.vmzakharov.ecdataframe.dsl.FunctionDescriptor;
 import io.github.vmzakharov.ecdataframe.dsl.value.Value;
@@ -53,5 +54,12 @@ implements FunctionDescriptor
     public String magicalParameterName()
     {
         return "*" + this.getName();
+    }
+
+    protected void assertParameterCount(int expectedCount, int actualCount)
+    {
+        ErrorReporter.reportAndThrow(
+                expectedCount != actualCount,
+                "Invalid number of parameters in a call to '" + this.getName() + "'. " + this.usageString());
     }
 }
