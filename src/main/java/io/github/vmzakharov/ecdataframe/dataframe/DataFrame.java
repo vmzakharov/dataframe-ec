@@ -97,6 +97,10 @@ public class DataFrame
                     + " to '" + this.getName() + "' column '"
                     + newColumn.getName() + "' already bound to '" + newColumn.getDataFrame().getName() + "'");
         }
+
+        ErrorReporter.reportAndThrow(this.hasColumn(newColumn.getName()),
+                "Column named '" + newColumn.getName() + "' is already in data frame '" + this.getName() + "'");
+
         this.columnsByName.put(newColumn.getName(), newColumn);
         this.columns.add(newColumn);
 
@@ -121,10 +125,10 @@ public class DataFrame
     public DfColumn getColumnNamed(String columnName)
     {
         DfColumn column = this.columnsByName.get(columnName);
-        if (column == null)
-        {
-            ErrorReporter.reportAndThrow("Column '" + columnName + "' does not exist in DataFrame '" + this.getName() + "'");
-        }
+
+        ErrorReporter.reportAndThrow(column == null,
+                "Column '" + columnName + "' does not exist in data frame '" + this.getName() + "'");
+
         return column;
     }
 
@@ -369,7 +373,7 @@ public class DataFrame
             this.rowCount = storedColumnsSizes.get(0);
             if (storedColumnsSizes.detectIfNone(e -> e != this.rowCount, -1) != -1)
             {
-                throw new RuntimeException(
+                ErrorReporter.reportAndThrow(
                         "Stored column sizes are not the same when attempting to seal data frame '" + this.getName() + "'");
             }
         }
@@ -480,7 +484,7 @@ public class DataFrame
         return summedDataFrame;
     }
 
-      public Twin<DataFrame> selectAndRejectBy(String filterExpressionString)
+    public Twin<DataFrame> selectAndRejectBy(String filterExpressionString)
     {
         DataFrame selected = this.cloneStructure(this.name+"-selected");
         DataFrame rejected = this.cloneStructure(this.name+"-rejected");
@@ -722,5 +726,21 @@ public class DataFrame
                 this.bitmap.set(i, true);
             }
         }
+    }
+
+    /**
+     * Removes the column from this data frame. Throws a {@code RuntimeException} if the specified column doesn't
+     * exists.
+     * @param columnName the name of the column to drop.
+     * @return the data frame
+     */
+    public DataFrame dropColumn(String columnName)
+    {
+        DfColumn dropped = this.getColumnNamed(columnName);
+
+        this.columns.remove(dropped);
+        this.columnsByName.remove(columnName);
+
+        return this;
     }
 }

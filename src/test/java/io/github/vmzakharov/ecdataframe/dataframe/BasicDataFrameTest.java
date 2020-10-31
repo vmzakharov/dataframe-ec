@@ -65,4 +65,55 @@ public class BasicDataFrameTest
         Assert.assertEquals(30.0, dataFrame.getDouble("DoubleComp", 0), 0.000001);
         Assert.assertEquals(LocalDate.of(2020, 10, 20), dataFrame.getDate("Date", 0));
     }
+
+    @Test
+    public void dropColumn()
+    {
+        DataFrame df = new DataFrame("df1")
+            .addStringColumn("Name").addLongColumn("Count").addDoubleColumn("Value")
+            .addRow("Alice", 5, 23.45)
+            .addRow("Deb",   0,  7.89);
+
+        df.dropColumn("Count");
+
+        DataFrame expected = new DataFrame("expected")
+            .addStringColumn("Name").addDoubleColumn("Value")
+            .addRow("Alice", 23.45)
+            .addRow("Deb",    7.89);
+
+        DataFrameUtil.assertEquals(expected, df);
+    }
+
+    @Test
+    public void dropFirstAndLastColumn()
+    {
+        DataFrame df = new DataFrame("df1")
+            .addStringColumn("Name").addLongColumn("Count").addDoubleColumn("Value")
+            .addRow("Alice", 5, 23.45)
+            .addRow("Deb",   0,  7.89);
+
+        df.dropColumn("Name").dropColumn("Value");
+        Assert.assertFalse(df.hasColumn("Name"));
+        Assert.assertFalse(df.hasColumn("Value"));
+
+        DataFrame expected = new DataFrame("expected")
+            .addLongColumn("Count")
+            .addRow(5)
+            .addRow(0);
+
+        DataFrameUtil.assertEquals(expected, df);
+    }
+
+    @Test(expected = RuntimeException.class)
+    public void dropNonExistingColumn()
+    {
+        DataFrame df = new DataFrame("df1")
+            .addStringColumn("Name").addLongColumn("Count").addDoubleColumn("Value")
+            .addRow("Alice", 5, 23.45)
+            .addRow("Deb",   0,  7.89);
+
+        df.dropColumn("Giraffe");
+
+        Assert.fail("Shouldn't get here");
+    }
 }
