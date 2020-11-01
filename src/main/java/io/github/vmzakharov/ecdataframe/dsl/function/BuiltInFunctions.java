@@ -139,6 +139,26 @@ public class BuiltInFunctions
             }
         },
 
+        new IntrinsicFunctionDescriptor("toString") {
+            @Override
+            public Value evaluate(EvalContext context)
+            {
+                VectorValue parameters = (VectorValue) context.getVariableOrDefault(magicalParameterName(), VectorValue.EMPTY);
+
+                this.assertParameterCount(1, parameters.size());
+
+                Value value = parameters.get(0);
+
+                return new StringValue(value.stringValue());
+            }
+
+            @Override
+            public String usageString()
+            {
+                return "Usage: " + this.getName() + "(number)";
+            }
+        },
+
         new IntrinsicFunctionDescriptor("toDate") {
             @Override
             public Value evaluate(EvalContext context)

@@ -9,6 +9,8 @@ import io.github.vmzakharov.ecdataframe.dsl.visitor.InMemoryEvaluationVisitor;
 import io.github.vmzakharov.ecdataframe.util.CollectingPrinter;
 import io.github.vmzakharov.ecdataframe.util.PrinterFactory;
 
+import java.time.LocalDate;
+
 public class BuiltInFunctionTest
 {
     @Test
@@ -76,5 +78,20 @@ public class BuiltInFunctionTest
         Assert.assertEquals(10, ExpressionTestUtil.evaluateToLong("abs(10)"));
         Assert.assertEquals(10.0, ExpressionTestUtil.evaluateToDouble("abs(-10.0)"), 0.0);
         Assert.assertEquals(10.0, ExpressionTestUtil.evaluateToDouble("abs(10.0)"), 0.0);
+    }
+
+    @Test
+    public void toStringFunction()
+    {
+        Assert.assertEquals("12345", ExpressionTestUtil.evaluateToString("toString(12345)"));
+        Assert.assertEquals("-10", ExpressionTestUtil.evaluateToString("toString(-10)"));
+
+        Assert.assertEquals("123.45", ExpressionTestUtil.evaluateToString("toString(123.45)"));
+
+        Assert.assertEquals("Boo", ExpressionTestUtil.evaluateToString("toString('Boo')"));
+
+        Assert.assertEquals("2020-10-06", ExpressionTestUtil.evaluateToString("toString(toDate('2020-10-06'))"));
+        
+        Assert.assertEquals(LocalDate.of(2020, 10, 6), ExpressionTestUtil.evaluateToDate("toDate(toString(toDate('2020-10-06')))"));
     }
 }
