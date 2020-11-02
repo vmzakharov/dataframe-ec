@@ -578,7 +578,7 @@ public class DataFrame
     {
         this.unsort();
 
-        // doing this here to make sure that the columns exists even if the data frame is empty
+        // doing this before check for rowCount to make sure that the sort columns exist even if the data frame is empty
         ListIterable<DfColumn> columnsToSortBy = this.columnsNamed(columnsToSortByNames);
 
         if (this.rowCount == 0)
@@ -742,5 +742,73 @@ public class DataFrame
         this.columnsByName.remove(columnName);
 
         return this;
+    }
+
+    /**
+     * A very basic join - creates a data frame that is this an join of this data frame and another one, based on
+     * the key column values. Rows with the same values of the key column will be combined in the resulting data frame
+     * into one wide row. This is an inner join so rows for which there is no match in the other data frame will not be
+     * present in the join.
+     * @param other the data frame to join to
+     * @param thisJoinColumnName the name of the column in the data frame to use a join key
+     * @param otherJoinColumnName the name of the column in the data frame to use a join
+     * @return a data frame that is a join of this data frame and the data frame passed as a parameter
+     */
+    // todo: multi column join
+    // todo: outer join
+    // todo: data frame difference
+    // todo: deal with column name collision
+    // todo: do not override sort order (use external sort)
+    public DataFrame join(DataFrame other, String thisJoinColumnName, String otherJoinColumnName)
+    {
+        DataFrame joined = this.cloneStructure(this.getName() + "_" + other.getName());
+
+        other.columns
+                .reject(c -> c.getName().equals(otherJoinColumnName))
+                .forEach(c -> c.cloneSchemaAndAttachTo(joined));
+
+        this.sortBy(Lists.immutable.of(thisJoinColumnName));
+        other.sortBy(Lists.immutable.of(otherJoinColumnName));
+
+        int thisRowIndex = 0;
+        int otherRowIndex = 0;
+
+        int thisRowCount = this.rowCount();
+        int otherRowCount = other.rowCount();
+
+        Object[] rowData = new Object[joined.columnCount()];
+
+        ListIterable<String> theseColumnNames = this.columns.collect(DfColumn::getName);
+        int theseColumnCount = theseColumnNames.size();
+        ListIterable<String> otherColumnNames = other.columns.collect(DfColumn::getName).rejectWith(String::equals, otherJoinColumnName);
+
+        while (thisRowIndex < thisRowCount && otherRowIndex  < otherRowCount)
+        {
+            int comparison = ((Comparable<Object>) this.getObject(thisJoinColumnName, thisRowIndex)).compareTo(
+                    other.getObject(otherJoinColumnName, otherRowIndex));
+
+            if (comparison == 0)
+            {
+                final int thisFinalRequired = thisRowIndex;
+                final int otherFinalRequired = otherRowIndex;
+
+                theseColumnNames.forEachWithIndex((colName, i) -> rowData[i] = this.getObject(colName, thisFinalRequired));
+                otherColumnNames.forEachWithIndex((colName, i) -> rowData[theseColumnCount + i] = other.getObject(colName, otherFinalRequired));
+
+                joined.addRow(rowData);
+                thisRowIndex++;
+                otherRowIndex++;
+            }
+            else if (comparison < 0)
+            {
+                thisRowIndex++;
+            }
+            else
+            {
+                otherRowIndex++;
+            }
+        }
+
+        return joined;
     }
 }
