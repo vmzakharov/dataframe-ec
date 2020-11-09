@@ -44,13 +44,13 @@ public interface UnaryOp
         @Override
         public BooleanValue applyString(String operand)
         {
-            return BooleanValue.valueOf(operand == null || operand.length() == 0);
+            return BooleanValue.valueOf(operand == null || operand.isEmpty());
         }
 
         @Override
         public BooleanValue applyVector(ListIterable<Value> operand)
         {
-            return BooleanValue.valueOf(operand == null || operand.size() == 0);
+            return BooleanValue.valueOf(operand == null || operand.isEmpty());
         }
 
         @Override

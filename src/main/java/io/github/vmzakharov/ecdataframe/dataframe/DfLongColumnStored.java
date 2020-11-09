@@ -58,7 +58,14 @@ implements DfColumnStored
     @Override
     public void addObject(Object newObject)
     {
-        this.addLong(((Number) newObject).longValue());
+        if (newObject == null)
+        {
+            this.addLong(0L);
+        }
+        else
+        {
+            this.addLong(((Number) newObject).longValue());
+        }
     }
 
     @Override

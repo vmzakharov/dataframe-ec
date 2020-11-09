@@ -135,4 +135,131 @@ public class DataFrameJoinTest
 
         DataFrameUtil.assertEquals(expected, joined);
     }
+
+    @Test
+    public void outerJoinWithAllRowsMatching()
+    {
+        DataFrame df1 = new DataFrame("df1")
+                .addStringColumn("Foo").addStringColumn("Bar").addLongColumn("Baz")
+                .addRow("Blinky", "red",     7)
+                .addRow("Pinky",  "pink",    8)
+                .addRow("Inky",   "cyan",    9)
+                .addRow("Clyde",  "orange", 10)
+                ;
+
+        DataFrame df2 = new DataFrame("df2")
+                .addStringColumn("Name").addStringColumn("Color").addLongColumn("Number")
+                .addRow("Grapefruit", "pink",   2)
+                .addRow("Orange",     "orange", 4)
+                .addRow("Mint",       "cyan",   3)
+                .addRow("Apple",      "red",    1)
+                ;
+
+        DataFrame joined = df1.outerJoin(df2, "Bar", "Color");
+
+        DataFrame expected = new DataFrame("expected")
+                .addStringColumn("Foo").addStringColumn("Bar").addLongColumn("Baz").addStringColumn("Name").addLongColumn("Number")
+                .addRow("Inky",   "cyan",    9, "Mint",       3)
+                .addRow("Clyde",  "orange", 10, "Orange",     4)
+                .addRow("Pinky",  "pink",    8, "Grapefruit", 2)
+                .addRow("Blinky", "red",     7, "Apple",      1)
+                ;
+
+        DataFrameUtil.assertEquals(expected, joined);
+    }
+
+    @Test
+    public void outerJoinWithMismatchedKeys()
+    {
+        DataFrame df1 = new DataFrame("df1")
+                .addStringColumn("Foo").addStringColumn("Bar").addLongColumn("Baz")
+                .addRow("Blinky", "red",     7)
+                .addRow("Inky",   "cyan",    9)
+                .addRow("Clyde",  "orange", 10)
+                ;
+
+        DataFrame df2 = new DataFrame("df2")
+                .addStringColumn("Name").addStringColumn("Color").addLongColumn("Number")
+                .addRow("Grapefruit", "pink",   2)
+                .addRow("Orange",     "orange", 4)
+                .addRow("Apple",      "red",    1)
+                ;
+
+        DataFrame joined = df1.outerJoin(df2, "Bar", "Color");
+
+        DataFrame expected = new DataFrame("expected")
+                .addStringColumn("Foo").addStringColumn("Bar").addLongColumn("Baz").addStringColumn("Name").addLongColumn("Number")
+                .addRow("Inky",   "cyan",    9, null,         0)
+                .addRow("Clyde",  "orange", 10, "Orange",     4)
+                .addRow(null,     "pink", null, "Grapefruit", 2)
+                .addRow("Blinky", "red",     7, "Apple",      1)
+                ;
+
+        System.out.println(joined.asCsvString());
+
+        DataFrameUtil.assertEquals(expected, joined);
+    }
+
+    @Test
+    public void outerJoinWithOneSideHanging()
+    {
+        DataFrame df1 = new DataFrame("df1")
+                .addStringColumn("Foo").addStringColumn("Bar").addLongColumn("Baz")
+                .addRow("Inky",   "cyan",    9)
+                .addRow("Clyde",  "orange", 10)
+                ;
+
+        DataFrame df2 = new DataFrame("df2")
+                .addStringColumn("Name").addStringColumn("Color").addLongColumn("Number")
+                .addRow("Grapefruit", "pink",   2)
+                .addRow("Orange",     "orange", 4)
+                .addRow("Apple",      "red",    1)
+                ;
+
+        DataFrame joined = df1.outerJoin(df2, "Bar", "Color");
+
+        DataFrame expected = new DataFrame("expected")
+                .addStringColumn("Foo").addStringColumn("Bar").addLongColumn("Baz").addStringColumn("Name").addLongColumn("Number")
+                .addRow("Inky",   "cyan",    9, null,         0)
+                .addRow("Clyde",  "orange", 10, "Orange",     4)
+                .addRow(null,     "pink", null, "Grapefruit", 2)
+                .addRow(null,     "red",     0, "Apple",      1)
+                ;
+
+        System.out.println(joined.asCsvString());
+
+        DataFrameUtil.assertEquals(expected, joined);
+    }
+
+    @Test
+    public void outerJoinWithBothSidesHanging()
+    {
+        DataFrame df1 = new DataFrame("df1")
+                .addStringColumn("Foo").addStringColumn("Bar").addLongColumn("Baz")
+                .addRow("Blinky", "red",     7)
+                .addRow("Inky",   "cyan",    9)
+                .addRow("Clyde",  "orange", 10)
+                ;
+
+        DataFrame df2 = new DataFrame("df2")
+                .addStringColumn("Name").addStringColumn("Color").addLongColumn("Number")
+                .addRow("Grapefruit", "pink",   2)
+                .addRow("Orange",     "orange", 4)
+                .addRow("Mint",       "cyan",   3)
+                ;
+
+        DataFrame joined = df1.outerJoin(df2, "Bar", "Color");
+
+        DataFrame expected = new DataFrame("expected")
+                .addStringColumn("Foo").addStringColumn("Bar").addLongColumn("Baz").addStringColumn("Name").addLongColumn("Number")
+                .addRow("Inky",   "cyan",    9, "Mint",       3)
+                .addRow("Clyde",  "orange", 10, "Orange",     4)
+                .addRow(null,     "pink", null, "Grapefruit", 2)
+                .addRow("Blinky", "red",     7, null,         0)
+                ;
+
+        System.out.println(joined.asCsvString());
+
+        DataFrameUtil.assertEquals(expected, joined);
+    }
 }

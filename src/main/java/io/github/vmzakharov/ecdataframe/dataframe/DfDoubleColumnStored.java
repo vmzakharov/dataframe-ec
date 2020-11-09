@@ -42,7 +42,14 @@ extends DfDoubleColumn
     @Override
     public void addObject(Object newObject)
     {
-        this.addDouble(((Number) newObject).doubleValue());
+        if (newObject == null)
+        {
+            this.addDouble(0.0);
+        }
+        else
+        {
+            this.addDouble(((Number) newObject).doubleValue());
+        }
     }
 
     @Override

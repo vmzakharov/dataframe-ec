@@ -52,12 +52,12 @@ public class CsvSchemaColumn
 
         String trimmed = aString.trim();
 
-        return trimmed.length() == 0 ? null : LocalDate.parse(trimmed, this.dateTimeFormatter);
+        return trimmed.isEmpty() ? null : LocalDate.parse(trimmed, this.dateTimeFormatter);
     }
 
     public double parseAsDouble(String aString)
     {
-        if (aString == null || aString.length() == 0)
+        if (aString == null || aString.isEmpty())
         {
             return 0.0;
         }
@@ -67,7 +67,7 @@ public class CsvSchemaColumn
 
     public long parseAsLong(String aString)
     {
-        if (aString == null || aString.length() == 0)
+        if (aString == null || aString.isEmpty())
         {
             return 0L;
         }
