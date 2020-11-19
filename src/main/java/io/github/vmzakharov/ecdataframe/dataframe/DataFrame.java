@@ -26,6 +26,7 @@ import org.eclipse.collections.impl.tuple.Tuples;
 import org.eclipse.collections.impl.utility.ArrayIterate;
 
 import java.time.LocalDate;
+import java.util.Arrays;
 
 public class DataFrame
 {
@@ -156,7 +157,7 @@ public class DataFrame
         {
             for (int columnIndex = 0; columnIndex < columnCount; columnIndex++)
             {
-                row[columnIndex] = this.getValueAsStringLiteral(rowIndex,columnIndex);
+                row[columnIndex] = this.getValueAsStringLiteral(rowIndex, columnIndex);
             }
             s.append(ArrayIterate.makeString(row));
             s.append('\n');
@@ -359,6 +360,7 @@ public class DataFrame
 
     /**
      * indicates that no further updates can be made to this data frame.
+     *
      * @return the data frame
      */
     public DataFrame seal()
@@ -406,7 +408,7 @@ public class DataFrame
 
         ErrorReporter.reportAndThrow(nonNumericColumns.notEmpty(),
                 "Attempting to aggregate non-numeric columns: "
-                + nonNumericColumns.collect(DfColumn::getName).makeString() + " in data frame '" + this.getName() + "'");
+                        + nonNumericColumns.collect(DfColumn::getName).makeString() + " in data frame '" + this.getName() + "'");
 
         return columnsToAggregate;
     }
@@ -418,11 +420,11 @@ public class DataFrame
         DataFrame summedDataFrame = new DataFrame("Sum Of " + this.getName());
 
         columnsToGroupByNames
-            .collect(this::getColumnNamed)
-            .forEachWith(DfColumn::cloneSchemaAndAttachTo, summedDataFrame);
+                .collect(this::getColumnNamed)
+                .forEachWith(DfColumn::cloneSchemaAndAttachTo, summedDataFrame);
 
         columnsToSum
-            .forEachWith(DfColumn::cloneSchemaAndAttachTo, summedDataFrame);
+                .forEachWith(DfColumn::cloneSchemaAndAttachTo, summedDataFrame);
 
         ListIterable<DfColumn> accumulatorColumns = summedDataFrame.columnsNamed(columnsToSumNames);
 
@@ -468,7 +470,7 @@ public class DataFrame
 
             while (sumIndex.size() <= accIndex)
             {
-                 sumIndex.add(IntLists.mutable.of());
+                sumIndex.add(IntLists.mutable.of());
             }
 
             sumIndex.get(accIndex).add(i);
@@ -486,8 +488,8 @@ public class DataFrame
 
     public Twin<DataFrame> selectAndRejectBy(String filterExpressionString)
     {
-        DataFrame selected = this.cloneStructure(this.name+"-selected");
-        DataFrame rejected = this.cloneStructure(this.name+"-rejected");
+        DataFrame selected = this.cloneStructure(this.name + "-selected");
+        DataFrame rejected = this.cloneStructure(this.name + "-rejected");
 
         DataFrameEvalContext context = new DataFrameEvalContext(this);
         Expression filterExpression = ExpressionParserHelper.toExpression(filterExpressionString);
@@ -644,6 +646,7 @@ public class DataFrame
     /**
      * Creates a new data frame which is a union of this data frame and the data frame passed as the parameter.
      * The data frame schemas must match.
+     *
      * @param other the data frame to union with
      * @return a data frame with the rows being the union of the rows this data frame and the parameter
      */
@@ -707,6 +710,7 @@ public class DataFrame
 
     /**
      * Tag rows based on whether the provided expression returns true of false
+     *
      * @param filterExpressionString the expression to set the flags by
      */
     public void flagRowsBy(String filterExpressionString)
@@ -731,6 +735,7 @@ public class DataFrame
     /**
      * Removes the column from this data frame. Throws a {@code RuntimeException} if the specified column doesn't
      * exists.
+     *
      * @param columnName the name of the column to drop.
      * @return the data frame
      */
@@ -749,17 +754,27 @@ public class DataFrame
      * the key column values. Rows with the same values of the key column will be combined in the resulting data frame
      * into one wide row. This is an inner join so rows for which there is no match in the other data frame will not be
      * present in the join.
-     * @param other the data frame to join to
-     * @param thisJoinColumnName the name of the column in the data frame to use a join key
+     *
+     * @param other               the data frame to join to
+     * @param thisJoinColumnName  the name of the column in the data frame to use a join key
      * @param otherJoinColumnName the name of the column in the data frame to use a join
      * @return a data frame that is a join of this data frame and the data frame passed as a parameter
      */
+    public DataFrame join(DataFrame other, String thisJoinColumnName, String otherJoinColumnName)
+    {
+        return this.join(other, false, thisJoinColumnName, otherJoinColumnName);
+    }
+
+    public DataFrame outerJoin(DataFrame other, String thisJoinColumnName, String otherJoinColumnName)
+    {
+        return this.join(other, true, thisJoinColumnName, otherJoinColumnName);
+    }
+
     // todo: multi column join
-    // todo: outer join
     // todo: data frame difference
     // todo: deal with column name collision
     // todo: do not override sort order (use external sort)
-    public DataFrame join(DataFrame other, String thisJoinColumnName, String otherJoinColumnName)
+    private DataFrame join(DataFrame other, boolean outerJoin, String thisJoinColumnName, String otherJoinColumnName)
     {
         DataFrame joined = this.cloneStructure(this.getName() + "_" + other.getName());
 
@@ -780,31 +795,85 @@ public class DataFrame
 
         ListIterable<String> theseColumnNames = this.columns.collect(DfColumn::getName);
         int theseColumnCount = theseColumnNames.size();
+
+        int joinColumnIndex = theseColumnNames.detectIndex(e -> e.equals(thisJoinColumnName));
+
         ListIterable<String> otherColumnNames = other.columns.collect(DfColumn::getName).rejectWith(String::equals, otherJoinColumnName);
 
-        while (thisRowIndex < thisRowCount && otherRowIndex  < otherRowCount)
+
+        int comparison = 0;
+        while (thisRowIndex < thisRowCount && otherRowIndex < otherRowCount)
         {
-            int comparison = ((Comparable<Object>) this.getObject(thisJoinColumnName, thisRowIndex)).compareTo(
+            comparison = ((Comparable<Object>) this.getObject(thisJoinColumnName, thisRowIndex)).compareTo(
                     other.getObject(otherJoinColumnName, otherRowIndex));
+
+            final int thisMakeFinal = thisRowIndex;
+            final int otherMakeFinal = otherRowIndex;
 
             if (comparison == 0)
             {
-                final int thisFinalRequired = thisRowIndex;
-                final int otherFinalRequired = otherRowIndex;
-
-                theseColumnNames.forEachWithIndex((colName, i) -> rowData[i] = this.getObject(colName, thisFinalRequired));
-                otherColumnNames.forEachWithIndex((colName, i) -> rowData[theseColumnCount + i] = other.getObject(colName, otherFinalRequired));
+                theseColumnNames.forEachWithIndex((colName, i) -> rowData[i] = this.getObject(colName, thisMakeFinal));
+                otherColumnNames.forEachWithIndex((colName, i) -> rowData[theseColumnCount + i] = other.getObject(colName, otherMakeFinal));
 
                 joined.addRow(rowData);
                 thisRowIndex++;
                 otherRowIndex++;
             }
-            else if (comparison < 0)
-            {
-                thisRowIndex++;
-            }
             else
             {
+                if (comparison < 0)
+                {
+                    // this side is behind
+                    if (outerJoin)
+                    {
+                        Arrays.fill(rowData, null);
+                        theseColumnNames.forEachWithIndex((colName, i) -> rowData[i] = this.getObject(colName, thisMakeFinal));
+
+                        joined.addRow(rowData);
+                    }
+                    thisRowIndex++;
+                }
+                else
+                {
+                    // the other side is behind
+                    if (outerJoin)
+                    {
+                        Arrays.fill(rowData, null);
+                        rowData[joinColumnIndex] = other.getObject(otherJoinColumnName, otherMakeFinal);
+                        otherColumnNames.forEachWithIndex((colName, i) -> rowData[theseColumnCount + i] = other.getObject(colName, otherMakeFinal));
+
+                        joined.addRow(rowData);
+                    }
+                    otherRowIndex++;
+                }
+            }
+        }
+
+        //   leftovers go here
+        if (outerJoin)
+        {
+            while (thisRowIndex < thisRowCount)
+            {
+                int thisMakeFinal = thisRowIndex;
+
+                Arrays.fill(rowData, null);
+                theseColumnNames.forEachWithIndex((colName, i) -> rowData[i] = this.getObject(colName, thisMakeFinal));
+
+                joined.addRow(rowData);
+
+                thisRowIndex++;
+            }
+
+            while (otherRowIndex < otherRowCount)
+            {
+                int otherMakeFinal = otherRowIndex;
+
+                Arrays.fill(rowData, null);
+                rowData[joinColumnIndex] = other.getObject(otherJoinColumnName, otherMakeFinal);
+                otherColumnNames.forEachWithIndex((colName, i) -> rowData[theseColumnCount + i] = other.getObject(colName, otherMakeFinal));
+
+                joined.addRow(rowData);
+
                 otherRowIndex++;
             }
         }
