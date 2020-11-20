@@ -1,6 +1,5 @@
 package io.github.vmzakharov.ecdataframe.dsl.function;
 
-import io.github.vmzakharov.ecdataframe.dsl.EvalContext;
 import io.github.vmzakharov.ecdataframe.dsl.value.*;
 import io.github.vmzakharov.ecdataframe.util.Printer;
 import io.github.vmzakharov.ecdataframe.util.PrinterFactory;
@@ -17,22 +16,20 @@ public class BuiltInFunctions
     private static final ImmutableList<IntrinsicFunctionDescriptor> FUNCTIONS = Lists.immutable.of(
         new IntrinsicFunctionDescriptor("print") {
             @Override
-            public Value evaluate(EvalContext context)
+            public Value evaluate(VectorValue parameters)
             {
-                VectorValue parameters = (VectorValue) context.getVariableOrDefault(magicalParameterName(), VectorValue.EMPTY);
                 Printer printer = PrinterFactory.getPrinter();
-                parameters.getElements().forEach(e -> printer.print(e.stringValue()));
+                parameters.getElements().collect(Value::stringValue).forEach(printer::print);
                 return Value.VOID;
             }
         },
 
         new IntrinsicFunctionDescriptor("println") {
             @Override
-            public Value evaluate(EvalContext context)
+            public Value evaluate(VectorValue parameters)
             {
-                VectorValue parameters = (VectorValue) context.getVariableOrDefault(magicalParameterName(), VectorValue.EMPTY);
                 Printer printer = PrinterFactory.getPrinter();
-                parameters.getElements().forEach(e -> printer.print(e.stringValue()));
+                parameters.getElements().collect(Value::stringValue).forEach(printer::print);
                 printer.newLine();
                 return Value.VOID;
             }
@@ -40,10 +37,8 @@ public class BuiltInFunctions
 
         new IntrinsicFunctionDescriptor("startsWith") {
             @Override
-            public Value evaluate(EvalContext context)
+            public Value evaluate(VectorValue parameters)
             {
-                VectorValue parameters = (VectorValue) context.getVariableOrDefault(magicalParameterName(), VectorValue.EMPTY);
-
                 this.assertParameterCount(parameters.size(), 2);
 
                 String aString = parameters.get(0).stringValue();
@@ -61,10 +56,8 @@ public class BuiltInFunctions
 
         new IntrinsicFunctionDescriptor("contains") {
             @Override
-            public Value evaluate(EvalContext context)
+            public Value evaluate(VectorValue parameters)
             {
-                VectorValue parameters = (VectorValue) context.getVariableOrDefault(magicalParameterName(), VectorValue.EMPTY);
-
                 this.assertParameterCount(parameters.size(), 2);
 
                 String aString = parameters.get(0).stringValue();
@@ -80,12 +73,26 @@ public class BuiltInFunctions
             }
         },
 
+        new IntrinsicFunctionDescriptor("toUpper") {
+            @Override
+            public Value evaluate(VectorValue parameters)
+            {
+                this.assertParameterCount(parameters.size(), 1);
+
+                return new StringValue(parameters.get(0).stringValue().toUpperCase());
+            }
+
+            @Override
+            public String usageString()
+            {
+                return "Usage: " + this.getName() + "(string)";
+            }
+        },
+
         new IntrinsicFunctionDescriptor("substr") {
             @Override
-            public Value evaluate(EvalContext context)
+            public Value evaluate(VectorValue parameters)
             {
-                VectorValue parameters = (VectorValue) context.getVariableOrDefault(magicalParameterName(), VectorValue.EMPTY);
-
                 int parameterCount = parameters.size();
                 if (parameterCount != 2 && parameterCount != 3)
                 {
@@ -111,10 +118,8 @@ public class BuiltInFunctions
 
         new IntrinsicFunctionDescriptor("abs") {
             @Override
-            public Value evaluate(EvalContext context)
+            public Value evaluate(VectorValue parameters)
             {
-                VectorValue parameters = (VectorValue) context.getVariableOrDefault(magicalParameterName(), VectorValue.EMPTY);
-
                 this.assertParameterCount(1, parameters.size());
 
                 Value value = parameters.get(0);
@@ -141,10 +146,8 @@ public class BuiltInFunctions
 
         new IntrinsicFunctionDescriptor("toString") {
             @Override
-            public Value evaluate(EvalContext context)
+            public Value evaluate(VectorValue parameters)
             {
-                VectorValue parameters = (VectorValue) context.getVariableOrDefault(magicalParameterName(), VectorValue.EMPTY);
-
                 this.assertParameterCount(1, parameters.size());
 
                 Value value = parameters.get(0);
@@ -161,10 +164,8 @@ public class BuiltInFunctions
 
         new IntrinsicFunctionDescriptor("toDate") {
             @Override
-            public Value evaluate(EvalContext context)
+            public Value evaluate(VectorValue parameters)
             {
-                VectorValue parameters = (VectorValue) context.getVariableOrDefault(magicalParameterName(), VectorValue.EMPTY);
-
                 this.assertParameterCount(1, parameters.size());
 
                 String aString = parameters.get(0).stringValue();
@@ -181,10 +182,8 @@ public class BuiltInFunctions
 
         new IntrinsicFunctionDescriptor("withinDays") {
             @Override
-            public Value evaluate(EvalContext context)
+            public Value evaluate(VectorValue parameters)
             {
-                VectorValue parameters = (VectorValue) context.getVariableOrDefault(magicalParameterName(), VectorValue.EMPTY);
-
                 this.assertParameterCount(3, parameters.size());
 
                 LocalDate date1 = ((DateValue) parameters.get(0)).dateValue();

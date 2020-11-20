@@ -55,6 +55,13 @@ public class BuiltInFunctionTest
     }
 
     @Test
+    public void toUpper()
+    {
+        Assert.assertEquals("HELLO", ExpressionTestUtil.evaluateToString("toUpper('Hello')"));
+        Assert.assertEquals("THERE! 123", ExpressionTestUtil.evaluateToString("toUpper(\"THERE! 123\")"));
+    }
+
+    @Test
     public void startsWith()
     {
         Assert.assertTrue(ExpressionTestUtil.evaluateToBoolean("startsWith(\"Hello, there!\", \"Hello\")"));

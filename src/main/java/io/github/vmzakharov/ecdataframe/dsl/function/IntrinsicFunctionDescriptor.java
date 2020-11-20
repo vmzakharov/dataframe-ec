@@ -4,6 +4,7 @@ import io.github.vmzakharov.ecdataframe.dataframe.ErrorReporter;
 import io.github.vmzakharov.ecdataframe.dsl.EvalContext;
 import io.github.vmzakharov.ecdataframe.dsl.FunctionDescriptor;
 import io.github.vmzakharov.ecdataframe.dsl.value.Value;
+import io.github.vmzakharov.ecdataframe.dsl.value.VectorValue;
 import org.eclipse.collections.api.list.ListIterable;
 import org.eclipse.collections.impl.factory.Lists;
 
@@ -44,7 +45,12 @@ implements FunctionDescriptor
         return this.parameterNames.size() > 0;
     }
 
-    abstract public Value evaluate(EvalContext context);
+    public Value evaluate(EvalContext context)
+    {
+        return this.evaluate((VectorValue) context.getVariableOrDefault(magicalParameterName(), VectorValue.EMPTY));
+    }
+
+    abstract public Value evaluate(VectorValue parameters);
 
     public String usageString()
     {
