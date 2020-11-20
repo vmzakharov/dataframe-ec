@@ -53,12 +53,22 @@ extends BinaryOp
         @Override
         public BooleanValue applyString(String operand1, String operand2)
         {
+            if (operand1 == null)
+            {
+                return BooleanValue.valueOf(operand2 != null);
+            }
+
             return BooleanValue.valueOf(!operand1.equals(operand2));
         }
 
         @Override
         public BooleanValue applyDate(LocalDate operand1, LocalDate operand2)
         {
+            if (operand1 == null)
+            {
+                return BooleanValue.valueOf(operand2 != null);
+            }
+
             return BooleanValue.valueOf(!operand1.equals(operand2));
         }
 

@@ -53,8 +53,13 @@ public class StandaloneExpressionFromStringTest
     {
         Assert.assertTrue(ExpressionTestUtil.evaluateToBoolean("3.1 > 1"));
         Assert.assertFalse(ExpressionTestUtil.evaluateToBoolean("3 > 5.2"));
+        Assert.assertTrue(ExpressionTestUtil.evaluateToBoolean("1 < 1.23"));
         Assert.assertTrue(ExpressionTestUtil.evaluateToBoolean("7 <= (4.2 + 2.8)"));
         Assert.assertTrue(ExpressionTestUtil.evaluateToBoolean("7 == (4.2 + 2.8)"));
+        Assert.assertTrue(ExpressionTestUtil.evaluateToBoolean("3 != 1.0"));
+        Assert.assertTrue(ExpressionTestUtil.evaluateToBoolean("1.0 == 1"));
+        Assert.assertTrue(ExpressionTestUtil.evaluateToBoolean("3.0 >= 3"));
+        Assert.assertFalse(ExpressionTestUtil.evaluateToBoolean("2.0 != 2"));
     }
 
     @Test
@@ -104,6 +109,14 @@ public class StandaloneExpressionFromStringTest
         Assert.assertFalse(ExpressionTestUtil.evaluateToBoolean("123 in (456, 567, 789)"));
         Assert.assertFalse(ExpressionTestUtil.evaluateToBoolean("123 in ()"));
         Assert.assertFalse(ExpressionTestUtil.evaluateToBoolean("\"abc\" in ()"));
+    }
+
+    @Test
+    public void inOperationMixedNumericTypes()
+    {
+        Assert.assertTrue(ExpressionTestUtil.evaluateToBoolean("123 in (456, 567, 123.0)"));
+        Assert.assertTrue(ExpressionTestUtil.evaluateToBoolean("123.0 in (456, 123, 789)"));
+        Assert.assertFalse(ExpressionTestUtil.evaluateToBoolean("123.0 in (456, 567, 789)"));
     }
 
     @Test

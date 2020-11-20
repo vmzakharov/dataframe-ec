@@ -12,7 +12,7 @@ extends BinaryOp
         @Override
         public BooleanValue apply(Value value, VectorValue vectorValue)
         {
-            return BooleanValue.valueOf(vectorValue.getElements().anySatisfy(e -> e.compareTo(value) == 0));
+            return BooleanValue.valueOf(vectorValue.getElements().anySatisfy(e -> ComparisonOp.EQ.apply(e, value).isTrue()));
         }
 
         @Override
@@ -27,7 +27,7 @@ extends BinaryOp
         @Override
         public BooleanValue apply(Value value, VectorValue vectorValue)
         {
-            return BooleanValue.valueOf(vectorValue.getElements().allSatisfy(e -> e.compareTo(value) != 0));
+            return BooleanValue.valueOf(vectorValue.getElements().allSatisfy(e -> ComparisonOp.NE.apply(e, value).isTrue()));
         }
 
         @Override
