@@ -13,7 +13,7 @@ import java.time.LocalDate;
 public class ObjectValueContainsOpTest
 {
     @Test
-    public void stringIn()
+    public void stringVectorIn()
     {
         Assert.assertTrue( ExpressionTestUtil.evaluate(ContainsOp.IN, new StringValue("Foo"), this.vectorOfStrings("Foo", "Bar", null, "Baz")));
         Assert.assertFalse(ExpressionTestUtil.evaluate(ContainsOp.IN, new StringValue("Foo"), this.vectorOfStrings("Bar", null, "Baz")));
@@ -22,7 +22,7 @@ public class ObjectValueContainsOpTest
     }
 
     @Test
-    public void stringNotIn()
+    public void stringVectorNotIn()
     {
         Assert.assertFalse(ExpressionTestUtil.evaluate(ContainsOp.NOT_IN, new StringValue("Foo"), this.vectorOfStrings("Foo", "Bar", null, "Baz")));
         Assert.assertTrue( ExpressionTestUtil.evaluate(ContainsOp.NOT_IN, new StringValue("Foo"), this.vectorOfStrings("Bar", null, "Baz")));
@@ -31,7 +31,7 @@ public class ObjectValueContainsOpTest
     }
 
     @Test
-    public void dateIn()
+    public void dateVectorIn()
     {
         Assert.assertTrue( ExpressionTestUtil.evaluate(ContainsOp.IN, this.dateValue(2020, 8, 15), this.vectorOfDates(LocalDate.of(2020, 8, 15), LocalDate.of(2020, 7, 15), null, LocalDate.of(2020, 8, 2))));
         Assert.assertFalse(ExpressionTestUtil.evaluate(ContainsOp.IN, this.dateValue(2020, 8, 15), this.vectorOfDates(LocalDate.of(2020, 7, 15), null, LocalDate.of(2020, 8, 2))));
@@ -40,12 +40,30 @@ public class ObjectValueContainsOpTest
     }
 
     @Test
-    public void dateNotIn()
+    public void dateVectorNotIn()
     {
         Assert.assertFalse(ExpressionTestUtil.evaluate(ContainsOp.NOT_IN, this.dateValue(2020, 8, 15), this.vectorOfDates(LocalDate.of(2020, 8, 15), LocalDate.of(2020, 7, 15), null, LocalDate.of(2020, 8, 2))));
         Assert.assertTrue( ExpressionTestUtil.evaluate(ContainsOp.NOT_IN, this.dateValue(2020, 8, 15), this.vectorOfDates(LocalDate.of(2020, 7, 15), null, LocalDate.of(2020, 8, 2))));
         Assert.assertFalse(ExpressionTestUtil.evaluate(ContainsOp.NOT_IN, new DateValue(null), this.vectorOfDates(LocalDate.of(2020, 8, 15), LocalDate.of(2020, 7, 15), null, LocalDate.of(2020, 8, 2))));
         Assert.assertTrue( ExpressionTestUtil.evaluate(ContainsOp.NOT_IN, new DateValue(null), this.vectorOfDates(LocalDate.of(2020, 8, 15), LocalDate.of(2020, 7, 15), LocalDate.of(2020, 8, 2))));
+    }
+
+    @Test
+    public void stringIn()
+    {
+        Assert.assertTrue( ExpressionTestUtil.evaluate(ContainsOp.IN, new StringValue("Hello"), new StringValue("Hello, there!")));
+        Assert.assertTrue( ExpressionTestUtil.evaluate(ContainsOp.IN, new StringValue(""),      new StringValue("Hello, there!")));
+        Assert.assertFalse(ExpressionTestUtil.evaluate(ContainsOp.IN, new StringValue("Thar"), new StringValue("Hello, there!")));
+        Assert.assertFalse(ExpressionTestUtil.evaluate(ContainsOp.IN, new StringValue("Hello"), new StringValue("")));
+    }
+
+    @Test
+    public void stringNotIn()
+    {
+        Assert.assertFalse(ExpressionTestUtil.evaluate(ContainsOp.NOT_IN, new StringValue("Hello"), new StringValue("Hello, there!")));
+        Assert.assertFalse(ExpressionTestUtil.evaluate(ContainsOp.NOT_IN, new StringValue(""),      new StringValue("Hello, there!")));
+        Assert.assertTrue( ExpressionTestUtil.evaluate(ContainsOp.NOT_IN, new StringValue("Thar"), new StringValue("Hello, there!")));
+        Assert.assertTrue( ExpressionTestUtil.evaluate(ContainsOp.NOT_IN, new StringValue("Hello"), new StringValue("")));
     }
 
     public VectorValue vectorOfStrings(String... items)

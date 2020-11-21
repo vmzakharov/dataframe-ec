@@ -90,6 +90,4 @@ extends BinaryOp
     LongValue applyLong(long operand1, long operand2);
 
     DoubleValue applyDouble(double operand1, double operand2);
-
-    String asString();
 }

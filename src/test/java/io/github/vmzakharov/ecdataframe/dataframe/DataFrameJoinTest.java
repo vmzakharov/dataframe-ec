@@ -195,8 +195,6 @@ public class DataFrameJoinTest
                 .addRow("Blinky", "red",     7, "Apple",      1)
                 ;
 
-        System.out.println(joined.asCsvString());
-
         DataFrameUtil.assertEquals(expected, joined);
     }
 
@@ -225,8 +223,6 @@ public class DataFrameJoinTest
                 .addRow(null,     "pink", null, "Grapefruit", 2)
                 .addRow(null,     "red",     0, "Apple",      1)
                 ;
-
-        System.out.println(joined.asCsvString());
 
         DataFrameUtil.assertEquals(expected, joined);
     }
@@ -257,8 +253,6 @@ public class DataFrameJoinTest
                 .addRow(null,     "pink", null, "Grapefruit", 2)
                 .addRow("Blinky", "red",     7, null,         0)
                 ;
-
-        System.out.println(joined.asCsvString());
 
         DataFrameUtil.assertEquals(expected, joined);
     }

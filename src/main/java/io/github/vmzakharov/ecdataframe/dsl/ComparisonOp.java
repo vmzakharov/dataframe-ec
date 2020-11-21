@@ -6,7 +6,7 @@ import io.github.vmzakharov.ecdataframe.dsl.value.Value;
 import java.time.LocalDate;
 
 public interface ComparisonOp
-extends BinaryOp
+extends PredicateOp
 {
     ComparisonOp EQ = new ComparisonOp()
     {
@@ -287,19 +287,4 @@ extends BinaryOp
         @Override
         public String asString() { return ">="; }
     };
-
-    default BooleanValue apply(Value operand1, Value operand2)
-    {
-        return operand1.applyComparison(operand2, this);
-    }
-
-    BooleanValue applyString(String operand1, String operand2);
-
-    BooleanValue applyDate(LocalDate operand1, LocalDate operand2);
-
-    BooleanValue applyLong(long operand1, long operand2);
-
-    BooleanValue applyDouble(double operand1, double operand2);
-
-    String asString();
 }

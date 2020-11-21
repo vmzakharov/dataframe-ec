@@ -55,6 +55,4 @@ extends BinaryOp
     }
 
     BooleanValue apply(BooleanValue operand1, BooleanValue operand2);
-
-    String asString();
 }

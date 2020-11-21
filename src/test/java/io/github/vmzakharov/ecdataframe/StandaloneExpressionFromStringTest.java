@@ -129,4 +129,13 @@ public class StandaloneExpressionFromStringTest
         Assert.assertTrue(ExpressionTestUtil.evaluateToBoolean("123 not in ()"));
         Assert.assertTrue(ExpressionTestUtil.evaluateToBoolean("\"abc\" not in ()"));
     }
+
+    @Test
+    public void notInOperationForStrings()
+    {
+        Assert.assertTrue(ExpressionTestUtil.evaluateToBoolean("'abc' in 'foo abc bar'"));
+        Assert.assertFalse(ExpressionTestUtil.evaluateToBoolean("'abc' not in 'foo abc bar'"));
+        Assert.assertFalse(ExpressionTestUtil.evaluateToBoolean("\"XYZ\" in \"abracadabra\""));
+        Assert.assertTrue(ExpressionTestUtil.evaluateToBoolean("\"XYZ\" not in \"abracadabra\""));
+    }
 }

@@ -2,6 +2,7 @@ package io.github.vmzakharov.ecdataframe.dsl.value;
 
 import io.github.vmzakharov.ecdataframe.dsl.ArithmeticOp;
 import io.github.vmzakharov.ecdataframe.dsl.ComparisonOp;
+import io.github.vmzakharov.ecdataframe.dsl.PredicateOp;
 import io.github.vmzakharov.ecdataframe.dsl.UnaryOp;
 
 public class StringValue
@@ -39,7 +40,7 @@ extends AbstractValue
     }
 
     @Override
-    public BooleanValue applyComparison(Value another, ComparisonOp operation)
+    public BooleanValue applyPredicate(Value another, PredicateOp operation)
     {
         return operation.applyString(this.stringValue(), ((StringValue) another).stringValue());
     }

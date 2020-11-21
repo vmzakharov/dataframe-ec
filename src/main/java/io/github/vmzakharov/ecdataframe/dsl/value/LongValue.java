@@ -2,6 +2,7 @@ package io.github.vmzakharov.ecdataframe.dsl.value;
 
 import io.github.vmzakharov.ecdataframe.dsl.ArithmeticOp;
 import io.github.vmzakharov.ecdataframe.dsl.ComparisonOp;
+import io.github.vmzakharov.ecdataframe.dsl.PredicateOp;
 import io.github.vmzakharov.ecdataframe.dsl.UnaryOp;
 
 public class LongValue
@@ -49,7 +50,7 @@ implements NumberValue
     }
 
     @Override
-    public BooleanValue applyComparison(Value another, ComparisonOp operation)
+    public BooleanValue applyPredicate(Value another, PredicateOp operation)
     {
         if (another.isDouble())
         {

@@ -1,6 +1,7 @@
 package io.github.vmzakharov.ecdataframe.dsl.value;
 
 import io.github.vmzakharov.ecdataframe.dsl.ComparisonOp;
+import io.github.vmzakharov.ecdataframe.dsl.PredicateOp;
 import io.github.vmzakharov.ecdataframe.dsl.UnaryOp;
 
 import java.time.LocalDate;
@@ -31,7 +32,7 @@ extends AbstractValue
     }
 
     @Override
-    public BooleanValue applyComparison(Value another, ComparisonOp operation)
+    public BooleanValue applyPredicate(Value another, PredicateOp operation)
     {
         return operation.applyDate(this.dateValue(), ((DateValue) another).dateValue());
     }

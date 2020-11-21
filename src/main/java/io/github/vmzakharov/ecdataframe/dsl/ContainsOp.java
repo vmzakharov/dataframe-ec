@@ -5,14 +5,20 @@ import io.github.vmzakharov.ecdataframe.dsl.value.Value;
 import io.github.vmzakharov.ecdataframe.dsl.value.VectorValue;
 
 public interface ContainsOp
-extends BinaryOp
+extends PredicateOp
 {
     ContainsOp IN = new ContainsOp()
     {
         @Override
-        public BooleanValue apply(Value value, VectorValue vectorValue)
+        public BooleanValue applyWithVector(Value value, VectorValue vectorValue)
         {
             return BooleanValue.valueOf(vectorValue.getElements().anySatisfy(e -> ComparisonOp.EQ.apply(e, value).isTrue()));
+        }
+
+        @Override
+        public BooleanValue applyString(String operand1, String operand2)
+        {
+            return BooleanValue.valueOf(operand2.contains(operand1));
         }
 
         @Override
@@ -25,9 +31,15 @@ extends BinaryOp
     ContainsOp NOT_IN = new ContainsOp()
     {
         @Override
-        public BooleanValue apply(Value value, VectorValue vectorValue)
+        public BooleanValue applyWithVector(Value value, VectorValue vectorValue)
         {
             return BooleanValue.valueOf(vectorValue.getElements().allSatisfy(e -> ComparisonOp.NE.apply(e, value).isTrue()));
+        }
+
+        @Override
+        public BooleanValue applyString(String operand1, String operand2)
+        {
+            return BooleanValue.valueOf(!operand2.contains(operand1));
         }
 
         @Override
@@ -38,12 +50,16 @@ extends BinaryOp
     };
 
     @Override
-    default Value apply(Value operand1, Value operand2)
+    default BooleanValue apply(Value operand1, Value operand2)
     {
-        return this.apply(operand1, (VectorValue) operand2);
+        if (operand2.isVector())
+        {
+            return this.applyWithVector(operand1, (VectorValue) operand2);
+        }
+        return operand1.applyPredicate(operand2, this);
     }
 
-    BooleanValue apply(Value value, VectorValue vectorValue);
+    BooleanValue applyWithVector(Value value, VectorValue vectorValue);
 
     String asString();
 }
