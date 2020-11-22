@@ -772,15 +772,30 @@ public class DataFrame
 
     // todo: multi column join
     // todo: data frame difference
-    // todo: deal with column name collision
     // todo: do not override sort order (use external sort)
     private DataFrame join(DataFrame other, boolean outerJoin, String thisJoinColumnName, String otherJoinColumnName)
     {
         DataFrame joined = this.cloneStructure(this.getName() + "_" + other.getName());
 
+        MutableList<String> uniqueColumnNames = this.columns.collect(DfColumn::getName);
+
+        MutableMap<String, String> otherColumnNameMap = Maps.mutable.of();
+
+        other.columns.collect(DfColumn::getName).forEach(e ->
+            {
+                String newName = e;
+                while (uniqueColumnNames.contains(newName))
+                {
+                    newName += "_B";
+                }
+                uniqueColumnNames.add(newName);
+                otherColumnNameMap.put(e, newName);
+            }
+        );
+
         other.columns
                 .reject(c -> c.getName().equals(otherJoinColumnName))
-                .forEach(c -> c.cloneSchemaAndAttachTo(joined));
+                .forEach(c -> c.cloneSchemaAndAttachTo(joined, otherColumnNameMap.get(c.getName())));
 
         this.sortBy(Lists.immutable.of(thisJoinColumnName));
         other.sortBy(Lists.immutable.of(otherJoinColumnName));

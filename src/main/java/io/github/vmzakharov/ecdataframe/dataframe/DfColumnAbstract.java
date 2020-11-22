@@ -51,6 +51,12 @@ implements DfColumn
     @Override
     public DfColumn cloneSchemaAndAttachTo(DataFrame attachTo)
     {
+        return this.cloneSchemaAndAttachTo(attachTo, this.getName());
+    }
+
+    @Override
+    public DfColumn cloneSchemaAndAttachTo(DataFrame attachTo, String newName)
+    {
         DfColumn clonedColumn;
         try
         {
@@ -58,12 +64,12 @@ implements DfColumn
             if (this.isStored())
             {
                 Constructor<?> nameConstructor = myClass.getDeclaredConstructor(DataFrame.class, String.class);
-                clonedColumn = (DfColumn) nameConstructor.newInstance(attachTo, this.getName());
+                clonedColumn = (DfColumn) nameConstructor.newInstance(attachTo, newName);
             }
             else
             {
                 Constructor<?> nameConstructor = myClass.getDeclaredConstructor(DataFrame.class, String.class, String.class);
-                clonedColumn = (DfColumn) nameConstructor.newInstance(attachTo, this.getName(), ((DfColumnComputed) this).getExpressionAsString());
+                clonedColumn = (DfColumn) nameConstructor.newInstance(attachTo, newName, ((DfColumnComputed) this).getExpressionAsString());
             }
         }
         catch (NoSuchMethodException | IllegalAccessException | InstantiationException | InvocationTargetException e)

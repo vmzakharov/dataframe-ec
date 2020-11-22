@@ -256,4 +256,60 @@ public class DataFrameJoinTest
 
         DataFrameUtil.assertEquals(expected, joined);
     }
+
+    @Test
+    public void simpleJoinWithNameCollision()
+    {
+        DataFrame df1 = new DataFrame("df1")
+                .addStringColumn("Name").addStringColumn("Color").addLongColumn("Number")
+                .addRow("Pinky",  "pink",    8)
+                .addRow("Clyde",  "orange", 10)
+                ;
+
+        DataFrame df2 = new DataFrame("df2")
+                .addStringColumn("Name").addStringColumn("Color").addLongColumn("Number")
+                .addRow("Grapefruit", "pink",   2)
+                .addRow("Orange",     "orange", 4)
+                ;
+
+        DataFrame joined = df1.join(df2, "Color", "Color");
+
+        DataFrame expected = new DataFrame("expected")
+                .addStringColumn("Name").addStringColumn("Color").addLongColumn("Number").addStringColumn("Name_B").addLongColumn("Number_B")
+                .addRow("Clyde",  "orange", 10, "Orange",     4)
+                .addRow("Pinky",  "pink",    8, "Grapefruit", 2)
+                ;
+
+        System.out.println(joined.asCsvString());
+
+        DataFrameUtil.assertEquals(expected, joined);
+    }
+
+    @Test
+    public void simpleJoinWithNameConfusion()
+    {
+        DataFrame df1 = new DataFrame("df1")
+                .addStringColumn("Foo").addStringColumn("Foo_B_B").addLongColumn("Foo_B_B_B")
+                .addRow("Pinky",  "pink",    8)
+                .addRow("Clyde",  "orange", 10)
+                ;
+
+        DataFrame df2 = new DataFrame("df2")
+                .addStringColumn("Foo").addStringColumn("Color").addLongColumn("Foo_B")
+                .addRow("Grapefruit", "pink",   2)
+                .addRow("Orange",     "orange", 4)
+                ;
+
+        DataFrame joined = df1.join(df2, "Foo_B_B", "Color");
+
+        DataFrame expected = new DataFrame("expected")
+                .addStringColumn("Foo").addStringColumn("Foo_B_B").addLongColumn("Foo_B_B_B").addStringColumn("Foo_B").addLongColumn("Foo_B_B_B_B")
+                .addRow("Clyde",  "orange", 10, "Orange",     4)
+                .addRow("Pinky",  "pink",    8, "Grapefruit", 2)
+                ;
+
+        System.out.println(joined.asCsvString());
+
+        DataFrameUtil.assertEquals(expected, joined);
+    }
 }

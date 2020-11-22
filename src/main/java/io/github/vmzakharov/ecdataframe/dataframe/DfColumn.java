@@ -40,6 +40,8 @@ public interface DfColumn
 
     DfColumn cloneSchemaAndAttachTo(DataFrame attachTo);
 
+    DfColumn cloneSchemaAndAttachTo(DataFrame attachTo, String newName);
+
     void addRowToColumn(int rowIndex, DfColumn target);
 
     default void seal()
