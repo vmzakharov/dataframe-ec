@@ -62,6 +62,15 @@ public class BuiltInFunctionTest
     }
 
     @Test
+    public void functionNamesNotCaseSensitive()
+    {
+        Assert.assertEquals("HELLO", ExpressionTestUtil.evaluateToString("toUpper('Hello')"));
+        Assert.assertEquals("HELLO", ExpressionTestUtil.evaluateToString("toupper('Hello')"));
+        Assert.assertEquals("HELLO", ExpressionTestUtil.evaluateToString("TOUPPER('Hello')"));
+        Assert.assertEquals("HELLO", ExpressionTestUtil.evaluateToString("ToUpper('Hello')"));
+    }
+
+    @Test
     public void startsWith()
     {
         Assert.assertTrue(ExpressionTestUtil.evaluateToBoolean("startsWith(\"Hello, there!\", \"Hello\")"));

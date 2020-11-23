@@ -10,18 +10,25 @@ extends AbstractScript
 implements FunctionDescriptor
 {
     private final String name;
+    private final String normalizedName;
 
     private final ListIterable<String> parameterNames;
 
     public FunctionScript(String newName, ListIterable<String> newParameterNames)
     {
         this.name = newName;
+        this.normalizedName = this.name.toUpperCase();
         this.parameterNames = newParameterNames;
     }
 
     public String getName()
     {
         return this.name;
+    }
+
+    public String getNormalizedName()
+    {
+        return this.normalizedName;
     }
 
     @Override

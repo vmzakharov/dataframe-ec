@@ -10,11 +10,13 @@ public class FunctionCallExpr
 implements Expression
 {
     final private String functionName;
+    final private String normalizedFunctionName;
     final private ListIterable<Expression> parameters;
 
     public FunctionCallExpr(String newFunctionName, ListIterable<Expression> newParameters)
     {
         this.functionName = newFunctionName;
+        this.normalizedFunctionName = this.functionName.toUpperCase();
         this.parameters = newParameters;
     }
 
@@ -38,6 +40,11 @@ implements Expression
     public String getFunctionName()
     {
         return this.functionName;
+    }
+
+    public String getNormalizedFunctionName()
+    {
+        return this.normalizedFunctionName;
     }
 
     public ListIterable<Expression> getParameters()

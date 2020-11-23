@@ -29,7 +29,7 @@ extends AbstractScript
 
     public void addFunctionScript(FunctionScript functionScript)
     {
-        this.functions.put(functionScript.getName(), functionScript);
+        this.functions.put(functionScript.getNormalizedName(), functionScript);
     }
 
     public MutableMap<String, FunctionScript> getFunctions()

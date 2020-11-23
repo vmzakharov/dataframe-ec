@@ -280,8 +280,6 @@ public class DataFrameJoinTest
                 .addRow("Pinky",  "pink",    8, "Grapefruit", 2)
                 ;
 
-        System.out.println(joined.asCsvString());
-
         DataFrameUtil.assertEquals(expected, joined);
     }
 
@@ -307,8 +305,6 @@ public class DataFrameJoinTest
                 .addRow("Clyde",  "orange", 10, "Orange",     4)
                 .addRow("Pinky",  "pink",    8, "Grapefruit", 2)
                 ;
-
-        System.out.println(joined.asCsvString());
 
         DataFrameUtil.assertEquals(expected, joined);
     }

@@ -12,11 +12,13 @@ public abstract class IntrinsicFunctionDescriptor
 implements FunctionDescriptor
 {
     private final String name;
+    private final String normalizedName;
     private final ListIterable<String> parameterNames;
 
     public IntrinsicFunctionDescriptor(String newName, ListIterable<String> newParameterNames)
     {
         this.name = newName;
+        this.normalizedName = this.name.toUpperCase();
         this.parameterNames = newParameterNames;
     }
 
@@ -33,6 +35,11 @@ implements FunctionDescriptor
     public String getName()
     {
         return this.name;
+    }
+
+    public String getNormalizedName()
+    {
+        return this.normalizedName;
     }
 
     public ListIterable<String> getParameterNames()

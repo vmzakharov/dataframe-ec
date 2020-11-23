@@ -44,7 +44,7 @@ public class FunctionDeclarationsTest
                 "\n" +
                 "one = 1\n" +
                 "two = 2\n" +
-                "sum( mul(5, two), sum(one, two) )";
+                "sum( mul(5, two), SUM(one, two) )";
 
         AnonymousScript script = ExpressionParserHelper.toScript(scriptText);
         Value result = script.evaluate();

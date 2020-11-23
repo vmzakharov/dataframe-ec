@@ -204,7 +204,7 @@ public class BuiltInFunctions
     );
 
     private static final ImmutableMap<String, IntrinsicFunctionDescriptor> FUNCTIONS_BY_NAME =
-            FUNCTIONS.toMap(fd -> fd.getName(), fd -> fd).toImmutable();
+            FUNCTIONS.toMap(fd -> fd.getNormalizedName(), fd -> fd).toImmutable();
 
     public static IntrinsicFunctionDescriptor getFunctionDescriptor(String name)
     {

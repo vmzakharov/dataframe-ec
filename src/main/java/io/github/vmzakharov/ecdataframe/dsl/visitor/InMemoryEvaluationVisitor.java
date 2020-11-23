@@ -52,7 +52,7 @@ implements ExpressionEvaluationVisitor
     @Override
     public Value visitFunctionCallExpr(FunctionCallExpr expr)
     {
-        String functionName = expr.getFunctionName();
+        String functionName = expr.getNormalizedFunctionName();
         SimpleEvalContext localContext = new SimpleEvalContext();
         ListIterable<Value> parameterValues = expr.getParameters().collectWith(Expression::evaluate, this);
 

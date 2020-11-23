@@ -114,7 +114,7 @@ implements ExpressionVisitor
     @Override
     public void visitFunctionCallExpr(FunctionCallExpr expr)
     {
-        FunctionScript functionScript = this.getFunction(expr.getFunctionName());
+        FunctionScript functionScript = this.getFunction(expr.getNormalizedFunctionName());
 
         TypeInferenceVisitor functionCallContextVisitor = new TypeInferenceVisitor();
         expr.getParameters().forEachWithIndex((p, i) -> {
