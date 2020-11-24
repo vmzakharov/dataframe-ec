@@ -139,7 +139,7 @@ implements ExpressionVisitor
     @Override
     public void visitStatementSequenceScript(StatementSequenceScript expr)
     {
-        this.printExpressionListLn(expr.getExpressions()).newLine();
+        this.printExpressionListLn(expr.getExpressions());
     }
 
     @Override
@@ -182,16 +182,32 @@ implements ExpressionVisitor
     @Override
     public void visitIfElseExpr(IfElseExpr expr)
     {
-        this.print("if ").printExpression(expr.getCondition()).print(" then").newLine();
-        this.tab().printExpressionListLn(expr.getIfScript().getExpressions()).tabBack();
-
-        if (expr.hasElseSection())
+        if (expr.isTernary())
         {
-            this.print("else").newLine();
-            this.tab().printExpressionListLn(expr.getElseScript().getExpressions()).tabBack();
+            this
+                .printExpression(expr.getCondition())
+                .print(" ? ")
+                .printExpression(expr.getIfScript())
+                .print(" : ")
+                .printExpression(expr.getElseScript());
         }
+        else
+        {
+            this.print("if ").printExpression(expr.getCondition()).print(" then").newLine();
+            this.tab();
+            expr.getIfScript().accept(this);
+            this.tabBack();
 
-        this.print("endif");
+            if (expr.hasElseSection())
+            {
+                this.print("else").newLine();
+                this.tab();
+                expr.getElseScript().accept(this);
+                this.tabBack();
+            }
+
+            this.print("endif");
+        }
     }
 
     private PrettyPrintVisitor print(String s)

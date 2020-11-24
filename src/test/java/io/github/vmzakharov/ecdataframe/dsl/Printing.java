@@ -60,6 +60,58 @@ public class Printing
     }
 
     @Test
+    public void printCondition()
+    {
+        String scriptText =
+                "if a > b then\n" +
+                "\"a\" else\n" +
+                "\"b\"\n" +
+                "endif";
+        AnonymousScript script = ExpressionParserHelper.toScript(scriptText);
+
+        String result = PrettyPrintVisitor.exprToString(script);
+
+        Assert.assertEquals(
+                "if (a > b) then\n" +
+                "  \"a\"\n" +
+                "else\n" +
+                "  \"b\"\n" +
+                "endif\n", result);
+    }
+
+    @Test
+    public void printTernaryOperator()
+    {
+        String scriptText = "a > b ? 5 + 6 : 12";
+
+        Expression expression = ExpressionParserHelper.toExpression(scriptText);
+
+        String result = PrettyPrintVisitor.exprToString(expression);
+
+        Assert.assertEquals("(a > b) ? (5 + 6) : 12", result);
+    }
+
+    @Test
+    public void printConditionWithTernary()
+    {
+        String scriptText =
+                "if a > b then\n" +
+                "a > b ? 5 + 6 : 12 else\n" +
+                "a < b / 2 ? 1 : 2\n" +
+                "endif";
+        AnonymousScript script = ExpressionParserHelper.toScript(scriptText);
+
+        String result = PrettyPrintVisitor.exprToString(script);
+
+        Assert.assertEquals(
+                "if (a > b) then\n" +
+                "  (a > b) ? (5 + 6) : 12\n" +
+                "else\n" +
+                "  (a < (b / 2)) ? 1 : 2\n" +
+                "endif\n", result);
+    }
+
+    @Test
     public void expressionToString()
     {
         String expressionAsString = "(1 + 2)/ (7.0 +9)";

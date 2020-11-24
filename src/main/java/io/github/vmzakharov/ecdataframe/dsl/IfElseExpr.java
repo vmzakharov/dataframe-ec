@@ -8,14 +8,21 @@ public class IfElseExpr
 implements Expression
 {
     private final Expression condition;
-    private final Script ifScript;
-    private final Script elseScript;
+    private final Expression ifScript;
+    private final Expression elseScript;
+    private final boolean ternary;
 
-    public IfElseExpr(Expression newCondition, Script newIfScript, Script newElseScript)
+    public IfElseExpr(Expression newCondition, Expression newIfScript, Expression newElseScript)
+    {
+        this(newCondition, newIfScript, newElseScript, false);
+    }
+
+    public IfElseExpr(Expression newCondition, Expression newIfScript, Expression newElseScript, boolean newTernary)
     {
         this.condition = newCondition;
         this.ifScript = newIfScript;
         this.elseScript = newElseScript;
+        this.ternary = newTernary;
     }
 
     public IfElseExpr(Expression newCondition, Script newIfScript)
@@ -23,6 +30,7 @@ implements Expression
         this.condition = newCondition;
         this.ifScript = newIfScript;
         this.elseScript = null;
+        this.ternary = false;
     }
 
     public Expression getCondition()
@@ -30,12 +38,12 @@ implements Expression
         return this.condition;
     }
 
-    public Script getIfScript()
+    public Expression getIfScript()
     {
         return this.ifScript;
     }
 
-    public Script getElseScript()
+    public Expression getElseScript()
     {
         return this.elseScript;
     }
@@ -43,6 +51,11 @@ implements Expression
     public boolean hasElseSection()
     {
         return this.elseScript != null;
+    }
+
+    public boolean isTernary()
+    {
+        return this.ternary;
     }
 
     @Override

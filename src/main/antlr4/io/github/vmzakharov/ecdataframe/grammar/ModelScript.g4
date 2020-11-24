@@ -49,6 +49,7 @@ expr :
     | DOUBLE                   #doubleLiteralExpr
     | STRING                   #stringLiteralExpr
     | ID                       #varExpr
+    | condExpr=expr '?' ifExpr=expr ':' elseExpr=expr   #ternaryExpr
     ;
 
 vectorExpr : '(' exprList ')' | '(' ')';

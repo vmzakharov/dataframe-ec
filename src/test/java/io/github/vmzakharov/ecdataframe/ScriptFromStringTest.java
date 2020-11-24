@@ -90,8 +90,7 @@ public class ScriptFromStringTest
     {
         AnonymousScript script = ExpressionParserHelper.toScript(
                 "x = \"a\"\n" +
-                "if x in (\"a\", \"b\", \"c\")\n" +
-                "then\n" +
+                "if x in (\"a\", \"b\", \"c\") then\n" +
                 "  2 + 2\n" +
                 "  result = \"in\"\n" +
                 "  if x == \"b\" then y = 5 else y = 6 endif\n" +

@@ -138,4 +138,11 @@ public class StandaloneExpressionFromStringTest
         Assert.assertFalse(ExpressionTestUtil.evaluateToBoolean("\"XYZ\" in \"abracadabra\""));
         Assert.assertTrue(ExpressionTestUtil.evaluateToBoolean("\"XYZ\" not in \"abracadabra\""));
     }
+
+    @Test
+    public void ternaryOperator()
+    {
+        Assert.assertEquals("Ah", ExpressionTestUtil.evaluateToString("5 > 6 ? 'Huh' : 'Ah'"));
+        Assert.assertEquals(110, ExpressionTestUtil.evaluateToLong("toUpper('Times') == 'TIMES' ? 10 * 11 : 10 + 11"));
+    }
 }

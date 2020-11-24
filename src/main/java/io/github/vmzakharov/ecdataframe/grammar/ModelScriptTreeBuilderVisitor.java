@@ -22,13 +22,13 @@ extends ModelScriptBaseVisitor<Expression>
         this.scriptStack.push(new AnonymousScript());
     }
 
-    @Override
-    public Expression visitScript(ModelScriptParser.ScriptContext ctx)
-    {
-        // todo: need it?
-        return super.visitScript(ctx);
-    }
-
+//    @Override
+//    public Expression visitScript(ModelScriptParser.ScriptContext ctx)
+//    {
+//        // todo: need it?
+//        return super.visitScript(ctx);
+//    }
+//
     @Override
     public Expression visitFreeExp(ModelScriptParser.FreeExpContext ctx)
     {
@@ -269,6 +269,12 @@ extends ModelScriptBaseVisitor<Expression>
     }
 
     @Override
+    public Expression visitTernaryExpr(ModelScriptParser.TernaryExprContext ctx)
+    {
+        return new IfElseExpr(this.visit(ctx.condExpr), this.visit(ctx.ifExpr), this.visit(ctx.elseExpr), true);
+    }
+
+    @Override
     public Expression visitConditionExpr(ModelScriptParser.ConditionExprContext ctx)
     {
         Expression condition = this.visit(ctx.expr());
@@ -283,7 +289,7 @@ extends ModelScriptBaseVisitor<Expression>
         {
             Script elseScript = this.processStatementSequence(ctx.elseBody);
 
-            this.addStatementToCurrentScriptContext(new IfElseExpr(condition, ifScript, elseScript));
+            this.addStatementToCurrentScriptContext(new IfElseExpr(condition, ifScript, elseScript, false));
         }
 
         return null;
