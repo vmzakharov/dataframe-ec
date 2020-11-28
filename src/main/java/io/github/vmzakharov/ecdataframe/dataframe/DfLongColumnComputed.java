@@ -62,7 +62,6 @@ implements DfColumnComputed
     {
         return Interval
                 .zeroTo(this.getDataFrame().rowCount() - 1)
-                .asLazy()
                 .collectLong(this::getLong)
                 .sum();
     }

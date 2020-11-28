@@ -63,7 +63,6 @@ implements DfColumnComputed
     public double sum()
     {
         return Interval.zeroTo(this.getDataFrame().rowCount() - 1)
-                .asLazy()
                 .collectDouble(this::getDouble)
                 .sum();
     }
