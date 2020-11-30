@@ -1,5 +1,6 @@
 package io.github.vmzakharov.ecdataframe.dataframe;
 
+import io.github.vmzakharov.ecdataframe.ExpressionTestUtil;
 import io.github.vmzakharov.ecdataframe.dsl.value.LongValue;
 import org.eclipse.collections.api.factory.Lists;
 import org.eclipse.collections.api.list.ImmutableList;
@@ -32,7 +33,7 @@ public class DataFrameExpressionTest
     @Test
     public void arithmeticExpression()
     {
-        Expression expression = ExpressionParserHelper.toExpression("Count * 2");
+        Expression expression = ExpressionTestUtil.toExpression("Count * 2");
 
         MutableLongList values = LongLists.mutable.of();
 
@@ -44,7 +45,7 @@ public class DataFrameExpressionTest
     @Test
     public void stringExpression()
     {
-        Expression expression = ExpressionParserHelper.toExpression("substr(Name, 2) + \"X\"");
+        Expression expression = ExpressionTestUtil.toExpression("substr(Name, 2) + \"X\"");
 
         ImmutableList<Object> values = IntInterval.zeroTo(3).collect(i -> df.evaluateExpression(expression, i).stringValue());
 

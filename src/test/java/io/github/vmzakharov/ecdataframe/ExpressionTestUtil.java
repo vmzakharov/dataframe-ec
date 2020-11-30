@@ -1,9 +1,6 @@
 package io.github.vmzakharov.ecdataframe;
 
-import io.github.vmzakharov.ecdataframe.dsl.BinaryExpr;
-import io.github.vmzakharov.ecdataframe.dsl.BinaryOp;
-import io.github.vmzakharov.ecdataframe.dsl.ConstExpr;
-import io.github.vmzakharov.ecdataframe.dsl.Expression;
+import io.github.vmzakharov.ecdataframe.dsl.*;
 import io.github.vmzakharov.ecdataframe.dsl.value.*;
 import io.github.vmzakharov.ecdataframe.dsl.visitor.InMemoryEvaluationVisitor;
 import io.github.vmzakharov.ecdataframe.util.ExpressionParserHelper;
@@ -18,9 +15,19 @@ public class ExpressionTestUtil
         return ((LongValue) evaluate(s)).longValue();
     }
 
+    public static AnonymousScript toScript(String s)
+    {
+        return ExpressionParserHelper.DEFAULT.toScript(s);
+    }
+
+    public static Expression toExpression(String s)
+    {
+        return ExpressionParserHelper.DEFAULT.toExpression(s);
+    }
+
     public static Value evaluate(String s)
     {
-        return ExpressionParserHelper.toExpression(s).evaluate(new InMemoryEvaluationVisitor());
+        return ExpressionParserHelper.DEFAULT.toExpression(s).evaluate(new InMemoryEvaluationVisitor());
     }
 
     static public double evaluateToDouble(String s)

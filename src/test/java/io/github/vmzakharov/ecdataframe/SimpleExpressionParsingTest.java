@@ -3,7 +3,6 @@ package io.github.vmzakharov.ecdataframe;
 import io.github.vmzakharov.ecdataframe.dsl.*;
 import io.github.vmzakharov.ecdataframe.dsl.value.LongValue;
 import io.github.vmzakharov.ecdataframe.dsl.visitor.InMemoryEvaluationVisitor;
-import io.github.vmzakharov.ecdataframe.util.ExpressionParserHelper;
 import org.eclipse.collections.impl.factory.Lists;
 import org.junit.Assert;
 import org.junit.Test;
@@ -13,7 +12,7 @@ public class SimpleExpressionParsingTest
     @Test
     public void negativeNumber()
     {
-        Expression expression = ExpressionParserHelper.toExpression("-1\n");
+        Expression expression = ExpressionTestUtil.toExpression("-1\n");
 
         Assert.assertEquals(UnaryExpr.class, expression.getClass());
         UnaryExpr unaryExpr = (UnaryExpr) expression;
@@ -23,7 +22,7 @@ public class SimpleExpressionParsingTest
     @Test
     public void assignment()
     {
-        Expression expression = ExpressionParserHelper.toExpression("a = 5\n");
+        Expression expression = ExpressionTestUtil.toExpression("a = 5\n");
         Assert.assertEquals("a", ((AssingExpr) expression).getVarName());
 
         EvalContext evalContext = new SimpleEvalContext();
@@ -38,7 +37,7 @@ public class SimpleExpressionParsingTest
     @Test
     public void functionCall()
     {
-        Expression expression = ExpressionParserHelper.toExpression("x(1, y * 7)");
+        Expression expression = ExpressionTestUtil.toExpression("x(1, y * 7)");
 
         Assert.assertEquals(FunctionCallExpr.class, expression.getClass());
 
@@ -55,7 +54,7 @@ public class SimpleExpressionParsingTest
     @Test
     public void noArgFunctionCall()
     {
-        Expression expression = ExpressionParserHelper.toExpression("fff()");
+        Expression expression = ExpressionTestUtil.toExpression("fff()");
 
         Assert.assertEquals(FunctionCallExpr.class, expression.getClass());
 
@@ -68,7 +67,7 @@ public class SimpleExpressionParsingTest
     @Test
     public void projection()
     {
-        Script script = ExpressionParserHelper.toScript("project {Foo.bar, Foo.baz} where Foo.qux > 7");
+        Script script = ExpressionTestUtil.toScript("project {Foo.bar, Foo.baz} where Foo.qux > 7");
 
         Expression expression = script.getExpressions().get(0);
 
@@ -83,7 +82,7 @@ public class SimpleExpressionParsingTest
     @Test
     public void projectionWithAlias()
     {
-        Script script = ExpressionParserHelper.toScript(
+        Script script = ExpressionTestUtil.toScript(
                 "project {\n" +
                 "barbar : Foo.bar, " +
                 "bazbaz : Foo.baz" +
@@ -103,7 +102,7 @@ public class SimpleExpressionParsingTest
     @Test
     public void vectorExpression()
     {
-        Script script = ExpressionParserHelper.toScript("(\"a\", \"b\", \"c\")");
+        Script script = ExpressionTestUtil.toScript("(\"a\", \"b\", \"c\")");
 
         Expression expression = script.getExpressions().get(0);
 

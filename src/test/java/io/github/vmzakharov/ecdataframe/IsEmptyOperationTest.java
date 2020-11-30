@@ -6,7 +6,6 @@ import io.github.vmzakharov.ecdataframe.dsl.value.DateValue;
 import io.github.vmzakharov.ecdataframe.dsl.value.StringValue;
 import io.github.vmzakharov.ecdataframe.dsl.value.Value;
 import io.github.vmzakharov.ecdataframe.dsl.visitor.InMemoryEvaluationVisitor;
-import io.github.vmzakharov.ecdataframe.util.ExpressionParserHelper;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -54,12 +53,12 @@ public class IsEmptyOperationTest
         InMemoryEvaluationVisitor evaluationVisitor = new InMemoryEvaluationVisitor();
         evaluationVisitor.getContext().setVariable("x", new DateValue(null));
 
-        AnonymousScript script = ExpressionParserHelper.toScript("x is empty");
+        AnonymousScript script = ExpressionTestUtil.toScript("x is empty");
         Value result = script.evaluate(evaluationVisitor);
 
         Assert.assertTrue(((BooleanValue) result).isTrue());
 
-        script = ExpressionParserHelper.toScript("x is not empty");
+        script = ExpressionTestUtil.toScript("x is not empty");
         result = script.evaluate(evaluationVisitor);
         Assert.assertFalse(((BooleanValue) result).isTrue());
     }
@@ -70,12 +69,12 @@ public class IsEmptyOperationTest
         InMemoryEvaluationVisitor evaluationVisitor = new InMemoryEvaluationVisitor();
         evaluationVisitor.getContext().setVariable("x", new StringValue(null));
 
-        AnonymousScript script = ExpressionParserHelper.toScript("x is empty");
+        AnonymousScript script = ExpressionTestUtil.toScript("x is empty");
         Value result = script.evaluate(evaluationVisitor);
 
         Assert.assertTrue(((BooleanValue) result).isTrue());
 
-        script = ExpressionParserHelper.toScript("x is not empty");
+        script = ExpressionTestUtil.toScript("x is not empty");
         result = script.evaluate(evaluationVisitor);
         Assert.assertFalse(((BooleanValue) result).isTrue());
     }

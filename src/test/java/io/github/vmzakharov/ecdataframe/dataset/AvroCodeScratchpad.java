@@ -1,5 +1,6 @@
 package io.github.vmzakharov.ecdataframe.dataset;
 
+import io.github.vmzakharov.ecdataframe.ExpressionTestUtil;
 import io.github.vmzakharov.ecdataframe.dsl.Script;
 import io.github.vmzakharov.ecdataframe.dsl.value.Value;
 import org.apache.avro.generic.GenericRecord;
@@ -91,7 +92,7 @@ public class AvroCodeScratchpad
 
         System.out.println(scriptString);
         System.out.println("-----------");
-        Script script = ExpressionParserHelper.toScript(scriptString);
+        Script script = ExpressionTestUtil.toScript(scriptString);
 
         InMemoryEvaluationVisitor visitor = new InMemoryEvaluationVisitor();
         visitor.getContext().addDataSet(dataSet);

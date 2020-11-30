@@ -2,10 +2,10 @@ package io.github.vmzakharov.ecdataframe.util;
 
 import io.github.vmzakharov.ecdataframe.dsl.AnonymousScript;
 import io.github.vmzakharov.ecdataframe.dsl.Expression;
-import io.github.vmzakharov.ecdataframe.dsl.Script;
 import io.github.vmzakharov.ecdataframe.grammar.ModelScriptLexer;
 import io.github.vmzakharov.ecdataframe.grammar.ModelScriptParser;
 import io.github.vmzakharov.ecdataframe.grammar.ModelScriptTreeBuilderVisitor;
+import org.antlr.v4.runtime.ANTLRErrorListener;
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
@@ -13,29 +13,57 @@ import org.antlr.v4.runtime.tree.ParseTree;
 
 public class ExpressionParserHelper
 {
-    static public Expression toExpression(String s)
+    static public ExpressionParserHelper DEFAULT = new ExpressionParserHelper();
+
+    private ANTLRErrorListener replacementErrorListener;
+
+    public ExpressionParserHelper(ANTLRErrorListener newReplacementErrorListener)
     {
-        ModelScriptParser parser = stringToParser(s);
+        this.replacementErrorListener = newReplacementErrorListener;
+    }
+
+    public ExpressionParserHelper()
+    {
+    }
+
+    public Expression toExpression(String s)
+    {
+        ModelScriptParser parser = this.stringToParser(s);
         ParseTree tree = parser.statement();
 
+        if (parser.getNumberOfSyntaxErrors() > 0)
+        {
+            return null;
+        }
+
         ModelScriptTreeBuilderVisitor visitor = new ModelScriptTreeBuilderVisitor();
 
         return visitor.visit(tree);
     }
 
-    static public Expression toProjection(String s)
+    public Expression toProjection(String s)
     {
-        ModelScriptParser parser = stringToParser(s);
+        ModelScriptParser parser = this.stringToParser(s);
         ParseTree tree = parser.projectionStatement();
 
+        if (parser.getNumberOfSyntaxErrors() > 0)
+        {
+            return null;
+        }
+
         ModelScriptTreeBuilderVisitor visitor = new ModelScriptTreeBuilderVisitor();
 
         return visitor.visit(tree);
     }
 
-    static public Expression toExpressionOrScript(String s)
+    public Expression toExpressionOrScript(String s)
     {
-        AnonymousScript script = toScript(s);
+        AnonymousScript script = this.toScript(s);
+
+        if (script == null)
+        {
+            return null;
+        }
 
         if (script.getExpressions().size() == 1 && script.getFunctions().size() == 0)
         {
@@ -45,10 +73,15 @@ public class ExpressionParserHelper
         return script;
     }
 
-    static public AnonymousScript toScript(String s)
+    public AnonymousScript toScript(String s)
     {
-        ModelScriptParser parser = stringToParser(s);
+        ModelScriptParser parser = this.stringToParser(s);
         ParseTree tree = parser.script();
+
+        if (parser.getNumberOfSyntaxErrors() > 0)
+        {
+            return null;
+        }
 
         ModelScriptTreeBuilderVisitor visitor = new ModelScriptTreeBuilderVisitor();
         visitor.visit(tree);
@@ -56,11 +89,17 @@ public class ExpressionParserHelper
         return visitor.getAsAnonymousScript();
     }
 
-    static private ModelScriptParser stringToParser(String s)
+    private ModelScriptParser stringToParser(String s)
     {
         CharStream charStream = CharStreams.fromString(s);
         ModelScriptLexer lexer = new ModelScriptLexer(charStream);
         CommonTokenStream tokens = new CommonTokenStream(lexer);
-        return new ModelScriptParser(tokens);
+        ModelScriptParser parser = new ModelScriptParser(tokens);
+        if (this.replacementErrorListener != null)
+        {
+            parser.removeErrorListeners();
+            parser.addErrorListener(this.replacementErrorListener);
+        }
+        return parser;
     }
 }

@@ -15,7 +15,7 @@ public class VectorExpressionTest
     @Test
     public void vectorVariableIn()
     {
-        AnonymousScript script = ExpressionParserHelper.toScript(
+        AnonymousScript script = ExpressionTestUtil.toScript(
                 "x = (\"a\", \"b\", \"c\")\n" +
                 "y = \"a\"\n" +
                 "y in x\n"
@@ -34,7 +34,7 @@ public class VectorExpressionTest
     @Test
     public void indexWithVariables()
     {
-        AnonymousScript script = ExpressionParserHelper.toScript(
+        AnonymousScript script = ExpressionTestUtil.toScript(
                 "x = (\"a\", \"b\", \"c\")\n" +
                 "y = 2\n" +
                 "x[y]\n"
@@ -47,7 +47,7 @@ public class VectorExpressionTest
     @Test
     public void indexWithFunction()
     {
-        AnonymousScript script = ExpressionParserHelper.toScript(
+        AnonymousScript script = ExpressionTestUtil.toScript(
                 "function foo(switch)\n" +
                 "{\n" +
                 "  if switch == 1 then\n" +

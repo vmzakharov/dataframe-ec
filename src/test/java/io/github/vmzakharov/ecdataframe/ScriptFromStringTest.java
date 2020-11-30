@@ -18,7 +18,7 @@ public class ScriptFromStringTest
                 "x = 1\n" +
                 "y = 2\n" +
                 "z = x + y";
-        AnonymousScript script = ExpressionParserHelper.toScript(scriptText);
+        AnonymousScript script = ExpressionTestUtil.toScript(scriptText);
         Value result = script.evaluate(new InMemoryEvaluationVisitor());
         Assert.assertTrue(result.isLong());
         Assert.assertEquals(3, ((LongValue) result).longValue());
@@ -32,7 +32,7 @@ public class ScriptFromStringTest
                 "y =2\n" +
                 "z=x+ y\n" +
                 "3+1 +2";
-        AnonymousScript script = ExpressionParserHelper.toScript(scriptText);
+        AnonymousScript script = ExpressionTestUtil.toScript(scriptText);
         Value result = script.evaluate();
         Assert.assertTrue(result.isLong());
         Assert.assertEquals(6, ((LongValue) result).longValue());
@@ -41,7 +41,7 @@ public class ScriptFromStringTest
     @Test
     public void inOperator()
     {
-        AnonymousScript script = ExpressionParserHelper.toScript(
+        AnonymousScript script = ExpressionTestUtil.toScript(
                 "x = 1\n" +
                 "y = 1\n" +
                 "x in (3, 2, y)");
@@ -49,7 +49,7 @@ public class ScriptFromStringTest
         Assert.assertTrue(result.isBoolean());
         Assert.assertTrue(((BooleanValue) result).isTrue());
 
-        script = ExpressionParserHelper.toScript(
+        script = ExpressionTestUtil.toScript(
                 "x= \"a\"\n" +
                 "y= \"b\"\n" +
                 "q= \"c\"\n" +
@@ -58,7 +58,7 @@ public class ScriptFromStringTest
         Assert.assertTrue(result.isBoolean());
         Assert.assertFalse(((BooleanValue) result).isTrue());
 
-        script = ExpressionParserHelper.toScript(
+        script = ExpressionTestUtil.toScript(
                 "y= \"b\"\n" +
                 "q= \"c\"\n" +
                 "\"c\" in (\"b\", y, q)");
@@ -70,7 +70,7 @@ public class ScriptFromStringTest
     @Test
     public void ifStatement()
     {
-        AnonymousScript script = ExpressionParserHelper.toScript(
+        AnonymousScript script = ExpressionTestUtil.toScript(
                 "x = \"a\"\n" +
                 "if x in (\"a\", \"b\", \"c\")\n" +
                 "then\n" +
@@ -88,7 +88,7 @@ public class ScriptFromStringTest
     @Test
     public void nestedIfStatement()
     {
-        AnonymousScript script = ExpressionParserHelper.toScript(
+        AnonymousScript script = ExpressionTestUtil.toScript(
                 "x = \"a\"\n" +
                 "if x in (\"a\", \"b\", \"c\") then\n" +
                 "  2 + 2\n" +
@@ -111,7 +111,7 @@ public class ScriptFromStringTest
     @Test
     public void ifStatementAsExpression()
     {
-        AnonymousScript script = ExpressionParserHelper.toScript(
+        AnonymousScript script = ExpressionTestUtil.toScript(
                 "x = \"aa\"\n" +
                 "if x in (\"a\", \"b\", \"c\")\n" +
                 "then\n" +
@@ -127,7 +127,7 @@ public class ScriptFromStringTest
     @Test
     public void nestedIfStatementAsExpressionm()
     {
-        AnonymousScript script = ExpressionParserHelper.toScript(
+        AnonymousScript script = ExpressionTestUtil.toScript(
                 "x = \"a\"\n" +
                 "if x in (\"a\", \"b\", \"c\")\n" +
                 "then\n" +

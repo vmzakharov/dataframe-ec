@@ -1,5 +1,6 @@
 package io.github.vmzakharov.ecdataframe.dsl;
 
+import io.github.vmzakharov.ecdataframe.ExpressionTestUtil;
 import org.junit.Assert;
 import org.junit.Test;
 import io.github.vmzakharov.ecdataframe.dsl.visitor.PrettyPrintVisitor;
@@ -15,7 +16,7 @@ public class Printing
                 "y =2\n" +
                 "z=x+ y\n" +
                 "3+1 +2";
-        AnonymousScript script = ExpressionParserHelper.toScript(scriptText);
+        AnonymousScript script = ExpressionTestUtil.toScript(scriptText);
 
         String result = PrettyPrintVisitor.exprToString(script);
 
@@ -34,7 +35,7 @@ public class Printing
                 "y =2\n" +
                 "foo(x, y + 2, time(), \"Oy\")\n" +
                 "3 + bar(1, 2) - zzz()";
-        AnonymousScript script = ExpressionParserHelper.toScript(scriptText);
+        AnonymousScript script = ExpressionTestUtil.toScript(scriptText);
 
         String result = PrettyPrintVisitor.exprToString(script);
 
@@ -52,7 +53,7 @@ public class Printing
                 "project {Foo.bar, Foo.baz}\n" +
                 "where\n" +
                 "Foo.qux > 7";
-        AnonymousScript script = ExpressionParserHelper.toScript(scriptText);
+        AnonymousScript script = ExpressionTestUtil.toScript(scriptText);
 
         String result = PrettyPrintVisitor.exprToString(script);
 
@@ -67,7 +68,7 @@ public class Printing
                 "\"a\" else\n" +
                 "\"b\"\n" +
                 "endif";
-        AnonymousScript script = ExpressionParserHelper.toScript(scriptText);
+        AnonymousScript script = ExpressionTestUtil.toScript(scriptText);
 
         String result = PrettyPrintVisitor.exprToString(script);
 
@@ -84,7 +85,7 @@ public class Printing
     {
         String scriptText = "a > b ? 5 + 6 : 12";
 
-        Expression expression = ExpressionParserHelper.toExpression(scriptText);
+        Expression expression = ExpressionTestUtil.toExpression(scriptText);
 
         String result = PrettyPrintVisitor.exprToString(expression);
 
@@ -99,7 +100,7 @@ public class Printing
                 "a > b ? 5 + 6 : 12 else\n" +
                 "a < b / 2 ? 1 : 2\n" +
                 "endif";
-        AnonymousScript script = ExpressionParserHelper.toScript(scriptText);
+        AnonymousScript script = ExpressionTestUtil.toScript(scriptText);
 
         String result = PrettyPrintVisitor.exprToString(script);
 
@@ -115,7 +116,7 @@ public class Printing
     public void expressionToString()
     {
         String expressionAsString = "(1 + 2)/ (7.0 +9)";
-        Expression expression = ExpressionParserHelper.toExpression(expressionAsString);
+        Expression expression = ExpressionTestUtil.toExpression(expressionAsString);
 
         String result = PrettyPrintVisitor.exprToString(expression);
 

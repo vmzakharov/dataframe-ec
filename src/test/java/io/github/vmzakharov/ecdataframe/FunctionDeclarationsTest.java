@@ -22,7 +22,7 @@ public class FunctionDeclarationsTest
                 "y = 2\n" +
                 "x(5, y * 7)";
 
-        AnonymousScript script = ExpressionParserHelper.toScript(scriptText);
+        AnonymousScript script = ExpressionTestUtil.toScript(scriptText);
         Value result = script.evaluate();
         Assert.assertTrue(result.isLong());
         Assert.assertEquals(19, ((LongValue) result).longValue());
@@ -46,7 +46,7 @@ public class FunctionDeclarationsTest
                 "two = 2\n" +
                 "sum( mul(5, two), SUM(one, two) )";
 
-        AnonymousScript script = ExpressionParserHelper.toScript(scriptText);
+        AnonymousScript script = ExpressionTestUtil.toScript(scriptText);
         Value result = script.evaluate();
         Assert.assertTrue(result.isLong());
         Assert.assertEquals(13, ((LongValue) result).longValue());
@@ -68,7 +68,7 @@ public class FunctionDeclarationsTest
                 "\n" +
                 "hello() + \" there\" + bang()";
 
-        AnonymousScript script = ExpressionParserHelper.toScript(scriptText);
+        AnonymousScript script = ExpressionTestUtil.toScript(scriptText);
         Value result = script.evaluate();
         Assert.assertTrue(result.isString());
         Assert.assertEquals("hello there!", result.stringValue());

@@ -20,7 +20,7 @@ implements DfColumnComputed
     {
         super(newDataFrame, newName);
         this.expressionAsString = newExpressionAsString;
-        this.expression = ExpressionParserHelper.toExpressionOrScript(expressionAsString);
+        this.expression = ExpressionParserHelper.DEFAULT.toExpressionOrScript(expressionAsString);
     }
 
     @Override

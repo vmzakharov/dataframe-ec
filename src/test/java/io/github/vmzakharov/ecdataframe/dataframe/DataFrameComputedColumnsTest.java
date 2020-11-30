@@ -186,7 +186,7 @@ public class DataFrameComputedColumnsTest
                 "}\n"
         ;
 
-        AnonymousScript outerScript = ExpressionParserHelper.toScript(outerScriptString);
+        AnonymousScript outerScript = ExpressionParserHelper.DEFAULT.toScript(outerScriptString);
 
         SimpleEvalContext outerContext = new SimpleEvalContext();
         outerContext.setDeclaredFunctions(outerScript.getFunctions());

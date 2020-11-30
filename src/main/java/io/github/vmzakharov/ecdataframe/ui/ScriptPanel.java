@@ -30,7 +30,7 @@ extends JPanel
 
         JButton runButton = new JButton("Run");
         runButton.addActionListener(e -> {
-            Script script = ExpressionParserHelper.toScript(textArea.getText());
+            Script script = ExpressionParserHelper.DEFAULT.toScript(textArea.getText());
             Value result = script.evaluate(new InMemoryEvaluationVisitor(newStoredContext));
             PrinterFactory.getPrinter().println("DONE: " + result.asStringLiteral());
             this.actionsPostEvaluation.forEach(Runnable::run);
@@ -38,7 +38,7 @@ extends JPanel
 
         JButton parseButton = new JButton("Parse");
         runButton.addActionListener(e -> {
-            ExpressionParserHelper.toScript(textArea.getText());
+            ExpressionParserHelper.DEFAULT.toScript(textArea.getText());
             this.actionsPostEvaluation.forEach(Runnable::run);
         });
 

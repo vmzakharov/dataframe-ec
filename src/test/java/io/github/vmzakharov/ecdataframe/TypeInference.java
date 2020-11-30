@@ -114,7 +114,7 @@ public class TypeInference
                 "    Fav : User.favorite_number\n" +
                 "} where User.favorite_number > 2";
 
-        ProjectionExpr expr = (ProjectionExpr) ExpressionParserHelper.toProjection(expressionString);
+        ProjectionExpr expr = (ProjectionExpr) ExpressionParserHelper.DEFAULT.toProjection(expressionString);
 
         ListIterable<ValueType> projectionExpressionTypes = expr.getProjectionExpressions().collect(visitor::inferExpressionType);
 
@@ -123,12 +123,12 @@ public class TypeInference
 
     private void assertScriptType(String scriptAsString, ValueType valueType)
     {
-        this.assertType(ExpressionParserHelper.toScript(scriptAsString), valueType);
+        this.assertType(ExpressionTestUtil.toScript(scriptAsString), valueType);
     }
 
     private void assertExpressionType(String expressionAsString, ValueType valueType)
     {
-        this.assertType(ExpressionParserHelper.toExpression(expressionAsString), valueType);
+        this.assertType(ExpressionTestUtil.toExpression(expressionAsString), valueType);
     }
 
     private void assertType(Expression expression, ValueType valueType)

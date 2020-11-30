@@ -19,7 +19,7 @@ public class BuiltInFunctionTest
         CollectingPrinter collectingPrinter = new CollectingPrinter();
         PrinterFactory.setPrinter(collectingPrinter);
 
-        Script script = ExpressionParserHelper.toScript("println(1 + 3)\n" +
+        Script script = ExpressionTestUtil.toScript("println(1 + 3)\n" +
                 "print(\"ene\")\n" +
                 "println(\"-mene\")\n" +
                 "println(\"Hello!\")");
@@ -39,7 +39,7 @@ public class BuiltInFunctionTest
                 "print(\"ene\", \"-mene\")\n" +
                 "println(\", hello!\")";
 
-        Script script = ExpressionParserHelper.toScript(s);
+        Script script = ExpressionTestUtil.toScript(s);
 
         script.evaluate(new InMemoryEvaluationVisitor());
 

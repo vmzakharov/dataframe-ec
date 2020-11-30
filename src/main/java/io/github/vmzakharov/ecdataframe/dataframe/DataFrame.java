@@ -492,7 +492,7 @@ public class DataFrame
         DataFrame rejected = this.cloneStructure(this.name + "-rejected");
 
         DataFrameEvalContext context = new DataFrameEvalContext(this);
-        Expression filterExpression = ExpressionParserHelper.toExpression(filterExpressionString);
+        Expression filterExpression = ExpressionParserHelper.DEFAULT.toExpression(filterExpressionString);
         InMemoryEvaluationVisitor evaluationVisitor = new InMemoryEvaluationVisitor(context);
 
         for (int i = 0; i < this.rowCount; i++)
@@ -519,7 +519,7 @@ public class DataFrame
     {
         DataFrame filtered = this.cloneStructure();
         DataFrameEvalContext context = new DataFrameEvalContext(this);
-        Expression filterExpression = ExpressionParserHelper.toExpression(filterExpressionString);
+        Expression filterExpression = ExpressionParserHelper.DEFAULT.toExpression(filterExpressionString);
         InMemoryEvaluationVisitor evaluationVisitor = new InMemoryEvaluationVisitor(context);
         for (int i = 0; i < this.rowCount; i++)
         {
@@ -610,7 +610,7 @@ public class DataFrame
             return;
         }
 
-        Expression expression = ExpressionParserHelper.toExpression(expressionString);
+        Expression expression = ExpressionParserHelper.DEFAULT.toExpression(expressionString);
         MutableIntList indexes = IntInterval.zeroTo(this.rowCount - 1).toList();
         indexes.sortThisBy(i -> this.evaluateExpression(expression, i));
         this.rowIndex = indexes;
@@ -718,7 +718,7 @@ public class DataFrame
         this.bitmap = BooleanArrayList.newWithNValues(this.rowCount, false);
 
         DataFrameEvalContext context = new DataFrameEvalContext(this);
-        Expression filterExpression = ExpressionParserHelper.toExpression(filterExpressionString);
+        Expression filterExpression = ExpressionParserHelper.DEFAULT.toExpression(filterExpressionString);
         InMemoryEvaluationVisitor evaluationVisitor = new InMemoryEvaluationVisitor(context);
 
         for (int i = 0; i < this.rowCount; i++)
