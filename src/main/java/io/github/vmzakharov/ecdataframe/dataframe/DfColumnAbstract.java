@@ -81,4 +81,19 @@ implements DfColumn
 
         return clonedColumn;
     }
+
+    protected DfColumn validateAndCreateTargetColumn(DfColumn other, DataFrame target)
+    {
+        ErrorReporter.reportAndThrow(!this.getType().equals(other.getType()),
+                        "Attempting to merge columns of different types: " +
+                        this.getName() + " (" + this.getType() + ") and " + other.getName() + " (" + other.getType() + ")");
+
+        target.addColumn(this.getName(), this.getType());
+
+        DfColumnStored newColumn = (DfColumnStored) target.getColumnAt(target.columnCount() - 1);
+
+        newColumn.ensureCapacity(this.getSize() + other.getSize());
+
+        return newColumn;
+    }
 }

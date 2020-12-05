@@ -3,7 +3,9 @@ package io.github.vmzakharov.ecdataframe.dataframe;
 import io.github.vmzakharov.ecdataframe.dsl.value.DateValue;
 import io.github.vmzakharov.ecdataframe.dsl.value.Value;
 import io.github.vmzakharov.ecdataframe.dsl.value.ValueType;
+import org.eclipse.collections.api.LongIterable;
 import org.eclipse.collections.api.list.ImmutableList;
+import org.eclipse.collections.api.list.ListIterable;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -55,5 +57,17 @@ extends DfColumnAbstract
     public void addRowToColumn(int rowIndex, DfColumn target)
     {
         ((DfDateColumnStored) target).addDate(this.getDate(rowIndex));
+    }
+
+    protected abstract void addAllItems(ListIterable<LocalDate> items);
+
+    @Override
+    public DfColumn mergeWithInto(DfColumn other, DataFrame target)
+    {
+        DfDateColumn mergedCol = (DfDateColumn) this.validateAndCreateTargetColumn(other, target);
+
+        mergedCol.addAllItems(this.toList());
+        mergedCol.addAllItems(((DfDateColumn) other).toList());
+        return mergedCol;
     }
 }

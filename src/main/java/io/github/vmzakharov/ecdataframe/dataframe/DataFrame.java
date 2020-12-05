@@ -517,7 +517,7 @@ public class DataFrame
 
     public DataFrame selectBy(String filterExpressionString)
     {
-        DataFrame filtered = this.cloneStructure();
+        DataFrame filtered = this.cloneStructure(this.getName()+"-selected");
         DataFrameEvalContext context = new DataFrameEvalContext(this);
         Expression filterExpression = ExpressionParserHelper.DEFAULT.toExpression(filterExpressionString);
         InMemoryEvaluationVisitor evaluationVisitor = new InMemoryEvaluationVisitor(context);
@@ -537,7 +537,7 @@ public class DataFrame
     private DataFrame selectByMarkValue(BooleanList marked, BooleanPredicate markAtIndexPredicate)
     {
 
-        DataFrame filtered = this.cloneStructure();
+        DataFrame filtered = this.cloneStructure(this.getName()+"-selected");
         for (int i = 0; i < this.rowCount; i++)
         {
             if (markAtIndexPredicate.accept(marked.get(i)))
@@ -562,16 +562,26 @@ public class DataFrame
         }
     }
 
-    public DataFrame cloneStructure()
-    {
-        return this.cloneStructure(this.getName() + "-copy");
-    }
-
     public DataFrame cloneStructure(String newName)
     {
         DataFrame cloned = new DataFrame(newName);
 
         this.columns.each(each -> each.cloneSchemaAndAttachTo(cloned));
+
+        return cloned;
+    }
+
+    /**
+     * creates an empty data frame with the same schema as this one except computed columns are converted to stored
+     * columns of the same type
+     * @param newName the name for thenew data frame
+     * @return an empty data frame with the provided name and new schema
+     */
+    public DataFrame cloneStructureAsStored(String newName)
+    {
+        DataFrame cloned = new DataFrame(newName);
+
+        this.columns.each(e -> cloned.addColumn(e.getName(), e.getType()));
 
         return cloned;
     }
@@ -734,7 +744,7 @@ public class DataFrame
 
     /**
      * Removes the column from this data frame. Throws a {@code RuntimeException} if the specified column doesn't
-     * exists.
+     * exist.
      *
      * @param columnName the name of the column to drop.
      * @return the data frame
@@ -814,7 +824,6 @@ public class DataFrame
         int joinColumnIndex = theseColumnNames.detectIndex(e -> e.equals(thisJoinColumnName));
 
         ListIterable<String> otherColumnNames = other.columns.collect(DfColumn::getName).rejectWith(String::equals, otherJoinColumnName);
-
 
         int comparison = 0;
         while (thisRowIndex < thisRowCount && otherRowIndex < otherRowCount)

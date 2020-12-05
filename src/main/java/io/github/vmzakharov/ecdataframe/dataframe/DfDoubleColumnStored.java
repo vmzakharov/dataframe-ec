@@ -3,13 +3,14 @@ package io.github.vmzakharov.ecdataframe.dataframe;
 import io.github.vmzakharov.ecdataframe.dsl.value.DoubleValue;
 import io.github.vmzakharov.ecdataframe.dsl.value.NumberValue;
 import io.github.vmzakharov.ecdataframe.dsl.value.Value;
-import io.github.vmzakharov.ecdataframe.dsl.value.ValueType;
+import org.eclipse.collections.api.DoubleIterable;
 import org.eclipse.collections.api.list.primitive.ImmutableDoubleList;
 import org.eclipse.collections.api.list.primitive.MutableDoubleList;
 import org.eclipse.collections.impl.factory.primitive.DoubleLists;
 
 public class DfDoubleColumnStored
 extends DfDoubleColumn
+implements DfColumnStored
 {
     private MutableDoubleList values = DoubleLists.mutable.of();
 
@@ -76,12 +77,6 @@ extends DfDoubleColumn
     }
 
     @Override
-    public ValueType getType()
-    {
-        return ValueType.DOUBLE;
-    }
-
-    @Override
     public double sum()
     {
         return this.values.sum();
@@ -113,16 +108,15 @@ extends DfDoubleColumn
     }
 
     @Override
-    public DfColumn mergeWithInto(DfColumn other, DataFrame target)
+    public void ensureCapacity(int newCapacity)
     {
-        ErrorReporter.reportAndThrow(!this.getClass().equals(other.getClass()), "Attempting to merge colums of different types");
+        this.values = DoubleLists.mutable.withInitialCapacity(newCapacity);
+    }
 
-        DfDoubleColumnStored mergedCol = (DfDoubleColumnStored) this.cloneSchemaAndAttachTo(target);
-
-        mergedCol.values = DoubleLists.mutable.withInitialCapacity(this.getSize() + other.getSize());
-        mergedCol.values.addAll(this.values);
-        mergedCol.values.addAll(((DfDoubleColumnStored) other).values);
-        return mergedCol;
+    @Override
+    protected void addAllItems(DoubleIterable items)
+    {
+        this.values.addAll(items);
     }
 
     @Override

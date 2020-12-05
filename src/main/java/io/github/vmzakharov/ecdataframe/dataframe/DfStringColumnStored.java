@@ -1,8 +1,8 @@
 package io.github.vmzakharov.ecdataframe.dataframe;
 
 import io.github.vmzakharov.ecdataframe.dsl.value.Value;
-import io.github.vmzakharov.ecdataframe.dsl.value.ValueType;
 import org.eclipse.collections.api.list.ImmutableList;
+import org.eclipse.collections.api.list.ListIterable;
 import org.eclipse.collections.api.list.MutableList;
 import org.eclipse.collections.api.set.Pool;
 import org.eclipse.collections.impl.factory.Lists;
@@ -83,12 +83,6 @@ implements DfColumnStored
     }
 
     @Override
-    public ValueType getType()
-    {
-        return ValueType.STRING;
-    }
-
-    @Override
     public int getSize()
     {
         return this.values.size();
@@ -119,16 +113,14 @@ implements DfColumnStored
     }
 
     @Override
-    public DfColumn mergeWithInto(DfColumn other, DataFrame target)
+    public void ensureCapacity(int newCapacity)
     {
-        ErrorReporter.reportAndThrow(!this.getClass().equals(other.getClass()), "Attempting to merge columns of different types");
+        this.values = Lists.mutable.withInitialCapacity(newCapacity);
+    }
 
-        DfStringColumnStored mergedCol = (DfStringColumnStored) this.cloneSchemaAndAttachTo(target);
-
-        mergedCol.values = Lists.mutable.withInitialCapacity(this.getSize() + other.getSize());
-
-        mergedCol.values.addAll(this.values);
-        mergedCol.values.addAll(((DfStringColumnStored) other).values);
-        return mergedCol;
+    @Override
+    protected void addAllItems(ListIterable<String> items)
+    {
+        this.values.addAllIterable(items);
     }
 }

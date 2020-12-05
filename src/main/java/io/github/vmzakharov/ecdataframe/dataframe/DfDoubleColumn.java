@@ -3,16 +3,12 @@ package io.github.vmzakharov.ecdataframe.dataframe;
 import io.github.vmzakharov.ecdataframe.dsl.value.DoubleValue;
 import io.github.vmzakharov.ecdataframe.dsl.value.Value;
 import io.github.vmzakharov.ecdataframe.dsl.value.ValueType;
+import org.eclipse.collections.api.DoubleIterable;
 import org.eclipse.collections.api.list.primitive.ImmutableDoubleList;
 
 abstract public class DfDoubleColumn
 extends DfColumnAbstract
 {
-    public DfDoubleColumn(String newName)
-    {
-        super(newName);
-    }
-
     public DfDoubleColumn(DataFrame newDataFrame, String newName)
     {
         super(newDataFrame, newName);
@@ -52,4 +48,17 @@ extends DfColumnAbstract
     }
 
     abstract public double sum();
+
+    protected abstract void addAllItems(DoubleIterable items);
+
+    @Override
+    public DfColumn mergeWithInto(DfColumn other, DataFrame target)
+    {
+        DfDoubleColumn mergedCol = (DfDoubleColumn) this.validateAndCreateTargetColumn(other, target);
+
+        mergedCol.addAllItems(this.toDoubleList());
+        mergedCol.addAllItems(((DfDoubleColumn) other).toDoubleList());
+
+        return mergedCol;
+    }
 }

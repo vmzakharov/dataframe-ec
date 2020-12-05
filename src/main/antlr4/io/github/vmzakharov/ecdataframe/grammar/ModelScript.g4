@@ -13,7 +13,7 @@ functionDeclarationExpr :
     '}'
     ;
 
-statementSequence: (statement)*;
+statementSequence: statement*;
 
 statement :
       ID '=' expr     #assignExpr

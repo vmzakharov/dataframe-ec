@@ -4,6 +4,7 @@ import io.github.vmzakharov.ecdataframe.dsl.EvalContext;
 import io.github.vmzakharov.ecdataframe.dsl.Script;
 import io.github.vmzakharov.ecdataframe.dsl.value.Value;
 import io.github.vmzakharov.ecdataframe.dsl.visitor.InMemoryEvaluationVisitor;
+import io.github.vmzakharov.ecdataframe.grammar.CollectingErrorListener;
 import io.github.vmzakharov.ecdataframe.util.ExpressionParserHelper;
 import io.github.vmzakharov.ecdataframe.util.PrinterFactory;
 import org.eclipse.collections.api.list.MutableList;
@@ -30,9 +31,20 @@ extends JPanel
 
         JButton runButton = new JButton("Run");
         runButton.addActionListener(e -> {
-            Script script = ExpressionParserHelper.DEFAULT.toScript(textArea.getText());
-            Value result = script.evaluate(new InMemoryEvaluationVisitor(newStoredContext));
-            PrinterFactory.getPrinter().println("DONE: " + result.asStringLiteral());
+            CollectingErrorListener errorListener = new CollectingErrorListener();
+            Script script = new ExpressionParserHelper(errorListener).toScript(textArea.getText());
+            if (errorListener.hasErrors())
+            {
+                PrinterFactory.getPrinter().println(">>> PARSE ERRORS:");
+                errorListener.getErrors()
+                        .collect(CollectingErrorListener.Error::detailedErrorMessage)
+                        .forEach(PrinterFactory.getPrinter()::println);
+            }
+            else
+            {
+                Value result = script.evaluate(new InMemoryEvaluationVisitor(newStoredContext));
+                PrinterFactory.getPrinter().println(result.stringValue());
+            }
             this.actionsPostEvaluation.forEach(Runnable::run);
         });
 

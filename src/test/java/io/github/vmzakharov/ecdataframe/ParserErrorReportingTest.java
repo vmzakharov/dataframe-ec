@@ -1,5 +1,7 @@
 package io.github.vmzakharov.ecdataframe;
 
+import io.github.vmzakharov.ecdataframe.dsl.Expression;
+import io.github.vmzakharov.ecdataframe.dsl.Script;
 import io.github.vmzakharov.ecdataframe.grammar.CollectingErrorListener;
 import io.github.vmzakharov.ecdataframe.util.ExpressionParserHelper;
 import org.eclipse.collections.api.factory.Lists;
@@ -29,13 +31,17 @@ public class ParserErrorReportingTest
         Assert.assertEquals(4, error.charPositionInLine());
     }
 
+    // todo: make the script rule fail on this input.
     @Test
     public void simpleErrorReporting2()
     {
         CollectingErrorListener errorListener = new CollectingErrorListener();
         ExpressionParserHelper parserHelper = new ExpressionParserHelper(errorListener);
 
-        parserHelper.toExpression(" and x");
+//        Script script = parserHelper.toScript(" and x");
+        Expression script = parserHelper.toExpression(" and x");
+
+        Assert.assertNull(script);
 
         Assert.assertTrue(errorListener.hasErrors());
         Assert.assertEquals(1, errorListener.getErrors().size());

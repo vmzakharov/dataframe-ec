@@ -3,6 +3,7 @@ package io.github.vmzakharov.ecdataframe.dataframe;
 import io.github.vmzakharov.ecdataframe.dsl.value.LongValue;
 import io.github.vmzakharov.ecdataframe.dsl.value.Value;
 import io.github.vmzakharov.ecdataframe.dsl.value.ValueType;
+import org.eclipse.collections.api.LongIterable;
 import org.eclipse.collections.api.list.primitive.ImmutableLongList;
 
 abstract public class DfLongColumn
@@ -47,4 +48,17 @@ extends DfColumnAbstract
     }
 
     abstract public long sum();
+
+    @Override
+    public DfColumn mergeWithInto(DfColumn other, DataFrame target)
+    {
+        DfLongColumn mergedCol = (DfLongColumn) this.validateAndCreateTargetColumn(other, target);
+
+        mergedCol.addAllItems(this.toLongList());
+        mergedCol.addAllItems(((DfLongColumn) other).toLongList());
+
+        return mergedCol;
+    }
+
+    protected abstract void addAllItems(LongIterable items);
 }

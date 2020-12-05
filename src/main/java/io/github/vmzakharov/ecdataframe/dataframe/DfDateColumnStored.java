@@ -4,6 +4,7 @@ import io.github.vmzakharov.ecdataframe.dsl.value.DateValue;
 import io.github.vmzakharov.ecdataframe.dsl.value.Value;
 import org.eclipse.collections.api.factory.Lists;
 import org.eclipse.collections.api.list.ImmutableList;
+import org.eclipse.collections.api.list.ListIterable;
 import org.eclipse.collections.api.list.MutableList;
 import org.eclipse.collections.api.set.Pool;
 import org.eclipse.collections.impl.set.mutable.UnifiedSet;
@@ -110,16 +111,14 @@ implements DfColumnStored
     }
 
     @Override
-    public DfColumn mergeWithInto(DfColumn other, DataFrame target)
+    public void ensureCapacity(int newCapacity)
     {
-        ErrorReporter.reportAndThrow(!this.getClass().equals(other.getClass()), "Attempting to merge columns of different types");
+        this.values = Lists.mutable.withInitialCapacity(newCapacity);
+    }
 
-        DfDateColumnStored mergedCol = (DfDateColumnStored) this.cloneSchemaAndAttachTo(target);
-
-        mergedCol.values = Lists.mutable.withInitialCapacity(this.getSize() + other.getSize());
-
-        mergedCol.values.addAll(this.values);
-        mergedCol.values.addAll(((DfDateColumnStored) other).values);
-        return mergedCol;
+    @Override
+    protected void addAllItems(ListIterable<LocalDate> items)
+    {
+        this.values.addAllIterable(items);
     }
 }

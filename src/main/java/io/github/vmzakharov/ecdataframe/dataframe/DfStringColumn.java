@@ -4,6 +4,7 @@ import io.github.vmzakharov.ecdataframe.dsl.value.StringValue;
 import io.github.vmzakharov.ecdataframe.dsl.value.Value;
 import io.github.vmzakharov.ecdataframe.dsl.value.ValueType;
 import org.eclipse.collections.api.list.ImmutableList;
+import org.eclipse.collections.api.list.ListIterable;
 
 abstract public class DfStringColumn
 extends DfColumnAbstract
@@ -51,5 +52,17 @@ extends DfColumnAbstract
     public void addRowToColumn(int rowIndex, DfColumn target)
     {
         ((DfStringColumnStored) target).addString(this.getString(rowIndex));
+    }
+
+    abstract protected void addAllItems(ListIterable<String> items);
+
+    @Override
+    public DfColumn mergeWithInto(DfColumn other, DataFrame target)
+    {
+        DfStringColumn mergedCol = (DfStringColumn) this.validateAndCreateTargetColumn(other, target);
+
+        mergedCol.addAllItems(this.toList());
+        mergedCol.addAllItems(((DfStringColumn) other).toList());
+        return mergedCol;
     }
 }

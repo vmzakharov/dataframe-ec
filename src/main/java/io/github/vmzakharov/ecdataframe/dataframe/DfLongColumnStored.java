@@ -2,7 +2,9 @@ package io.github.vmzakharov.ecdataframe.dataframe;
 
 import io.github.vmzakharov.ecdataframe.dsl.value.LongValue;
 import io.github.vmzakharov.ecdataframe.dsl.value.Value;
+import org.eclipse.collections.api.LongIterable;
 import org.eclipse.collections.api.list.primitive.ImmutableLongList;
+import org.eclipse.collections.api.list.primitive.LongList;
 import org.eclipse.collections.api.list.primitive.MutableLongList;
 import org.eclipse.collections.impl.factory.primitive.LongLists;
 
@@ -94,15 +96,13 @@ implements DfColumnStored
     }
 
     @Override
-    public DfColumn mergeWithInto(DfColumn other, DataFrame target)
+    public void ensureCapacity(int newCapacity)
     {
-        ErrorReporter.reportAndThrow(!this.getClass().equals(other.getClass()), "Attempting to merge colums of different types");
+        this.values = LongLists.mutable.withInitialCapacity(newCapacity);
+    }
 
-        DfLongColumnStored mergedCol = (DfLongColumnStored) this.cloneSchemaAndAttachTo(target);
-
-        mergedCol.values = LongLists.mutable.withInitialCapacity(this.getSize() + other.getSize());
-        mergedCol.values.addAll(this.values);
-        mergedCol.values.addAll(((DfLongColumnStored) other).values);
-        return mergedCol;
+    protected void addAllItems(LongIterable items)
+    {
+        this.values.addAll(items);
     }
 }
