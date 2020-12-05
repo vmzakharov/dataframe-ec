@@ -785,7 +785,7 @@ public class DataFrame
     // todo: do not override sort order (use external sort)
     private DataFrame join(DataFrame other, boolean outerJoin, String thisJoinColumnName, String otherJoinColumnName)
     {
-        DataFrame joined = this.cloneStructure(this.getName() + "_" + other.getName());
+        DataFrame joined = this.cloneStructureAsStored(this.getName() + "_" + other.getName());
 
         MutableList<String> uniqueColumnNames = this.columns.collect(DfColumn::getName);
 
@@ -805,7 +805,8 @@ public class DataFrame
 
         other.columns
                 .reject(c -> c.getName().equals(otherJoinColumnName))
-                .forEach(c -> c.cloneSchemaAndAttachTo(joined, otherColumnNameMap.get(c.getName())));
+                .forEach(c -> joined.addColumn(otherColumnNameMap.get(c.getName()), c.getType()));
+//                .forEach(c -> c.cloneSchemaAndAttachTo(joined, otherColumnNameMap.get(c.getName())));
 
         this.sortBy(Lists.immutable.of(thisJoinColumnName));
         other.sortBy(Lists.immutable.of(otherJoinColumnName));

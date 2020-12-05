@@ -86,8 +86,6 @@ public class DataFrameUnionTest
 
         DataFrame union = df1.union(df2);
 
-        System.out.println(union.asCsvString());
-
         DataFrame expected = new DataFrame("expected")
                 .addStringColumn("Name").addLongColumn("Count").addDoubleColumn("Value")
                 .addStringColumn("aName").addLongColumn("MoreCount").addDoubleColumn("MoreValue")

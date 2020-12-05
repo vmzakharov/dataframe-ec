@@ -37,6 +37,101 @@ public class DataFrameJoinTest
     }
 
     @Test
+    public void joinByLongColumn()
+    {
+        DataFrame df1 = new DataFrame("df1")
+                .addStringColumn("Foo").addLongColumn("Baz")
+                .addRow("Blinky",  7)
+                .addRow("Pinky",   8)
+                .addRow("Inky",    9)
+                .addRow("Clyde",  10)
+                ;
+
+        DataFrame df2 = new DataFrame("df2")
+                .addStringColumn("Name").addLongColumn("Number")
+                .addRow("Grapefruit",  8)
+                .addRow("Orange",     10)
+                .addRow("Mint",        9)
+                .addRow("Apple",       7)
+                ;
+
+        DataFrame joined = df1.join(df2, "Baz", "Number");
+
+        DataFrame expected = new DataFrame("expected")
+                .addStringColumn("Foo").addLongColumn("Bar").   addStringColumn("Name")
+                .addRow("Blinky", 7, "Apple")
+                .addRow("Pinky",  8, "Grapefruit")
+                .addRow("Inky",   9, "Mint")
+                .addRow("Clyde", 10, "Orange")
+                ;
+
+        DataFrameUtil.assertEquals(expected, joined);
+    }
+
+    @Test
+    public void joinByComputedColumns()
+    {
+        DataFrame df1 = new DataFrame("df1")
+                .addStringColumn("Foo").addStringColumn("AbcBar").addLongColumn("Baz")
+                .addRow("Blinky", "abcred",     7)
+                .addRow("Pinky",  "abcpink",    8)
+                .addRow("Inky",   "abccyan",    9)
+                ;
+
+        df1.addStringColumn("Bar", "substr(AbcBar, 3)");
+
+        DataFrame df2 = new DataFrame("df2")
+                .addStringColumn("Name").addStringColumn("Color").addLongColumn("Number")
+                .addRow("Grapefruit", "pink",   2)
+                .addRow("Mint",       "cyan",   3)
+                .addRow("Apple",      "red",    1)
+                ;
+
+        DataFrame joined = df1.join(df2, "Bar", "Color");
+
+        DataFrame expected = new DataFrame("expected")
+                .addStringColumn("Foo").addStringColumn("AbcBar").addLongColumn("Baz").addStringColumn("Bar").addStringColumn("Name").addLongColumn("Number")
+                .addRow("Inky",   "abccyan", 9, "cyan", "Mint",       3)
+                .addRow("Pinky",  "abcpink", 8, "pink", "Grapefruit", 2)
+                .addRow("Blinky", "abcred",  7, "red",  "Apple",      1)
+                ;
+
+        DataFrameUtil.assertEquals(expected, joined);
+    }
+
+    @Test
+    public void joinWithComputedColumns()
+    {
+        DataFrame df1 = new DataFrame("df1")
+                .addStringColumn("Foo").addStringColumn("Bar").addLongColumn("Baz", "123")
+                .addRow("Blinky", "red")
+                .addRow("Pinky",  "pink")
+                .addRow("Inky",   "cyan")
+                .addRow("Clyde",  "orange")
+                ;
+
+        DataFrame df2 = new DataFrame("df2")
+                .addStringColumn("Name").addStringColumn("Color").addLongColumn("Number").addStringColumn("Counted", "'One ' + Name")
+                .addRow("Grapefruit", "pink",   2)
+                .addRow("Orange",     "orange", 4)
+                .addRow("Mint",       "cyan",   3)
+                .addRow("Apple",      "red",    1)
+                ;
+
+        DataFrame joined = df1.join(df2, "Bar", "Color");
+
+        DataFrame expected = new DataFrame("expected")
+                .addStringColumn("Foo").addStringColumn("Bar").addLongColumn("Baz").addStringColumn("Name").addLongColumn("Number").addStringColumn("Counted")
+                .addRow("Inky",   "cyan",   123, "Mint",       3, "One Mint"      )
+                .addRow("Clyde",  "orange", 123, "Orange",     4, "One Orange"    )
+                .addRow("Pinky",  "pink",   123, "Grapefruit", 2, "One Grapefruit")
+                .addRow("Blinky", "red",    123, "Apple",      1, "One Apple"     )
+                ;
+
+        DataFrameUtil.assertEquals(expected, joined);
+    }
+
+    @Test
     public void joinWithMismatchedKeys()
     {
         DataFrame df1 = new DataFrame("df1")
