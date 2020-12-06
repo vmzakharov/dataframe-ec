@@ -1,6 +1,7 @@
 package io.github.vmzakharov.ecdataframe.dataframe;
 
 import io.github.vmzakharov.ecdataframe.dsl.value.ValueType;
+import org.eclipse.collections.api.factory.Lists;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -85,6 +86,42 @@ public class BasicDataFrameTest
     }
 
     @Test
+    public void dropManyColumns()
+    {
+        DataFrame df = new DataFrame("df1")
+            .addStringColumn("Name").addLongColumn("Count").addDoubleColumn("Value").addStringColumn("Foo")
+            .addRow("Alice", 5, 23.45, "abc")
+            .addRow("Deb",   0,  7.89, "xyz");
+
+        df.dropColumns(Lists.immutable.of("Value", "Count"));
+
+        DataFrame expected = new DataFrame("expected")
+            .addStringColumn("Name").addStringColumn("Foo")
+            .addRow("Alice", "abc")
+            .addRow("Deb",   "xyz");
+
+        DataFrameUtil.assertEquals(expected, df);
+    }
+
+    @Test
+    public void keepColumns()
+    {
+        DataFrame df = new DataFrame("df1")
+            .addStringColumn("Name").addLongColumn("Count").addDoubleColumn("Value").addStringColumn("Foo")
+            .addRow("Alice", 5, 23.45, "abc")
+            .addRow("Deb",   0,  7.89, "xyz");
+
+        df.keepColumns(Lists.immutable.of("Name", "Foo"));
+
+        DataFrame expected = new DataFrame("expected")
+            .addStringColumn("Name").addStringColumn("Foo")
+            .addRow("Alice", "abc")
+            .addRow("Deb",   "xyz");
+
+        DataFrameUtil.assertEquals(expected, df);
+    }
+
+    @Test
     public void dropFirstAndLastColumn()
     {
         DataFrame df = new DataFrame("df1")
@@ -113,7 +150,27 @@ public class BasicDataFrameTest
             .addRow("Deb",   0,  7.89);
 
         df.dropColumn("Giraffe");
+    }
 
-        Assert.fail("Shouldn't get here");
+    @Test(expected = RuntimeException.class)
+    public void dropNonExistingColumn2()
+    {
+        DataFrame df = new DataFrame("df1")
+            .addStringColumn("Name").addLongColumn("Count").addDoubleColumn("Value")
+            .addRow("Alice", 5, 23.45)
+            .addRow("Deb",   0,  7.89);
+
+        df.dropColumns(Lists.immutable.of("Name", "Giraffe"));
+    }
+
+    @Test(expected = RuntimeException.class)
+    public void keepNonExistingColumns()
+    {
+        DataFrame df = new DataFrame("df1")
+                .addStringColumn("Name").addLongColumn("Count").addDoubleColumn("Value")
+                .addRow("Alice", 5, 23.45)
+                .addRow("Deb",   0,  7.89);
+
+        df.keepColumns(Lists.immutable.of("Name", "Giraffe"));
     }
 }
