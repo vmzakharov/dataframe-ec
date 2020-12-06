@@ -9,7 +9,6 @@ import io.github.vmzakharov.ecdataframe.dsl.value.ValueType;
 import io.github.vmzakharov.ecdataframe.dsl.visitor.InMemoryEvaluationVisitor;
 import io.github.vmzakharov.ecdataframe.util.ExpressionParserHelper;
 import org.eclipse.collections.api.block.predicate.primitive.BooleanPredicate;
-import org.eclipse.collections.api.list.ImmutableList;
 import org.eclipse.collections.api.list.ListIterable;
 import org.eclipse.collections.api.list.MutableList;
 import org.eclipse.collections.api.list.primitive.BooleanList;
@@ -36,7 +35,7 @@ public class DataFrame
     private final MutableList<DfColumn> columns = Lists.mutable.of();
     private int rowCount = 0;
 
-    private final DataFrameEvalContext evalContext; // todo: make threadlocal
+    private final DataFrameEvalContext evalContext; // todo: make threadlocal?
     private IntList rowIndex = null;
     private boolean poolingEnabled = false;
 
@@ -575,7 +574,7 @@ public class DataFrame
     /**
      * creates an empty data frame with the same schema as this one except computed columns are converted to stored
      * columns of the same type
-     * @param newName the name for thenew data frame
+     * @param newName the name for the new data frame
      * @return an empty data frame with the provided name and new schema
      */
     public DataFrame cloneStructureAsStored(String newName)
@@ -709,7 +708,7 @@ public class DataFrame
     }
 
     /**
-     * creates a new data frame, which contain a subset of rows of this data frame for the rows with the btimap flag not
+     * creates a new data frame, which contain a subset of rows of this data frame for the rows with the bitmap flag not
      * set (i.e. equals to false). This is the behavior the opposite of {@code selectMarked}
      *
      * @return a data frame containing the filtered subset of rows
@@ -838,7 +837,7 @@ public class DataFrame
 
         ListIterable<String> otherColumnNames = other.columns.collect(DfColumn::getName).rejectWith(String::equals, otherJoinColumnName);
 
-        int comparison = 0;
+        int comparison;
         while (thisRowIndex < thisRowCount && otherRowIndex < otherRowCount)
         {
             comparison = ((Comparable<Object>) this.getObject(thisJoinColumnName, thisRowIndex)).compareTo(

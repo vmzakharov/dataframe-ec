@@ -1,6 +1,5 @@
 package io.github.vmzakharov.ecdataframe.dsl.value;
 
-import io.github.vmzakharov.ecdataframe.dsl.ComparisonOp;
 import io.github.vmzakharov.ecdataframe.dsl.PredicateOp;
 import io.github.vmzakharov.ecdataframe.dsl.UnaryOp;
 

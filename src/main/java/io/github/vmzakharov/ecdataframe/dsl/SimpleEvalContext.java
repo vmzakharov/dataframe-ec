@@ -3,7 +3,6 @@ package io.github.vmzakharov.ecdataframe.dsl;
 import io.github.vmzakharov.ecdataframe.dataset.AvroDataSet;
 import io.github.vmzakharov.ecdataframe.dsl.value.Value;
 import org.eclipse.collections.api.RichIterable;
-import org.eclipse.collections.api.map.MapIterable;
 import org.eclipse.collections.api.map.MutableMap;
 import org.eclipse.collections.impl.factory.Maps;
 

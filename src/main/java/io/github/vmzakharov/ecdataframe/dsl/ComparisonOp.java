@@ -1,7 +1,6 @@
 package io.github.vmzakharov.ecdataframe.dsl;
 
 import io.github.vmzakharov.ecdataframe.dsl.value.BooleanValue;
-import io.github.vmzakharov.ecdataframe.dsl.value.Value;
 
 import java.time.LocalDate;
 
