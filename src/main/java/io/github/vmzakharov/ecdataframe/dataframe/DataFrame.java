@@ -9,6 +9,7 @@ import io.github.vmzakharov.ecdataframe.dsl.value.ValueType;
 import io.github.vmzakharov.ecdataframe.dsl.visitor.InMemoryEvaluationVisitor;
 import io.github.vmzakharov.ecdataframe.util.ExpressionParserHelper;
 import org.eclipse.collections.api.block.predicate.primitive.BooleanPredicate;
+import org.eclipse.collections.api.list.ImmutableList;
 import org.eclipse.collections.api.list.ListIterable;
 import org.eclipse.collections.api.list.MutableList;
 import org.eclipse.collections.api.list.primitive.BooleanList;
@@ -775,6 +776,17 @@ public class DataFrame
         return this.join(other, false, thisJoinColumnName, otherJoinColumnName);
     }
 
+    /**
+     * A basic outer join - creates a data frame that is this an join of this data frame and another one, based on
+     * the key column values. Rows with the same values of the key column will be combined in the resulting data frame
+     * into one wide row. The rows for which there is no match in the other data frame will have the missing values
+     * filled with nulls for object column types or zeros for numeric column types.
+     *
+     * @param other               the data frame to join to
+     * @param thisJoinColumnName  the name of the column in the data frame to use a join key
+     * @param otherJoinColumnName the name of the column in the data frame to use a join
+     * @return a data frame that is a join of this data frame and the data frame passed as a parameter
+     */
     public DataFrame outerJoin(DataFrame other, String thisJoinColumnName, String otherJoinColumnName)
     {
         return this.join(other, true, thisJoinColumnName, otherJoinColumnName);
@@ -904,5 +916,34 @@ public class DataFrame
         }
 
         return joined;
+    }
+
+    /**
+     * Drops the data frame columns with the names specified as the method parameter
+     * @param columnNamesToDrop the names of the columns to remove from this data frame
+     * @return the data frame
+     */
+    public DataFrame dropColumns(ListIterable<String> columnNamesToDrop)
+    {
+        ListIterable<DfColumn> columnsToDrop = columnNamesToDrop.collect(this::getColumnNamed);
+
+        this.columns.removeAllIterable(columnsToDrop);
+        this.columnsByName.removeAllKeys(columnNamesToDrop.toSet());
+
+        return this;
+    }
+
+    /**
+     * Drops all the data frame columns except those with the names specified as the method parameter
+     * @param columnNamesToKeep the list of column names to retain
+     * @return the data frame
+     */
+    public DataFrame keepColumns(ListIterable<String> columnNamesToKeep)
+    {
+        ListIterable<DfColumn> columnsToKeep = columnNamesToKeep.collect(this::getColumnNamed); // will throw if a column doesn't exist
+
+        MutableList<String> columnNamesToDrop = this.columns.collect(DfColumn::getName).reject(columnNamesToKeep::contains);
+
+        return this.dropColumns(columnNamesToDrop);
     }
 }
