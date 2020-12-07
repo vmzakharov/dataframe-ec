@@ -51,11 +51,27 @@ Boolean | there are no literal of boolean type as there was no scenario where th
 
 The variables in the DSL are immutable - once assigned, the value of the variable cannot change. This helps avoid errors arising from reusing variables.
 
-Variable type is inferred at runtime and doesn't need to be declared.
+A variable type is inferred at runtime and doesn't need to be declared.
+
+Examples:
+```
+x = 123
+123 in (x - 1, x, x + 1) ? 'in' : 'out'
+a = "Hello, "
+b = "there"
+substr(a + b, 3)
+```
 
 ### Expressions
 
-...
+Category | Type | Example
+------------ | ------------ | -------------
+Unary | `-`<br>`not` | `-123`<br>`not (a > b)` 
+Binary Arithmetic | `+` `-` `*` `/` | `1 + 2`<br>`unit_price * quantity`<br>string concatenation:<br> `"Hello, " + "world!"`
+Comparison |`>` `>=` `<` `<=` `==` `!=`|
+Boolean | `and`<br>`or`<br>`xor` |
+Containment | `in`<br>`not in` | vectors: <br>`"a" in ("a", "b", "c")`<br>`x not in (1, 2, 3)`<br>strings:<br>`'ello' in 'Hello!'`<br>`"bye" not in "Hello!"`
+Empty | `is empty`<br>`is not empty` | `"" is empty`<br>`'Hello' is not empty`<br>vectors:<br>`(1, 2, 3) is not empty`<br>`() is empty`
 
 ### Statements
 
