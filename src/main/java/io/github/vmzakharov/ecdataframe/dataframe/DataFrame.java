@@ -390,7 +390,8 @@ public class DataFrame
 
         DataFrame summedDataFrame = new DataFrame("Sum Of " + this.getName());
 
-        columnsToSum.forEachWith(DfColumn::cloneSchemaAndAttachTo, summedDataFrame);
+        // convert calculated columns into stored so that we can aggregate into them
+        columnsToSum.forEach(each -> summedDataFrame.addColumn(each.getName(), each.getType()));
 
         ListIterable<Number> sums = columnsToSum.collect(
                 each -> (each instanceof DfDoubleColumn) ? ((DfDoubleColumn) each).sum() : ((DfLongColumn) each).sum()
@@ -421,10 +422,10 @@ public class DataFrame
 
         columnsToGroupByNames
                 .collect(this::getColumnNamed)
-                .forEachWith(DfColumn::cloneSchemaAndAttachTo, summedDataFrame);
+                .forEach(each -> summedDataFrame.addColumn(each.getName(), each.getType()));
 
-        columnsToSum
-                .forEachWith(DfColumn::cloneSchemaAndAttachTo, summedDataFrame);
+        // converting calculated columns into stored
+        columnsToSum.forEach(each -> summedDataFrame.addColumn(each.getName(), each.getType()));
 
         ListIterable<DfColumn> accumulatorColumns = summedDataFrame.columnsNamed(columnsToSumNames);
 

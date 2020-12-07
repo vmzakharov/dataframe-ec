@@ -45,7 +45,7 @@ extends DfColumn
     @Override
     default void incrementFrom(int targetRowIndex, DfColumn sourceColumn, int sourceRowIndex)
     {
-        throw new RuntimeException("Cannot increment a value on computed column '" + this.getName() + "'");
+        throw new RuntimeException("Cannot increment a value of computed column '" + this.getName() + "'");
     }
 
     default void throwUnmodifiableColumnException()
