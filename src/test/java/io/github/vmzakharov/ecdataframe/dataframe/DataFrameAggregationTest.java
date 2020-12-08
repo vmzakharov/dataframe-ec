@@ -25,6 +25,19 @@ public class DataFrameAggregationTest
     }
 
     @Test
+    public void sumEmpty()
+    {
+        DataFrame dataFrame = new DataFrame("FrameOfData")
+                .addStringColumn("Name").addStringColumn("Foo").addLongColumn("Bar").addDoubleColumn("Baz").addDoubleColumn("Qux");
+
+        DataFrame summed = dataFrame.sum(Lists.immutable.of("Bar", "Baz", "Qux"));
+
+        Assert.assertEquals(0L, summed.getLongColumn("Bar").getLong(0));
+        Assert.assertEquals(0.0, summed.getDoubleColumn("Baz").getDouble(0), TOLERANCE);
+        Assert.assertEquals(0.0, summed.getDoubleColumn("Qux").getDouble(0), TOLERANCE);
+    }
+
+    @Test
     public void sumItAllWithCalculatedColumns()
     {
         DataFrame dataFrame = new DataFrame("FrameOfData")
@@ -40,6 +53,22 @@ public class DataFrameAggregationTest
         DataFrame expected = new DataFrame("Sum of FrameOfData")
                 .addLongColumn("Bar").addDoubleColumn("Baz").addDoubleColumn("BazBaz")
                 .addRow(1368L, 37.0, 74.0);
+
+        DataFrameUtil.assertEquals(expected, summed);
+    }
+
+    @Test
+    public void sumEmptyWithCalculatedColumns()
+    {
+        DataFrame dataFrame = new DataFrame("FrameOfData")
+                .addStringColumn("Name").addStringColumn("Foo").addLongColumn("Bar").addDoubleColumn("Baz")
+                .addDoubleColumn("BazBaz", "Baz * 2").addLongColumn("BarBar", "Bar * 2");
+
+        DataFrame summed = dataFrame.sum(Lists.immutable.of("Bar", "Baz", "BazBaz", "BarBar"));
+
+        DataFrame expected = new DataFrame("Sum of FrameOfData")
+                .addLongColumn("Bar").addDoubleColumn("Baz").addDoubleColumn("BazBaz").addLongColumn("BarBar")
+                .addRow(0L, 0.0, 0.0, 0L);
 
         DataFrameUtil.assertEquals(expected, summed);
     }

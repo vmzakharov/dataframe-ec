@@ -7,6 +7,7 @@ import io.github.vmzakharov.ecdataframe.dsl.visitor.InMemoryEvaluationVisitor;
 import io.github.vmzakharov.ecdataframe.util.ExpressionParserHelper;
 import org.eclipse.collections.api.DoubleIterable;
 import org.eclipse.collections.api.list.primitive.ImmutableDoubleList;
+import org.eclipse.collections.impl.factory.primitive.DoubleLists;
 import org.eclipse.collections.impl.list.Interval;
 
 public class DfDoubleColumnComputed
@@ -39,6 +40,11 @@ implements DfColumnComputed
     @Override
     public ImmutableDoubleList toDoubleList()
     {
+        if (this.getDataFrame().rowCount() == 0)
+        {
+            return DoubleLists.immutable.empty();
+        }
+
         ImmutableDoubleList result = Interval.zeroTo(this.getDataFrame().rowCount() - 1)
                 .collectDouble(this::getDouble)
                 .toList()
@@ -49,6 +55,11 @@ implements DfColumnComputed
     @Override
     public double sum()
     {
+        if (this.getDataFrame().rowCount() == 0)
+        {
+            return 0.0;
+        }
+
         return Interval.zeroTo(this.getDataFrame().rowCount() - 1)
                 .collectDouble(this::getDouble)
                 .sum();

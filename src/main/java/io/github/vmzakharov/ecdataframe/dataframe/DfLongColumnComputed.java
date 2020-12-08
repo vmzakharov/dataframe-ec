@@ -7,6 +7,7 @@ import io.github.vmzakharov.ecdataframe.dsl.visitor.InMemoryEvaluationVisitor;
 import io.github.vmzakharov.ecdataframe.util.ExpressionParserHelper;
 import org.eclipse.collections.api.LongIterable;
 import org.eclipse.collections.api.list.primitive.ImmutableLongList;
+import org.eclipse.collections.impl.factory.primitive.LongLists;
 import org.eclipse.collections.impl.list.Interval;
 
 public class DfLongColumnComputed
@@ -34,9 +35,15 @@ implements DfColumnComputed
         return result.longValue();
     }
 
+
     @Override
     public ImmutableLongList toLongList()
     {
+        if (this.getDataFrame().rowCount() == 0)
+        {
+            return LongLists.immutable.empty();
+        }
+
         ImmutableLongList result = Interval
                 .zeroTo(this.getDataFrame().rowCount() - 1)
                 .collectLong(this::getLong)
@@ -48,6 +55,11 @@ implements DfColumnComputed
     @Override
     public long sum()
     {
+        if (this.getDataFrame().rowCount() == 0)
+        {
+            return 0L;
+        }
+
         return Interval
                 .zeroTo(this.getDataFrame().rowCount() - 1)
                 .collectLong(this::getLong)

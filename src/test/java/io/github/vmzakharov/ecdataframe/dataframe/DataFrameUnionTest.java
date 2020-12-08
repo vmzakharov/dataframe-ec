@@ -76,7 +76,7 @@ public class DataFrameUnionTest
 
         df1.addStringColumn("aName", "\"A\" + Name").addLongColumn("MoreCount", "Count + 1").addDoubleColumn("MoreValue", "Value * 10");
 
-        DataFrame df2 = new DataFrame("df1")
+        DataFrame df2 = new DataFrame("df2")
                 .addStringColumn("Name").addLongColumn("Count").addDoubleColumn("Value")
                 .addRow("Ivan", 3, 36.78)
                 .addRow("Judy", 4, 47.89)
@@ -91,6 +91,41 @@ public class DataFrameUnionTest
                 .addStringColumn("aName").addLongColumn("MoreCount").addDoubleColumn("MoreValue")
                 .addRow("Alice", 5, 23.45, "AAlice",  6, 234.5)
                 .addRow("Bob",  10, 12.34, "ABob",   11, 123.4)
+                .addRow("Ivan",  3, 36.78, "BIvan",   5, 37.78)
+                .addRow("Judy",  4, 47.89, "BJudy",   6, 48.89)
+                ;
+
+        DataFrameUtil.assertEquals(expected, union);
+    }
+
+    @Test
+    public void unionOfEmptyWithComputedColumns()
+    {
+        DataFrame df1 = new DataFrame("df1")
+                .addStringColumn("Name").addLongColumn("Count").addDoubleColumn("Value")
+                ;
+
+        df1.addStringColumn("aName", "\"A\" + Name").addLongColumn("MoreCount", "Count + 1").addDoubleColumn("MoreValue", "Value * 10");
+
+        DataFrame df2 = new DataFrame("df2")
+                .addStringColumn("Name").addLongColumn("Count").addDoubleColumn("Value")
+                .addRow("Ivan", 3, 36.78)
+                .addRow("Judy", 4, 47.89)
+                ;
+
+        df2.addStringColumn("aName", "\"B\" + Name").addLongColumn("MoreCount", "Count + 2").addDoubleColumn("MoreValue", "Value + 1");
+
+        DataFrame df3 = new DataFrame("df3")
+                .addStringColumn("Name").addLongColumn("Count").addDoubleColumn("Value")
+                ;
+
+        df3.addStringColumn("aName", "\"C\" + Name").addLongColumn("MoreCount", "Count + 3").addDoubleColumn("MoreValue", "Value + 11");
+
+        DataFrame union = df1.union(df2).union(df3);
+
+        DataFrame expected = new DataFrame("expected")
+                .addStringColumn("Name").addLongColumn("Count").addDoubleColumn("Value")
+                .addStringColumn("aName").addLongColumn("MoreCount").addDoubleColumn("MoreValue")
                 .addRow("Ivan",  3, 36.78, "BIvan",   5, 37.78)
                 .addRow("Judy",  4, 47.89, "BJudy",   6, 48.89)
                 ;
