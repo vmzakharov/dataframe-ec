@@ -90,4 +90,9 @@ public class CsvSchema
 
         return (aString.charAt(0) == this.getQuoteCharacter()) && (aString.charAt(aString.length() - 1) == this.getQuoteCharacter());
     }
+
+    public CsvSchemaColumn columnAt(int columnIndex)
+    {
+        return this.columns.get(columnIndex);
+    }
 }

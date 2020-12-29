@@ -9,6 +9,7 @@ import io.github.vmzakharov.ecdataframe.dsl.value.ValueType;
 import io.github.vmzakharov.ecdataframe.dsl.visitor.InMemoryEvaluationVisitor;
 import io.github.vmzakharov.ecdataframe.util.ExpressionParserHelper;
 import org.eclipse.collections.api.block.predicate.primitive.BooleanPredicate;
+import org.eclipse.collections.api.list.ImmutableList;
 import org.eclipse.collections.api.list.ListIterable;
 import org.eclipse.collections.api.list.MutableList;
 import org.eclipse.collections.api.list.primitive.BooleanList;
@@ -131,6 +132,11 @@ public class DataFrame
                 "Column '" + columnName + "' does not exist in data frame '" + this.getName() + "'");
 
         return column;
+    }
+
+    public ImmutableList<DfColumn> getColumns()
+    {
+        return this.columns.toImmutable();
     }
 
     public DfColumn getColumnAt(int columnIndex)

@@ -12,6 +12,7 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.time.format.ResolverStyle;
+import java.time.temporal.TemporalAccessor;
 
 public class CsvDataSet
 extends DataSetAbstract
@@ -23,7 +24,8 @@ extends DataSetAbstract
     private boolean emptyElementsConvertedToNulls = false;
 
     private CsvSchema schema;
-    private String columnFormatPattern; // todo: refactor so that this is not required
+
+    private DateTimeFormatter[] formatters;
 
     public CsvDataSet(String dataFileName, String newName)
     {
@@ -66,11 +68,13 @@ extends DataSetAbstract
 //
     }
 
+
+
     public void write(DataFrame dataFrame)
     {
         if (this.schemaIsNotDefined())
         {
-            this.schema = new CsvSchema();
+            this.schema = this.schemaFromDataFrame(dataFrame);
         }
 
         try (BufferedWriter writer = new BufferedWriter(this.createWriter(), BUFFER_SIZE))
@@ -79,7 +83,7 @@ extends DataSetAbstract
 
             for (int columnIndex = 0; columnIndex < columnCount; columnIndex++)
             {
-                writer.write(dataFrame.getColumnAt(columnIndex).getName());
+                writer.write(schema.columnAt(columnIndex).getName());
 
                 if (columnIndex < columnCount - 1)
                 {
@@ -93,8 +97,7 @@ extends DataSetAbstract
             {
                 for (int columnIndex = 0; columnIndex < columnCount; columnIndex++)
                 {
-                    String valueAsLiteral = dataFrame.getColumnAt(columnIndex).getValueAsStringLiteral(rowIndex);
-                    writer.write(valueAsLiteral);
+                    this.writeValue(writer, dataFrame, rowIndex, columnIndex);
 
                     if (columnIndex < columnCount - 1)
                     {
@@ -110,7 +113,58 @@ extends DataSetAbstract
         }
     }
 
-    private Writer createWriter()
+    private CsvSchema schemaFromDataFrame(DataFrame dataFrame)
+    {
+        CsvSchema schema = new CsvSchema();
+        dataFrame.getColumns().forEach(e -> schema.addColumn(e.getName(), e.getType()));
+        return schema;
+    }
+
+    private void writeValue(Writer writer, DataFrame dataFrame, int rowIndex, int columnIndex)
+    throws IOException
+    {
+        DfColumn column = dataFrame.getColumnAt(columnIndex);
+
+        String valueAsLiteral;
+        switch (column.getType())
+        {
+            case LONG:
+            case DOUBLE:
+                valueAsLiteral = column.getValueAsStringLiteral(rowIndex);
+                break;
+            case STRING:
+                String stringValue = column.getValueAsString(rowIndex);
+                valueAsLiteral = stringValue == null ? "" : schema.getQuoteCharacter() + stringValue + schema.getQuoteCharacter();
+                break;
+            case DATE:
+                LocalDate dateValue = ((DfDateColumn) column).getDate(rowIndex);
+                valueAsLiteral = dateValue == null ? "" : this.formatterForColumn(columnIndex).format(dateValue);
+                break;
+            default:
+                ErrorReporter.reportAndThrow("Do not know how to convert value of type " + column.getType() + " to a string");
+                valueAsLiteral = null;
+        }
+
+        writer.write(valueAsLiteral);
+    }
+
+    private DateTimeFormatter formatterForColumn(int columnIndex)
+    {
+        if (this.formatters == null)
+        {
+            this.formatters = new DateTimeFormatter[this.schema.columnCount()];
+        }
+
+        if (this.formatters[columnIndex] == null)
+        {
+            String pattern = schema.columnAt(columnIndex).getPattern();
+            this.formatters[columnIndex] = DateTimeFormatter.ofPattern(pattern);
+        }
+
+        return this.formatters[columnIndex];
+    }
+
+    protected Writer createWriter()
     throws IOException
     {
         return new FileWriter(this.dataFileName);
@@ -216,12 +270,13 @@ extends DataSetAbstract
         {
             String element = elements.get(i);
             ValueType guessedType;
+            String matchingFormat = null;
 
             if (this.getSchema().surroundedByQuotes(element))
             {
                 guessedType = ValueType.STRING;
             }
-            else if (this.canParseAsDate(element))
+            else if ((matchingFormat = this.findMatchingDateFormat(element)) != null)
             {
                 guessedType = ValueType.DATE;
             }
@@ -238,15 +293,7 @@ extends DataSetAbstract
                 guessedType = ValueType.STRING;
             }
 
-            if (this.columnFormatPattern != null)
-            {
-                this.schema.addColumn(headers.get(i), guessedType, this.columnFormatPattern);
-                this.columnFormatPattern = null;
-            }
-            else
-            {
-                this.schema.addColumn(headers.get(i), guessedType);
-            }
+            this.schema.addColumn(headers.get(i), guessedType, matchingFormat);
         }
     }
 
@@ -303,7 +350,7 @@ extends DataSetAbstract
         }
     }
 
-    private boolean canParseAsDate(String aString)
+    private String findMatchingDateFormat(String aString)
     {
         ListIterable<String> dateFormats = Lists.immutable.of("uuuu/M/d", "uuuu-M-d", "M/d/uuuu");
 
@@ -316,8 +363,7 @@ extends DataSetAbstract
             {
                 DateTimeFormatter candidateFormatter = DateTimeFormatter.ofPattern(pattern).withResolverStyle(ResolverStyle.STRICT);
                 LocalDate.parse(trimmed, candidateFormatter);
-                this.columnFormatPattern = pattern;
-                return true;
+                return pattern;
             }
             catch (DateTimeParseException e)
             {
@@ -325,7 +371,7 @@ extends DataSetAbstract
             }
         }
 
-        return false;
+        return null;
     }
 
     private MutableList<String> splitMindingQs(String aString)
