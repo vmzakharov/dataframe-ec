@@ -118,6 +118,7 @@ implements ExpressionVisitor
     @Override
     public void visitAnonymousScriptExpr(AnonymousScript expr)
     {
+        expr.getFunctions().forEachValue(this::visitFunctionScriptExpr);
         this.printExpressionListLn(expr.getExpressions());;
     }
 
@@ -131,9 +132,10 @@ implements ExpressionVisitor
         }
 
         this.newLine()
-            .print("{")
+            .print("{").newLine().tab()
             .printExpressionListLn(expr.getExpressions())
-            .print("}");
+            .tabBack()
+            .print("}").newLine();
     }
 
     @Override

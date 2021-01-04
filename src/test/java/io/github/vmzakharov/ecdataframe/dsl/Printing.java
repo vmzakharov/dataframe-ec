@@ -9,7 +9,7 @@ import io.github.vmzakharov.ecdataframe.util.ExpressionParserHelper;
 public class Printing
 {
     @Test
-    public void printScript()
+    public void script()
     {
         String scriptText =
                 "x= 1\n" +
@@ -25,6 +25,31 @@ public class Printing
                 "z = (x + y)\n" +
                 "((3 + 1) + 2)\n"
                 , result);
+    }
+
+    @Test
+    public void scriptWithFunctionDeclaration()
+    {
+        String scriptText =
+                "function sum(a, b)\n" +
+                        "{  a + b\n" +
+                        "}\n" +
+                        "x= 1\n" +
+                "y =2\n" +
+                "sum(x, y)";
+        AnonymousScript script = ExpressionTestUtil.toScript(scriptText);
+
+        String result = PrettyPrintVisitor.exprToString(script);
+
+        Assert.assertEquals(
+                "function sum(a, b)\n" +
+                "{\n" +
+                "  (a + b)\n" +
+                "}\n" +
+                "x = 1\n" +
+                "y = 2\n" +
+                "sum(x, y)\n",
+                result);
     }
 
     @Test
