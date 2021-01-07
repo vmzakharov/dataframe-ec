@@ -41,7 +41,7 @@ Customer | Count | Price | Date
 
 #### Sum of Columns
 ```
-orders.sum(Lists.immutable.of("Count", "Price"));
+DataFrame totalOrdered = orders.sum(Lists.immutable.of("Count", "Price"));
 ```
 Result:
 
@@ -51,7 +51,7 @@ Count | Price
 
 #### Sum With Group By
 ```
-orders.sumBy(Lists.immutable.of("Count", "Price"), Lists.immutable.of("Customer"));
+DataFrame totalsByCustomer = orders.sumBy(Lists.immutable.of("Count", "Price"), Lists.immutable.of("Customer"));
 ```
 Result:
 
