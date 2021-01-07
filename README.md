@@ -1,5 +1,7 @@
 # dataframe-ec
-A tabular data structure (aka a data frame) based on the Eclipse Collections framework
+A tabular data structure (aka a data frame) based on the Eclipse Collections framework. A data frame store is columnar, with focus on memory optimization achieved by using efficient Eclipse Collections data structures and APIs.
+
+For more on Eclipse Collections see: https://www.eclipse.org/collections/.
 
 ## Data Frame Operations
 
@@ -7,12 +9,142 @@ A tabular data structure (aka a data frame) based on the Eclipse Collections fra
 - add a column to a data frame, columns can be
   - stored or computed
   - of type: string, integer (long), double, date
-- drop a column
+- drop one or more a column
 - select a subset of rows based on a criteria
-- sort 
+- sort by one or more columns or by an expression
 - union
-- join
-- aggregation
+- join - inner or outer
+- aggregation - grouping by or summing column values
+
+###Examples
+####Creating a Data Frame
+
+```
+DataFrame df = new DataFrame("Donut Orders")
+    .addStringColumn("Customer").addLongColumn("Count").addDoubleColumn("Price").addDateColumn("Date")
+    .addRow("Alice",  5, 23.45, LocalDate.of(2020, 10, 15))
+    .addRow("Bob",   10, 40.34, LocalDate.of(2020, 11, 10))
+    .addRow("Alice",  4, 19.50, LocalDate.of(2020, 10, 19))
+    .addRow("Carl",  11, 44.78, LocalDate.of(2020, 12, 25))
+    .addRow("Doris",  1,  5.00, LocalDate.of(2020,  9,  1));
+```
+Result:
+
+Customer | Count | Price | Date
+ --- |  --- |  --- | ---
+"Alice" | 5 | 23.45 | 2020-10-15
+"Bob" | 10 | 40.34 | 2020-11-10
+"Alice" | 4 | 19.5 | 2020-10-19
+"Carl" | 11 | 44.78 | 2020-12-25
+"Doris" | 1 | 5.0 | 2020-09-01
+
+#### Sum of Columns
+```
+orders.sum(Lists.immutable.of("Count", "Price"));
+```
+Result:
+
+Count | Price
+ --- | ---
+31 | 133.07
+
+#### Sum With Group By
+```
+orders.sumBy(Lists.immutable.of("Count", "Price"), Lists.immutable.of("Customer"));
+```
+Result:
+
+Customer | Count | Price
+ --- |  --- | ---
+"Alice" | 9 | 42.95
+"Bob" | 10 | 40.34
+"Carl" | 11 | 44.78
+"Doris" | 1 | 5.0
+
+#### Add a Calculated Column
+```
+orders.addDoubleColumn("AvgDonutPrice", "Price / Count");
+```
+Result:
+
+Customer | Count | Price | Date | AvgDonutPrice
+ --- |  --- |  --- |  --- | ---
+"Alice" | 5 | 23.45 | 2020-10-15 | 4.69
+"Bob" | 10 | 40.34 | 2020-11-10 | 4.034
+"Alice" | 4 | 19.5 | 2020-10-19 | 4.875
+"Carl" | 11 | 44.78 | 2020-12-25 | 4.071
+"Doris" | 1 | 5.0 | 2020-09-01 | 5.0
+
+#### Filter
+Selection of a sub dataframe with the rows matching the filter condition
+```
+orders.selectBy("Count >= 10");
+```
+Result:
+
+Customer | Count | Price | Date | AvgDonutPrice
+ --- |  --- |  --- |  --- | ---
+"Bob" | 10 | 40.34 | 2020-11-10 | 4.034
+"Carl" | 11 | 44.78 | 2020-12-25 | 4.071
+
+Select two subsets both matching and not matching the filter condition respectively
+```
+Twin<DataFrame> lowAndHigh = orders.selectAndRejectBy("Count >= 10");
+```
+Result - a pair of data frames:
+
+Customer | Count | Price | Date | AvgDonutPrice
+--- |  --- |  --- |  --- | ---
+"Bob" | 10 | 40.34 | 2020-11-10 | 4.034
+"Carl" | 11 | 44.78 | 2020-12-25 | 4.071
+
+Customer | Count | Price | Date | AvgDonutPrice
+ --- |  --- |  --- |  --- | ---
+"Alice" | 5 | 23.45 | 2020-10-15 | 4.69
+"Alice" | 4 | 19.5 | 2020-10-19 | 4.875
+"Doris" | 1 | 5.0 | 2020-09-01 | 5.0
+
+#### Drop Column
+```
+orders.dropColumn("AvgDonutPrice");
+```
+Result:
+
+Customer | Count | Price | Date
+--- |  --- |  --- | ---
+"Alice" | 5 | 23.45 | 2020-10-15
+"Bob" | 10 | 40.34 | 2020-11-10
+"Alice" | 4 | 19.5 | 2020-10-19
+"Carl" | 11 | 44.78 | 2020-12-25
+"Doris" | 1 | 5.0 | 2020-09-01
+#### Sort
+Sort by the order date:
+```
+orders.sortBy(Lists.immutable.of("Date"));
+```
+Result:
+
+Customer | Count | Price | Date
+ --- |  --- |  --- | ---
+"Doris" | 1 | 5.0 | 2020-09-01
+"Alice" | 5 | 23.45 | 2020-10-15
+"Alice" | 4 | 19.5 | 2020-10-19
+"Bob" | 10 | 40.34 | 2020-11-10
+"Carl" | 11 | 44.78 | 2020-12-25
+
+Sort by Customer ignoring the first letter of their name
+```
+orders.sortByExpression("substr(Customer, 1)");
+```
+Result:
+
+Customer | Count | Price | Date
+ --- |  --- |  --- | ---
+"Carl" | 11 | 44.78 | 2020-12-25
+"Alice" | 5 | 23.45 | 2020-10-15
+"Alice" | 4 | 19.5 | 2020-10-19
+"Bob" | 10 | 40.34 | 2020-11-10
+"Doris" | 1 | 5.0 | 2020-09-01
 
 ## Domain Specific Language
 
@@ -39,7 +171,7 @@ There is no implicit type conversion of values and variables to avoid inadverten
 The following are examples of literals
 
 Type | Example
------------- | -------------
+--- | ---
 String | `"Hello"` or `'Abracadabra'` (both single and double quotes are supported)
 Long | `123`
 Double | `123.456`
@@ -86,15 +218,25 @@ There are two types of functions - intrinsic (built-in) and explicitly declared 
 
 Recursion (direct or indirect) is not supported.
 
-Example
+####Example 1
 ```
 function abs(x)
+{
   if x > 0 then
     x
   else
     -x
   endif
-  
+} 
 abs(-123)
 ```
 
+####Example 2
+```
+function hello()
+{
+  'Hello'
+} 
+
+hello() + ' world!'
+```
