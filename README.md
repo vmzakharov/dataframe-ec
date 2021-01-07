@@ -22,7 +22,7 @@ For more on Eclipse Collections see: https://www.eclipse.org/collections/.
 #### Creating a Data Frame
 
 ```
-DataFrame df = new DataFrame("Donut Orders")
+DataFrame orders = new DataFrame("Donut Orders")
     .addStringColumn("Customer").addLongColumn("Count").addDoubleColumn("Price").addDateColumn("Date")
     .addRow("Alice",  5, 23.45, LocalDate.of(2020, 10, 15))
     .addRow("Bob",   10, 40.34, LocalDate.of(2020, 11, 10))
@@ -147,6 +147,25 @@ Customer | Count | Price | Date
 "Alice" | 4 | 19.5 | 2020-10-19
 "Bob" | 10 | 40.34 | 2020-11-10
 "Doris" | 1 | 5.0 | 2020-09-01
+
+#### Union
+```
+DataFrame otherOrders = new DataFrame("Other Donut Orders")
+    .addStringColumn("Customer").addLongColumn("Count").addDoubleColumn("Price").addDateColumn("Date")
+    .addRow("Eve",  2, 9.80, LocalDate.of(2020, 12, 5));
+
+DataFrame combinedOrders = orders.union(otherOrders);
+```
+Result:
+
+Customer | Count | Price | Date
+--- | --- | --- | ---
+"Alice" | 5 | 23.45 | 2020-10-15
+"Bob" | 10 | 40.34 | 2020-11-10
+"Alice" | 4 | 19.5 | 2020-10-19
+"Carl" | 11 | 44.78 | 2020-12-25
+"Doris" | 1 | 5.0 | 2020-09-01
+"Eve" | 2 | 9.8 | 2020-12-05
 
 ## Domain Specific Language
 
