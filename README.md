@@ -16,9 +16,9 @@ For more on Eclipse Collections see: https://www.eclipse.org/collections/.
 - join - inner or outer
 - aggregation - grouping by or summing column values
 
-###Examples
+### Examples
 
-####Creating a Data Frame
+#### Creating a Data Frame
 
 ```
 DataFrame df = new DataFrame("Donut Orders")
