@@ -9,12 +9,13 @@ For more on Eclipse Collections see: https://www.eclipse.org/collections/.
 - add a column to a data frame, columns can be
   - stored or computed
   - of type: string, integer (long), double, date
-- drop one or more a column
+- drop one or more columns
 - select a subset of rows based on a criteria
 - sort by one or more columns or by an expression
-- union
-- join - inner or outer
+- union - concatenating data frames with the same schemas
+- join with another data frame, based on a spefied column value, inner and outer joins are supported
 - aggregation - grouping by or summing column values
+- flag rows - individually or matching a criteria. 
 
 ### Examples
 
