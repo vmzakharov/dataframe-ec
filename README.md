@@ -17,6 +17,7 @@ For more on Eclipse Collections see: https://www.eclipse.org/collections/.
 - aggregation - grouping by or summing column values
 
 ###Examples
+
 ####Creating a Data Frame
 
 ```
