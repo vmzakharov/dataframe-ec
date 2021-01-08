@@ -56,7 +56,7 @@ public class DataFrameFilterTest
     @Test
     public void selectAndReject()
     {
-        Twin<DataFrame> selectedAndRejected = this.dataFrame.selectAndRejectBy("Foo == \"Def\" or Foo == \"Abc\"");
+        Twin<DataFrame> selectedAndRejected = this.dataFrame.partition("Foo == \"Def\" or Foo == \"Abc\"");
 
         DataFrame expectedSelected = new DataFrame("FrameOfData")
                 .addStringColumn("Name").addStringColumn("Foo").addLongColumn("Bar").addDoubleColumn("Baz").addDoubleColumn("Qux")

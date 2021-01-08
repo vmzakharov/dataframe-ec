@@ -493,7 +493,7 @@ public class DataFrame
         return summedDataFrame;
     }
 
-    public Twin<DataFrame> selectAndRejectBy(String filterExpressionString)
+    public Twin<DataFrame> partition(String filterExpressionString)
     {
         DataFrame selected = this.cloneStructure(this.name + "-selected");
         DataFrame rejected = this.cloneStructure(this.name + "-rejected");
@@ -824,7 +824,6 @@ public class DataFrame
         other.columns
                 .reject(c -> c.getName().equals(otherJoinColumnName))
                 .forEach(c -> joined.addColumn(otherColumnNameMap.get(c.getName()), c.getType()));
-//                .forEach(c -> c.cloneSchemaAndAttachTo(joined, otherColumnNameMap.get(c.getName())));
 
         this.sortBy(Lists.immutable.of(thisJoinColumnName));
         other.sortBy(Lists.immutable.of(otherJoinColumnName));
