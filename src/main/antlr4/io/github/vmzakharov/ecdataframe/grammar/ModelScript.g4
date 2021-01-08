@@ -89,6 +89,7 @@ ENDIF : 'endif' | 'ENDIF';
 ID : LETTER (LETTER|DIGIT)*;
 INT : DIGIT+;
 DOUBLE : ('.' DIGIT+ | DIGIT+ ('.' DIGIT*)? ) ;
+LINE_COMMENT : '//' ~[\r\n]* -> skip;
 WS : [ \t]+ -> skip;
 NL : [\n\r] -> skip;
 STRING : '"' ( ESC | . )*? '"' | '\'' ( ESC | . )*? '\'';
