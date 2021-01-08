@@ -91,7 +91,7 @@ Customer | Count | Price | Date | AvgDonutPrice
 
 Select two subsets both matching and not matching the filter condition respectively
 ```
-Twin<DataFrame> lowAndHigh = orders.selectAndRejectBy("Count >= 10");
+Twin<DataFrame> lowAndHigh = orders.partition("Count >= 10");
 ```
 Result - a pair of data frames:
 
@@ -239,7 +239,7 @@ There are two types of functions - intrinsic (built-in) and explicitly declared 
 
 Recursion (direct or indirect) is not supported.
 
-####Example 1
+#### Example 1
 ```
 function abs(x)
 {
@@ -252,7 +252,7 @@ function abs(x)
 abs(-123)
 ```
 
-####Example 2
+#### Example 2
 ```
 function hello()
 {
