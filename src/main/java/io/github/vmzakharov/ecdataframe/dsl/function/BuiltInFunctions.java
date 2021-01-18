@@ -180,7 +180,45 @@ public class BuiltInFunctions
             }
         },
 
-        new IntrinsicFunctionDescriptor("withinDays") {
+            new IntrinsicFunctionDescriptor("toLong") {
+                @Override
+                public Value evaluate(VectorValue parameters)
+                {
+                    this.assertParameterCount(1, parameters.size());
+                    Value parameter = parameters.get(0);
+                    this.assertParameterType(ValueType.STRING, parameter.getType());
+                    String aString = parameter.stringValue();
+
+                    return new LongValue(Long.parseLong(aString));
+                }
+
+                @Override
+                public String usageString()
+                {
+                    return "Usage: " + this.getName() + "(string)";
+                }
+            },
+
+            new IntrinsicFunctionDescriptor("toDouble") {
+                @Override
+                public Value evaluate(VectorValue parameters)
+                {
+                    this.assertParameterCount(1, parameters.size());
+                    Value parameter = parameters.get(0);
+                    this.assertParameterType(ValueType.STRING, parameter.getType());
+                    String aString = parameter.stringValue();
+
+                    return new DoubleValue(Double.parseDouble(aString));
+                }
+
+                @Override
+                public String usageString()
+                {
+                    return "Usage: " + this.getName() + "(string)";
+                }
+            },
+
+            new IntrinsicFunctionDescriptor("withinDays") {
             @Override
             public Value evaluate(VectorValue parameters)
             {

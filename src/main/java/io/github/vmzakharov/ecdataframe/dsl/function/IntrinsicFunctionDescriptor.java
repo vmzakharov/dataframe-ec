@@ -4,6 +4,7 @@ import io.github.vmzakharov.ecdataframe.dataframe.ErrorReporter;
 import io.github.vmzakharov.ecdataframe.dsl.EvalContext;
 import io.github.vmzakharov.ecdataframe.dsl.FunctionDescriptor;
 import io.github.vmzakharov.ecdataframe.dsl.value.Value;
+import io.github.vmzakharov.ecdataframe.dsl.value.ValueType;
 import io.github.vmzakharov.ecdataframe.dsl.value.VectorValue;
 import org.eclipse.collections.api.list.ListIterable;
 import org.eclipse.collections.impl.factory.Lists;
@@ -74,5 +75,11 @@ implements FunctionDescriptor
         ErrorReporter.reportAndThrow(
                 expectedCount != actualCount,
                 "Invalid number of parameters in a call to '" + this.getName() + "'. " + this.usageString());
+    }
+    protected void assertParameterType(ValueType expected, ValueType actual)
+    {
+        ErrorReporter.reportAndThrow(
+                expected != actual,
+                "Invalid parameter type in a call to '" + this.getName() + "'. " + this.usageString());
     }
 }
