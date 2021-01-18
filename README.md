@@ -126,10 +126,14 @@ Twin<DataFrame> highAndLow = orders.partition("Count >= 10");
 ```
 Result - a pair of data frames:
 
+`highAndLow.getOne()`
+
 Customer | Count | Price | Date | AvgDonutPrice
 --- |  --- |  --- |  --- | ---
 "Bob" | 10 | 40.34 | 2020-11-10 | 4.034
 "Carl" | 11 | 44.78 | 2020-12-25 | 4.071
+
+`highAndLow.getTwo()`
 
 Customer | Count | Price | Date | AvgDonutPrice
  --- |  --- |  --- |  --- | ---
@@ -169,7 +173,7 @@ Sort by Customer ignoring the first letter of their name
 ```
 orders.sortByExpression("substr(Customer, 1)");
 ```
-`ordes`:
+`orders`:
 
 Customer | Count | Price | Date
  --- |  --- |  --- | ---
