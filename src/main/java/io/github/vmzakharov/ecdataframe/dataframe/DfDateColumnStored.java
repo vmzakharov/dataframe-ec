@@ -105,9 +105,9 @@ implements DfColumnStored
     }
 
     @Override
-    public void incrementFrom(int targetRowIndex, DfColumn sourceColumn, int sourceRowIndex)
+    public void applyAggregator(int targetRowIndex, DfColumn sourceColumn, int sourceRowIndex, AggregateFunction aggregateFunction)
     {
-        throw new RuntimeException("Not implemented yet");
+        throw new UnsupportedOperationException("Not implemented yet");
     }
 
     @Override

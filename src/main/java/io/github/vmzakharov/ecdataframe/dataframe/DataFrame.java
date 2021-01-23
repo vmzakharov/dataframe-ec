@@ -29,6 +29,8 @@ import org.eclipse.collections.impl.utility.ArrayIterate;
 import java.time.LocalDate;
 import java.util.Arrays;
 
+import static io.github.vmzakharov.ecdataframe.dataframe.AggregateFunction.SUM;
+
 public class DataFrame
 {
     private final String name;
@@ -150,7 +152,22 @@ public class DataFrame
         this.rowCount++;
     }
 
+    /**
+     * Convert the data frame into a multi-line CSV string. The output will include column headers.
+     * @return a string representation of the data frame.
+     */
     public String asCsvString()
+    {
+        return this.asCsvString(-1);
+    }
+
+    /**
+     * Convert the data frame into a multi-line CSV string. The output will include column headers.
+     * @param limit number of rows to convert, all rows if the value if  negative. If the value is zero the result will
+     *              only contain column names.
+     * @return a string representation of the data frame.
+     */
+    public String asCsvString(int limit)
     {
         StringBuilder s = new StringBuilder();
 
@@ -159,7 +176,10 @@ public class DataFrame
 
         int columnCount = this.columnCount();
         String[] row = new String[columnCount];
-        for (int rowIndex = 0; rowIndex < this.rowCount(); rowIndex++)
+
+        int last = limit < 0 ? this.rowCount() : Math.max(limit, this.rowCount);
+
+        for (int rowIndex = 0; rowIndex < last; rowIndex++)
         {
             for (int columnIndex = 0; columnIndex < columnCount; columnIndex++)
             {
@@ -390,7 +410,13 @@ public class DataFrame
         return this;
     }
 
-    public DataFrame sum(ListIterable<String> columnsToSumNames)
+
+    public DataFrame sum(ListIterable<String> columnsToAggregateNames)
+    {
+        return this.aggregate(columnsToAggregateNames, SUM);
+    }
+
+    public DataFrame aggregate(ListIterable<String> columnsToSumNames, AggregateFunction aggregateFunction)
     {
         ListIterable<DfColumn> columnsToSum = this.getColumnsToAggregate(columnsToSumNames);
 
@@ -400,7 +426,9 @@ public class DataFrame
         columnsToSum.forEach(each -> summedDataFrame.addColumn(each.getName(), each.getType()));
 
         ListIterable<Number> sums = columnsToSum.collect(
-                each -> (each instanceof DfDoubleColumn) ? ((DfDoubleColumn) each).sum() : ((DfLongColumn) each).sum()
+                each -> (each instanceof DfDoubleColumn) ?
+                        ((DfDoubleColumn) each).aggregate(aggregateFunction) :
+                        ((DfLongColumn) each).aggregate(aggregateFunction)
         );
 
         summedDataFrame.addRow(sums.toArray());
@@ -418,6 +446,42 @@ public class DataFrame
                         + nonNumericColumns.collect(DfColumn::getName).makeString() + " in data frame '" + this.getName() + "'");
 
         return columnsToAggregate;
+    }
+
+    public DataFrame aggregateBy(
+            ListIterable<String> columnsToAggregateNames,
+            ListIterable<String> columnsToGroupByNames,
+            AggregateFunction aggregator)
+    {
+        ListIterable<DfColumn> columnsToAggregate = this.getColumnsToAggregate(columnsToAggregateNames);
+
+        DataFrame summedDataFrame = new DataFrame("Aggregate Of " + this.getName());
+
+        columnsToGroupByNames
+                .collect(this::getColumnNamed)
+                .forEach(each -> summedDataFrame.addColumn(each.getName(), each.getType()));
+
+        // converting calculated columns into stored
+        columnsToAggregate.forEach(each -> summedDataFrame.addColumn(each.getName(), each.getType()));
+
+        ListIterable<DfColumn> accumulatorColumns = summedDataFrame
+                .columnsNamed(columnsToAggregateNames)
+                .tap(DfColumn::enableNulls);
+
+        // todo: consider implementing index as a structure in DataFrame
+        DfUniqueIndex index = new DfUniqueIndex(summedDataFrame, columnsToGroupByNames);
+
+        for (int i = 0; i < this.rowCount; i++)
+        {
+            ListIterable<Object> keyValue = index.computeKeyFrom(this, i);
+            int accIndex = index.getRowIndexAtKeyIfAbsentAdd(keyValue);
+            for (int colIndex = 0; colIndex < columnsToAggregate.size(); colIndex++)
+            {
+                accumulatorColumns.get(colIndex).applyAggregator(accIndex, columnsToAggregate.get(colIndex), i, aggregator);
+            }
+        }
+
+        return summedDataFrame;
     }
 
     public DataFrame sumBy(ListIterable<String> columnsToSumNames, ListIterable<String> columnsToGroupByNames)
@@ -444,7 +508,7 @@ public class DataFrame
             int accIndex = index.getRowIndexAtKeyIfAbsentAdd(keyValue);
             for (int colIndex = 0; colIndex < columnsToSum.size(); colIndex++)
             {
-                accumulatorColumns.get(colIndex).incrementFrom(accIndex, columnsToSum.get(colIndex), i);
+                accumulatorColumns.get(colIndex).applyAggregator(accIndex, columnsToSum.get(colIndex), i, SUM);
             }
         }
 
@@ -484,7 +548,7 @@ public class DataFrame
 
             for (int colIndex = 0; colIndex < columnsToSum.size(); colIndex++)
             {
-                accumulatorColumns.get(colIndex).incrementFrom(accIndex, columnsToSum.get(colIndex), i);
+                accumulatorColumns.get(colIndex).applyAggregator(accIndex, columnsToSum.get(colIndex), i, SUM);
             }
         }
 

@@ -2,26 +2,66 @@ package io.github.vmzakharov.ecdataframe.dataframe;
 
 import org.eclipse.collections.impl.factory.Lists;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
+
+import static io.github.vmzakharov.ecdataframe.dataframe.AggregateFunction.*;
 
 public class DataFrameAggregationTest
 {
-    private static final double TOLERANCE = 0.0;
+    private static final double TOLERANCE = 0.00001;
+
+    private DataFrame dataFrame;
+
+    @Before
+    public void initialiseDataFrame()
+    {
+        this.dataFrame = new DataFrame("FrameOfData")
+                .addStringColumn("Name").addStringColumn("Foo").addLongColumn("Bar").addDoubleColumn("Baz").addDoubleColumn("Qux")
+                .addRow("Alice", "Abc",  123L, 10.0, 100.0)
+                .addRow("Bob",   "Def",  456L, 12.0, -25.0)
+                .addRow("Carol", "Xyz", -789L, 17.0,  42.0);
+    }
 
     @Test
-    public void sumItAll()
+    public void sumAll()
     {
-        DataFrame dataFrame = new DataFrame("FrameOfData")
-                .addStringColumn("Name").addStringColumn("Foo").addLongColumn("Bar").addDoubleColumn("Baz").addDoubleColumn("Qux")
-                .addRow("Alice", "Abc",  123L, 10.0, 20.0)
-                .addRow("Bob",   "Def",  456L, 12.0, 25.0)
-                .addRow("Carol", "Xyz",  789L, 15.0, 40.0);
+        DataFrame expected = new DataFrame("sum")
+                .addLongColumn("Bar").addDoubleColumn("Baz").addDoubleColumn("Qux")
+                .addRow(-210L, 39.0, 117.0);
 
-        DataFrame summed = dataFrame.sum(Lists.immutable.of("Bar", "Baz", "Qux"));
+        DataFrameUtil.assertEquals(expected, this.dataFrame.sum(Lists.immutable.of("Bar", "Baz", "Qux")));
+        DataFrameUtil.assertEquals(expected, this.dataFrame.aggregate(Lists.immutable.of("Bar", "Baz", "Qux"), SUM));
+    }
 
-        Assert.assertEquals(1368L, summed.getLongColumn("Bar").getLong(0));
-        Assert.assertEquals( 37.0, summed.getDoubleColumn("Baz").getDouble(0), TOLERANCE);
-        Assert.assertEquals( 85.0, summed.getDoubleColumn("Qux").getDouble(0), TOLERANCE);
+    @Test
+    public void minAll()
+    {
+        DataFrame expected = new DataFrame("sum")
+                .addLongColumn("Bar").addDoubleColumn("Baz").addDoubleColumn("Qux")
+                .addRow(-789L, 10.0, -25.0);
+
+        DataFrameUtil.assertEquals(expected, this.dataFrame.aggregate(Lists.immutable.of("Bar", "Baz", "Qux"), MIN));
+    }
+
+    @Test
+    public void maxAll()
+    {
+        DataFrame expected = new DataFrame("sum")
+                .addLongColumn("Bar").addDoubleColumn("Baz").addDoubleColumn("Qux")
+                .addRow(456L, 17.0, 100.0);
+
+        DataFrameUtil.assertEquals(expected, this.dataFrame.aggregate(Lists.immutable.of("Bar", "Baz", "Qux"), MAX));
+    }
+
+    @Test
+    public void averageAll()
+    {
+        DataFrame expected = new DataFrame("sum")
+                .addLongColumn("Bar").addDoubleColumn("Baz").addDoubleColumn("Qux")
+                .addRow(-70L, 13.0, 39.0);
+
+        DataFrameUtil.assertEquals(expected, this.dataFrame.aggregate(Lists.immutable.of("Bar", "Baz", "Qux"), AVG));
     }
 
     @Test
@@ -38,23 +78,35 @@ public class DataFrameAggregationTest
     }
 
     @Test
-    public void sumItAllWithCalculatedColumns()
+    public void aggregationsAllWithCalculatedColumns()
     {
-        DataFrame dataFrame = new DataFrame("FrameOfData")
-                .addStringColumn("Name").addStringColumn("Foo").addLongColumn("Bar").addDoubleColumn("Baz")
-                .addRow("Alice", "Abc",  123L, 10.0)
-                .addRow("Bob",   "Def",  456L, 12.0)
-                .addRow("Carol", "Xyz",  789L, 15.0);
+        this.dataFrame.addLongColumn("BarBar", "Bar * 2");
+        this.dataFrame.addDoubleColumn("BazBaz", "Baz * 2");
 
-        dataFrame.addDoubleColumn("BazBaz", "Baz * 2");
+        DataFrame expectedSum = new DataFrame("Sum of FrameOfData")
+                .addLongColumn("Bar").addDoubleColumn("Baz").addLongColumn("BarBar").addDoubleColumn("BazBaz")
+                .addRow(-210L, 39.0, -420L, 78.0);
 
-        DataFrame summed = dataFrame.sum(Lists.immutable.of("Bar", "Baz", "BazBaz"));
+        DataFrameUtil.assertEquals(expectedSum, dataFrame.sum(Lists.immutable.of("Bar", "Baz", "BarBar", "BazBaz")));
+        DataFrameUtil.assertEquals(expectedSum, dataFrame.aggregate(Lists.immutable.of("Bar", "Baz", "BarBar", "BazBaz"), SUM));
 
-        DataFrame expected = new DataFrame("Sum of FrameOfData")
-                .addLongColumn("Bar").addDoubleColumn("Baz").addDoubleColumn("BazBaz")
-                .addRow(1368L, 37.0, 74.0);
+        DataFrame expectedMin = new DataFrame("Min of FrameOfData")
+                .addLongColumn("Bar").addDoubleColumn("Baz").addLongColumn("BarBar").addDoubleColumn("BazBaz")
+                .addRow(-789L, 10.0, -1578L, 20.0);
 
-        DataFrameUtil.assertEquals(expected, summed);
+        DataFrameUtil.assertEquals(expectedMin, dataFrame.aggregate(Lists.immutable.of("Bar", "Baz", "BarBar", "BazBaz"), MIN));
+
+        DataFrame expectedMax = new DataFrame("Max of FrameOfData")
+                .addLongColumn("Bar").addDoubleColumn("Baz").addLongColumn("BarBar").addDoubleColumn("BazBaz")
+                .addRow(456L, 17.0, 912L, 34.0);
+
+        DataFrameUtil.assertEquals(expectedMax, dataFrame.aggregate(Lists.immutable.of("Bar", "Baz", "BarBar", "BazBaz"), MAX));
+
+        DataFrame expectedAvg = new DataFrame("Avg of FrameOfData")
+                .addLongColumn("Bar").addDoubleColumn("Baz").addLongColumn("BarBar").addDoubleColumn("BazBaz")
+                .addRow(-70L, 13.0, -140L, 26.0);
+
+        DataFrameUtil.assertEquals(expectedAvg, dataFrame.aggregate(Lists.immutable.of("Bar", "Baz", "BarBar", "BazBaz"), AVG));
     }
 
     @Test
@@ -110,14 +162,50 @@ public class DataFrameAggregationTest
         DataFrame dataFrame = new DataFrame("FrameOfData")
                 .addStringColumn("Name").addStringColumn("Foo").addLongColumn("Bar").addDoubleColumn("Baz").addDoubleColumn("Qux");
 
-        dataFrame.addRow("Alice", "Abc",  123L, 10.0, 20.0);
-        dataFrame.addRow("Alice", "Xyz",  456L, 11.0, 22.0);
+        dataFrame.addRow("Alice", "Abc",  123L, 10.0, 22.0);
+        dataFrame.addRow("Alice", "Xyz",  456L, 11.0, 20.0);
 
         DataFrame summed = dataFrame.sumBy(Lists.immutable.of("Bar", "Baz", "Qux"), Lists.immutable.of("Name"));
 
         DataFrame expected = new DataFrame("Expected")
                 .addStringColumn("Name").addLongColumn("Bar").addDoubleColumn("Baz").addDoubleColumn("Qux")
                 .addRow("Alice", 579, 21.0, 42.0);
+
+        DataFrameUtil.assertEquals(expected, summed);
+    }
+
+    @Test
+    public void minGroupingSimple()
+    {
+        DataFrame dataFrame = new DataFrame("FrameOfData")
+                .addStringColumn("Name").addStringColumn("Foo").addLongColumn("Bar").addDoubleColumn("Baz").addDoubleColumn("Qux");
+
+        dataFrame.addRow("Alice", "Abc",  123L, 10.0, 22.0);
+        dataFrame.addRow("Alice", "Xyz",  456L, 11.0, 20.0);
+
+        DataFrame summed = dataFrame.aggregateBy(Lists.immutable.of("Bar", "Baz", "Qux"), Lists.immutable.of("Name"), MIN);
+
+        DataFrame expected = new DataFrame("Expected")
+                .addStringColumn("Name").addLongColumn("Bar").addDoubleColumn("Baz").addDoubleColumn("Qux")
+                .addRow("Alice", 123L, 10.0, 20.0);
+
+        DataFrameUtil.assertEquals(expected, summed);
+    }
+
+    @Test
+    public void maxGroupingSimple()
+    {
+        DataFrame dataFrame = new DataFrame("FrameOfData")
+                .addStringColumn("Name").addStringColumn("Foo").addLongColumn("Bar").addDoubleColumn("Baz").addDoubleColumn("Qux");
+
+        dataFrame.addRow("Alice", "Abc",  123L, 10.0, 22.0);
+        dataFrame.addRow("Alice", "Xyz",  456L, 11.0, 20.0);
+
+        DataFrame summed = dataFrame.aggregateBy(Lists.immutable.of("Bar", "Baz", "Qux"), Lists.immutable.of("Name"), MAX);
+
+        DataFrame expected = new DataFrame("Expected")
+                .addStringColumn("Name").addLongColumn("Bar").addDoubleColumn("Baz").addDoubleColumn("Qux")
+                .addRow("Alice", 456L, 11.0, 22.0);
 
         DataFrameUtil.assertEquals(expected, summed);
     }

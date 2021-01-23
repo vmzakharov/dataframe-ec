@@ -36,7 +36,12 @@ public interface DfColumn
 
     void addEmptyValue();
 
-    void incrementFrom(int targetRowIndex, DfColumn sourceColumn, int sourceRowIndex);
+    default void enableNulls()
+    {
+        // noop by default
+    }
+
+    void applyAggregator(int targetRowIndex, DfColumn sourceColumn, int sourceRowIndex, AggregateFunction aggregateFunction);
 
     DfColumn cloneSchemaAndAttachTo(DataFrame attachTo);
 

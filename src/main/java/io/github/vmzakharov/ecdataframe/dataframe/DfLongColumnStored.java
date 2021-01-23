@@ -4,13 +4,18 @@ import io.github.vmzakharov.ecdataframe.dsl.value.LongValue;
 import io.github.vmzakharov.ecdataframe.dsl.value.Value;
 import org.eclipse.collections.api.LongIterable;
 import org.eclipse.collections.api.list.primitive.ImmutableLongList;
+import org.eclipse.collections.api.list.primitive.MutableBooleanList;
 import org.eclipse.collections.api.list.primitive.MutableLongList;
+import org.eclipse.collections.impl.factory.primitive.BooleanLists;
 import org.eclipse.collections.impl.factory.primitive.LongLists;
 
 public class DfLongColumnStored
 extends DfLongColumn
 implements DfColumnStored
 {
+    private boolean nullsEnabled = false;
+    private MutableBooleanList nullMap = null;
+
     private MutableLongList values = LongLists.mutable.of();
 
     public DfLongColumnStored(DataFrame newDataFrame, String newName)
@@ -41,6 +46,10 @@ implements DfColumnStored
 
     public long getLong(int rowIndex)
     {
+        if (this.nullsAreEnabled() && this.isNull(rowIndex))
+        {
+            throw new NullPointerException();
+        }
         return this.values.get(rowIndex);
     }
 
@@ -51,9 +60,9 @@ implements DfColumnStored
     }
 
     @Override
-    public long sum()
+    public long aggregate(AggregateFunction aggregateFunction)
     {
-        return this.values.sum();
+        return aggregateFunction.apply(this.values);
     }
 
     @Override
@@ -62,6 +71,11 @@ implements DfColumnStored
         if (newObject == null)
         {
             this.addLong(0L);
+
+            if (this.nullsAreEnabled())
+            {
+                this.nullMap.add(true);
+            }
         }
         else
         {
@@ -78,20 +92,58 @@ implements DfColumnStored
     @Override
     public void setObject(int rowIndex, Object anObject)
     {
-        this.values.set(rowIndex, (Long) anObject);
+        if (anObject == null)
+        {
+            this.setNull(rowIndex);
+            this.values.set(rowIndex, 0L);
+        }
+        else
+        {
+            this.values.set(rowIndex, (Long) anObject);
+            this.clearNull(rowIndex);
+        }
     }
 
     @Override
-    public void incrementFrom(int targetRowIndex, DfColumn sourceColumn, int sourceRowIndex)
+    public void applyAggregator(int targetRowIndex, DfColumn sourceColumn, int sourceRowIndex, AggregateFunction aggregator)
     {
-        long stored = this.values.get(targetRowIndex);
-        this.values.set(targetRowIndex, stored + ((DfLongColumn) sourceColumn).getLong(sourceRowIndex));
+        long stored = this.isNull(targetRowIndex) ? aggregator.longInitialValue() : this.values.get(targetRowIndex);
+        this.values.set(targetRowIndex, aggregator.longAccumulator(
+                stored,
+                ((DfLongColumn) sourceColumn).getLong(sourceRowIndex)));
+        this.clearNull(targetRowIndex);
+    }
+
+    private void clearNull(int rowIndex)
+    {
+        if (this.nullsAreEnabled())
+        {
+            this.nullMap.set(rowIndex, false);
+        }
+    }
+
+    private void setNull(int rowIndex)
+    {
+        if (this.nullsAreEnabled())
+        {
+            this.nullMap.set(rowIndex, true);
+        }
+    }
+
+    private boolean isNull(int rowIndex)
+    {
+        return this.nullsEnabled && this.nullMap.get(rowIndex);
     }
 
     @Override
     public void addEmptyValue()
     {
         this.values.add(0L);
+
+        if (this.nullsEnabled)
+        {
+            this.nullMap.add(true);
+        }
     }
 
     @Override
@@ -103,5 +155,22 @@ implements DfColumnStored
     protected void addAllItems(LongIterable items)
     {
         this.values.addAll(items);
+    }
+
+    public void enableNulls()
+    {
+        this.nullsEnabled = true;
+        this.nullMap = BooleanLists.mutable.withInitialCapacity(this.getSize());
+    }
+
+    public void disableNulls()
+    {
+        this.nullsEnabled = false;
+        this.nullMap = null;
+    }
+
+    public boolean nullsAreEnabled()
+    {
+        return this.nullsEnabled;
     }
 }

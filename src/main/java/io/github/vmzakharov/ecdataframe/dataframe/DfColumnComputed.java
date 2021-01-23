@@ -43,9 +43,9 @@ extends DfColumn
     }
 
     @Override
-    default void incrementFrom(int targetRowIndex, DfColumn sourceColumn, int sourceRowIndex)
+    default void applyAggregator(int targetRowIndex, DfColumn sourceColumn, int sourceRowIndex, AggregateFunction aggregateFunction)
     {
-        throw new RuntimeException("Cannot increment a value of computed column '" + this.getName() + "'");
+        throw new RuntimeException("Cannot store aggregated value into a computed column '" + this.getName() + "'");
     }
 
     default void throwUnmodifiableColumnException()

@@ -10,11 +10,6 @@ implements DfColumn
 
     private DataFrame dataFrame;
 
-    public DfColumnAbstract(String newName)
-    {
-        this.name = newName;
-    }
-
     public DfColumnAbstract(DataFrame newDataFrame, String newName)
     {
         this.dataFrame = newDataFrame;

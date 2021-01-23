@@ -53,17 +53,16 @@ implements DfColumnComputed
     }
 
     @Override
-    public long sum()
+    public long aggregate(AggregateFunction aggregateFunction)
     {
-        if (this.getDataFrame().rowCount() == 0)
+        if (this.getSize() == 0)
         {
-            return 0L;
+            return aggregateFunction.defaultLongIfEmpty();
         }
 
-        return Interval
-                .zeroTo(this.getDataFrame().rowCount() - 1)
-                .collectLong(this::getLong)
-                .sum();
+        return aggregateFunction.apply(
+                Interval.zeroTo(this.getDataFrame().rowCount() - 1).collectLong(this::getLong)
+        );
     }
 
     @Override

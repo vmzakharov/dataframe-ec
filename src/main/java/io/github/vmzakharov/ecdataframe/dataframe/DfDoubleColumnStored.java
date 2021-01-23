@@ -45,7 +45,7 @@ implements DfColumnStored
     {
         if (newObject == null)
         {
-            this.addDouble(0.0);
+            this.addDouble(Double.NaN);
         }
         else
         {
@@ -67,6 +67,11 @@ implements DfColumnStored
 
     public double getDouble(int rowIndex)
     {
+        if (this.isNull(rowIndex))
+        {
+            throw new NullPointerException("Null value at " + this.getName() + "[" + rowIndex + "]");
+        }
+
         return this.values.get(rowIndex);
     }
 
@@ -77,9 +82,9 @@ implements DfColumnStored
     }
 
     @Override
-    public double sum()
+    public double aggregate(AggregateFunction aggregateFunction)
     {
-        return this.values.sum();
+        return aggregateFunction.apply(this.values);
     }
 
     @Override
@@ -91,26 +96,42 @@ implements DfColumnStored
     @Override
     public void setObject(int rowIndex, Object anObject)
     {
-        this.values.set(rowIndex, (Double) anObject);
+        if (anObject == null)
+        {
+            this.values.set(rowIndex, Double.NaN);
+        }
+        else
+        {
+            this.values.set(rowIndex, (Double) anObject);
+        }
     }
 
     @Override
     public void addEmptyValue()
     {
-        this.values.add(0.0);
+        this.values.add(Double.NaN);
+//        this.values.add(0.0);
     }
 
     @Override
-    public void incrementFrom(int targetRowIndex, DfColumn sourceColumn, int sourceRowIndex)
+    public void applyAggregator(int targetRowIndex, DfColumn sourceColumn, int sourceRowIndex, AggregateFunction aggregator)
     {
-        double stored = this.values.get(targetRowIndex);
-        this.values.set(targetRowIndex, stored + ((DfDoubleColumn) sourceColumn).getDouble(sourceRowIndex));
+        double stored = this.isNull(targetRowIndex) ? aggregator.doubleInitialValue() : this.values.get(targetRowIndex);
+
+        this.values.set(targetRowIndex, aggregator.doubleAccumulator(
+                stored,
+                ((DfDoubleColumn) sourceColumn).getDouble(sourceRowIndex)));
     }
 
     @Override
     public void ensureCapacity(int newCapacity)
     {
         this.values = DoubleLists.mutable.withInitialCapacity(newCapacity);
+    }
+
+    private boolean isNull(int rowIndex)
+    {
+        return Double.isNaN(this.values.get(rowIndex));
     }
 
     @Override
