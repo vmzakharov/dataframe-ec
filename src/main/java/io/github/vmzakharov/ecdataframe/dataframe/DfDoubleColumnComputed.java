@@ -60,7 +60,7 @@ implements DfColumnComputed
             return aggregateFunction.defaultDoubleIfEmpty();
         }
 
-        return aggregateFunction.apply(
+        return aggregateFunction.applyDoubleIterable(
                 Interval.zeroTo(this.getDataFrame().rowCount() - 1).collectDouble(this::getDouble)
         );
     }

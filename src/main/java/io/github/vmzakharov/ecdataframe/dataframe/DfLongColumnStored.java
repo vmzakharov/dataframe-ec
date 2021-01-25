@@ -62,7 +62,7 @@ implements DfColumnStored
     @Override
     public long aggregate(AggregateFunction aggregateFunction)
     {
-        return aggregateFunction.apply(this.values);
+        return aggregateFunction.applyLongIterable(this.values);
     }
 
     @Override

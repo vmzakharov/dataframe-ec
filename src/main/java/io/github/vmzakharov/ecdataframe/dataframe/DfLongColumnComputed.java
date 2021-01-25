@@ -60,7 +60,7 @@ implements DfColumnComputed
             return aggregateFunction.defaultLongIfEmpty();
         }
 
-        return aggregateFunction.apply(
+        return aggregateFunction.applyLongIterable(
                 Interval.zeroTo(this.getDataFrame().rowCount() - 1).collectLong(this::getLong)
         );
     }

@@ -29,8 +29,6 @@ import org.eclipse.collections.impl.utility.ArrayIterate;
 import java.time.LocalDate;
 import java.util.Arrays;
 
-import static io.github.vmzakharov.ecdataframe.dataframe.AggregateFunction.SUM;
-
 public class DataFrame
 {
     private final String name;
@@ -410,25 +408,24 @@ public class DataFrame
         return this;
     }
 
-
     public DataFrame sum(ListIterable<String> columnsToAggregateNames)
     {
-        return this.aggregate(columnsToAggregateNames, SUM);
+        return this.aggregate(columnsToAggregateNames.collect(AggregateFunction::sum));
     }
 
-    public DataFrame aggregate(ListIterable<String> columnsToSumNames, AggregateFunction aggregateFunction)
+    public DataFrame aggregate(ListIterable<AggregateFunction> aggregators)
     {
-        ListIterable<DfColumn> columnsToSum = this.getColumnsToAggregate(columnsToSumNames);
+        ListIterable<DfColumn> columnsToSum = this.getColumnsToAggregate(aggregators.collect(AggregateFunction::getColumnName));
 
-        DataFrame summedDataFrame = new DataFrame("Sum Of " + this.getName());
+        DataFrame summedDataFrame = new DataFrame("Aggregate Of " + this.getName());
 
         // convert calculated columns into stored so that we can aggregate into them
         columnsToSum.forEach(each -> summedDataFrame.addColumn(each.getName(), each.getType()));
 
-        ListIterable<Number> sums = columnsToSum.collect(
-                each -> (each instanceof DfDoubleColumn) ?
-                        ((DfDoubleColumn) each).aggregate(aggregateFunction) :
-                        ((DfLongColumn) each).aggregate(aggregateFunction)
+        ListIterable<Number> sums = columnsToSum.collectWithIndex(
+                (each, index) -> (each instanceof DfDoubleColumn) ?
+                        ((DfDoubleColumn) each).aggregate(aggregators.get(index)) :
+                        ((DfLongColumn) each).aggregate(aggregators.get(index))
         );
 
         summedDataFrame.addRow(sums.toArray());
@@ -449,10 +446,10 @@ public class DataFrame
     }
 
     public DataFrame aggregateBy(
-            ListIterable<String> columnsToAggregateNames,
-            ListIterable<String> columnsToGroupByNames,
-            AggregateFunction aggregator)
+            ListIterable<AggregateFunction> aggregators,
+            ListIterable<String> columnsToGroupByNames)
     {
+        ListIterable<String> columnsToAggregateNames = aggregators.collect(AggregateFunction::getColumnName);
         ListIterable<DfColumn> columnsToAggregate = this.getColumnsToAggregate(columnsToAggregateNames);
 
         DataFrame summedDataFrame = new DataFrame("Aggregate Of " + this.getName());
@@ -477,7 +474,7 @@ public class DataFrame
             int accIndex = index.getRowIndexAtKeyIfAbsentAdd(keyValue);
             for (int colIndex = 0; colIndex < columnsToAggregate.size(); colIndex++)
             {
-                accumulatorColumns.get(colIndex).applyAggregator(accIndex, columnsToAggregate.get(colIndex), i, aggregator);
+                accumulatorColumns.get(colIndex).applyAggregator(accIndex, columnsToAggregate.get(colIndex), i, aggregators.get(colIndex));
             }
         }
 
@@ -502,13 +499,15 @@ public class DataFrame
         // todo: consider implementing index as a structure in DataFrame
         DfUniqueIndex index = new DfUniqueIndex(summedDataFrame, columnsToGroupByNames);
 
+        AggregateFunction summer = AggregateFunction.sum("NA"); // todo: pass as a parameter
+
         for (int i = 0; i < this.rowCount; i++)
         {
             ListIterable<Object> keyValue = index.computeKeyFrom(this, i);
             int accIndex = index.getRowIndexAtKeyIfAbsentAdd(keyValue);
             for (int colIndex = 0; colIndex < columnsToSum.size(); colIndex++)
             {
-                accumulatorColumns.get(colIndex).applyAggregator(accIndex, columnsToSum.get(colIndex), i, SUM);
+                accumulatorColumns.get(colIndex).applyAggregator(accIndex, columnsToSum.get(colIndex), i, summer);
             }
         }
 
@@ -534,6 +533,8 @@ public class DataFrame
 
         DfUniqueIndex index = new DfUniqueIndex(summedDataFrame, columnsToGroupByNames);
 
+        AggregateFunction summer = AggregateFunction.sum("NA"); // todo: pass as a parameter
+
         for (int i = 0; i < this.rowCount; i++)
         {
             ListIterable<Object> keyValue = index.computeKeyFrom(this, i);
@@ -548,7 +549,7 @@ public class DataFrame
 
             for (int colIndex = 0; colIndex < columnsToSum.size(); colIndex++)
             {
-                accumulatorColumns.get(colIndex).applyAggregator(accIndex, columnsToSum.get(colIndex), i, SUM);
+                accumulatorColumns.get(colIndex).applyAggregator(accIndex, columnsToSum.get(colIndex), i, summer);
             }
         }
 

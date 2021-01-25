@@ -5,23 +5,81 @@ import org.eclipse.collections.api.LongIterable;
 
 public abstract class AggregateFunction
 {
-    private final String description;
+    private final String columnName;
 
-    public AggregateFunction(String newDescription)
+    public static AggregateFunction sum(String newColumnName)
     {
-        this.description = newDescription;
+        return new Sum(newColumnName);
     }
 
-    public static AggregateFunction SUM = new AggregateFunction("SUM")
+    public static AggregateFunction min(String newColumnName)
     {
+        return new Min(newColumnName);
+    }
+
+    public static AggregateFunction max(String newColumnName)
+    {
+        return new Max(newColumnName);
+    }
+
+    public static AggregateFunction avg(String newColumnName)
+    {
+        return new Avg(newColumnName);
+    }
+
+    public AggregateFunction(String newColumnName)
+    {
+        this.columnName = newColumnName;
+    }
+
+    public String getColumnName()
+    {
+        return this.columnName;
+    }
+
+    abstract double applyDoubleIterable(DoubleIterable items);
+    abstract long applyLongIterable(LongIterable items);
+
+    abstract long longInitialValue();
+    abstract double doubleInitialValue();
+
+    abstract long longAccumulator(long currentAggregate, long newValue);
+    abstract double doubleAccumulator(double currentAggregate, double newValue);
+
+    abstract public String getDescription();
+
+    public long defaultLongIfEmpty()
+    {
+        throw new UnsupportedOperationException("Operation " + this.getDescription() + " is not defined on empty lists");
+    }
+
+    public double defaultDoubleIfEmpty()
+    {
+        throw new UnsupportedOperationException("Operation " + this.getDescription() + " is not defined on empty lists");
+    }
+
+    public static class Sum
+    extends AggregateFunction
+    {
+        public Sum(String newColumnName)
+        {
+            super(newColumnName);
+        }
+
         @Override
-        public double apply(DoubleIterable items)
+        public String getDescription()
+        {
+            return "SUM";
+        }
+
+        @Override
+        public double applyDoubleIterable(DoubleIterable items)
         {
             return items.sum();
         }
 
         @Override
-        public long apply(LongIterable items)
+        public long applyLongIterable(LongIterable items)
         {
             return items.sum();
         }
@@ -63,16 +121,28 @@ public abstract class AggregateFunction
         }
     };
 
-    public static AggregateFunction MAX = new AggregateFunction("MAX")
+    public static class Max
+    extends AggregateFunction
     {
+        public Max(String newColumnName)
+        {
+            super(newColumnName);
+        }
+
         @Override
-        public double apply(DoubleIterable items)
+        public String getDescription()
+        {
+            return "MAX";
+        }
+
+        @Override
+        public double applyDoubleIterable(DoubleIterable items)
         {
             return items.max();
         }
 
         @Override
-        public long apply(LongIterable items)
+        public long applyLongIterable(LongIterable items)
         {
             return items.max();
         }
@@ -102,16 +172,28 @@ public abstract class AggregateFunction
         }
     };
 
-    public static AggregateFunction MIN = new AggregateFunction("MIN")
+    public static class Min
+    extends AggregateFunction
     {
+        public Min(String newColumnName)
+        {
+            super(newColumnName);
+        }
+
         @Override
-        public double apply(DoubleIterable items)
+        public String getDescription()
+        {
+            return "MIN";
+        }
+
+        @Override
+        public double applyDoubleIterable(DoubleIterable items)
         {
             return items.min();
         }
 
         @Override
-        public long apply(LongIterable items)
+        public long applyLongIterable(LongIterable items)
         {
             return items.min();
         }
@@ -141,16 +223,28 @@ public abstract class AggregateFunction
         }
     };
 
-    public static AggregateFunction AVG = new AggregateFunction("AVG")
+    public static class Avg
+    extends AggregateFunction
     {
+        public Avg(String newColumnName)
+        {
+            super(newColumnName);
+        }
+
         @Override
-        public double apply(DoubleIterable items)
+        public String getDescription()
+        {
+            return "AVG";
+        }
+
+        @Override
+        public double applyDoubleIterable(DoubleIterable items)
         {
             return items.average();
         }
 
         @Override
-        public long apply(LongIterable items)
+        public long applyLongIterable(LongIterable items)
         {
             return Math.round(items.average());
         }
@@ -191,23 +285,5 @@ public abstract class AggregateFunction
             return 0.0;
         }
     };
-
-    abstract double apply(DoubleIterable items);
-    abstract long apply(LongIterable items);
-
-    abstract long longInitialValue();
-    abstract double doubleInitialValue();
-
-    abstract long longAccumulator(long currentAggregate, long newValue);
-    abstract double doubleAccumulator(double currentAggregate, double newValue);
-
-    public long defaultLongIfEmpty()
-    {
-        throw new UnsupportedOperationException("Operation " + this.description + " is not defined on empty lists");
-    }
-
-    public double defaultDoubleIfEmpty()
-    {
-        throw new UnsupportedOperationException("Operation " + this.description + " is not defined on empty lists");
-    }
 }
+
