@@ -8,6 +8,8 @@ import org.eclipse.collections.impl.factory.primitive.IntLists;
 import org.junit.Assert;
 import org.junit.Test;
 
+import static io.github.vmzakharov.ecdataframe.dataframe.AggregateFunction.*;
+
 public class DataFrameAggregationWithIndexTest
 {
     @Test
@@ -23,7 +25,7 @@ public class DataFrameAggregationWithIndexTest
 
         DataFrame summed = dataFrame.sumByWithIndex(Lists.immutable.of("Bar", "Baz", "Qux"), Lists.immutable.of("Name"));
 
-                DataFrame expected = new DataFrame("Summed")
+        DataFrame expected = new DataFrame("Summed")
                 .addStringColumn("Name").addLongColumn("Bar").addDoubleColumn("Baz").addDoubleColumn("Qux")
                 .addRow("Alice",  912L, 25.0, 60.0)
                 .addRow("Bob",   1245L, 27.0, 65.0)
@@ -36,7 +38,87 @@ public class DataFrameAggregationWithIndexTest
     }
 
     @Test
-    public void sumWithIndexOnSortedDataFrame()
+    public void sumWithIndexOfComputedByComputed()
+    {
+        DataFrame dataFrame = new DataFrame("FrameOfData")
+                .addStringColumn("Name1").addStringColumn("Name2").addStringColumn("Foo").addLongColumn("Bar").addDoubleColumn("Baz").addDoubleColumn("Qux")
+                .addRow("Al", "ice", "Abc",  123L, 10.0, 20.0)
+                .addRow("Bo", "b",   "Def",  456L, 12.0, 25.0)
+                .addRow("Al", "ice", "Xyz",  789L, 15.0, 40.0)
+                .addRow("Bo", "b",   "Xyz",  789L, 15.0, 40.0)
+                ;
+
+        dataFrame.addStringColumn("Name", "Name1 + Name2").addDoubleColumn("Value", "Baz + Qux");
+
+        DataFrame summed = dataFrame.sumByWithIndex(Lists.immutable.of("Bar", "Value"), Lists.immutable.of("Name"));
+
+        DataFrame expected = new DataFrame("Expected")
+                .addStringColumn("Name").addLongColumn("Bar").addDoubleColumn("Value")
+                .addRow("Alice",  912L, 85.0)
+                .addRow("Bob",   1245L, 92.0)
+                ;
+
+        DataFrameUtil.assertEquals(expected, summed);
+
+        Assert.assertEquals(IntLists.immutable.of(0, 2), summed.getAggregateIndex(0));
+        Assert.assertEquals(IntLists.immutable.of(1, 3), summed.getAggregateIndex(1));
+    }
+
+    @Test
+    public void aggregateWithIndex()
+    {
+        DataFrame dataFrame = new DataFrame("FrameOfData")
+                .addStringColumn("Name").addStringColumn("Foo").addLongColumn("Bar").addDoubleColumn("Baz").addDoubleColumn("Qux")
+                .addRow("Alice", "Abc",  123L, 10.0, 20.0)
+                .addRow("Bob",   "Def",  456L, 12.0, 25.0)
+                .addRow("Alice", "Xyz",  789L, 15.0, 40.0)
+                .addRow("Bob",   "Xyz",  789L, 15.0, 40.0)
+                ;
+
+        DataFrame summed = dataFrame.aggregateByWithIndex(
+                Lists.immutable.of(sum("Bar"), sum("Baz"), sum("Qux")), Lists.immutable.of("Name"));
+
+        DataFrame expected = new DataFrame("Summed")
+                .addStringColumn("Name").addLongColumn("Bar").addDoubleColumn("Baz").addDoubleColumn("Qux")
+                .addRow("Alice",  912L, 25.0, 60.0)
+                .addRow("Bob",   1245L, 27.0, 65.0)
+                ;
+
+        DataFrameUtil.assertEquals(expected, summed);
+
+        Assert.assertEquals(IntLists.immutable.of(0, 2), summed.getAggregateIndex(0));
+        Assert.assertEquals(IntLists.immutable.of(1, 3), summed.getAggregateIndex(1));
+    }
+
+    @Test
+    public void aggregateSameColumnWithIndex()
+    {
+        DataFrame dataFrame = new DataFrame("FrameOfData")
+                .addStringColumn("Name").addStringColumn("Foo").addLongColumn("Bar").addDoubleColumn("Baz").addDoubleColumn("Qux")
+                .addRow("Alice", "Abc",  123L, 10.0, 20.0)
+                .addRow("Bob",   "Def",  456L, 12.0, 25.0)
+                .addRow("Alice", "Xyz",  789L, 15.0, 40.0)
+                .addRow("Bob",   "Xyz",  789L, 15.0, 40.0)
+                ;
+
+        DataFrame summed = dataFrame.aggregateByWithIndex(
+                Lists.immutable.of(sum("Bar", "BarSum"), min("Bar", "BarMin"), sum("Qux", "QuxSum"), max("Qux", "QuxMax")),
+                Lists.immutable.of("Name"));
+
+        DataFrame expected = new DataFrame("Summed")
+                .addStringColumn("Name").addLongColumn("BarSum").addLongColumn("BarMin").addDoubleColumn("QuxSum").addDoubleColumn("QuxMax")
+                .addRow("Alice",  912L, 123L, 60.0, 40.0)
+                .addRow("Bob",   1245L, 456L, 65.0, 40.0)
+                ;
+
+        DataFrameUtil.assertEquals(expected, summed);
+
+        Assert.assertEquals(IntLists.immutable.of(0, 2), summed.getAggregateIndex(0));
+        Assert.assertEquals(IntLists.immutable.of(1, 3), summed.getAggregateIndex(1));
+    }
+
+    @Test
+    public void indexIsSortedWhenAggregateIsSorted()
     {
         DataFrame dataFrame = new DataFrame("FrameOfData")
                 .addStringColumn("Name").addStringColumn("Foo").addLongColumn("Bar").addDoubleColumn("Baz").addDoubleColumn("Qux")
@@ -45,8 +127,6 @@ public class DataFrameAggregationWithIndexTest
                 .addRow("Bob",   "Xyz",  789L, 15.0, 40.0)
                 .addRow("Alice", "Xyz",  789L, 15.0, 40.0)
                 ;
-
-//        dataFrame.sortBy(Lists.immutable.of("Name"));
 
         DataFrame summed = dataFrame.sumByWithIndex(Lists.immutable.of("Bar", "Baz", "Qux"), Lists.immutable.of("Name"));
 
