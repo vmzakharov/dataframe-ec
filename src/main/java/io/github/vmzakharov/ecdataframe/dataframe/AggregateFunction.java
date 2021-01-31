@@ -6,10 +6,16 @@ import org.eclipse.collections.api.LongIterable;
 public abstract class AggregateFunction
 {
     private final String columnName;
+    private final String targetColumnName;
 
     public static AggregateFunction sum(String newColumnName)
     {
         return new Sum(newColumnName);
+    }
+
+    public static AggregateFunction sum(String newColumnName, String newTargetColumnName)
+    {
+        return new Sum(newColumnName, newTargetColumnName);
     }
 
     public static AggregateFunction min(String newColumnName)
@@ -17,9 +23,19 @@ public abstract class AggregateFunction
         return new Min(newColumnName);
     }
 
+    public static AggregateFunction min(String newColumnName, String newTargetColumnName)
+    {
+        return new Min(newColumnName, newTargetColumnName);
+    }
+
     public static AggregateFunction max(String newColumnName)
     {
         return new Max(newColumnName);
+    }
+
+    public static AggregateFunction max(String newColumnName, String newTargetColumnName)
+    {
+        return new Max(newColumnName, newTargetColumnName);
     }
 
     public static AggregateFunction avg(String newColumnName)
@@ -27,14 +43,30 @@ public abstract class AggregateFunction
         return new Avg(newColumnName);
     }
 
+    public static AggregateFunction avg(String newColumnName, String newTargetColumnName)
+    {
+        return new Avg(newColumnName, newTargetColumnName);
+    }
+
     public AggregateFunction(String newColumnName)
     {
+        this(newColumnName, newColumnName);
+    }
+
+    public AggregateFunction(String newColumnName, String newTargetColumnName)
+    {
         this.columnName = newColumnName;
+        this.targetColumnName = newTargetColumnName;
     }
 
     public String getColumnName()
     {
         return this.columnName;
+    }
+
+    public String getTargetColumnName()
+    {
+        return this.targetColumnName;
     }
 
     abstract double applyDoubleIterable(DoubleIterable items);
@@ -64,6 +96,11 @@ public abstract class AggregateFunction
         public Sum(String newColumnName)
         {
             super(newColumnName);
+        }
+
+        public Sum(String newColumnName, String newTargetColumnName)
+        {
+            super(newColumnName, newTargetColumnName);
         }
 
         @Override
@@ -129,6 +166,11 @@ public abstract class AggregateFunction
             super(newColumnName);
         }
 
+        public Max(String newColumnName, String newTargetColumnName)
+        {
+            super(newColumnName, newTargetColumnName);
+        }
+
         @Override
         public String getDescription()
         {
@@ -180,6 +222,11 @@ public abstract class AggregateFunction
             super(newColumnName);
         }
 
+        public Min(String newColumnName, String newTargetColumnName)
+        {
+            super(newColumnName, newTargetColumnName);
+        }
+
         @Override
         public String getDescription()
         {
@@ -229,6 +276,11 @@ public abstract class AggregateFunction
         public Avg(String newColumnName)
         {
             super(newColumnName);
+        }
+
+        public Avg(String newColumnName, String newTargetColumnName)
+        {
+            super(newColumnName, newTargetColumnName);
         }
 
         @Override
