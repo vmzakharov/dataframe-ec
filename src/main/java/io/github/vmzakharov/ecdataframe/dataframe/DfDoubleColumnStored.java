@@ -106,6 +106,11 @@ implements DfColumnStored
         }
     }
 
+    public void setDouble(int rowIndex, double value)
+    {
+        this.values.set(rowIndex, value);
+    }
+
     @Override
     public void addEmptyValue()
     {

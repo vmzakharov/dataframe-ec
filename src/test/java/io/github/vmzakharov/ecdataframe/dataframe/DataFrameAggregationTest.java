@@ -121,6 +121,15 @@ public class DataFrameAggregationTest
         Assert.assertEquals(0.0, summed.getDoubleColumn("Qux").getDouble(0), TOLERANCE);
     }
 
+    @Test(expected = RuntimeException.class)
+    public void averageEmptyThrowsException()
+    {
+        DataFrame dataFrame = new DataFrame("FrameOfData")
+                .addStringColumn("Name").addStringColumn("Foo").addLongColumn("Bar").addDoubleColumn("Baz").addDoubleColumn("Qux");
+
+        dataFrame.aggregate(Lists.immutable.of(avg("Bar"), avg("Baz"), avg("Qux")));
+    }
+
     @Test
     public void aggregationsAllWithCalculatedColumns()
     {
@@ -181,198 +190,6 @@ public class DataFrameAggregationTest
         DataFrame summed = dataFrame.sum(Lists.immutable.of("Foo", "Bar", "Baz"));
 
         Assert.fail("Shouldn't get to this line");
-    }
-
-    @Test
-    public void sumGroupingOneRow()
-    {
-        DataFrame dataFrame = new DataFrame("FrameOfData")
-                .addStringColumn("Name").addStringColumn("Foo").addLongColumn("Bar").addDoubleColumn("Baz").addDoubleColumn("Qux")
-                .addRow("Alice", "Abc",  123L, 10.0, 20.0);
-
-        DataFrame summed = dataFrame.sumBy(Lists.immutable.of("Bar", "Baz", "Qux"), Lists.immutable.of("Name"));
-
-        Assert.assertEquals(1, summed.rowCount());
-
-        Assert.assertEquals("Alice", summed.getString("Name", 0));
-        Assert.assertEquals(   123L, summed.getLong("Bar", 0));
-        Assert.assertEquals(   10.0, summed.getDouble("Baz", 0), TOLERANCE);
-        Assert.assertEquals(   20.0, summed.getDouble("Qux", 0), TOLERANCE);
-    }
-
-    @Test
-    public void sumGroupingSimple()
-    {
-        DataFrame dataFrame = new DataFrame("FrameOfData")
-                .addStringColumn("Name").addStringColumn("Foo").addLongColumn("Bar").addDoubleColumn("Baz").addDoubleColumn("Qux");
-
-        dataFrame.addRow("Alice", "Abc",  123L, 10.0, 22.0);
-        dataFrame.addRow("Alice", "Xyz",  456L, 11.0, 20.0);
-
-        DataFrame summed = dataFrame.sumBy(Lists.immutable.of("Bar", "Baz", "Qux"), Lists.immutable.of("Name"));
-
-        DataFrame expected = new DataFrame("Expected")
-                .addStringColumn("Name").addLongColumn("Bar").addDoubleColumn("Baz").addDoubleColumn("Qux")
-                .addRow("Alice", 579, 21.0, 42.0);
-
-        DataFrameUtil.assertEquals(expected, summed);
-    }
-
-    @Test
-    public void minGroupingSimple()
-    {
-        DataFrame dataFrame = new DataFrame("FrameOfData")
-                .addStringColumn("Name").addStringColumn("Foo").addLongColumn("Bar").addDoubleColumn("Baz").addDoubleColumn("Qux");
-
-        dataFrame.addRow("Alice", "Abc",  123L, 10.0, 22.0);
-        dataFrame.addRow("Alice", "Xyz",  456L, 11.0, 20.0);
-
-        DataFrame summed = dataFrame.aggregateBy(Lists.immutable.of(min("Bar"), min("Baz"), min("Qux")), Lists.immutable.of("Name"));
-
-        DataFrame expected = new DataFrame("Expected")
-                .addStringColumn("Name").addLongColumn("Bar").addDoubleColumn("Baz").addDoubleColumn("Qux")
-                .addRow("Alice", 123L, 10.0, 20.0);
-
-        DataFrameUtil.assertEquals(expected, summed);
-    }
-
-    @Test
-    public void maxGroupingSimple()
-    {
-        DataFrame dataFrame = new DataFrame("FrameOfData")
-                .addStringColumn("Name").addStringColumn("Foo").addLongColumn("Bar").addDoubleColumn("Baz").addDoubleColumn("Qux");
-
-        dataFrame.addRow("Alice", "Abc",  123L, 10.0, 22.0);
-        dataFrame.addRow("Alice", "Xyz",  456L, 11.0, 20.0);
-
-        DataFrame summed = dataFrame.aggregateBy(Lists.immutable.of(max("Bar"), max("Baz"), max("Qux")), Lists.immutable.of("Name"));
-
-        DataFrame expected = new DataFrame("Expected")
-                .addStringColumn("Name").addLongColumn("Bar").addDoubleColumn("Baz").addDoubleColumn("Qux")
-                .addRow("Alice", 456L, 11.0, 22.0);
-
-        DataFrameUtil.assertEquals(expected, summed);
-    }
-
-    @Test
-    public void mixedGroupingSimple()
-    {
-        DataFrame dataFrame = new DataFrame("FrameOfData")
-                .addStringColumn("Name").addStringColumn("Foo").addLongColumn("Bar").addDoubleColumn("Baz").addDoubleColumn("Qux");
-
-        dataFrame.addRow("Alice", "Abc",  123L, 10.0, 22.0);
-        dataFrame.addRow("Alice", "Xyz",  456L, 11.0, 20.0);
-
-        DataFrame summed = dataFrame.aggregateBy(Lists.immutable.of(sum("Bar"), min("Baz"), max("Qux")), Lists.immutable.of("Name"));
-
-        DataFrame expected = new DataFrame("Expected")
-                .addStringColumn("Name").addLongColumn("Bar").addDoubleColumn("Baz").addDoubleColumn("Qux")
-                .addRow("Alice", 579L, 10.0, 22.0);
-
-        DataFrameUtil.assertEquals(expected, summed);
-    }
-
-    @Test
-    public void multiAggWithGroupingSimple()
-    {
-        DataFrame dataFrame = new DataFrame("FrameOfData")
-                .addStringColumn("Name").addStringColumn("Foo").addLongColumn("Bar").addDoubleColumn("Baz").addDoubleColumn("Qux");
-
-        dataFrame.addRow("Alice", "Abc",  123L, 10.0, 22.0);
-        dataFrame.addRow("Alice", "Xyz",  456L, 12.0, 20.0);
-
-        DataFrame summed = dataFrame.aggregateBy(
-                Lists.immutable.of(sum("Bar", "BarSum"), min("Bar", "BarMin"), sum("Qux", "QuxSum"), max("Qux", "QuxMax"), count("Qux", "QuxCount")),
-                Lists.immutable.of("Name"));
-
-        DataFrame expected = new DataFrame("Expected")
-                .addStringColumn("Name").addLongColumn("BarSum").addLongColumn("BarMin").addDoubleColumn("QuxSum").addDoubleColumn("QuxMax").addLongColumn("QuxCount")
-                .addRow("Alice", 579L, 123L, 42.0, 22.0, 2);
-
-        DataFrameUtil.assertEquals(expected, summed);
-    }
-
-    @Test
-    public void sumWithGrouping()
-    {
-        DataFrame dataFrame = new DataFrame("FrameOfData")
-                .addStringColumn("Name").addStringColumn("Foo").addLongColumn("Bar").addDoubleColumn("Baz").addDoubleColumn("Qux");
-
-        dataFrame.addRow("Bob",   "Def",  456L, 12.0, 25.0);
-        dataFrame.addRow("Alice", "Abc",  123L, 10.0, 20.0);
-        dataFrame.addRow("Carol", "Rrr",  789L, 15.0, 40.0);
-        dataFrame.addRow("Bob",   "Def",  111L, 12.0, 25.0);
-        dataFrame.addRow("Carol", "Qqq",  789L, 15.0, 40.0);
-        dataFrame.addRow("Carol", "Zzz",  789L, 15.0, 40.0);
-
-        DataFrame expected = new DataFrame("Expected")
-            .addStringColumn("Name").addLongColumn("Bar").addDoubleColumn("Baz").addDoubleColumn("Qux")
-                .addRow("Bob",	  567, 24,  50)
-                .addRow("Alice",  123, 10,  20)
-                .addRow("Carol", 2367, 45, 120);
-
-        DataFrameUtil.assertEquals(expected,
-                dataFrame.sumBy(Lists.immutable.of("Bar", "Baz", "Qux"), Lists.immutable.of("Name")));
-
-        DataFrameUtil.assertEquals(expected,
-                dataFrame.aggregateBy(Lists.immutable.of(sum("Bar"), sum("Baz"), sum("Qux")), Lists.immutable.of("Name")));
-    }
-
-    @Test
-    public void multiAggWithGrouping()
-    {
-        DataFrame dataFrame = new DataFrame("FrameOfData")
-                .addStringColumn("Name").addStringColumn("Foo").addLongColumn("Bar").addDoubleColumn("Baz").addDoubleColumn("Qux");
-
-        dataFrame.addRow("Bob",   "Def",  456L, 12.0, 25.0);
-        dataFrame.addRow("Alice", "Abc",  123L, 10.0, 20.0);
-        dataFrame.addRow("Carol", "Rrr",  789L, 15.0, 40.0);
-        dataFrame.addRow("Bob",   "Def",  111L, 12.0, 25.0);
-        dataFrame.addRow("Carol", "Qqq",  789L, 15.0, 50.0);
-        dataFrame.addRow("Carol", "Zzz",  789L, 15.0, 30.0);
-
-        DataFrame summed = dataFrame.aggregateBy(
-                Lists.immutable.of(
-                        count("Name", "NameCount"), sum("Bar", "BarSum"), max("Bar", "BarMax"), sum("Qux", "QuxSum"), min("Qux", "QuxMin"), count("Qux", "QuxCount")),
-                Lists.immutable.of("Name"));
-
-        DataFrame expected = new DataFrame("Expected")
-                .addStringColumn("Name")
-                .addLongColumn("NameCount").addLongColumn("BarSum").addLongColumn("BarMax").addDoubleColumn("QuxSum").addDoubleColumn("QuxMin").addLongColumn("QuxCount")
-                .addRow("Bob",	 2,  567, 456,  50.0, 25.0, 2)
-                .addRow("Alice", 1,  123, 123,  20.0, 20.0, 1)
-                .addRow("Carol", 3, 2367, 789, 120.0, 30.0, 3);
-
-        DataFrameUtil.assertEquals(expected, summed);
-    }
-
-    @Test
-    public void differentAggregationsWithGrouping()
-    {
-        DataFrame dataFrame = new DataFrame("FrameOfData")
-                .addStringColumn("Name").addStringColumn("Foo").addLongColumn("Bar").addDoubleColumn("Baz").addDoubleColumn("Qux");
-
-        dataFrame.addRow("Bob",   "Def",  456L, 12.0, 45.0);
-        dataFrame.addRow("Alice", "Abc",  123L, 10.0, 20.0);
-        dataFrame.addRow("Carol", "Rrr",  789L, 14.0, 20.0);
-        dataFrame.addRow("Bob",   "Def",  111L, 12.0, 25.0);
-        dataFrame.addRow("Carol", "Qqq",  789L, 11.0, 30.0);
-        dataFrame.addRow("Carol", "Zzz",  789L, 15.0, 40.0);
-
-        DataFrame summed = dataFrame.aggregateBy(
-                Lists.immutable.of(sum("Bar"), min("Baz"), max("Qux"), count("Name", "NameCount"), count("Baz", "BazCount")),
-                Lists.immutable.of("Name")
-        );
-
-        Assert.assertEquals(3, summed.rowCount());
-
-        DataFrame expected = new DataFrame("Expected")
-                .addStringColumn("Name").addLongColumn("Bar").addDoubleColumn("Baz").addDoubleColumn("Qux").addLongColumn("NameCount").addLongColumn("BazCount")
-                .addRow("Bob",	  567, 12.0, 45.0, 2, 2)
-                .addRow("Alice",  123, 10.0, 20.0, 1, 1)
-                .addRow("Carol", 2367, 11.0, 40.0, 3, 3);
-
-        DataFrameUtil.assertEquals(expected, summed);
     }
 
     @Test

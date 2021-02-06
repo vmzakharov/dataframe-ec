@@ -474,6 +474,8 @@ public class DataFrame
             sumIndex = Lists.mutable.of();
         }
 
+        int[] counts = new int[this.rowCount()]; // todo: a bit wasteful?
+
         ListIterable<String> columnsToAggregateNames = aggregators.collect(AggregateFunction::getColumnName);
         ListIterable<DfColumn> columnsToAggregate = this.getColumnsToAggregate(columnsToAggregateNames);
 
@@ -497,7 +499,6 @@ public class DataFrame
 
         for (int rowIndex = 0; rowIndex < this.rowCount; rowIndex++)
         {
-
             ListIterable<Object> keyValue = index.computeKeyFrom(this, rowIndex);
             int aggregateRowIndex = index.getRowIndexAtKeyIfAbsentAdd(keyValue);
 
@@ -511,6 +512,8 @@ public class DataFrame
                 sumIndex.get(aggregateRowIndex).add(rowIndex);
             }
 
+            counts[aggregateRowIndex]++;
+
             for (int colIndex = 0; colIndex < columnsToAggregate.size(); colIndex++)
             {
                 accumulatorColumns.get(colIndex).applyAggregator(aggregateRowIndex, columnsToAggregate.get(colIndex), rowIndex, aggregators.get(colIndex));
@@ -521,6 +524,8 @@ public class DataFrame
         {
             aggregatedDataFrame.aggregateIndex = sumIndex;
         }
+
+        aggregators.forEach(agg -> agg.finishAggregating(aggregatedDataFrame, counts));
 
         return aggregatedDataFrame;
     }

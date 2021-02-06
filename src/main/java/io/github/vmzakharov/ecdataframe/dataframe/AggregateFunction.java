@@ -40,7 +40,6 @@ public abstract class AggregateFunction
         return new Max(newColumnName, newTargetColumnName);
     }
 
-
     public static AggregateFunction avg(String newColumnName)
     {
         return new Avg(newColumnName);
@@ -120,6 +119,10 @@ public abstract class AggregateFunction
     public long getLongValue(DfColumn sourceColumn, int sourceRowIndex)
     {
         return ((DfLongColumn) sourceColumn).getLong(sourceRowIndex);
+    }
+
+    public void finishAggregating(DataFrame aggregatedDataFrame, int[] countsByRow)
+    {
     }
 
     public static class Sum
@@ -358,15 +361,30 @@ public abstract class AggregateFunction
         }
 
         @Override
-        public long defaultLongIfEmpty()
+        public void finishAggregating(DataFrame aggregatedDataFrame, int[] countsByRow)
         {
-            return 0L;
-        }
+            DfColumn aggregatedColumn = aggregatedDataFrame.getColumnNamed(this.getTargetColumnName());
 
-        @Override
-        public double defaultDoubleIfEmpty()
-        {
-            return 0.0;
+            if (aggregatedColumn.getType().isLong())
+            {
+                DfLongColumnStored longColumn = (DfLongColumnStored) aggregatedColumn;
+
+                int columnSize = longColumn.getSize();
+                for (int rowIndex = 0; rowIndex < columnSize; rowIndex++)
+                {
+                    longColumn.setLong(rowIndex, longColumn.getLong(rowIndex) / countsByRow[rowIndex]);
+                }
+            }
+            else if (aggregatedColumn.getType().isDouble())
+            {
+                DfDoubleColumnStored doubleColumn = (DfDoubleColumnStored) aggregatedColumn;
+
+                int columnSize = doubleColumn.getSize();
+                for (int rowIndex = 0; rowIndex < columnSize; rowIndex++)
+                {
+                    doubleColumn.setDouble(rowIndex, doubleColumn.getDouble(rowIndex) / countsByRow[rowIndex]);
+                }
+            }
         }
     };
 

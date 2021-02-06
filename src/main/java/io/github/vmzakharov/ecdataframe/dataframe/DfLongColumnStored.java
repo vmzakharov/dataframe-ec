@@ -105,6 +105,11 @@ implements DfColumnStored
         }
     }
 
+    public void setLong(int rowIndex, long value)
+    {
+        this.values.set(rowIndex, value);
+    }
+
     @Override
     public void applyAggregator(int targetRowIndex, DfColumn sourceColumn, int sourceRowIndex, AggregateFunction aggregator)
     {
