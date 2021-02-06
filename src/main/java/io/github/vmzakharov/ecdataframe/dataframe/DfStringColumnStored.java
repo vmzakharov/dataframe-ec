@@ -113,6 +113,12 @@ implements DfColumnStored
     }
 
     @Override
+    public Number aggregate(AggregateFunction aggregator)
+    {
+        return aggregator.<String>applyIterable(this.values);
+    }
+
+    @Override
     public void ensureCapacity(int newCapacity)
     {
         this.values = Lists.mutable.withInitialCapacity(newCapacity);

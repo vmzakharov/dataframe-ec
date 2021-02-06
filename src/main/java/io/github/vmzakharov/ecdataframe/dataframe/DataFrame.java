@@ -420,15 +420,14 @@ public class DataFrame
         DataFrame summedDataFrame = new DataFrame("Aggregate Of " + this.getName());
 
         columnsToAggregate.forEachInBoth(aggregators,
-                (col, agg) -> summedDataFrame.addColumn(agg.getTargetColumnName(), col.getType()));
-
-        ListIterable<Number> sums = columnsToAggregate.collectWithIndex(
-                (each, index) -> (each instanceof DfDoubleColumn) ?
-                        ((DfDoubleColumn) each).aggregate(aggregators.get(index)) :
-                        ((DfLongColumn) each).aggregate(aggregators.get(index))
+                (col, agg) -> summedDataFrame.addColumn(agg.getTargetColumnName(), agg.targetColumnType(col.getType()))
         );
 
-        summedDataFrame.addRow(sums.toArray());
+        ListIterable<Number> aggregatedValues = columnsToAggregate.collectWithIndex(
+                (each, index) -> each.aggregate(aggregators.get(index))
+        );
+
+        summedDataFrame.addRow(aggregatedValues.toArray());
         return summedDataFrame;
     }
 
@@ -436,11 +435,11 @@ public class DataFrame
     {
         ListIterable<DfColumn> columnsToAggregate = this.columnsNamed(columnNames);
 
-        ListIterable<DfColumn> nonNumericColumns = columnsToAggregate.reject(each -> each.getType().isNumber());
-
-        ErrorReporter.reportAndThrow(nonNumericColumns.notEmpty(),
-                "Attempting to aggregate non-numeric columns: "
-                        + nonNumericColumns.collect(DfColumn::getName).makeString() + " in data frame '" + this.getName() + "'");
+//        ListIterable<DfColumn> nonNumericColumns = columnsToAggregate.reject(each -> each.getType().isNumber());
+//
+//        ErrorReporter.reportAndThrow(nonNumericColumns.notEmpty(),
+//                "Attempting to aggregate non-numeric columns: "
+//                        + nonNumericColumns.collect(DfColumn::getName).makeString() + " in data frame '" + this.getName() + "'");
 
         return columnsToAggregate;
     }
@@ -449,37 +448,7 @@ public class DataFrame
             ListIterable<AggregateFunction> aggregators,
             ListIterable<String> columnsToGroupByNames)
     {
-        DataFrame aggregatedDataFrame = new DataFrame("Aggregate Of " + this.getName());
-
-        columnsToGroupByNames
-                .collect(this::getColumnNamed)
-                .forEach(each -> aggregatedDataFrame.addColumn(each.getName(), each.getType()));
-
-        ListIterable<String> columnsToAggregateNames = aggregators.collect(AggregateFunction::getColumnName);
-        ListIterable<DfColumn> columnsToAggregate = this.getColumnsToAggregate(columnsToAggregateNames);
-
-        ListIterable<String> targetColumnNames = aggregators.collect(AggregateFunction::getTargetColumnName);
-
-        columnsToAggregate.forEachInBoth(targetColumnNames, (col, aggName) -> aggregatedDataFrame.addColumn(aggName, col.getType()));
-
-        ListIterable<DfColumn> accumulatorColumns = aggregatedDataFrame
-                .columnsNamed(targetColumnNames)
-                .tap(DfColumn::enableNulls);
-
-        // todo: consider implementing index as a structure in DataFrame
-        DfUniqueIndex index = new DfUniqueIndex(aggregatedDataFrame, columnsToGroupByNames);
-
-        for (int i = 0; i < this.rowCount; i++)
-        {
-            ListIterable<Object> keyValue = index.computeKeyFrom(this, i);
-            int accIndex = index.getRowIndexAtKeyIfAbsentAdd(keyValue);
-            for (int colIndex = 0; colIndex < columnsToAggregate.size(); colIndex++)
-            {
-                accumulatorColumns.get(colIndex).applyAggregator(accIndex, columnsToAggregate.get(colIndex), i, aggregators.get(colIndex));
-            }
-        }
-
-        return aggregatedDataFrame;
+        return this.aggregateByWithIndex(aggregators, columnsToGroupByNames, false);
     }
 
     public DataFrame sumBy(ListIterable<String> columnsToSumNames, ListIterable<String> columnsToGroupByNames)
@@ -487,9 +456,23 @@ public class DataFrame
         return this.aggregateBy(columnsToSumNames.collect(AggregateFunction::sum), columnsToGroupByNames);
     }
 
-    public DataFrame aggregateByWithIndex(ListIterable<AggregateFunction> aggregators, ListIterable<String> columnsToGroupByNames)
+    public DataFrame aggregateByWithIndex(
+            ListIterable<AggregateFunction> aggregators,
+            ListIterable<String> columnsToGroupByNames)
     {
-        MutableList<MutableIntList> sumIndex = Lists.mutable.of();
+        return this.aggregateByWithIndex(aggregators, columnsToGroupByNames, true);
+    }
+
+    private DataFrame aggregateByWithIndex(
+            ListIterable<AggregateFunction> aggregators,
+            ListIterable<String> columnsToGroupByNames,
+            boolean createSourceRowIdIndex)
+    {
+        MutableList<MutableIntList> sumIndex = null;
+        if (createSourceRowIdIndex)
+        {
+            sumIndex = Lists.mutable.of();
+        }
 
         ListIterable<String> columnsToAggregateNames = aggregators.collect(AggregateFunction::getColumnName);
         ListIterable<DfColumn> columnsToAggregate = this.getColumnsToAggregate(columnsToAggregateNames);
@@ -500,35 +483,44 @@ public class DataFrame
                 .collect(this::getColumnNamed)
                 .forEach(col -> aggregatedDataFrame.addColumn(col.getName(), col.getType()));
 
-        ListIterable<String> targetColumnNames = aggregators.collect(AggregateFunction::getTargetColumnName);
 
-        columnsToAggregate.forEachInBoth(targetColumnNames, (col, aggName) -> aggregatedDataFrame.addColumn(aggName, col.getType()));
+        columnsToAggregate.forEachInBoth(aggregators,
+                (col, agg) -> aggregatedDataFrame.addColumn(agg.getTargetColumnName(), agg.targetColumnType(col.getType()))
+        );
 
-        ListIterable<DfColumn> accumulatorColumns = aggregatedDataFrame
-                .columnsNamed(targetColumnNames)
+        ListIterable<DfColumn> accumulatorColumns = aggregators
+                .collect(AggregateFunction::getTargetColumnName)
+                .collect(aggregatedDataFrame::getColumnNamed)
                 .tap(DfColumn::enableNulls);
 
         DfUniqueIndex index = new DfUniqueIndex(aggregatedDataFrame, columnsToGroupByNames);
 
         for (int rowIndex = 0; rowIndex < this.rowCount; rowIndex++)
         {
+
             ListIterable<Object> keyValue = index.computeKeyFrom(this, rowIndex);
-            int accIndex = index.getRowIndexAtKeyIfAbsentAdd(keyValue);
+            int aggregateRowIndex = index.getRowIndexAtKeyIfAbsentAdd(keyValue);
 
-            while (sumIndex.size() <= accIndex)
+            if (createSourceRowIdIndex)
             {
-                sumIndex.add(IntLists.mutable.of());
-            }
+                while (sumIndex.size() <= aggregateRowIndex)
+                {
+                    sumIndex.add(IntLists.mutable.of());
+                }
 
-            sumIndex.get(accIndex).add(rowIndex);
+                sumIndex.get(aggregateRowIndex).add(rowIndex);
+            }
 
             for (int colIndex = 0; colIndex < columnsToAggregate.size(); colIndex++)
             {
-                accumulatorColumns.get(colIndex).applyAggregator(accIndex, columnsToAggregate.get(colIndex), rowIndex, aggregators.get(colIndex));
+                accumulatorColumns.get(colIndex).applyAggregator(aggregateRowIndex, columnsToAggregate.get(colIndex), rowIndex, aggregators.get(colIndex));
             }
         }
 
-        aggregatedDataFrame.aggregateIndex = sumIndex;
+        if (createSourceRowIdIndex)
+        {
+            aggregatedDataFrame.aggregateIndex = sumIndex;
+        }
 
         return aggregatedDataFrame;
     }

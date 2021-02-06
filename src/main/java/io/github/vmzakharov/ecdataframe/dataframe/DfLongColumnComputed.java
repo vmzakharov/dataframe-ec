@@ -53,7 +53,7 @@ implements DfColumnComputed
     }
 
     @Override
-    public long aggregate(AggregateFunction aggregateFunction)
+    public Number aggregate(AggregateFunction aggregateFunction)
     {
         if (this.getSize() == 0)
         {

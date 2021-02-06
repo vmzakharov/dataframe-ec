@@ -47,8 +47,6 @@ extends DfColumnAbstract
         ((DfLongColumnStored) target).addLong(this.getLong(rowIndex));
     }
 
-    abstract public long aggregate(AggregateFunction aggregateFunction);
-
     @Override
     public DfColumn mergeWithInto(DfColumn other, DataFrame target)
     {

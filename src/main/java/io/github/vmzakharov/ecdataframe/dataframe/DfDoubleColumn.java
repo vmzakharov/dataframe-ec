@@ -47,8 +47,6 @@ extends DfColumnAbstract
         ((DfDoubleColumnStored) target).addDouble(this.getDouble(rowIndex));
     }
 
-    abstract public double aggregate(AggregateFunction aggregateFunction);
-
     protected abstract void addAllItems(DoubleIterable items);
 
     @Override

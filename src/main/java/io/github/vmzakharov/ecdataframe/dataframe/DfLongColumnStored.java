@@ -3,6 +3,7 @@ package io.github.vmzakharov.ecdataframe.dataframe;
 import io.github.vmzakharov.ecdataframe.dsl.value.LongValue;
 import io.github.vmzakharov.ecdataframe.dsl.value.Value;
 import org.eclipse.collections.api.LongIterable;
+import org.eclipse.collections.api.block.procedure.primitive.LongProcedure;
 import org.eclipse.collections.api.list.primitive.ImmutableLongList;
 import org.eclipse.collections.api.list.primitive.MutableBooleanList;
 import org.eclipse.collections.api.list.primitive.MutableLongList;
@@ -60,7 +61,7 @@ implements DfColumnStored
     }
 
     @Override
-    public long aggregate(AggregateFunction aggregateFunction)
+    public Number aggregate(AggregateFunction aggregateFunction)
     {
         return aggregateFunction.applyLongIterable(this.values);
     }
@@ -108,9 +109,9 @@ implements DfColumnStored
     public void applyAggregator(int targetRowIndex, DfColumn sourceColumn, int sourceRowIndex, AggregateFunction aggregator)
     {
         long stored = this.isNull(targetRowIndex) ? aggregator.longInitialValue() : this.values.get(targetRowIndex);
-        this.values.set(targetRowIndex, aggregator.longAccumulator(
-                stored,
-                ((DfLongColumn) sourceColumn).getLong(sourceRowIndex)));
+        this.values.set(targetRowIndex,
+                aggregator.longAccumulator(stored, aggregator.getLongValue(sourceColumn, sourceRowIndex))
+        );
         this.clearNull(targetRowIndex);
     }
 

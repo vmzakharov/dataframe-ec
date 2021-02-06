@@ -82,7 +82,7 @@ implements DfColumnStored
     }
 
     @Override
-    public double aggregate(AggregateFunction aggregateFunction)
+    public Number aggregate(AggregateFunction aggregateFunction)
     {
         return aggregateFunction.applyDoubleIterable(this.values);
     }

@@ -36,6 +36,15 @@ public interface DfColumn
 
     void addEmptyValue();
 
+    default Number aggregate(AggregateFunction aggregator)
+    {
+        ErrorReporter.reportAndThrow(
+                "Aggregation " + aggregator.getDescription() + " cannot be performed on column "
+                + this.getName() + " of type " + this.getType());
+
+        return null; // will not get here
+    }
+
     default void enableNulls()
     {
         // noop by default
