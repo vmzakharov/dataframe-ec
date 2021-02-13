@@ -68,8 +68,6 @@ extends DataSetAbstract
 //
     }
 
-
-
     public void write(DataFrame dataFrame)
     {
         if (this.schemaIsNotDefined())
