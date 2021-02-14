@@ -9,7 +9,7 @@ For more on Eclipse Collections see: https://www.eclipse.org/collections/.
 <dependency>
   <groupId>io.github.vmzakharov</groupId>
   <artifactId>dataframe-ec</artifactId>
-  <version>0.4.1</version>
+  <version>0.5.1</version>
 </dependency>
 ```
 
@@ -23,9 +23,9 @@ For more on Eclipse Collections see: https://www.eclipse.org/collections/.
 - select a subset of rows based on a criteria
 - sort by one or more columns or by an expression
 - union - concatenating data frames with the same schemas
-- join with another data frame, based on a spefied column value, inner and outer joins are supported
-- aggregation - grouping by or summing column values
-- flag rows - individually or matching a criteria. 
+- join with another data frame, based on the specified column value, inner and outer joins are supported
+- aggregation - aggregating the entire data frame or grouping by the specified column values and aggregating within a group
+- flag rows - individually or matching a criteria.
 
 ### Examples
 
@@ -41,15 +41,16 @@ Then a data frame can be loaded from this file as shown below. The file schema c
 ```
 DataFrame ordersFromFile  = new CsvDataSet("donut_orders.csv", "Donut Orders").loadAsDataFrame();
 ```
-`ordersFromFile` contains:
 
-Customer |  Count |  Price |  Date
---- | --- | --- | ---
-"Archibald" | 5.0 | 23.45 | 2020-10-15
-"Bridget" | 10.0 | 40.34 | 2020-11-10
-"Clyde" | 4.0 | 19.5 | 2020-10-19
+`ordersFromFile`
 
-A data frame can be created **programmatically**: 
+Customer |   Count |   Price |   Date
+---|---:|---:|---
+"Archibald" | 5.0000 | 23.4500 | 2020-10-15
+"Bridget" | 10.0000 | 40.3400 | 2020-11-10
+"Clyde" | 4.0000 | 19.5000 | 2020-10-19
+
+A data frame can be created **programmatically**:
 ```
 DataFrame orders = new DataFrame("Donut Orders")
     .addStringColumn("Customer").addLongColumn("Count").addDoubleColumn("Price").addDateColumn("Date")
@@ -59,66 +60,85 @@ DataFrame orders = new DataFrame("Donut Orders")
     .addRow("Carl",  11, 44.78, LocalDate.of(2020, 12, 25))
     .addRow("Doris",  1,  5.00, LocalDate.of(2020,  9,  1));
 ```
-`orders` contains:
+`orders`
 
 Customer | Count | Price | Date
- --- |  --- |  --- | ---
-"Alice" | 5 | 23.45 | 2020-10-15
-"Bob" | 10 | 40.34 | 2020-11-10
-"Alice" | 4 | 19.5 | 2020-10-19
-"Carl" | 11 | 44.78 | 2020-12-25
-"Doris" | 1 | 5.0 | 2020-09-01
+---|---:|---:|---
+"Alice" | 5 | 23.4500 | 2020-10-15
+"Bob" | 10 | 40.3400 | 2020-11-10
+"Alice" | 4 | 19.5000 | 2020-10-19
+"Carl" | 11 | 44.7800 | 2020-12-25
+"Doris" | 1 | 5.0000 | 2020-09-01
 
 #### Sum of Columns
 ```
 DataFrame totalOrdered = orders.sum(Lists.immutable.of("Count", "Price"));
 ```
 
-`totalOrdered` contains:
+`totalOrdered`
 
 Count | Price
- --- | ---
-31 | 133.07
+---:|---:
+31 | 133.0700
+
+#### Aggregation Functions
+
+The following aggregation functions are supported
+- `sum`
+- `min`
+- `max`
+- `avg`
+- `count`
+
+```
+DataFrame orderStats = orders.aggregate(Lists.immutable.of(max("Price", "MaxPrice"), min("Price", "MinPrice"), sum("Price", "Total")));
+```
+
+`orderStats`
+
+MaxPrice | MinPrice | Total
+---:|---:|---:
+44.7800 | 5.0000 | 133.0700
 
 #### Sum With Group By
 ```
 DataFrame totalsByCustomer = orders.sumBy(Lists.immutable.of("Count", "Price"), Lists.immutable.of("Customer"));
 ```
 
-`totalsByCustomer` contains:
+`totalsByCustomer`
 
 Customer | Count | Price
- --- |  --- | ---
-"Alice" | 9 | 42.95
-"Bob" | 10 | 40.34
-"Carl" | 11 | 44.78
-"Doris" | 1 | 5.0
+---|---:|---:
+"Alice" | 9 | 42.9500
+"Bob" | 10 | 40.3400
+"Carl" | 11 | 44.7800
+"Doris" | 1 | 5.0000
 
 #### Add a Calculated Column
 ```
 orders.addDoubleColumn("AvgDonutPrice", "Price / Count");
 ```
-`orders` contains
+`orders`
 
 Customer | Count | Price | Date | AvgDonutPrice
- --- |  --- |  --- |  --- | ---
-"Alice" | 5 | 23.45 | 2020-10-15 | 4.69
-"Bob" | 10 | 40.34 | 2020-11-10 | 4.034
-"Alice" | 4 | 19.5 | 2020-10-19 | 4.875
-"Carl" | 11 | 44.78 | 2020-12-25 | 4.071
-"Doris" | 1 | 5.0 | 2020-09-01 | 5.0
+---|---:|---:|---|---:
+"Alice" | 5 | 23.4500 | 2020-10-15 | 4.6900
+"Bob" | 10 | 40.3400 | 2020-11-10 | 4.0340
+"Alice" | 4 | 19.5000 | 2020-10-19 | 4.8750
+"Carl" | 11 | 44.7800 | 2020-12-25 | 4.0709
+"Doris" | 1 | 5.0000 | 2020-09-01 | 5.0000
 
 #### Filter
 Selection of a sub dataframe with the rows matching the filter condition
 ```
 DataFrame bigOrders = orders.selectBy("Count >= 10");
 ```
-`bigOrders` contains:
+`bigOrders`
 
 Customer | Count | Price | Date | AvgDonutPrice
- --- |  --- |  --- |  --- | ---
-"Bob" | 10 | 40.34 | 2020-11-10 | 4.034
-"Carl" | 11 | 44.78 | 2020-12-25 | 4.071
+---|---:|---:|---|---:
+"Bob" | 10 | 40.3400 | 2020-11-10 | 4.0340
+"Carl" | 11 | 44.7800 | 2020-12-25 | 4.0709
 
 Select two subsets both matching and not matching the filter condition respectively
 ```
@@ -129,59 +149,60 @@ Result - a pair of data frames:
 `highAndLow.getOne()`
 
 Customer | Count | Price | Date | AvgDonutPrice
---- |  --- |  --- |  --- | ---
-"Bob" | 10 | 40.34 | 2020-11-10 | 4.034
-"Carl" | 11 | 44.78 | 2020-12-25 | 4.071
+---|---:|---:|---|---:
+"Bob" | 10 | 40.3400 | 2020-11-10 | 4.0340
+"Carl" | 11 | 44.7800 | 2020-12-25 | 4.0709
 
 `highAndLow.getTwo()`
 
 Customer | Count | Price | Date | AvgDonutPrice
- --- |  --- |  --- |  --- | ---
-"Alice" | 5 | 23.45 | 2020-10-15 | 4.69
-"Alice" | 4 | 19.5 | 2020-10-19 | 4.875
-"Doris" | 1 | 5.0 | 2020-09-01 | 5.0
+---|---:|---:|---|---:
+"Alice" | 5 | 23.4500 | 2020-10-15 | 4.6900
+"Alice" | 4 | 19.5000 | 2020-10-19 | 4.8750
+"Doris" | 1 | 5.0000 | 2020-09-01 | 5.0000
 
 #### Drop Column
 ```
 orders.dropColumn("AvgDonutPrice");
 ```
-`orders` contains:
+`orders`
 
 Customer | Count | Price | Date
---- |  --- |  --- | ---
-"Alice" | 5 | 23.45 | 2020-10-15
-"Bob" | 10 | 40.34 | 2020-11-10
-"Alice" | 4 | 19.5 | 2020-10-19
-"Carl" | 11 | 44.78 | 2020-12-25
-"Doris" | 1 | 5.0 | 2020-09-01
+---|---:|---:|---
+"Alice" | 5 | 23.4500 | 2020-10-15
+"Bob" | 10 | 40.3400 | 2020-11-10
+"Alice" | 4 | 19.5000 | 2020-10-19
+"Carl" | 11 | 44.7800 | 2020-12-25
+"Doris" | 1 | 5.0000 | 2020-09-01
+
 #### Sort
 Sort by the order date:
 ```
 orders.sortBy(Lists.immutable.of("Date"));
 ```
-`orders`:
+`orders`
 
 Customer | Count | Price | Date
- --- |  --- |  --- | ---
-"Doris" | 1 | 5.0 | 2020-09-01
-"Alice" | 5 | 23.45 | 2020-10-15
-"Alice" | 4 | 19.5 | 2020-10-19
-"Bob" | 10 | 40.34 | 2020-11-10
-"Carl" | 11 | 44.78 | 2020-12-25
+---|---:|---:|---
+"Doris" | 1 | 5.0000 | 2020-09-01
+"Alice" | 5 | 23.4500 | 2020-10-15
+"Alice" | 4 | 19.5000 | 2020-10-19
+"Bob" | 10 | 40.3400 | 2020-11-10
+"Carl" | 11 | 44.7800 | 2020-12-25
 
 Sort by Customer ignoring the first letter of their name
 ```
 orders.sortByExpression("substr(Customer, 1)");
 ```
-`orders`:
+`orders`
 
 Customer | Count | Price | Date
- --- |  --- |  --- | ---
-"Carl" | 11 | 44.78 | 2020-12-25
-"Alice" | 5 | 23.45 | 2020-10-15
-"Alice" | 4 | 19.5 | 2020-10-19
-"Bob" | 10 | 40.34 | 2020-11-10
-"Doris" | 1 | 5.0 | 2020-09-01
+---|---:|---:|---
+"Carl" | 11 | 44.7800 | 2020-12-25
+"Alice" | 5 | 23.4500 | 2020-10-15
+"Alice" | 4 | 19.5000 | 2020-10-19
+"Bob" | 10 | 40.3400 | 2020-11-10
+"Doris" | 1 | 5.0000 | 2020-09-01
 
 #### Union
 ```
@@ -191,20 +212,20 @@ DataFrame otherOrders = new DataFrame("Other Donut Orders")
 
 DataFrame combinedOrders = orders.union(otherOrders);
 ```
-`combinedOrders`:
+`combinedOrders`
 
 Customer | Count | Price | Date
---- | --- | --- | ---
-"Alice" | 5 | 23.45 | 2020-10-15
-"Bob" | 10 | 40.34 | 2020-11-10
-"Alice" | 4 | 19.5 | 2020-10-19
-"Carl" | 11 | 44.78 | 2020-12-25
-"Doris" | 1 | 5.0 | 2020-09-01
-"Eve" | 2 | 9.8 | 2020-12-05
+---|---:|---:|---
+"Alice" | 5 | 23.4500 | 2020-10-15
+"Bob" | 10 | 40.3400 | 2020-11-10
+"Alice" | 4 | 19.5000 | 2020-10-19
+"Carl" | 11 | 44.7800 | 2020-12-25
+"Doris" | 1 | 5.0000 | 2020-09-01
+"Eve" | 2 | 9.8000 | 2020-12-05
 
 ## Domain Specific Language
 
-The framework supports a simple Domain Specific Language (DSL) for computed column expression and operations on data frames such as filtering. 
+The framework supports a simple Domain Specific Language (DSL) for computed column expression and operations on data frames such as filtering.
 
 ### Script
 
@@ -220,7 +241,7 @@ The language supports variable and literal values of the following types:
 - vector
 - boolean
 
-There is no implicit type conversion of values and variables to avoid inadvertent errors, surprises, and to fail early.   
+There is no implicit type conversion of values and variables to avoid inadvertent errors, surprises, and to fail early.
 
 ### Literals
 
@@ -231,7 +252,7 @@ Type | Example
 String | `"Hello"` or `'Abracadabra'` (both single and double quotes are supported)
 Long | `123`
 Double | `123.456`
-Date | There is not date literal per se, however there is a built-in function `toDate()` that lets specify date constants `toDate(2021, 11, 25)` 
+Date | There is not date literal per se, however there is a built-in function `toDate()` that lets specify date constants `toDate(2021, 11, 25)`
 Vector | `(1, 2, 3)` <br>`('A', 'B', 'C')` <br>`(x, x + 1, x + 2)`
 Boolean | there are no literal of boolean type as there was no scenario where they would be required, however boolean variables and expressions are fully supported
 
@@ -254,7 +275,7 @@ substr(a + b, 3)
 
 Category | Type | Example
 ------------ | ------------ | -------------
-Unary | `-`<br>`not` | `-123`<br>`not (a > b)` 
+Unary | `-`<br>`not` | `-123`<br>`not (a > b)`
 Binary Arithmetic | `+` `-` `*` `/` | `1 + 2`<br>`unit_price * quantity`<br>string concatenation:<br> `"Hello, " + "world!"`
 Comparison |`>` `>=` `<` `<=` `==` `!=`|
 Boolean | `and`<br>`or`<br>`xor` |
@@ -263,7 +284,7 @@ Empty | `is empty`<br>`is not empty` | `"" is empty`<br>`'Hello' is not empty`<b
 
 ### Statements
 
-The following statements are available: 
+The following statements are available:
 - assignment
 - conditional
 - a free-standing expression
@@ -283,7 +304,7 @@ function abs(x)
   else
     -x
   endif
-} 
+}
 abs(-123)
 ```
 
@@ -292,7 +313,7 @@ abs(-123)
 function hello()
 {
   'Hello'
-} 
+}
 
 hello() + ' world!'
 ```
