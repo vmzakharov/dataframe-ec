@@ -2,10 +2,33 @@ package io.github.vmzakharov.ecdataframe.dsl.visitor;
 
 import io.github.vmzakharov.ecdataframe.dataframe.DataFrame;
 import io.github.vmzakharov.ecdataframe.dataset.AvroDataSet;
-import io.github.vmzakharov.ecdataframe.dsl.*;
+import io.github.vmzakharov.ecdataframe.dsl.AnonymousScript;
+import io.github.vmzakharov.ecdataframe.dsl.AssingExpr;
+import io.github.vmzakharov.ecdataframe.dsl.BinaryExpr;
+import io.github.vmzakharov.ecdataframe.dsl.ConstExpr;
+import io.github.vmzakharov.ecdataframe.dsl.EvalContext;
+import io.github.vmzakharov.ecdataframe.dsl.Expression;
+import io.github.vmzakharov.ecdataframe.dsl.FunctionCallExpr;
+import io.github.vmzakharov.ecdataframe.dsl.FunctionScript;
+import io.github.vmzakharov.ecdataframe.dsl.IfElseExpr;
+import io.github.vmzakharov.ecdataframe.dsl.IndexExpr;
+import io.github.vmzakharov.ecdataframe.dsl.ProjectionExpr;
+import io.github.vmzakharov.ecdataframe.dsl.PropertyPathExpr;
+import io.github.vmzakharov.ecdataframe.dsl.Script;
+import io.github.vmzakharov.ecdataframe.dsl.SimpleEvalContext;
+import io.github.vmzakharov.ecdataframe.dsl.StatementSequenceScript;
+import io.github.vmzakharov.ecdataframe.dsl.UnaryExpr;
+import io.github.vmzakharov.ecdataframe.dsl.VarExpr;
+import io.github.vmzakharov.ecdataframe.dsl.VectorExpr;
 import io.github.vmzakharov.ecdataframe.dsl.function.BuiltInFunctions;
 import io.github.vmzakharov.ecdataframe.dsl.function.IntrinsicFunctionDescriptor;
-import io.github.vmzakharov.ecdataframe.dsl.value.*;
+import io.github.vmzakharov.ecdataframe.dsl.value.BooleanValue;
+import io.github.vmzakharov.ecdataframe.dsl.value.DataFrameValue;
+import io.github.vmzakharov.ecdataframe.dsl.value.LongValue;
+import io.github.vmzakharov.ecdataframe.dsl.value.StringValue;
+import io.github.vmzakharov.ecdataframe.dsl.value.Value;
+import io.github.vmzakharov.ecdataframe.dsl.value.ValueType;
+import io.github.vmzakharov.ecdataframe.dsl.value.VectorValue;
 import org.eclipse.collections.api.list.ListIterable;
 
 public class InMemoryEvaluationVisitor
@@ -68,7 +91,7 @@ implements ExpressionEvaluationVisitor
             functionScript.getParameterNames().forEachWithIndex(
                     (p, i) -> localContext.setVariable(p, parameterValues.get(i)));
 
-            localContext.loadFunctionsExcept(context.getDeclaredFunctions(), functionName); // no recursion for you!
+            localContext.loadFunctionsExcept(this.context.getDeclaredFunctions(), functionName); // no recursion for you!
 
             return this.applyVisitorToScript(new InMemoryEvaluationVisitor(localContext), functionScript);
         }

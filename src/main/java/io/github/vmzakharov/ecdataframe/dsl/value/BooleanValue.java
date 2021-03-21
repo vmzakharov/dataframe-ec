@@ -7,7 +7,7 @@ abstract public class BooleanValue
 extends AbstractValue
 implements Value
 {
-    static public BooleanValue TRUE = new BooleanValue()
+    static public final BooleanValue TRUE = new BooleanValue()
     {
         @Override
         public boolean isTrue()
@@ -22,7 +22,7 @@ implements Value
         }
     };
 
-    static public BooleanValue FALSE = new BooleanValue()
+    static public final BooleanValue FALSE = new BooleanValue()
     {
         @Override
         public boolean isTrue()

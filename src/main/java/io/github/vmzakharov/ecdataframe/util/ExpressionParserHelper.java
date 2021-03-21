@@ -13,7 +13,7 @@ import org.antlr.v4.runtime.tree.ParseTree;
 
 public class ExpressionParserHelper
 {
-    static public ExpressionParserHelper DEFAULT = new ExpressionParserHelper();
+    static public final ExpressionParserHelper DEFAULT = new ExpressionParserHelper();
 
     private ANTLRErrorListener replacementErrorListener;
 

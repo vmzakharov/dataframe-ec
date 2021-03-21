@@ -77,6 +77,6 @@ public class CsvSchemaColumn
 
     public String parseAsString(String aString)
     {
-        return csvSchema.stripQuotesIfAny(aString);
+        return this.csvSchema.stripQuotesIfAny(aString);
     }
 }

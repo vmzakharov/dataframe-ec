@@ -55,7 +55,7 @@ extends DataSetAbstract
 
     private Schema findFieldSchema(String fieldName)
     {
-        Schema fieldSchema = schema.getField(fieldName).schema();
+        Schema fieldSchema = this.schema.getField(fieldName).schema();
 
         if (fieldSchema.isUnion())
         {
@@ -69,7 +69,7 @@ extends DataSetAbstract
     {
 
         File file = new File(this.dataFileName);
-        DatumWriter<GenericRecord> datumWriter = new GenericDatumWriter<>(schema);
+        DatumWriter<GenericRecord> datumWriter = new GenericDatumWriter<>(this.schema);
 
         try (DataFileWriter<GenericRecord> dataFileWriter = new DataFileWriter<>(datumWriter);)
         {
@@ -127,7 +127,7 @@ extends DataSetAbstract
         }
         catch (IOException e)
         {
-            throw new RuntimeException("Unable to close data file reader for '" + dataFileName + "'");
+            throw new RuntimeException("Unable to close data file reader for '" + this.dataFileName + "'");
         }
     }
 

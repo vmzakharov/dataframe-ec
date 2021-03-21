@@ -52,7 +52,7 @@ extends EvalContextAbstract
         {
             if (this.getDataFrame().hasColumn(variableName))
             {
-                valueGetter = () -> dataFrame.getValueAtPhysicalRow(variableName, this.getRowIndex());
+                valueGetter = () -> this.dataFrame.getValueAtPhysicalRow(variableName, this.getRowIndex());
             }
             else if (this.getContextVariables().containsKey(variableName))
             {

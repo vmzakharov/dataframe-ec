@@ -1,23 +1,36 @@
 package io.github.vmzakharov.ecdataframe.dataset;
 
-import io.github.vmzakharov.ecdataframe.dataframe.*;
+import io.github.vmzakharov.ecdataframe.dataframe.DataFrame;
+import io.github.vmzakharov.ecdataframe.dataframe.DfColumn;
+import io.github.vmzakharov.ecdataframe.dataframe.DfDateColumn;
+import io.github.vmzakharov.ecdataframe.dataframe.DfDateColumnStored;
+import io.github.vmzakharov.ecdataframe.dataframe.DfDoubleColumnStored;
+import io.github.vmzakharov.ecdataframe.dataframe.DfLongColumnStored;
+import io.github.vmzakharov.ecdataframe.dataframe.DfStringColumnStored;
+import io.github.vmzakharov.ecdataframe.dataframe.ErrorReporter;
 import io.github.vmzakharov.ecdataframe.dsl.value.ValueType;
 import org.eclipse.collections.api.block.procedure.Procedure;
 import org.eclipse.collections.api.list.ListIterable;
 import org.eclipse.collections.api.list.MutableList;
 import org.eclipse.collections.impl.factory.Lists;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.Reader;
+import java.io.Writer;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.time.format.ResolverStyle;
-import java.time.temporal.TemporalAccessor;
 
 public class CsvDataSet
 extends DataSetAbstract
 {
-    public static int BUFFER_SIZE = 65_536;
+    public static final int BUFFER_SIZE = 65_536;
 
     private final String dataFileName;
 
@@ -81,7 +94,7 @@ extends DataSetAbstract
 
             for (int columnIndex = 0; columnIndex < columnCount; columnIndex++)
             {
-                writer.write(schema.columnAt(columnIndex).getName());
+                writer.write(this.schema.columnAt(columnIndex).getName());
 
                 if (columnIndex < columnCount - 1)
                 {
@@ -132,7 +145,7 @@ extends DataSetAbstract
                 break;
             case STRING:
                 String stringValue = column.getValueAsString(rowIndex);
-                valueAsLiteral = stringValue == null ? "" : schema.getQuoteCharacter() + stringValue + schema.getQuoteCharacter();
+                valueAsLiteral = stringValue == null ? "" : this.schema.getQuoteCharacter() + stringValue + this.schema.getQuoteCharacter();
                 break;
             case DATE:
                 LocalDate dateValue = ((DfDateColumn) column).getDate(rowIndex);
@@ -143,6 +156,7 @@ extends DataSetAbstract
                 valueAsLiteral = null;
         }
 
+        assert valueAsLiteral != null;
         writer.write(valueAsLiteral);
     }
 
@@ -155,7 +169,7 @@ extends DataSetAbstract
 
         if (this.formatters[columnIndex] == null)
         {
-            String pattern = schema.columnAt(columnIndex).getPattern();
+            String pattern = this.schema.columnAt(columnIndex).getPattern();
             this.formatters[columnIndex] = DateTimeFormatter.ofPattern(pattern);
         }
 
@@ -212,7 +226,7 @@ extends DataSetAbstract
 
 
             MutableList<Procedure<String>> columnPopulators = Lists.mutable.of();
-            this.getSchema().getColumns().forEach(col -> addDataFrameColumn(df, col, columnPopulators));
+            this.getSchema().getColumns().forEach(col -> this.addDataFrameColumn(df, col, columnPopulators));
 
             int columnCount = this.getSchema().columnCount();
             MutableList<String> lineElements = Lists.mutable.withInitialCapacity(columnCount);
@@ -404,10 +418,10 @@ extends DataSetAbstract
                 {
                     if (!closedQuote) // unquoted token followed by an empty token, add the current token first
                     {
-                        elements.add(substringOrNull(aString, currentTokenStart, index));
+                        elements.add(this.substringOrNull(aString, currentTokenStart, index));
                     }
                     // a comma right after a token, so add an empty value
-                    elements.add(substringOrNull(aString, index + 1, index + 1));
+                    elements.add(this.substringOrNull(aString, index + 1, index + 1));
                 }
                 else
                 {

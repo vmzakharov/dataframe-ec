@@ -3,9 +3,15 @@ package io.github.vmzakharov.ecdataframe.ui;
 import io.github.vmzakharov.ecdataframe.dsl.EvalContext;
 import org.eclipse.collections.api.list.MutableList;
 
-import javax.swing.*;
+import javax.swing.BorderFactory;
+import javax.swing.JButton;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTable;
+import javax.swing.ListSelectionModel;
 import javax.swing.table.AbstractTableModel;
-import java.awt.*;
+import java.awt.BorderLayout;
+import java.awt.Color;
 
 public class MemoryPanel
 extends JPanel
@@ -23,9 +29,9 @@ extends JPanel
 
         this.storedContext = newStoredContext;
 
-        variableTableModel = new VariableTableModel();
+        this.variableTableModel = new VariableTableModel();
 
-        this.variables = new JTable(variableTableModel);
+        this.variables = new JTable(this.variableTableModel);
         this.removeButton = new JButton("Remove");
         this.removeAllButton = new JButton("Remove All");
 
@@ -33,7 +39,7 @@ extends JPanel
 
         this.variables.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
         this.variables.getSelectionModel()
-                .addListSelectionListener(e -> removeButton.setEnabled(variables.getSelectedRowCount() > 0));
+                .addListSelectionListener(e -> this.removeButton.setEnabled(this.variables.getSelectedRowCount() > 0));
 
         JScrollPane scrollPane = new JScrollPane(this.variables);
         scrollPane.setBorder(BorderFactory.createCompoundBorder(
@@ -52,7 +58,7 @@ extends JPanel
             int[] selectedRows = this.variables.getSelectedRows();
             for (int i = selectedRows.length - 1; i >= 0; i--)
             {
-                String removed = (String) variableTableModel.getValueAt(selectedRows[i], 0);
+                String removed = (String) this.variableTableModel.getValueAt(selectedRows[i], 0);
                 this.storedContext.removeVariable(removed);
             }
             this.variableTableModel.fireTableDataChanged();
@@ -85,13 +91,13 @@ extends JPanel
 
         private void loadVariableNames()
         {
-            this.variableNames = storedContext.getVariableNames().toList();
+            this.variableNames = MemoryPanel.this.storedContext.getVariableNames().toList();
         }
 
         @Override
         public int getRowCount()
         {
-            return storedContext.getVariableNames().size();
+            return MemoryPanel.this.storedContext.getVariableNames().size();
         }
 
         @Override
@@ -110,9 +116,9 @@ extends JPanel
                 case 0:
                     return variableName;
                 case 1:
-                    return storedContext.getVariable(variableName).getType().toString();
+                    return MemoryPanel.this.storedContext.getVariable(variableName).getType().toString();
                 case 2:
-                    String valueAsString = storedContext.getVariable(variableName).asStringLiteral();
+                    String valueAsString = MemoryPanel.this.storedContext.getVariable(variableName).asStringLiteral();
                     if (valueAsString.length() > 50)
                     {
                         valueAsString = valueAsString.substring(0, 50) + "...";

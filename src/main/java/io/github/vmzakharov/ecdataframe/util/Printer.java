@@ -4,7 +4,10 @@ public interface Printer
 {
     void print(String value);
 
-    default void newLine() { print("\n"); }
+    default void newLine()
+    {
+        this.print("\n");
+    }
 
     default void println(String value)
     {

@@ -197,15 +197,15 @@ public class DataFrame
 
     public DataFrame addRow()
     {
-        columns.forEach(DfColumn::addEmptyValue);
-        rowCount++;
+        this.columns.forEach(DfColumn::addEmptyValue);
+        this.rowCount++;
         return this;
     }
 
     public DataFrame addRow(Object... values)
     {
         ArrayIterate.forEachWithIndex(values, (v, i) -> this.columns.get(i).addObject(v));
-        rowCount++;
+        this.rowCount++;
         return this;
     }
 
@@ -678,7 +678,7 @@ public class DataFrame
     public Value evaluateExpression(Expression expression, int rowIndex)
     {
         this.getEvalContext().setRowIndex(rowIndex);
-        return expression.evaluate(new InMemoryEvaluationVisitor(evalContext));
+        return expression.evaluate(new InMemoryEvaluationVisitor(this.evalContext));
     }
 
     private DfTuple rowToTuple(int rowIndex, ListIterable<DfColumn> columnsToCollect)

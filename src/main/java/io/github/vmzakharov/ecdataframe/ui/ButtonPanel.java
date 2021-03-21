@@ -1,6 +1,10 @@
 package io.github.vmzakharov.ecdataframe.ui;
 
-import javax.swing.*;
+import javax.swing.BorderFactory;
+import javax.swing.Box;
+import javax.swing.BoxLayout;
+import javax.swing.JButton;
+import javax.swing.JPanel;
 
 public class ButtonPanel
 extends JPanel

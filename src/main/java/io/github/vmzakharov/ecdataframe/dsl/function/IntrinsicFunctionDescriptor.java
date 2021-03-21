@@ -55,7 +55,7 @@ implements FunctionDescriptor
 
     public Value evaluate(EvalContext context)
     {
-        return this.evaluate((VectorValue) context.getVariableOrDefault(magicalParameterName(), VectorValue.EMPTY));
+        return this.evaluate((VectorValue) context.getVariableOrDefault(this.magicalParameterName(), VectorValue.EMPTY));
     }
 
     abstract public Value evaluate(VectorValue parameters);
@@ -76,6 +76,7 @@ implements FunctionDescriptor
                 expectedCount != actualCount,
                 "Invalid number of parameters in a call to '" + this.getName() + "'. " + this.usageString());
     }
+
     protected void assertParameterType(ValueType expected, ValueType actual)
     {
         ErrorReporter.reportAndThrow(

@@ -69,7 +69,7 @@ implements EvalContext
         functionsFromOutside.forEachKeyValue((k, v) -> {
             if (!k.equals(nameToExclude))
             {
-                declaredFunctions.put(k, v);
+                this.declaredFunctions.put(k, v);
             }
         });
     }

@@ -43,7 +43,7 @@ implements DfColumnStored
 
     public void addString(String s)
     {
-        if (pool == null)
+        if (this.pool == null)
         {
             this.values.add(s);
         }

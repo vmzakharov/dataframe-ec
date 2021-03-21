@@ -20,13 +20,13 @@ implements Comparable<DfTuple>
         if (this == o) { return true; }
         if (o == null || this.getClass() != o.getClass()) { return false; }
         DfTuple dfTuple = (DfTuple) o;
-        return Arrays.equals(items, dfTuple.items);
+        return Arrays.equals(this.items, dfTuple.items);
     }
 
     @Override
     public int hashCode()
     {
-        return Arrays.hashCode(items);
+        return Arrays.hashCode(this.items);
     }
 
     @Override
