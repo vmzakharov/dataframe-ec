@@ -18,7 +18,7 @@ import java.time.LocalDate;
 import java.time.Period;
 import java.time.format.DateTimeFormatter;
 
-public class BuiltInFunctions
+final public class BuiltInFunctions
 {
     private static final ImmutableList<IntrinsicFunctionDescriptor> FUNCTIONS = Lists.immutable.of(
         new IntrinsicFunctionDescriptor("print") {
@@ -109,8 +109,10 @@ public class BuiltInFunctions
                 String aString = parameters.get(0).stringValue();
                 int beginIndex = (int) ((LongValue) parameters.get(1)).longValue();
 
-                String substring = (parameterCount == 2) ?
-                    aString.substring(beginIndex) :
+                String substring = (parameterCount == 2)
+                        ?
+                    aString.substring(beginIndex)
+                        :
                     aString.substring(beginIndex, (int) ((LongValue) parameters.get(2)).longValue());
 
                 return new StringValue(substring);
@@ -250,6 +252,11 @@ public class BuiltInFunctions
 
     private static final ImmutableMap<String, IntrinsicFunctionDescriptor> FUNCTIONS_BY_NAME =
             FUNCTIONS.toMap(fd -> fd.getNormalizedName(), fd -> fd).toImmutable();
+
+    private BuiltInFunctions()
+    {
+        // Utility class
+    }
 
     public static IntrinsicFunctionDescriptor getFunctionDescriptor(String name)
     {

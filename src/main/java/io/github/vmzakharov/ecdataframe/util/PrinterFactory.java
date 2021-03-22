@@ -1,8 +1,13 @@
 package io.github.vmzakharov.ecdataframe.util;
 
-public class PrinterFactory
+final public class PrinterFactory
 {
     static private Printer printer = new SysOutPrinter();
+
+    private PrinterFactory()
+    {
+        // Utility class
+    }
 
     public static Printer getPrinter()
     {

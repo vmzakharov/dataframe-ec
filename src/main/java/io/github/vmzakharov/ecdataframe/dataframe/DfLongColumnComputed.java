@@ -35,7 +35,6 @@ implements DfColumnComputed
         return result.longValue();
     }
 
-
     @Override
     public ImmutableLongList toLongList()
     {

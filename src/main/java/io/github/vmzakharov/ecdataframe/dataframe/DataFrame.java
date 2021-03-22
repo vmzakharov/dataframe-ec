@@ -37,7 +37,7 @@ public class DataFrame
     private int rowCount = 0;
 
     private final DataFrameEvalContext evalContext; // todo: make threadlocal?
-    private IntList rowIndex = null;
+    private IntList virtualRowMap = null;
     private boolean poolingEnabled = false;
 
     private MutableBooleanList bitmap = null;
@@ -219,21 +219,21 @@ public class DataFrame
         return this.name;
     }
 
-    public DataFrame addColumn(String name, ValueType type)
+    public DataFrame addColumn(String columnName, ValueType type)
     {
         switch (type)
         {
             case LONG:
-                this.addLongColumn(name);
+                this.addLongColumn(columnName);
                 break;
             case DOUBLE:
-                this.addDoubleColumn(name);
+                this.addDoubleColumn(columnName);
                 break;
             case STRING:
-                this.addStringColumn(name);
+                this.addStringColumn(columnName);
                 break;
             case DATE:
-                this.addDateColumn(name);
+                this.addDateColumn(columnName);
                 break;
             default:
                 throw new RuntimeException("Cannot add a column for values of type " + type);
@@ -241,21 +241,21 @@ public class DataFrame
         return this;
     }
 
-    public DataFrame addColumn(String name, ValueType type, String expressionAsString)
+    public DataFrame addColumn(String columnName, ValueType type, String expressionAsString)
     {
         switch (type)
         {
             case LONG:
-                this.addLongColumn(name, expressionAsString);
+                this.addLongColumn(columnName, expressionAsString);
                 break;
             case DOUBLE:
-                this.addDoubleColumn(name, expressionAsString);
+                this.addDoubleColumn(columnName, expressionAsString);
                 break;
             case STRING:
-                this.addStringColumn(name, expressionAsString);
+                this.addStringColumn(columnName, expressionAsString);
                 break;
             case DATE:
-                this.addDateColumn(name, expressionAsString);
+                this.addDateColumn(columnName, expressionAsString);
                 break;
             default:
                 throw new RuntimeException("Cannot add a column for values of type " + type);
@@ -267,14 +267,14 @@ public class DataFrame
     {
         if (this.isIndexed())
         {
-            return this.rowIndex.get(virtualRowIndex);
+            return this.virtualRowMap.get(virtualRowIndex);
         }
         return virtualRowIndex;
     }
 
     private boolean isIndexed()
     {
-        return this.rowIndex != null;
+        return this.virtualRowMap != null;
     }
 
     public IntList getAggregateIndex(int rowIndex)
@@ -485,7 +485,6 @@ public class DataFrame
                 .collect(this::getColumnNamed)
                 .forEach(col -> aggregatedDataFrame.addColumn(col.getName(), col.getType()));
 
-
         columnsToAggregate.forEachInBoth(aggregators,
                 (col, agg) -> aggregatedDataFrame.addColumn(agg.getTargetColumnName(), agg.targetColumnType(col.getType()))
         );
@@ -566,7 +565,7 @@ public class DataFrame
 
     public DataFrame selectBy(String filterExpressionString)
     {
-        DataFrame filtered = this.cloneStructure(this.getName()+"-selected");
+        DataFrame filtered = this.cloneStructure(this.getName() + "-selected");
         DataFrameEvalContext context = new DataFrameEvalContext(this);
         Expression filterExpression = ExpressionParserHelper.DEFAULT.toExpression(filterExpressionString);
         InMemoryEvaluationVisitor evaluationVisitor = new InMemoryEvaluationVisitor(context);
@@ -586,7 +585,7 @@ public class DataFrame
     private DataFrame selectByMarkValue(BooleanList marked, BooleanPredicate markAtIndexPredicate)
     {
 
-        DataFrame filtered = this.cloneStructure(this.getName()+"-selected");
+        DataFrame filtered = this.cloneStructure(this.getName() + "-selected");
         for (int i = 0; i < this.rowCount; i++)
         {
             if (markAtIndexPredicate.accept(marked.get(i)))
@@ -644,7 +643,7 @@ public class DataFrame
 
         if (this.rowCount == 0)
         {
-            this.rowIndex = IntLists.immutable.empty();
+            this.virtualRowMap = IntLists.immutable.empty();
             return;
         }
 
@@ -657,7 +656,7 @@ public class DataFrame
         MutableIntList indexes = IntInterval.zeroTo(this.rowCount - 1).toList();
         indexes.sortThisBy(i -> tuples[i]);
 
-        this.rowIndex = indexes;
+        this.virtualRowMap = indexes;
     }
 
     public void sortByExpression(String expressionString)
@@ -665,14 +664,14 @@ public class DataFrame
         this.unsort();
         if (this.rowCount == 0)
         {
-            this.rowIndex = IntLists.immutable.empty();
+            this.virtualRowMap = IntLists.immutable.empty();
             return;
         }
 
         Expression expression = ExpressionParserHelper.DEFAULT.toExpression(expressionString);
         MutableIntList indexes = IntInterval.zeroTo(this.rowCount - 1).toList();
         indexes.sortThisBy(i -> this.evaluateExpression(expression, i));
-        this.rowIndex = indexes;
+        this.virtualRowMap = indexes;
     }
 
     public Value evaluateExpression(Expression expression, int rowIndex)
@@ -694,7 +693,7 @@ public class DataFrame
 
     public void unsort()
     {
-        this.rowIndex = null;
+        this.virtualRowMap = null;
     }
 
     private ListIterable<DfColumn> columnsNamed(ListIterable<String> columnNames)

@@ -45,7 +45,7 @@ extends DfColumnAbstract
 
     public ValueType getType()
     {
-        return ValueType.STRING  ;
+        return ValueType.STRING;
     }
 
     @Override

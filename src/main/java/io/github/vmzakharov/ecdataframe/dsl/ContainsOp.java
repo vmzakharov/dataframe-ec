@@ -60,6 +60,4 @@ extends PredicateOp
     }
 
     BooleanValue applyWithVector(Value value, VectorValue vectorValue);
-
-    String asString();
 }

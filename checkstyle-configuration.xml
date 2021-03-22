@@ -5,18 +5,54 @@
 
 <module name="Checker">
     <property name="charset" value="UTF-8"/>
+
     <property name="severity" value="error"/>
 
+    <!-- See https://checkstyle.org/config_misc.html#NewlineAtEndOfFile -->
     <module name="NewlineAtEndOfFile"/>
+    <!-- See https://checkstyle.org/config_whitespace.html#FileTabCharacter -->
+    <module name="FileTabCharacter"/>
 
     <module name="TreeWalker">
         <property name="tabWidth" value="4"/>
 
         <!-- Checks for Coding. -->
-        <!-- See https://checkstyle.org/config_coding.html#RequireThis -->
+        <!-- See https://checkstyle.org/config_coding.html -->
+        <module name="DeclarationOrder"/>
+        <module name="DefaultComesLast"/>
+        <module name="EmptyStatement"/>
+        <module name="EqualsHashCode"/>
+        <module name="FallThrough"/>
+        <module name="HiddenField">
+            <property name="ignoreSetter" value="true"/>
+            <property name="ignoreConstructorParameter" value="true"/>
+        </module>
+        <module name="IllegalInstantiation"/>
+        <module name="IllegalThrows"/>
+        <module name="InnerAssignment"/>
+        <!-- <module name="MagicNumber"/> -->
+        <module name="MissingSwitchDefault"/>
+        <module name="OneStatementPerLine"/>
+        <module name="PackageDeclaration"/>
+        <module name="ParameterAssignment"/>
         <module name="RequireThis">
             <property name="validateOnlyOverlapping" value="false"/>
         </module>
+        <module name="SimplifyBooleanExpression"/>
+        <module name="SimplifyBooleanReturn"/>
+        <module name="UnnecessaryParentheses"/>
+
+        <!-- Checks for class design -->
+        <!-- See https://checkstyle.org/config_design.htm -->
+        <module name="FinalClass"/>
+        <module name="HideUtilityClassConstructor"/>
+        <!-- <module name="InterfaceIsType"/> -->
+
+        <!-- Miscellaneous other checks. -->
+        <!-- See https://checkstyle.org/config_misc.htm -->
+        <module name="ArrayTypeStyle"/>
+        <module name="UpperEll"/>
+
 
         <!-- Checks for Naming Conventions. -->
         <!-- See https://checkstyle.org/config_naming.html -->
@@ -42,7 +78,7 @@
         <module name="StaticVariableName"/>
         <module name="TypeName"/>
 
-        <!-- Checks for imports                              -->
+        <!-- Checks for imports. -->
         <!-- See https://checkstyle.org/config_imports.html -->
         <module name="AvoidStarImport">
             <property name="allowStaticMemberImports" value="true"/>
@@ -52,5 +88,25 @@
         <module name="UnusedImports">
             <property name="processJavadoc" value="false"/>
         </module>
+
+        <!-- Check for whitespace. -->
+        <!-- See https://checkstyle.org/config_whitespace.html -->
+        <module name="EmptyForInitializerPad"/>
+        <module name="EmptyForIteratorPad"/>
+        <module name="EmptyLineSeparator">
+            <property name="allowNoEmptyLineBetweenFields" value="true"/>
+            <property name="allowMultipleEmptyLines" value="false"/>
+            <property name="allowMultipleEmptyLinesInsideClassMembers" value="false"/>
+        </module>
+        <module name="GenericWhitespace"/>
+        <module name="MethodParamPad"/>
+        <module name="NoLineWrap"/>
+        <module name="NoWhitespaceAfter"/>
+        <module name="NoWhitespaceBefore"/>
+        <module name="OperatorWrap"/>
+        <module name="ParenPad"/>
+        <module name="TypecastParenPad"/>
+        <module name="WhitespaceAfter"/>
+        <module name="WhitespaceAround"/>
     </module>
 </module>

@@ -17,9 +17,9 @@ public class CsvSchema
         return this.nullMarker;
     }
 
-    public CsvSchema nullMarker(String nullMarker)
+    public CsvSchema nullMarker(String newNullMarker)
     {
-        this.nullMarker = nullMarker;
+        this.nullMarker = newNullMarker;
         return this;
     }
 
@@ -33,9 +33,9 @@ public class CsvSchema
         return this.separator;
     }
 
-    public CsvSchema separator(char separator)
+    public CsvSchema separator(char newSeparator)
     {
-        this.separator = separator;
+        this.separator = newSeparator;
         return this;
     }
 
@@ -44,9 +44,9 @@ public class CsvSchema
         return this.quoteCharacter;
     }
 
-    public CsvSchema quoteCharacter(char quoteCharacter)
+    public CsvSchema quoteCharacter(char newQuoteCharacter)
     {
-        this.quoteCharacter = quoteCharacter;
+        this.quoteCharacter = newQuoteCharacter;
         return this;
     }
 

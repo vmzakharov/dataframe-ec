@@ -19,7 +19,7 @@ implements Value
 
         if (!other.isVoid() && (this.getClass() != other.getClass()))
         {
-            throw new UnsupportedOperationException("Cannot compare a " + this.getClass().getName() + " to a "+ other.getClass().getName());
+            throw new UnsupportedOperationException("Cannot compare a " + this.getClass().getName() + " to a " + other.getClass().getName());
         }
     }
 }

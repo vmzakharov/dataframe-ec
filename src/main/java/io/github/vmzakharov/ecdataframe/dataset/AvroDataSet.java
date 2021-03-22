@@ -59,7 +59,7 @@ extends DataSetAbstract
 
         if (fieldSchema.isUnion())
         {
-            fieldSchema = ListIterate.detect(fieldSchema.getTypes(), schema -> schema.getType() != Schema.Type.NULL);
+            fieldSchema = ListIterate.detect(fieldSchema.getTypes(), fs -> fs.getType() != Schema.Type.NULL);
         }
 
         return fieldSchema;

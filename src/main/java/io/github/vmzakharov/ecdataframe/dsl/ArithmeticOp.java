@@ -11,8 +11,8 @@ extends BinaryOp
     ArithmeticOp ADD = new ArithmeticOp()
     {
         @Override
-        public StringValue applyString(String operand1, String operand2) { return new StringValue(operand1 + operand2);
-        }
+        public StringValue applyString(String operand1, String operand2) { return new StringValue(operand1 + operand2); }
+
         @Override
         public LongValue applyLong(long operand1, long operand2) { return new LongValue(operand1 + operand2); }
 

@@ -32,5 +32,4 @@ extends BinaryOp
     {
         throw new UnsupportedOperationException("Cannot apply '" + this.asString() + "' to doubles");
     }
-
 }

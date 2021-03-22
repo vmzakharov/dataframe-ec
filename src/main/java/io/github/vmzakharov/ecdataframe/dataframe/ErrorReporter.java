@@ -2,8 +2,13 @@ package io.github.vmzakharov.ecdataframe.dataframe;
 
 import io.github.vmzakharov.ecdataframe.util.PrinterFactory;
 
-public class ErrorReporter
+final public class ErrorReporter
 {
+    private ErrorReporter()
+    {
+        // Utility class should not have a public constructor
+    }
+
     public static void reportAndThrow(boolean badThingHappened, String errorText)
     {
         if (badThingHappened)

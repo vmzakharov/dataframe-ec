@@ -13,6 +13,7 @@ abstract public class DfDateColumn
 extends DfColumnAbstract
 {
     private DateTimeFormatter formatter = DateTimeFormatter.ISO_DATE;
+
     public DfDateColumn(DataFrame newDataFrame, String newName)
     {
         super(newDataFrame, newName);

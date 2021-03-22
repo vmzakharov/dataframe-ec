@@ -15,14 +15,6 @@ extends JFrame
 {
     private final EvalContext storedContext = new SimpleEvalContext();
 
-    public static void main(String[] args)
-    {
-        javax.swing.SwingUtilities.invokeLater(() -> {
-            UiRunner uiRunner = new UiRunner();
-            uiRunner.setVisible(true);
-        });
-    }
-
     public UiRunner()
     throws HeadlessException
     {
@@ -51,5 +43,13 @@ extends JFrame
         contentPane.add(verticalSplit, BorderLayout.CENTER);
 
         this.pack();
+    }
+
+    public static void main(String[] args)
+    {
+        javax.swing.SwingUtilities.invokeLater(() -> {
+            UiRunner uiRunner = new UiRunner();
+            uiRunner.setVisible(true);
+        });
     }
 }

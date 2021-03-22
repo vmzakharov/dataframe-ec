@@ -10,6 +10,17 @@ public abstract class AggregateFunction
     private final String columnName;
     private final String targetColumnName;
 
+    public AggregateFunction(String newColumnName)
+    {
+        this(newColumnName, newColumnName);
+    }
+
+    public AggregateFunction(String newColumnName, String newTargetColumnName)
+    {
+        this.columnName = newColumnName;
+        this.targetColumnName = newTargetColumnName;
+    }
+
     public static AggregateFunction sum(String newColumnName)
     {
         return new Sum(newColumnName);
@@ -60,17 +71,6 @@ public abstract class AggregateFunction
         return new Count(newColumnName, newTargetColumnName);
     }
 
-    public AggregateFunction(String newColumnName)
-    {
-        this(newColumnName, newColumnName);
-    }
-
-    public AggregateFunction(String newColumnName, String newTargetColumnName)
-    {
-        this.columnName = newColumnName;
-        this.targetColumnName = newTargetColumnName;
-    }
-
     public String getColumnName()
     {
         return this.columnName;
@@ -99,9 +99,11 @@ public abstract class AggregateFunction
     }
 
     abstract long longInitialValue();
+
     abstract double doubleInitialValue();
 
     abstract long longAccumulator(long currentAggregate, long newValue);
+
     abstract double doubleAccumulator(double currentAggregate, double newValue);
 
     abstract public String getDescription();
@@ -191,7 +193,7 @@ public abstract class AggregateFunction
         {
             return 0.0;
         }
-    };
+    }
 
     public static class Max
     extends AggregateFunction
@@ -247,7 +249,7 @@ public abstract class AggregateFunction
         {
             return Math.max(currentAggregate, newValue);
         }
-    };
+    }
 
     public static class Min
     extends AggregateFunction
@@ -303,7 +305,7 @@ public abstract class AggregateFunction
         {
             return Math.min(currentAggregate, newValue);
         }
-    };
+    }
 
     public static class Avg
     extends AggregateFunction
@@ -386,7 +388,7 @@ public abstract class AggregateFunction
                 }
             }
         }
-    };
+    }
 
     public static class Count
     extends AggregateFunction
@@ -472,6 +474,6 @@ public abstract class AggregateFunction
         {
             return 0.0;
         }
-    };
+    }
 }
 

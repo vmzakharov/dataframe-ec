@@ -38,7 +38,7 @@ extends BinaryOp
         @Override
         public BooleanValue apply(BooleanValue operand1, BooleanValue operand2)
         {
-            return BooleanValue.valueOf(operand1.isTrue() ^ operand2.isTrue()) ;
+            return BooleanValue.valueOf(operand1.isTrue() ^ operand2.isTrue());
         }
 
         @Override

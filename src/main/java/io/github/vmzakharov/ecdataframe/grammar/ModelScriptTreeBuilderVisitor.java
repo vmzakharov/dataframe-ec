@@ -124,13 +124,23 @@ extends ModelScriptBaseVisitor<Expression>
 
     private Expression visitBinaryOperation(ModelScriptParser.ExprContext exprContext1, ModelScriptParser.ExprContext exprContext2, Token opToken)
     {
-        ArithmeticOp operation = null;
+        ArithmeticOp operation;
         switch (opToken.getType())
         {
-            case ModelScriptParser.MUL: operation = ArithmeticOp.MULTIPLY; break;
-            case ModelScriptParser.DIV: operation = ArithmeticOp.DIVIDE;   break;
-            case ModelScriptParser.ADD: operation = ArithmeticOp.ADD;      break;
-            case ModelScriptParser.SUB: operation = ArithmeticOp.SUBTRACT; break;
+            case ModelScriptParser.MUL:
+                operation = ArithmeticOp.MULTIPLY;
+                break;
+            case ModelScriptParser.DIV:
+                operation = ArithmeticOp.DIVIDE;
+                break;
+            case ModelScriptParser.ADD:
+                operation = ArithmeticOp.ADD;
+                break;
+            case ModelScriptParser.SUB:
+                operation = ArithmeticOp.SUBTRACT;
+                break;
+            default:
+                throw new RuntimeException("Do not understand token '" + opToken.getText() + "'");
         }
 
         return new BinaryExpr(this.visit(exprContext1), this.visit(exprContext2), operation);
@@ -150,7 +160,7 @@ extends ModelScriptBaseVisitor<Expression>
 
     private Expression visitBooleanOperation(ModelScriptParser.ExprContext exprContext1, ModelScriptParser.ExprContext exprContext2, Token opToken)
     {
-        BooleanOp operation = null;
+        BooleanOp operation;
         switch (opToken.getType())
         {
             case ModelScriptParser.AND:
@@ -162,6 +172,8 @@ extends ModelScriptBaseVisitor<Expression>
             case ModelScriptParser.XOR:
                 operation = BooleanOp.XOR;
                 break;
+            default:
+                throw new RuntimeException("Do not understand token '" + opToken.getText() + "'");
         }
 
         return new BinaryExpr(this.visit(exprContext1), this.visit(exprContext2), operation);
@@ -170,15 +182,29 @@ extends ModelScriptBaseVisitor<Expression>
     @Override
     public Expression visitCompareExpr(ModelScriptParser.CompareExprContext ctx)
     {
-        ComparisonOp operation = null;
+        ComparisonOp operation;
         switch (ctx.op.getType())
         {
-            case ModelScriptParser.GT : operation = ComparisonOp.GT ; break;
-            case ModelScriptParser.GTE: operation = ComparisonOp.GTE; break;
-            case ModelScriptParser.LT : operation = ComparisonOp.LT ; break;
-            case ModelScriptParser.LTE: operation = ComparisonOp.LTE; break;
-            case ModelScriptParser.EQ : operation = ComparisonOp.EQ ; break;
-            case ModelScriptParser.NE : operation = ComparisonOp.NE ; break;
+            case ModelScriptParser.GT:
+                operation = ComparisonOp.GT;
+                break;
+            case ModelScriptParser.GTE:
+                operation = ComparisonOp.GTE;
+                break;
+            case ModelScriptParser.LT:
+                operation = ComparisonOp.LT;
+                break;
+            case ModelScriptParser.LTE:
+                operation = ComparisonOp.LTE;
+                break;
+            case ModelScriptParser.EQ:
+                operation = ComparisonOp.EQ;
+                break;
+            case ModelScriptParser.NE:
+                operation = ComparisonOp.NE;
+                break;
+            default:
+                throw new RuntimeException("Do not understand token '" + ctx.op.getText() + "'");
         }
 
         return new BinaryExpr(this.visit(ctx.expr(0)), this.visit(ctx.expr(1)), operation);
@@ -328,8 +354,10 @@ extends ModelScriptBaseVisitor<Expression>
     {
         ListIterable<Expression> projectionList = ListIterate.collect(ctx.exprList().expr(), this::visit);
 
-        ProjectionExpr projectionExpr = (ctx.expr() == null) ?
-                new ProjectionExpr(projectionList) :
+        ProjectionExpr projectionExpr = (ctx.expr() == null)
+                ?
+                new ProjectionExpr(projectionList)
+                :
                 new ProjectionExpr(projectionList, this.visit(ctx.expr()));
 
         return this.addStatementToCurrentScriptContext(projectionExpr);
@@ -339,14 +367,14 @@ extends ModelScriptBaseVisitor<Expression>
     {
         if (aString.length() < 2) return aString;
 
-        if (aString.charAt(0) == '"' && aString.charAt(aString.length()-1) == '"')
+        if (aString.charAt(0) == '"' && aString.charAt(aString.length() - 1) == '"')
         {
-            return aString.substring(1, aString.length()-1);
+            return aString.substring(1, aString.length() - 1);
         }
 
-        if (aString.charAt(0) == '\'' && aString.charAt(aString.length()-1) == '\'')
+        if (aString.charAt(0) == '\'' && aString.charAt(aString.length() - 1) == '\'')
         {
-            return aString.substring(1, aString.length()-1);
+            return aString.substring(1, aString.length() - 1);
         }
 
         return aString;

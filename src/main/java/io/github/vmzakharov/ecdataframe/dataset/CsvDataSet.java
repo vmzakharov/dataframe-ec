@@ -126,9 +126,9 @@ extends DataSetAbstract
 
     private CsvSchema schemaFromDataFrame(DataFrame dataFrame)
     {
-        CsvSchema schema = new CsvSchema();
-        dataFrame.getColumns().forEach(e -> schema.addColumn(e.getName(), e.getType()));
-        return schema;
+        CsvSchema dfSchema = new CsvSchema();
+        dataFrame.getColumns().forEach(e -> dfSchema.addColumn(e.getName(), e.getType()));
+        return dfSchema;
     }
 
     private void writeValue(Writer writer, DataFrame dataFrame, int rowIndex, int columnIndex)
@@ -224,7 +224,6 @@ extends DataSetAbstract
                         + this.getSchema().columnCount() + ", " + firstRowElements.size() + ")");
             }
 
-
             MutableList<Procedure<String>> columnPopulators = Lists.mutable.of();
             this.getSchema().getColumns().forEach(col -> this.addDataFrameColumn(df, col, columnPopulators));
 
@@ -288,23 +287,27 @@ extends DataSetAbstract
             {
                 guessedType = ValueType.STRING;
             }
-            else if ((matchingFormat = this.findMatchingDateFormat(element)) != null)
-            {
-                guessedType = ValueType.DATE;
-            }
-            else if (this.canParseAsLong(element))
-            {
-                guessedType = ValueType.LONG;
-            }
-            else if (this.canParseAsDouble(element))
-            {
-                guessedType = ValueType.DOUBLE;
-            }
             else
             {
-                guessedType = ValueType.STRING;
-            }
+                matchingFormat = this.findMatchingDateFormat(element);
 
+                if (matchingFormat != null)
+                {
+                    guessedType = ValueType.DATE;
+                }
+                else if (this.canParseAsLong(element))
+                {
+                    guessedType = ValueType.LONG;
+                }
+                else if (this.canParseAsDouble(element))
+                {
+                    guessedType = ValueType.DOUBLE;
+                }
+                else
+                {
+                    guessedType = ValueType.STRING;
+                }
+            }
             this.schema.addColumn(headers.get(i), guessedType, matchingFormat);
         }
     }
@@ -480,7 +483,7 @@ extends DataSetAbstract
 
     private String substringOrNull(String aString, int beginIndex, int endIndex)
     {
-        if(beginIndex < endIndex)
+        if (beginIndex < endIndex)
         {
             return aString.substring(beginIndex, endIndex);
         }

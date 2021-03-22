@@ -99,5 +99,4 @@ public class AvroCodeScratchpad
         Value result = script.evaluate(visitor);
         System.out.println(result.stringValue());
     }
-
 }

@@ -30,13 +30,6 @@ implements ExpressionVisitor
     private int offset = 0;
     private boolean startedNewLine = true;
 
-    static public String exprToString(Expression e)
-    {
-        CollectingPrinter printer = new CollectingPrinter();
-        e.accept(new PrettyPrintVisitor(printer));
-        return printer.toString();
-    }
-
     public PrettyPrintVisitor()
     {
         this(PrinterFactory.getPrinter());
@@ -45,6 +38,13 @@ implements ExpressionVisitor
     public PrettyPrintVisitor(Printer newPrinter)
     {
         this.printer = newPrinter;
+    }
+
+    static public String exprToString(Expression e)
+    {
+        CollectingPrinter printer = new CollectingPrinter();
+        e.accept(new PrettyPrintVisitor(printer));
+        return printer.toString();
     }
 
     @Override
@@ -134,7 +134,7 @@ implements ExpressionVisitor
     public void visitAnonymousScriptExpr(AnonymousScript expr)
     {
         expr.getFunctions().forEachValue(this::visitFunctionScriptExpr);
-        this.printExpressionListLn(expr.getExpressions());;
+        this.printExpressionListLn(expr.getExpressions());
     }
 
     @Override

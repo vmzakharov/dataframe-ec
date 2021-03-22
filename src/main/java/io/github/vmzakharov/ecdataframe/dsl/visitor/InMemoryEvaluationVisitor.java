@@ -49,7 +49,7 @@ implements ExpressionEvaluationVisitor
     @Override
     public Value visitAssignExpr(AssingExpr expr)
     {
-        return this.getContext().  setVariable(expr.getVarName(), expr.getExpression().evaluate(this));
+        return this.getContext().setVariable(expr.getVarName(), expr.getExpression().evaluate(this));
     }
 
     @Override
@@ -205,7 +205,7 @@ implements ExpressionEvaluationVisitor
 
         AvroDataSet dataSet = this.getContext().getDataSet(propertyPathExpr.getEntityName());
 
-        boolean missingWhereClause = ( expr.getWhereClause() == null );
+        boolean missingWhereClause = expr.getWhereClause() == null;
 
         DataFrame dataFrame = new DataFrame("Projection");
 
