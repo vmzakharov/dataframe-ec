@@ -28,13 +28,13 @@ public class DataFrameBitmapTest
     @Test
     public void selectionOfFlaggedRows()
     {
-        dataFrame.enableBitmap();
+        this.dataFrame.enableBitmap();
 
-        dataFrame.setFlag(0);
-        dataFrame.setFlag(2);
-        dataFrame.setFlag(3);
+        this.dataFrame.setFlag(0);
+        this.dataFrame.setFlag(2);
+        this.dataFrame.setFlag(3);
 
-        DataFrame filtered = dataFrame.selectFlagged();
+        DataFrame filtered = this.dataFrame.selectFlagged();
 
         DataFrame expected = new DataFrame("Expected FrameOfData")
                 .addStringColumn("Name").addStringColumn("Foo").addLongColumn("Bar").addDoubleColumn("Baz").addDoubleColumn("Qux")
@@ -118,7 +118,7 @@ public class DataFrameBitmapTest
         this.dataFrame.setFlag(1);
         this.dataFrame.setFlag(4);
 
-        DataFrame filtered = dataFrame.selectNotFlagged();
+        DataFrame filtered = this.dataFrame.selectNotFlagged();
 
         DataFrame expected = new DataFrame("Expected FrameOfData")
                 .addStringColumn("Name").addStringColumn("Foo").addLongColumn("Bar").addDoubleColumn("Baz").addDoubleColumn("Qux")

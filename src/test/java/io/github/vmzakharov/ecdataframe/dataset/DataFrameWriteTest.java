@@ -1,7 +1,6 @@
 package io.github.vmzakharov.ecdataframe.dataset;
 
 import io.github.vmzakharov.ecdataframe.dataframe.DataFrame;
-import io.github.vmzakharov.ecdataframe.dataframe.DataFrameUtil;
 import io.github.vmzakharov.ecdataframe.dsl.value.ValueType;
 import org.junit.Assert;
 import org.junit.Test;
@@ -25,12 +24,12 @@ public class DataFrameWriteTest
         StringBasedCsvDataSet dataSet = new StringBasedCsvDataSet("Foo", "Employees", "");
         dataSet.write(dataFrame);
 
-        String expected = "Name,EmployeeId,HireDate,Dept,Salary\n" +
-                            "\"Alice\",1234,2020-01-01,\"Accounting\",110000.0\n" +
-                            "\"Bob\",1233,2010-01-01,\"Bee-bee-boo-boo\",100000.0\n" +
-                            "\"Carl\",10000,2005-11-21,\"Controllers\",130000.0\n" +
-                            "\"Diane\",10001,2012-09-20,\"\",130000.0\n" +
-                            "\"Ed\",10002,,,0.0\n";
+        String expected = "Name,EmployeeId,HireDate,Dept,Salary\n"
+                        + "\"Alice\",1234,2020-01-01,\"Accounting\",110000.0\n"
+                        + "\"Bob\",1233,2010-01-01,\"Bee-bee-boo-boo\",100000.0\n"
+                        + "\"Carl\",10000,2005-11-21,\"Controllers\",130000.0\n"
+                        + "\"Diane\",10001,2012-09-20,\"\",130000.0\n"
+                        + "\"Ed\",10002,,,0.0\n";
 
         Assert.assertEquals(expected, dataSet.getWrittenData());
     }
@@ -59,12 +58,12 @@ public class DataFrameWriteTest
         StringBasedCsvDataSet dataSet = new StringBasedCsvDataSet("Foo", "Employees", schema, "");
         dataSet.write(dataFrame);
 
-        String expected = "Name,EmployeeId,HireDate,OtherDate,Dept,Salary\n" +
-                "'Alice',1234,2020-01-01,1/1/2021,'Accounting',110000.0\n" +
-                "'Bob',1233,2010-01-01,1/1/2021,'Bee-bee-boo-boo',100000.0\n" +
-                "'Carl',10000,2005-11-21,11/21/2021,'Controllers',130000.0\n" +
-                "'Diane',10001,2012-09-20,9/20/2022,'',130000.0\n" +
-                "'Ed',10002,,,,0.0\n";
+        String expected = "Name,EmployeeId,HireDate,OtherDate,Dept,Salary\n"
+                + "'Alice',1234,2020-01-01,1/1/2021,'Accounting',110000.0\n"
+                + "'Bob',1233,2010-01-01,1/1/2021,'Bee-bee-boo-boo',100000.0\n"
+                + "'Carl',10000,2005-11-21,11/21/2021,'Controllers',130000.0\n"
+                + "'Diane',10001,2012-09-20,9/20/2022,'',130000.0\n"
+                + "'Ed',10002,,,,0.0\n";
 
         Assert.assertEquals(expected, dataSet.getWrittenData());
     }

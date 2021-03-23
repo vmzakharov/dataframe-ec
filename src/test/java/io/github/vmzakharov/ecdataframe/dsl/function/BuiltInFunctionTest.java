@@ -13,7 +13,7 @@ import static io.github.vmzakharov.ecdataframe.ExpressionTestUtil.*;
 
 public class BuiltInFunctionTest
 {
-    private static double TOLERANCE = 0.000001;
+    final private static double TOLERANCE = 0.000001;
 
     @Test
     public void printFunction()
@@ -21,10 +21,11 @@ public class BuiltInFunctionTest
         CollectingPrinter collectingPrinter = new CollectingPrinter();
         PrinterFactory.setPrinter(collectingPrinter);
 
-        Script script = toScript("println(1 + 3)\n" +
-                "print(\"ene\")\n" +
-                "println(\"-mene\")\n" +
-                "println(\"Hello!\")");
+        Script script = toScript(
+                  "println(1 + 3)\n"
+                + "print(\"ene\")\n"
+                + "println(\"-mene\")\n"
+                + "println(\"Hello!\")");
 
         script.evaluate(new InMemoryEvaluationVisitor());
 
@@ -37,9 +38,9 @@ public class BuiltInFunctionTest
         CollectingPrinter collectingPrinter = new CollectingPrinter();
         PrinterFactory.setPrinter(collectingPrinter);
 
-        String s = "println(1 + 3, \" = \", 4)\n" +
-                "print(\"ene\", \"-mene\")\n" +
-                "println(\", hello!\")";
+        String s = "println(1 + 3, \" = \", 4)\n"
+                + "print(\"ene\", \"-mene\")\n"
+                + "println(\", hello!\")";
 
         Script script = toScript(s);
 

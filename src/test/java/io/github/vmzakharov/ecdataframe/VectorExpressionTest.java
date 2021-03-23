@@ -4,11 +4,8 @@ import io.github.vmzakharov.ecdataframe.dsl.AnonymousScript;
 import io.github.vmzakharov.ecdataframe.dsl.value.BooleanValue;
 import io.github.vmzakharov.ecdataframe.dsl.value.LongValue;
 import io.github.vmzakharov.ecdataframe.dsl.value.Value;
-import io.github.vmzakharov.ecdataframe.util.ExpressionParserHelper;
 import org.junit.Assert;
 import org.junit.Test;
-
-import java.time.LocalDate;
 
 public class VectorExpressionTest
 {
@@ -16,9 +13,9 @@ public class VectorExpressionTest
     public void vectorVariableIn()
     {
         AnonymousScript script = ExpressionTestUtil.toScript(
-                "x = (\"a\", \"b\", \"c\")\n" +
-                "y = \"a\"\n" +
-                "y in x\n"
+                  "x = (\"a\", \"b\", \"c\")\n"
+                + "y = \"a\"\n"
+                + "y in x\n"
         );
 
         Value result = script.evaluate();
@@ -35,9 +32,9 @@ public class VectorExpressionTest
     public void indexWithVariables()
     {
         AnonymousScript script = ExpressionTestUtil.toScript(
-                "x = (\"a\", \"b\", \"c\")\n" +
-                "y = 2\n" +
-                "x[y]\n"
+                  "x = (\"a\", \"b\", \"c\")\n"
+                + "y = 2\n"
+                + "x[y]\n"
         );
 
         Value result = script.evaluate();
@@ -48,16 +45,16 @@ public class VectorExpressionTest
     public void indexWithFunction()
     {
         AnonymousScript script = ExpressionTestUtil.toScript(
-                "function foo(switch)\n" +
-                "{\n" +
-                "  if switch == 1 then\n" +
-                "    (1, 2, 3)\n" +
-                "  else\n" +
-                "    (4, 5, 6)\n" +
-                "  endif\n" +
-                "}\n" +
-                "\n" +
-                "foo(2)[2] + foo(1)[1] "
+                  "function foo(switch)\n"
+                + "{\n"
+                + "  if switch == 1 then\n"
+                + "    (1, 2, 3)\n"
+                + "  else\n"
+                + "    (4, 5, 6)\n"
+                + "  endif\n"
+                + "}\n"
+                + "\n"
+                + "foo(2)[2] + foo(1)[1] "
         );
 
         Value result = script.evaluate();

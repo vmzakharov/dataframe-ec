@@ -3,27 +3,27 @@ package io.github.vmzakharov.ecdataframe.dataset;
 import io.github.vmzakharov.ecdataframe.ExpressionTestUtil;
 import io.github.vmzakharov.ecdataframe.dsl.Script;
 import io.github.vmzakharov.ecdataframe.dsl.value.Value;
+import io.github.vmzakharov.ecdataframe.dsl.visitor.InMemoryEvaluationVisitor;
 import org.apache.avro.generic.GenericRecord;
 import org.eclipse.collections.api.list.MutableList;
 import org.eclipse.collections.impl.factory.Lists;
-import io.github.vmzakharov.ecdataframe.dsl.visitor.InMemoryEvaluationVisitor;
-import io.github.vmzakharov.ecdataframe.util.ExpressionParserHelper;
 
 public class AvroCodeScratchpad
 {
     public static void main(String[] args)
     {
-        System.out.println("Current working directory: "+System.getProperty("user.dir"));
+        AvroCodeScratchpad scratchpad = new AvroCodeScratchpad();
+        System.out.println("Current working directory: " + System.getProperty("user.dir"));
 
-//        writeStuff();
+//        scratchpad.writeStuff();
 //        System.out.println("-----------");
-        readStuff();
+        scratchpad.readStuff();
         System.out.println("-----------");
 //        System.out.println("-----------");
-        projectionScript();
+        scratchpad.projectionScript();
     }
 
-    private static void writeStuff()
+    private void writeStuff()
     {
         AvroDataSet dataSet = new AvroDataSet("src/test/resources/user.avsc", "User", "users.avro");
 
@@ -56,7 +56,7 @@ public class AvroCodeScratchpad
         dataSet.write(user1, user2, user3);
     }
 
-    private static void readStuff()
+    private void readStuff()
     {
         AvroDataSet dataSet = new AvroDataSet("src/test/resources/user.avsc", "User", "users.avro");
 
@@ -76,19 +76,19 @@ public class AvroCodeScratchpad
         users.forEach(System.out::println);
     }
 
-    private static void projectionScript()
+    private void projectionScript()
     {
         AvroDataSet dataSet = new AvroDataSet("src/test/resources/user.avsc", "User", "users.avro");
 
-        String scriptString = "" +
-                "x = \"Ben\"\n" +
-                "limit = 1\n" +
-                "project {\n" +
-                "    User.name,\n" +
-                "    Color : User.favorite_color,\n" +
-                "    Oompa : \"Loompa\",\n" +
-                "    Fav : User.favorite_number\n" +
-                "} where User.favorite_number > limit + 2";
+        String scriptString =
+                  "x = \"Ben\"\n"
+                + "limit = 1\n"
+                + "project {\n"
+                + "    User.name,\n"
+                + "    Color : User.favorite_color,\n"
+                + "    Oompa : \"Loompa\",\n"
+                + "    Fav : User.favorite_number\n"
+                + "} where User.favorite_number > limit + 2";
 
         System.out.println(scriptString);
         System.out.println("-----------");

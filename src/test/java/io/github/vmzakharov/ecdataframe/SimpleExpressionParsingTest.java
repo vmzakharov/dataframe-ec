@@ -1,6 +1,17 @@
 package io.github.vmzakharov.ecdataframe;
 
-import io.github.vmzakharov.ecdataframe.dsl.*;
+import io.github.vmzakharov.ecdataframe.dsl.AssingExpr;
+import io.github.vmzakharov.ecdataframe.dsl.BinaryExpr;
+import io.github.vmzakharov.ecdataframe.dsl.ConstExpr;
+import io.github.vmzakharov.ecdataframe.dsl.EvalContext;
+import io.github.vmzakharov.ecdataframe.dsl.Expression;
+import io.github.vmzakharov.ecdataframe.dsl.FunctionCallExpr;
+import io.github.vmzakharov.ecdataframe.dsl.ProjectionExpr;
+import io.github.vmzakharov.ecdataframe.dsl.Script;
+import io.github.vmzakharov.ecdataframe.dsl.SimpleEvalContext;
+import io.github.vmzakharov.ecdataframe.dsl.UnaryExpr;
+import io.github.vmzakharov.ecdataframe.dsl.UnaryOp;
+import io.github.vmzakharov.ecdataframe.dsl.VectorExpr;
 import io.github.vmzakharov.ecdataframe.dsl.value.LongValue;
 import io.github.vmzakharov.ecdataframe.dsl.visitor.InMemoryEvaluationVisitor;
 import org.eclipse.collections.impl.factory.Lists;
@@ -83,10 +94,10 @@ public class SimpleExpressionParsingTest
     public void projectionWithAlias()
     {
         Script script = ExpressionTestUtil.toScript(
-                "project {\n" +
-                "barbar : Foo.bar, " +
-                "bazbaz : Foo.baz" +
-                "} where Foo.qux > 7");
+                  "project {\n"
+                + "barbar : Foo.bar, "
+                + "bazbaz : Foo.baz"
+                + "} where Foo.qux > 7");
 
         Expression expression = script.getExpressions().get(0);
 

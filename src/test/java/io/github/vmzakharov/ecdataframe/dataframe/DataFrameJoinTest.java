@@ -58,7 +58,7 @@ public class DataFrameJoinTest
         DataFrame joined = df1.join(df2, "Baz", "Number");
 
         DataFrame expected = new DataFrame("expected")
-                .addStringColumn("Foo").addLongColumn("Bar").   addStringColumn("Name")
+                .addStringColumn("Foo").addLongColumn("Bar").addStringColumn("Name")
                 .addRow("Blinky", 7, "Apple")
                 .addRow("Pinky",  8, "Grapefruit")
                 .addRow("Inky",   9, "Mint")
@@ -122,10 +122,10 @@ public class DataFrameJoinTest
 
         DataFrame expected = new DataFrame("expected")
                 .addStringColumn("Foo").addStringColumn("Bar").addLongColumn("Baz").addStringColumn("Name").addLongColumn("Number").addStringColumn("Counted")
-                .addRow("Inky",   "cyan",   123, "Mint",       3, "One Mint"      )
-                .addRow("Clyde",  "orange", 123, "Orange",     4, "One Orange"    )
+                .addRow("Inky",   "cyan",   123, "Mint",       3, "One Mint")
+                .addRow("Clyde",  "orange", 123, "Orange",     4, "One Orange")
                 .addRow("Pinky",  "pink",   123, "Grapefruit", 2, "One Grapefruit")
-                .addRow("Blinky", "red",    123, "Apple",      1, "One Apple"     )
+                .addRow("Blinky", "red",    123, "Apple",      1, "One Apple")
                 ;
 
         DataFrameUtil.assertEquals(expected, joined);

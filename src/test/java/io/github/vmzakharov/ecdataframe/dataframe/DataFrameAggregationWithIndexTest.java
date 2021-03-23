@@ -1,8 +1,5 @@
 package io.github.vmzakharov.ecdataframe.dataframe;
 
-import org.eclipse.collections.api.list.MutableList;
-import org.eclipse.collections.api.list.primitive.MutableIntList;
-import org.eclipse.collections.api.tuple.Pair;
 import org.eclipse.collections.impl.factory.Lists;
 import org.eclipse.collections.impl.factory.primitive.IntLists;
 import org.junit.Assert;

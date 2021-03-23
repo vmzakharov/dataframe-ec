@@ -2,7 +2,6 @@ package io.github.vmzakharov.ecdataframe.dataframe;
 
 import io.github.vmzakharov.ecdataframe.ExpressionTestUtil;
 import io.github.vmzakharov.ecdataframe.dsl.AnonymousScript;
-import io.github.vmzakharov.ecdataframe.dsl.EvalContext;
 import io.github.vmzakharov.ecdataframe.dsl.SimpleEvalContext;
 import io.github.vmzakharov.ecdataframe.dsl.value.LongValue;
 import io.github.vmzakharov.ecdataframe.util.ExpressionParserHelper;
@@ -53,10 +52,10 @@ public class DataFrameComputedColumnsTest
         Assert.assertEquals(4, this.df.rowCount());
 
         Assert.assertEquals(LongLists.immutable.of(10L, 20L, 22L, 0L), this.df.getLongColumn("Double Count").toLongList());
-        Assert.assertEquals( 7L, this.df.getLongColumn("Two More").getLong(0));
+        Assert.assertEquals(7L, this.df.getLongColumn("Two More").getLong(0));
         Assert.assertEquals(12L, this.df.getLongColumn("Two More").getLong(1));
         Assert.assertEquals(13L, this.df.getLongColumn("Two More").getLong(2));
-        Assert.assertEquals( 2L, this.df.getLongColumn("Two More").getLong(3));
+        Assert.assertEquals(2L, this.df.getLongColumn("Two More").getLong(3));
     }
 
     @Test
@@ -121,11 +120,11 @@ public class DataFrameComputedColumnsTest
                 .addRow("Dan",    0,  7.89);
 
         String script =
-                "if Count > 7 then\n" +
-                "  Value * 2\n" +
-                "else\n" +
-                "  Value + 2\n" +
-                "endif";
+                  "if Count > 7 then\n"
+                + "  Value * 2\n"
+                + "else\n"
+                + "  Value + 2\n"
+                + "endif";
 
         this.df.addDoubleColumn("Complication", script);
 
@@ -136,12 +135,12 @@ public class DataFrameComputedColumnsTest
     public void usingScriptWithVariables()
     {
         String script =
-                "a = 7\n" +
-                "if Count > a then\n" +
-                "  Value * 2\n" +
-                "else\n" +
-                "  Value + 2\n" +
-                "endif";
+                  "a = 7\n"
+                + "if Count > a then\n"
+                + "  Value * 2\n"
+                + "else\n"
+                + "  Value + 2\n"
+                + "endif";
         this.df.addDoubleColumn("Complication", script);
 
         Assert.assertEquals(DoubleLists.immutable.of(25.45, 24.68, 113.56, 9.89), this.df.getDoubleColumn("Complication").toDoubleList());
@@ -151,16 +150,16 @@ public class DataFrameComputedColumnsTest
     public void usingScriptWithFunctionDeclaration()
     {
         String script =
-                "function bigEnough(value)\n" +
-                "{\n" +
-                "   value > 7\n" +
-                "}\n" +
-                "\n" +
-                "if bigEnough(Count) then\n" +
-                "  Value * 2\n" +
-                "else\n" +
-                "  Value + 2\n" +
-                "endif";
+                  "function bigEnough(value)\n"
+                + "{\n"
+                + "   value > 7\n"
+                + "}\n"
+                + "\n"
+                + "if bigEnough(Count) then\n"
+                + "  Value * 2\n"
+                + "else\n"
+                + "  Value + 2\n"
+                + "endif";
 
         this.df.addDoubleColumn("Complication", script);
 
@@ -171,19 +170,19 @@ public class DataFrameComputedColumnsTest
     public void usingScriptWithOutsideContext()
     {
         String script =
-                "if inTheList(Count, numbers) then\n" +
-                "  Value * 2\n" +
-                "else\n" +
-                "  Value + 2\n" +
-                "endif";
+                  "if inTheList(Count, numbers) then\n"
+                + "  Value * 2\n"
+                + "else\n"
+                + "  Value + 2\n"
+                + "endif";
 
         this.df.addDoubleColumn("Complication", script);
 
-        String outerScriptString = "" +
-                "function inTheList(item, list)\n" +
-                "{\n" +
-                "  item in list\n" +
-                "}\n"
+        String outerScriptString =
+                  "function inTheList(item, list)\n"
+                + "{\n"
+                + "  item in list\n"
+                + "}\n"
         ;
 
         AnonymousScript outerScript = ExpressionParserHelper.DEFAULT.toScript(outerScriptString);

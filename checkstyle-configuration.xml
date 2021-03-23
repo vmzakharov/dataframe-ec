@@ -102,7 +102,10 @@
         <module name="MethodParamPad"/>
         <module name="NoLineWrap"/>
         <module name="NoWhitespaceAfter"/>
-        <module name="NoWhitespaceBefore"/>
+        <module name="NoWhitespaceBefore">
+            <property name="tokens" value="SEMI"/>
+            <property name="allowLineBreaks" value="true"/>
+        </module>
         <module name="OperatorWrap"/>
         <module name="ParenPad"/>
         <module name="TypecastParenPad"/>

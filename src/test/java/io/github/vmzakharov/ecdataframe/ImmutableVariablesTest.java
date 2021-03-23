@@ -8,7 +8,7 @@ public class ImmutableVariablesTest
     public void immutableVariables()
     {
         ExpressionTestUtil.toScript(
-                "a = 1\n" +
-                "a = 2").evaluate();
+                  "a = 1\n"
+                + "a = 2").evaluate();
     }
 }

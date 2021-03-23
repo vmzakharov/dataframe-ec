@@ -27,7 +27,7 @@ public class SeparatedTextSplittingTest
     {
         this.validateSplitting(
                 "eenie, meenie  ,  , miny,, moe",
-                new String[] {"eenie"," meenie  ","  "," miny", ""," moe"});
+                new String[] {"eenie", " meenie  ", "  ", " miny", "", " moe"});
     }
 
     @Test
@@ -50,19 +50,19 @@ public class SeparatedTextSplittingTest
     @Test
     public void stringWithFirstAndLastBlankValues()
     {
-        this.validateSplitting(" ,eenie, meenie,  ", new String[] {" ", "eenie"," meenie", "  "});
+        this.validateSplitting(" ,eenie, meenie,  ", new String[] {" ", "eenie", " meenie", "  "});
     }
 
     @Test
     public void stringWithQuotesAndFirstAndLastBlankValues()
     {
-        this.validateSplitting(" ,\"eenie\",\" meenie\",  ", new String[] {" ", "\"eenie\"","\" meenie\"", "  "});
+        this.validateSplitting(" ,\"eenie\",\" meenie\",  ", new String[] {" ", "\"eenie\"", "\" meenie\"", "  "});
     }
 
     @Test
     public void simpleStringWithQuotes()
     {
-        this.validateSplitting("\"aa\",\"bb\",\"cc\"", new String[] {"\"aa\"", "\"bb\"","\"cc\""});
+        this.validateSplitting("\"aa\",\"bb\",\"cc\"", new String[] {"\"aa\"", "\"bb\"", "\"cc\""});
     }
 
     @Test

@@ -1,6 +1,7 @@
 package io.github.vmzakharov.ecdataframe.dataframe;
 
 import io.github.vmzakharov.ecdataframe.ExpressionTestUtil;
+import io.github.vmzakharov.ecdataframe.dsl.Expression;
 import io.github.vmzakharov.ecdataframe.dsl.value.LongValue;
 import org.eclipse.collections.api.factory.Lists;
 import org.eclipse.collections.api.list.ImmutableList;
@@ -10,8 +11,6 @@ import org.eclipse.collections.impl.list.primitive.IntInterval;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import io.github.vmzakharov.ecdataframe.dsl.Expression;
-import io.github.vmzakharov.ecdataframe.util.ExpressionParserHelper;
 
 public class DataFrameExpressionTest
 {
@@ -38,7 +37,7 @@ public class DataFrameExpressionTest
         MutableLongList values = LongLists.mutable.of();
 
         IntInterval.zeroTo(3)
-                .collectLong(i -> ((LongValue) df.evaluateExpression(expression, i)).longValue(), values);
+                .collectLong(i -> ((LongValue) this.df.evaluateExpression(expression, i)).longValue(), values);
         Assert.assertEquals(LongLists.immutable.of(10, 20, 22, 0), values);
     }
 
@@ -47,7 +46,7 @@ public class DataFrameExpressionTest
     {
         Expression expression = ExpressionTestUtil.toExpression("substr(Name, 2) + \"X\"");
 
-        ImmutableList<Object> values = IntInterval.zeroTo(3).collect(i -> df.evaluateExpression(expression, i).stringValue());
+        ImmutableList<Object> values = IntInterval.zeroTo(3).collect(i -> this.df.evaluateExpression(expression, i).stringValue());
 
         Assert.assertEquals(Lists.immutable.of("iceX", "bX", "rolX", "nX"), values);
     }

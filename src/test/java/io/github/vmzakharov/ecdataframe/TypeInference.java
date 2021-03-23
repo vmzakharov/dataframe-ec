@@ -41,60 +41,60 @@ public class TypeInference
     public void scriptTypeInference()
     {
         this.assertScriptType(
-                "1\n" +
-                        "2.0\n" +
-                        "\"abc\"", ValueType.STRING);
+                   "1\n"
+                + "2.0\n"
+                + "\"abc\"", ValueType.STRING);
 
         this.assertScriptType(
-                "a = 1\n" +
-                        "b = 2.0\n" +
-                        "c = a + b", ValueType.DOUBLE);
+                  "a = 1\n"
+                + "b = 2.0\n"
+                + "c = a + b", ValueType.DOUBLE);
     }
 
     @Test
     public void functionTypeInference()
     {
         this.assertScriptType(
-                "function sum(a, b)\n" +
-                "{\n" +
-                "    a + b\n" +
-                "}\n" +
-                "x = 1.0\n" +
-                "y = 2.0\n" +
-                "sum(x, y)", ValueType.DOUBLE);
+                  "function sum(a, b)\n"
+                + "{\n"
+                + "    a + b\n"
+                + "}\n"
+                + "x = 1.0\n"
+                + "y = 2.0\n"
+                + "sum(x, y)", ValueType.DOUBLE);
 
         this.assertScriptType(
-                "function sum(a, b)\n" +
-                "{\n" +
-                "    a + b\n" +
-                "}\n" +
-                "x = 1\n" +
-                "y = 2\n" +
-                "sum(x, y)", ValueType.LONG);
+                  "function sum(a, b)\n"
+                + "{\n"
+                + "    a + b\n"
+                + "}\n"
+                + "x = 1\n"
+                + "y = 2\n"
+                + "sum(x, y)", ValueType.LONG);
 
         this.assertScriptType(
-                "function sum(a, b)\n" +
-                "{\n" +
-                "    a + b\n" +
-                "}\n" +
-                "x = \"Hello, \"\n" +
-                "y = \"world!\"\n" +
-                "sum(x, y)", ValueType.STRING);
+                  "function sum(a, b)\n"
+                + "{\n"
+                + "    a + b\n"
+                + "}\n"
+                + "x = \"Hello, \"\n"
+                + "y = \"world!\"\n"
+                + "sum(x, y)", ValueType.STRING);
 
         this.assertScriptType(
-                "function sum(a, b)\n" +
-                "{\n" +
-                "    a + b\n" +
-                "}\n" +
-                "x = 1\n" +
-                "y = 2.0\n" +
-                "sum(x, y)", ValueType.DOUBLE);
+                  "function sum(a, b)\n"
+                + "{\n"
+                + "    a + b\n"
+                + "}\n"
+                + "x = 1\n"
+                + "y = 2.0\n"
+                + "sum(x, y)", ValueType.DOUBLE);
 
         this.assertScriptType(
-                "function isItBigger(a, b) { a > b }\n" +
-                "x = 1\n" +
-                "y = 2.0\n" +
-                "isItBigger(x, y)", ValueType.BOOLEAN);
+                  "function isItBigger(a, b) { a > b }\n"
+                + "x = 1\n"
+                + "y = 2.0\n"
+                + "isItBigger(x, y)", ValueType.BOOLEAN);
     }
 
     @Test
@@ -106,13 +106,13 @@ public class TypeInference
         context.addDataSet(dataSet);
         TypeInferenceVisitor visitor = new TypeInferenceVisitor(context);
 
-        String expressionString = "" +
-                "project {\n" +
-                "    User.name,\n" +
-                "    Color : User.favorite_color,\n" +
-                "    Oompa : \"Loompa\",\n" +
-                "    Fav : User.favorite_number\n" +
-                "} where User.favorite_number > 2";
+        String expressionString =
+                  "project {\n"
+                + "    User.name,\n"
+                + "    Color : User.favorite_color,\n"
+                + "    Oompa : \"Loompa\",\n"
+                + "    Fav : User.favorite_number\n"
+                + "} where User.favorite_number > 2";
 
         ProjectionExpr expr = (ProjectionExpr) ExpressionParserHelper.DEFAULT.toProjection(expressionString);
 

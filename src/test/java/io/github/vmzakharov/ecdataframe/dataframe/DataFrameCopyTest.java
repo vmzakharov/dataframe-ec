@@ -22,7 +22,7 @@ public class DataFrameCopyTest
 
         Assert.assertEquals(0, clonedSchema.rowCount());
         Assert.assertEquals(df.columnCount(), clonedSchema.columnCount());
-        for (int i= 0; i < df.columnCount(); i++)
+        for (int i = 0; i < df.columnCount(); i++)
         {
             DfColumn sourceColumn = df.getColumnAt(i);
             DfColumn copyColumn = clonedSchema.getColumnAt(i);
@@ -56,7 +56,7 @@ public class DataFrameCopyTest
 
         Assert.assertEquals(0, clonedSchema.rowCount());
         Assert.assertEquals(df.columnCount(), clonedSchema.columnCount());
-        for (int i= 0; i < df.columnCount(); i++)
+        for (int i = 0; i < df.columnCount(); i++)
         {
             DfColumn sourceColumn = df.getColumnAt(i);
             DfColumn copyColumn = clonedSchema.getColumnAt(i);

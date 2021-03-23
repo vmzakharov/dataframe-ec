@@ -1,7 +1,6 @@
 package io.github.vmzakharov.ecdataframe;
 
 import io.github.vmzakharov.ecdataframe.dsl.Expression;
-import io.github.vmzakharov.ecdataframe.dsl.Script;
 import io.github.vmzakharov.ecdataframe.grammar.CollectingErrorListener;
 import io.github.vmzakharov.ecdataframe.util.ExpressionParserHelper;
 import org.eclipse.collections.api.factory.Lists;
@@ -52,21 +51,20 @@ public class ParserErrorReportingTest
         Assert.assertEquals(1, error.charPositionInLine());
     }
 
-
     @Test
     public void simpleErrorReporting3()
     {
         CollectingErrorListener errorListener = new CollectingErrorListener();
         ExpressionParserHelper parserHelper = new ExpressionParserHelper(errorListener);
 
-        parserHelper.toScript("function boo boo()\n" +
-                "{\n" +
-                "  if a > 7\n" +
-                "    x = 'greater'\n" +
-                "  else\n" +
-                "    x = 'lesser'\n" +
-                "  endif\n" +
-                "  (x == 'greater') ? 'yes' }\n");
+        parserHelper.toScript("function boo boo()\n"
+                + "{\n"
+                + "  if a > 7\n"
+                + "    x = 'greater'\n"
+                + "  else\n"
+                + "    x = 'lesser'\n"
+                + "  endif\n"
+                + "  (x == 'greater') ? 'yes' }\n");
 
         Assert.assertTrue(errorListener.hasErrors());
 

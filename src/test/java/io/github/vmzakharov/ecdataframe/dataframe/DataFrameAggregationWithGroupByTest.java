@@ -37,18 +37,18 @@ public class DataFrameAggregationWithGroupByTest
     @Test
     public void sumGroupingOneRow()
     {
-        DataFrame dataFrame = new DataFrame("FrameOfData")
+        DataFrame df = new DataFrame("FrameOfData")
                 .addStringColumn("Name").addStringColumn("Foo").addLongColumn("Bar").addDoubleColumn("Baz").addDoubleColumn("Qux")
                 .addRow("Alice", "Abc",  123L, 10.0, 20.0);
 
-        DataFrame summed = dataFrame.sumBy(Lists.immutable.of("Bar", "Baz", "Qux"), Lists.immutable.of("Name"));
+        DataFrame summed = df.sumBy(Lists.immutable.of("Bar", "Baz", "Qux"), Lists.immutable.of("Name"));
 
         Assert.assertEquals(1, summed.rowCount());
 
         Assert.assertEquals("Alice", summed.getString("Name", 0));
-        Assert.assertEquals(   123L, summed.getLong("Bar", 0));
-        Assert.assertEquals(   10.0, summed.getDouble("Baz", 0), TOLERANCE);
-        Assert.assertEquals(   20.0, summed.getDouble("Qux", 0), TOLERANCE);
+        Assert.assertEquals(123L, summed.getLong("Bar", 0));
+        Assert.assertEquals(10.0, summed.getDouble("Baz", 0), TOLERANCE);
+        Assert.assertEquals(20.0, summed.getDouble("Qux", 0), TOLERANCE);
     }
 
     @Test
@@ -118,15 +118,15 @@ public class DataFrameAggregationWithGroupByTest
     {
         DataFrame expected = new DataFrame("Expected")
                 .addStringColumn("Name").addLongColumn("Bar").addDoubleColumn("Baz").addDoubleColumn("Qux")
-                .addRow("Bob",	  567, 24,  50)
+                .addRow("Bob",    567, 24,  50)
                 .addRow("Alice",  123, 10,  20)
                 .addRow("Carol", 2367, 45, 120);
 
         DataFrameUtil.assertEquals(expected,
-                dataFrame.sumBy(Lists.immutable.of("Bar", "Baz", "Qux"), Lists.immutable.of("Name")));
+                this.dataFrame.sumBy(Lists.immutable.of("Bar", "Baz", "Qux"), Lists.immutable.of("Name")));
 
         DataFrameUtil.assertEquals(expected,
-                dataFrame.aggregateBy(Lists.immutable.of(sum("Bar"), sum("Baz"), sum("Qux")), Lists.immutable.of("Name")));
+                this.dataFrame.aggregateBy(Lists.immutable.of(sum("Bar"), sum("Baz"), sum("Qux")), Lists.immutable.of("Name")));
     }
 
     @Test
@@ -134,7 +134,7 @@ public class DataFrameAggregationWithGroupByTest
     {
         DataFrame expected = new DataFrame("Expected")
             .addStringColumn("Name").addLongColumn("Bar").addDoubleColumn("Baz").addDoubleColumn("Qux")
-                .addRow("Bob",	  283, 12, 25)
+                .addRow("Bob",    283, 12, 25)
                 .addRow("Alice",  123, 10, 20)
                 .addRow("Carol",  789, 15, 40);
 
@@ -153,7 +153,7 @@ public class DataFrameAggregationWithGroupByTest
         DataFrame expected = new DataFrame("Expected")
                 .addStringColumn("Name")
                 .addLongColumn("NameCount").addLongColumn("BarSum").addLongColumn("BarMax").addDoubleColumn("QuxSum").addDoubleColumn("QuxMin").addLongColumn("QuxCount")
-                .addRow("Bob",	 2,  567, 456,  50.0, 25.0, 2)
+                .addRow("Bob",   2,  567, 456,  50.0, 25.0, 2)
                 .addRow("Alice", 1,  123, 123,  20.0, 20.0, 1)
                 .addRow("Carol", 3, 2367, 789, 120.0, 40.0, 3);
 
@@ -170,7 +170,7 @@ public class DataFrameAggregationWithGroupByTest
 
         DataFrame expected = new DataFrame("Expected")
                 .addStringColumn("Name").addLongColumn("Bar").addDoubleColumn("Baz").addDoubleColumn("Qux").addLongColumn("NameCount").addLongColumn("BazCount")
-                .addRow("Bob",	  567, 12.0, 25.0, 2, 2)
+                .addRow("Bob",    567, 12.0, 25.0, 2, 2)
                 .addRow("Alice",  123, 10.0, 20.0, 1, 1)
                 .addRow("Carol", 2367, 15.0, 40.0, 3, 3);
 
@@ -180,23 +180,23 @@ public class DataFrameAggregationWithGroupByTest
     @Test
     public void sumWithGroupingByTwoColumns()
     {
-        DataFrame dataFrame = new DataFrame("FrameOfData")
+        DataFrame df = new DataFrame("FrameOfData")
                 .addStringColumn("Name").addStringColumn("Foo").addLongColumn("Bar").addDoubleColumn("Baz").addDoubleColumn("Qux");
 
-        dataFrame.addRow("Bob",   "Def",  456L, 12.0, 25.0);
-        dataFrame.addRow("Bob",   "Abc",  123L, 44.0, 33.0);
-        dataFrame.addRow("Alice", "Qqq",  123L, 10.0, 20.0);
-        dataFrame.addRow("Carol", "Rrr",  789L, 15.0, 40.0);
-        dataFrame.addRow("Bob",   "Def",  111L, 12.0, 25.0);
-        dataFrame.addRow("Carol", "Qqq",   10L, 55.0, 22.0);
-        dataFrame.addRow("Carol", "Rrr",  789L, 16.0, 41.0);
+        df.addRow("Bob",   "Def",  456L, 12.0, 25.0);
+        df.addRow("Bob",   "Abc",  123L, 44.0, 33.0);
+        df.addRow("Alice", "Qqq",  123L, 10.0, 20.0);
+        df.addRow("Carol", "Rrr",  789L, 15.0, 40.0);
+        df.addRow("Bob",   "Def",  111L, 12.0, 25.0);
+        df.addRow("Carol", "Qqq",   10L, 55.0, 22.0);
+        df.addRow("Carol", "Rrr",  789L, 16.0, 41.0);
 
-        DataFrame summed = dataFrame.sumBy(Lists.immutable.of("Bar", "Baz", "Qux"), Lists.immutable.of("Name", "Foo"));
+        DataFrame summed = df.sumBy(Lists.immutable.of("Bar", "Baz", "Qux"), Lists.immutable.of("Name", "Foo"));
 
         DataFrame expected = new DataFrame("Expected")
                 .addStringColumn("Name").addStringColumn("Foo").addLongColumn("Bar").addDoubleColumn("Baz").addDoubleColumn("Qux")
-                .addRow("Bob",	 "Def",   567L, 24.0,  50.0)
-                .addRow("Bob",	 "Abc",   123L, 44.0,  33.0)
+                .addRow("Bob",   "Def",   567L, 24.0,  50.0)
+                .addRow("Bob",   "Abc",   123L, 44.0,  33.0)
                 .addRow("Alice", "Qqq",   123L, 10.0,  20.0)
                 .addRow("Carol", "Rrr",  1578L, 31.0,  81.0)
                 .addRow("Carol", "Qqq",    10L, 55.0,  22.0);
@@ -207,27 +207,27 @@ public class DataFrameAggregationWithGroupByTest
     @Test
     public void sumOfAndByCalculatedColumns()
     {
-        DataFrame dataFrame = new DataFrame("FrameOfData")
+        DataFrame df = new DataFrame("FrameOfData")
                 .addStringColumn("Name").addStringColumn("Foo").addLongColumn("Bar").addDoubleColumn("Baz").addDoubleColumn("Qux");
 
-        dataFrame.addRow("Bob",   "Def",  456L, 12.0, 25.0);
-        dataFrame.addRow("Bob",   "Abc",  123L, 44.0, 33.0);
-        dataFrame.addRow("Alice", "Qqq",  123L, 10.0, 20.0);
-        dataFrame.addRow("Carol", "Rrr",  789L, 15.0, 40.0);
-        dataFrame.addRow("Bob",   "Def",  111L, 12.0, 25.0);
-        dataFrame.addRow("Carol", "Qqq",   10L, 55.0, 22.0);
-        dataFrame.addRow("Carol", "Rrr",  789L, 16.0, 41.0);
+        df.addRow("Bob",   "Def",  456L, 12.0, 25.0);
+        df.addRow("Bob",   "Abc",  123L, 44.0, 33.0);
+        df.addRow("Alice", "Qqq",  123L, 10.0, 20.0);
+        df.addRow("Carol", "Rrr",  789L, 15.0, 40.0);
+        df.addRow("Bob",   "Def",  111L, 12.0, 25.0);
+        df.addRow("Carol", "Qqq",   10L, 55.0, 22.0);
+        df.addRow("Carol", "Rrr",  789L, 16.0, 41.0);
 
-        dataFrame.addStringColumn("aFoo", "'a' + Foo");
-        dataFrame.addLongColumn("BarBar", "Bar * 2");
-        dataFrame.addDoubleColumn("BazBaz", "Baz * 2");
+        df.addStringColumn("aFoo", "'a' + Foo");
+        df.addLongColumn("BarBar", "Bar * 2");
+        df.addDoubleColumn("BazBaz", "Baz * 2");
 
-        DataFrame summed = dataFrame.sumBy(Lists.immutable.of("BarBar", "BazBaz"), Lists.immutable.of("Name", "aFoo"));
+        DataFrame summed = df.sumBy(Lists.immutable.of("BarBar", "BazBaz"), Lists.immutable.of("Name", "aFoo"));
 
         DataFrame expected = new DataFrame("Expected")
                 .addStringColumn("Name").addStringColumn("Foo").addLongColumn("BarBar").addDoubleColumn("BazBaz")
-                .addRow("Bob",	 "aDef",  1134L,  48.0)
-                .addRow("Bob",	 "aAbc",   246L,  88.0)
+                .addRow("Bob",   "aDef",  1134L,  48.0)
+                .addRow("Bob",   "aAbc",   246L,  88.0)
                 .addRow("Alice", "aQqq",   246L,  20.0)
                 .addRow("Carol", "aRrr",  3156L,  62.0)
                 .addRow("Carol", "aQqq",    20L, 110.0);

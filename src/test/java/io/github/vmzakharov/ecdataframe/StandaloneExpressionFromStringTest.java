@@ -23,8 +23,8 @@ public class StandaloneExpressionFromStringTest
         Assert.assertEquals(17, ExpressionTestUtil.evaluateToLong("3 * 5 + 2"));
         Assert.assertEquals(16, ExpressionTestUtil.evaluateToLong("(3 + 5) * 2"));
         Assert.assertEquals(-8, ExpressionTestUtil.evaluateToLong("(3 + 5) * (2 - 4) / 2"));
-        Assert.assertEquals( 6, ExpressionTestUtil.evaluateToLong("(3 + 5) / 4 * 3"));
-        Assert.assertEquals( 6, ExpressionTestUtil.evaluateToLong("(3 + 5) * 3 / 4"));
+        Assert.assertEquals(6, ExpressionTestUtil.evaluateToLong("(3 + 5) / 4 * 3"));
+        Assert.assertEquals(6, ExpressionTestUtil.evaluateToLong("(3 + 5) * 3 / 4"));
 
         Assert.assertEquals(-8, ExpressionTestUtil.evaluateToLong("(3+ 5) * (2 -4)/(1+1)"));
 
@@ -35,7 +35,7 @@ public class StandaloneExpressionFromStringTest
     @Test
     public void intsAndDoubles()
     {
-        Assert.assertEquals( 4.0, ExpressionTestUtil.evaluateToDouble("3.0 + 1"), TOLERANCE);
+        Assert.assertEquals(4.0, ExpressionTestUtil.evaluateToDouble("3.0 + 1"), TOLERANCE);
         Assert.assertEquals(13.0, ExpressionTestUtil.evaluateToDouble("3 + 5 * 2.0"), TOLERANCE);
         Assert.assertEquals(-8.0, ExpressionTestUtil.evaluateToDouble("(3.0 + 5.0) * (2 - 4) / 2"), TOLERANCE);
     }

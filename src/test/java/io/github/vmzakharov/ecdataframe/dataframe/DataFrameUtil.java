@@ -2,8 +2,13 @@ package io.github.vmzakharov.ecdataframe.dataframe;
 
 import org.junit.Assert;
 
-public class DataFrameUtil
+final public class DataFrameUtil
 {
+    private DataFrameUtil()
+    {
+        // Utility class
+    }
+
     static public void assertEquals(DataFrame expected, DataFrame actual)
     {
 
