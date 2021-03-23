@@ -120,7 +120,11 @@
                     <configLocation>checkstyle-configuration.xml</configLocation>
                     <encoding>UTF-8</encoding>
                     <consoleOutput>true</consoleOutput>
-                    <includeTestSourceDirectory>true</includeTestSourceDirectory>
+<!--                    <includeTestSourceDirectory>true</includeTestSourceDirectory>-->
+                    <sourceDirectories>
+                        <sourceDirectory>${project.build.sourceDirectory}</sourceDirectory>
+                        <sourceDirectory>${project.build.testSourceDirectory}</sourceDirectory>
+                    </sourceDirectories>
                     <failsOnError>true</failsOnError>
                 </configuration>
                 <dependencies>
