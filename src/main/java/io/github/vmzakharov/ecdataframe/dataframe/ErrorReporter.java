@@ -19,13 +19,13 @@ final public class ErrorReporter
 
     public static void reportAndThrow(String errorText)
     {
-        PrinterFactory.getPrinter().println("ERROR: " + errorText);
+        PrinterFactory.getErrPrinter().println("ERROR: " + errorText);
         throw new RuntimeException(errorText);
     }
 
     public static void reportAndThrow(String errorText, Throwable t)
     {
-        PrinterFactory.getPrinter().println("ERROR: " + errorText);
+        PrinterFactory.getErrPrinter().println("ERROR: " + errorText);
         throw new RuntimeException(errorText, t);
     }
 }
