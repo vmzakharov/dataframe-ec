@@ -190,6 +190,16 @@ extends DataSetAbstract
 
     public DataFrame loadAsDataFrame()
     {
+        return this.loadAsDataFrame(0,true);
+    }
+
+    public DataFrame loadAsDataFrame(int headLineCount)
+    {
+        return this.loadAsDataFrame(headLineCount, false);
+    }
+
+    private DataFrame loadAsDataFrame(int headLineCount, boolean loadAllLines)
+    {
         DataFrame df = new DataFrame(this.getName());
         df.enablePooling();
 
@@ -200,13 +210,27 @@ extends DataSetAbstract
          */
         if (this.schemaIsNotDefined())
         {
-            this.schema = new CsvSchema();
+            this.schema = new CsvSchema(); // provides default separators, quote characters, etc.
         }
 
         try (BufferedReader reader = new BufferedReader(this.createReader(), BUFFER_SIZE))
         {
             MutableList<String> headers = this.splitMindingQs(reader.readLine());
+
             String dataRow = reader.readLine();
+
+            if (dataRow == null) // no data, just headers
+            {
+                if (this.getSchema().columnCount() == 0)
+                {
+                    headers.forEach(header -> this.schema.addColumn(header, ValueType.STRING));
+                }
+
+                this.getSchema().getColumns().forEach(col -> df.addColumn(col.getName(), col.getType()));
+
+                return df;
+            }
+
             MutableList<String> firstRowElements = this.splitMindingQs(dataRow);
 
             ErrorReporter.reportAndThrow(headers.size() != firstRowElements.size(),
@@ -217,24 +241,37 @@ extends DataSetAbstract
             {
                 this.inferSchema(headers, firstRowElements);
             }
-            else
-            {
-                ErrorReporter.reportAndThrow(this.getSchema().columnCount() != firstRowElements.size(),
-                        "The number of columns in the schema does not match the number of elements in the first data row ("
-                        + this.getSchema().columnCount() + ", " + firstRowElements.size() + ")");
-            }
+
+            ErrorReporter.reportAndThrow(this.getSchema().columnCount() != firstRowElements.size(),
+                    "The number of columns in the schema does not match the number of elements in the first data row ("
+                    + this.getSchema().columnCount() + ", " + firstRowElements.size() + ")");
 
             MutableList<Procedure<String>> columnPopulators = Lists.mutable.of();
+
             this.getSchema().getColumns().forEach(col -> this.addDataFrameColumn(df, col, columnPopulators));
 
             int columnCount = this.getSchema().columnCount();
             MutableList<String> lineElements = Lists.mutable.withInitialCapacity(columnCount);
 
-            do
+            if (loadAllLines)
             {
-                this.parseAndAddLineToDataFrame(dataRow, lineElements, columnCount, columnPopulators);
+                do
+                {
+                    this.parseAndAddLineToDataFrame(dataRow, lineElements, columnCount, columnPopulators);
+                }
+                while ((dataRow = reader.readLine()) != null);
             }
-            while ((dataRow = reader.readLine()) != null);
+            else if (headLineCount > 0)
+            {
+                int lineCount = 0;
+
+                do
+                {
+                    lineCount++;
+                    this.parseAndAddLineToDataFrame(dataRow, lineElements, columnCount, columnPopulators);
+                }
+                while ((dataRow = reader.readLine()) != null && lineCount != headLineCount);
+            }
 
             df.seal();
         }

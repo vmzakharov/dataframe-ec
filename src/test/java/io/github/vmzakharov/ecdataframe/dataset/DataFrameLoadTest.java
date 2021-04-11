@@ -5,6 +5,7 @@ import io.github.vmzakharov.ecdataframe.dsl.value.ValueType;
 import org.junit.Assert;
 import org.junit.Test;
 import io.github.vmzakharov.ecdataframe.dataframe.DataFrameUtil;
+import org.junit.rules.ExpectedException;
 
 import java.time.LocalDate;
 
@@ -307,5 +308,103 @@ public class DataFrameLoadTest
                 ;
 
         DataFrameUtil.assertEquals(expected, loaded);
+    }
+
+    @Test
+    public void headFewerThanTotalLines()
+    {
+        CsvDataSet dataSet = new StringBasedCsvDataSet("Foo", "Employees",
+                "Name,EmployeeId,HireDate,Dept,Salary\n"
+                        + "\"Alice\",1234,2020-01-01,\"Accounting\",110000.00\n"
+                        + "\"Bob\",1233,2010-01-01,\"Bee-bee-boo-boo\",100000.00\n"
+                        + "\"Carl\",10000,2005-11-21,\"Controllers\",130000.00\n"
+                        + "\"Diane\",10001,2012-09-20,\"\",130000.00\n"
+                        + "\"Ed\",10002,,,0.00"
+        );
+
+        DataFrame loaded = dataSet.loadAsDataFrame(2);
+
+        DataFrame expected = new DataFrame("Expected")
+                .addStringColumn("Name").addLongColumn("EmployeeId").addDateColumn("HireDate").addStringColumn("Dept").addDoubleColumn("Salary")
+                .addRow("Alice", 1234, LocalDate.of(2020, 1, 1), "Accounting", 110000.0)
+                .addRow("Bob", 1233, LocalDate.of(2010, 1, 1), "Bee-bee-boo-boo", 100000.0)
+                ;
+
+        DataFrameUtil.assertEquals(expected, loaded);
+    }
+
+    @Test
+    public void headMoreThanTotalLines()
+    {
+        CsvDataSet dataSet = new StringBasedCsvDataSet("Foo", "Employees",
+                  "Name,EmployeeId,HireDate,Dept,Salary\n"
+                + "\"Alice\",1234,2020-01-01,\"Accounting\",110000.00\n"
+                + "\"Bob\",1233,2010-01-01,\"Bee-bee-boo-boo\",100000.00\n"
+                + "\"Carl\",10000,2005-11-21,\"Controllers\",130000.00\n"
+                + "\"Diane\",10001,2012-09-20,\"\",130000.00\n"
+                + "\"Ed\",10002,,,0.00"
+        );
+
+        DataFrame loaded = dataSet.loadAsDataFrame(100);
+
+        DataFrame expected = new DataFrame("Expected")
+                .addStringColumn("Name").addLongColumn("EmployeeId").addDateColumn("HireDate").addStringColumn("Dept").addDoubleColumn("Salary")
+                .addRow("Alice", 1234, LocalDate.of(2020, 1, 1), "Accounting", 110000.0)
+                .addRow("Bob", 1233, LocalDate.of(2010, 1, 1), "Bee-bee-boo-boo", 100000.0)
+                .addRow("Carl", 10000, LocalDate.of(2005, 11, 21), "Controllers", 130000.0)
+                .addRow("Diane", 10001, LocalDate.of(2012, 9, 20), "", 130000.0)
+                .addRow("Ed", 10002, null, "", 0.0)
+                ;
+
+        DataFrameUtil.assertEquals(expected, loaded);
+    }
+
+    @Test
+    public void headZeroLines()
+    {
+        CsvDataSet dataSet = new StringBasedCsvDataSet("Foo", "Employees",
+                  "Name,EmployeeId,HireDate,Dept,Salary\n"
+                + "\"Alice\",1234,2020-01-01,\"Accounting\",110000.00\n"
+                + "\"Bob\",1233,2010-01-01,\"Bee-bee-boo-boo\",100000.00\n"
+                + "\"Carl\",10000,2005-11-21,\"Controllers\",130000.00\n"
+                + "\"Diane\",10001,2012-09-20,\"\",130000.00\n"
+                + "\"Ed\",10002,,,0.00"
+        );
+
+        DataFrame loaded = dataSet.loadAsDataFrame(0);
+
+        Assert.assertNotNull(loaded);
+        Assert.assertEquals(0, loaded.rowCount());
+    }
+
+    @Test
+    public void loadEmptyNoSchema()
+    {
+        CsvDataSet dataSet = new StringBasedCsvDataSet("Foo", "Dates",
+                "Name,Date,Number\n"
+        );
+
+        DataFrame loaded = dataSet.loadAsDataFrame();
+
+        Assert.assertEquals(0, loaded.rowCount());
+        Assert.assertEquals(3, loaded.columnCount());
+    }
+
+    @Test
+    public void loadEmptyWithSchema()
+    {
+        CsvSchema schema = new CsvSchema();
+        schema.addColumn("Name",   ValueType.STRING);
+        schema.addColumn("Date",   ValueType.DATE, "d-MMM-uuuu");
+        schema.addColumn("Number", ValueType.LONG);
+
+        CsvDataSet dataSet = new StringBasedCsvDataSet("Foo", "Dates", schema,
+                "Name,Date,Number\n"
+        );
+
+        DataFrame loaded = dataSet.loadAsDataFrame();
+
+        Assert.assertEquals(0, loaded.rowCount());
+        Assert.assertEquals(3, loaded.columnCount());
     }
 }
