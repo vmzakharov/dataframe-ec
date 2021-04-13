@@ -1,11 +1,10 @@
 package io.github.vmzakharov.ecdataframe.dataset;
 
 import io.github.vmzakharov.ecdataframe.dataframe.DataFrame;
+import io.github.vmzakharov.ecdataframe.dataframe.DataFrameUtil;
 import io.github.vmzakharov.ecdataframe.dsl.value.ValueType;
 import org.junit.Assert;
 import org.junit.Test;
-import io.github.vmzakharov.ecdataframe.dataframe.DataFrameUtil;
-import org.junit.rules.ExpectedException;
 
 import java.time.LocalDate;
 
