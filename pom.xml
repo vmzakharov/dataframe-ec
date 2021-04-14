@@ -72,22 +72,6 @@
             <artifactId>eclipse-collections</artifactId>
             <version>${eclipseCollections.version}</version>
         </dependency>
-        <dependency>
-            <groupId>org.apache.avro</groupId>
-            <artifactId>avro</artifactId>
-            <version>1.9.2</version>
-        </dependency>
-        <dependency>
-            <groupId>com.puppycrawl.tools</groupId>
-            <artifactId>checkstyle</artifactId>
-            <version>${checkstyle.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-checkstyle-plugin</artifactId>
-            <version>${checkstyle.plugin.version}</version>
-            <type>maven-plugin</type>
-        </dependency>
     </dependencies>
 
     <reporting>

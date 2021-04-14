@@ -1,6 +1,6 @@
 package io.github.vmzakharov.ecdataframe.dsl;
 
-import io.github.vmzakharov.ecdataframe.dataset.AvroDataSet;
+import io.github.vmzakharov.ecdataframe.dataset.HierarchicalDataSet;
 import io.github.vmzakharov.ecdataframe.dsl.value.Value;
 import org.eclipse.collections.api.RichIterable;
 import org.eclipse.collections.api.map.MutableMap;
@@ -9,7 +9,7 @@ import org.eclipse.collections.impl.factory.Maps;
 public class SimpleEvalContext
 extends EvalContextAbstract
 {
-    private final MutableMap<String, AvroDataSet> dataSets = Maps.mutable.of();
+    private final MutableMap<String, HierarchicalDataSet> dataSets = Maps.mutable.of();
 
     @Override
     public Value getVariable(String newVariableName)
@@ -33,13 +33,13 @@ extends EvalContextAbstract
     }
 
     @Override
-    public void addDataSet(AvroDataSet dataSet)
+    public void addDataSet(HierarchicalDataSet dataSet)
     {
         this.dataSets.put(dataSet.getName(), dataSet);
     }
 
     @Override
-    public AvroDataSet getDataSet(String dataSetName)
+    public HierarchicalDataSet getDataSet(String dataSetName)
     {
         return this.dataSets.get(dataSetName);
     }

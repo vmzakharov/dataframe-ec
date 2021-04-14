@@ -1,7 +1,7 @@
 package io.github.vmzakharov.ecdataframe.dsl;
 
 import io.github.vmzakharov.ecdataframe.dataframe.DataFrame;
-import io.github.vmzakharov.ecdataframe.dataset.AvroDataSet;
+import io.github.vmzakharov.ecdataframe.dataset.HierarchicalDataSet;
 import io.github.vmzakharov.ecdataframe.dsl.value.Value;
 import org.eclipse.collections.api.RichIterable;
 import org.eclipse.collections.api.map.MapIterable;
@@ -108,13 +108,13 @@ extends EvalContextAbstract
     }
 
     @Override
-    public void addDataSet(AvroDataSet dataSet)
+    public void addDataSet(HierarchicalDataSet dataSet)
     {
         throw new UnsupportedOperationException("Cannot add a data set to a data frame evaluation context");
     }
 
     @Override
-    public AvroDataSet getDataSet(String dataSetName)
+    public HierarchicalDataSet getDataSet(String dataSetName)
     {
         return this.getNestedContext().getDataSet(dataSetName);
     }

@@ -1,17 +1,10 @@
 package io.github.vmzakharov.ecdataframe;
 
-import io.github.vmzakharov.ecdataframe.dsl.ProjectionExpr;
+import io.github.vmzakharov.ecdataframe.dsl.Expression;
 import io.github.vmzakharov.ecdataframe.dsl.value.ValueType;
 import io.github.vmzakharov.ecdataframe.dsl.visitor.TypeInferenceVisitor;
-import org.eclipse.collections.api.list.ListIterable;
-import org.eclipse.collections.impl.factory.Lists;
 import org.junit.Assert;
 import org.junit.Test;
-import io.github.vmzakharov.ecdataframe.dataset.AvroDataSet;
-import io.github.vmzakharov.ecdataframe.dsl.EvalContext;
-import io.github.vmzakharov.ecdataframe.dsl.Expression;
-import io.github.vmzakharov.ecdataframe.dsl.SimpleEvalContext;
-import io.github.vmzakharov.ecdataframe.util.ExpressionParserHelper;
 
 public class TypeInference
 {
@@ -95,30 +88,6 @@ public class TypeInference
                 + "x = 1\n"
                 + "y = 2.0\n"
                 + "isItBigger(x, y)", ValueType.BOOLEAN);
-    }
-
-    @Test
-    public void projection()
-    {
-        AvroDataSet dataSet = new AvroDataSet("src/test/resources/user.avsc", "User", "users.avro");
-
-        EvalContext context = new SimpleEvalContext();
-        context.addDataSet(dataSet);
-        TypeInferenceVisitor visitor = new TypeInferenceVisitor(context);
-
-        String expressionString =
-                  "project {\n"
-                + "    User.name,\n"
-                + "    Color : User.favorite_color,\n"
-                + "    Oompa : \"Loompa\",\n"
-                + "    Fav : User.favorite_number\n"
-                + "} where User.favorite_number > 2";
-
-        ProjectionExpr expr = (ProjectionExpr) ExpressionParserHelper.DEFAULT.toProjection(expressionString);
-
-        ListIterable<ValueType> projectionExpressionTypes = expr.getProjectionExpressions().collect(visitor::inferExpressionType);
-
-        Assert.assertEquals(Lists.mutable.of(ValueType.STRING, ValueType.STRING, ValueType.STRING, ValueType.LONG), projectionExpressionTypes);
     }
 
     private void assertScriptType(String scriptAsString, ValueType valueType)

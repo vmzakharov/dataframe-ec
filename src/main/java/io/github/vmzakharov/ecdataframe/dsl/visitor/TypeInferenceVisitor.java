@@ -1,6 +1,6 @@
 package io.github.vmzakharov.ecdataframe.dsl.visitor;
 
-import io.github.vmzakharov.ecdataframe.dataset.AvroDataSet;
+import io.github.vmzakharov.ecdataframe.dataset.HierarchicalDataSet;
 import io.github.vmzakharov.ecdataframe.dsl.AliasExpr;
 import io.github.vmzakharov.ecdataframe.dsl.AnonymousScript;
 import io.github.vmzakharov.ecdataframe.dsl.ArithmeticOp;
@@ -149,7 +149,7 @@ implements ExpressionVisitor
     @Override
     public void visitPropertyPathExpr(PropertyPathExpr expr)
     {
-        AvroDataSet dataSet = this.evalContext.getDataSet(expr.getEntityName());
+        HierarchicalDataSet dataSet = this.evalContext.getDataSet(expr.getEntityName());
 
         this.store(dataSet.getFieldType(expr.getPropertyChainString()));
     }

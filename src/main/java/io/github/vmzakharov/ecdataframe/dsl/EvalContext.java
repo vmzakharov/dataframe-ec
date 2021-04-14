@@ -1,6 +1,6 @@
 package io.github.vmzakharov.ecdataframe.dsl;
 
-import io.github.vmzakharov.ecdataframe.dataset.AvroDataSet;
+import io.github.vmzakharov.ecdataframe.dataset.HierarchicalDataSet;
 import io.github.vmzakharov.ecdataframe.dsl.value.Value;
 import org.eclipse.collections.api.RichIterable;
 import org.eclipse.collections.api.map.MapIterable;
@@ -24,9 +24,9 @@ public interface EvalContext
 
     FunctionScript getDeclaredFunction(String functionName);
 
-    void addDataSet(AvroDataSet dataSet);
+    void addDataSet(HierarchicalDataSet dataSet);
 
-    AvroDataSet getDataSet(String dataSetName);
+    HierarchicalDataSet getDataSet(String dataSetName);
 
     RichIterable<String> getVariableNames();
 

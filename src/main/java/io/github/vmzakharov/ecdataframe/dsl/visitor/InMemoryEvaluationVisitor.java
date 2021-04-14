@@ -1,7 +1,7 @@
 package io.github.vmzakharov.ecdataframe.dsl.visitor;
 
 import io.github.vmzakharov.ecdataframe.dataframe.DataFrame;
-import io.github.vmzakharov.ecdataframe.dataset.AvroDataSet;
+import io.github.vmzakharov.ecdataframe.dataset.HierarchicalDataSet;
 import io.github.vmzakharov.ecdataframe.dsl.AnonymousScript;
 import io.github.vmzakharov.ecdataframe.dsl.AssingExpr;
 import io.github.vmzakharov.ecdataframe.dsl.BinaryExpr;
@@ -121,7 +121,7 @@ implements ExpressionEvaluationVisitor
     @Override
     public Value visitPropertyPathExpr(PropertyPathExpr expr)
     {
-        AvroDataSet dataSet = this.getContext().getDataSet(expr.getEntityName());
+        HierarchicalDataSet dataSet = this.getContext().getDataSet(expr.getEntityName());
         Object rawValue = dataSet.getValue(expr.getPropertyChainString());
 
         if (rawValue == null)
@@ -129,7 +129,8 @@ implements ExpressionEvaluationVisitor
             return Value.VOID;
         }
 
-        if (rawValue instanceof String || rawValue instanceof org.apache.avro.util.Utf8)
+        if (rawValue instanceof String)
+//        if (rawValue instanceof String || rawValue instanceof org.apache.avro.util.Utf8)
         {
             return new StringValue(rawValue.toString());
         }
@@ -203,7 +204,7 @@ implements ExpressionEvaluationVisitor
         PropertyPathExpr propertyPathExpr = (PropertyPathExpr) expr.getProjectionExpressions().detect(
                 e -> e instanceof PropertyPathExpr);
 
-        AvroDataSet dataSet = this.getContext().getDataSet(propertyPathExpr.getEntityName());
+        HierarchicalDataSet dataSet = this.getContext().getDataSet(propertyPathExpr.getEntityName());
 
         boolean missingWhereClause = expr.getWhereClause() == null;
 
