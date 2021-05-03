@@ -37,6 +37,7 @@
         <antlr4.version>4.8-1</antlr4.version>
         <checkstyle.version>8.41</checkstyle.version>
         <checkstyle.plugin.version>3.1.2</checkstyle.plugin.version>
+        <pitest.version>1.6.3</pitest.version>
     </properties>
 
     <dependencies>
@@ -105,7 +106,6 @@
                     <configLocation>checkstyle-configuration.xml</configLocation>
                     <encoding>UTF-8</encoding>
                     <consoleOutput>true</consoleOutput>
-<!--                    <includeTestSourceDirectory>true</includeTestSourceDirectory>-->
                     <sourceDirectories>
                         <sourceDirectory>${project.build.sourceDirectory}</sourceDirectory>
                         <sourceDirectory>${project.build.testSourceDirectory}</sourceDirectory>
@@ -194,6 +194,39 @@
                                 </goals>
                             </execution>
                         </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+
+        <profile>
+            <id>pitest</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.pitest</groupId>
+                        <artifactId>pitest-maven</artifactId>
+                        <version>${pitest.version}</version>
+                        <executions>
+                            <execution>
+                                <id>pitest</id>
+                                <phase>test</phase>
+                                <goals>
+                                    <goal>mutationCoverage</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                        <configuration>
+                            <targetClasses>
+                                <param>io.github.vmzakharov.ecdataframe.*</param>
+                            </targetClasses>
+                            <targetTests>
+                                <param>io.github.vmzakharov.ecdataframe.*</param>
+                            </targetTests>
+                            <mutators>
+                                <mutator>DEFAULTS</mutator>
+                            </mutators>
+                        </configuration>
                     </plugin>
                 </plugins>
             </build>
