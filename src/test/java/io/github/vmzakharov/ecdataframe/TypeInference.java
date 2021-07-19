@@ -1,7 +1,10 @@
 package io.github.vmzakharov.ecdataframe;
 
+import io.github.vmzakharov.ecdataframe.dsl.AnonymousScript;
 import io.github.vmzakharov.ecdataframe.dsl.Expression;
+import io.github.vmzakharov.ecdataframe.dsl.Script;
 import io.github.vmzakharov.ecdataframe.dsl.value.ValueType;
+import io.github.vmzakharov.ecdataframe.dsl.visitor.PrettyPrintVisitor;
 import io.github.vmzakharov.ecdataframe.dsl.visitor.TypeInferenceVisitor;
 import org.junit.Assert;
 import org.junit.Test;
@@ -88,6 +91,57 @@ public class TypeInference
                 + "x = 1\n"
                 + "y = 2.0\n"
                 + "isItBigger(x, y)", ValueType.BOOLEAN);
+    }
+
+    @Test
+    public void conditionalStatement()
+    {
+        this.assertExpressionType(" a > b ? 5 : 7", ValueType.LONG);
+        this.assertExpressionType(" a > b ? 5.0 : 7", ValueType.DOUBLE);
+        this.assertExpressionType(" a > b ? 'foo' : 'bar'", ValueType.STRING);
+        this.assertExpressionType(" a > b ? 'foo' : 7", ValueType.VOID);
+    }
+
+    @Test
+    public void conditionalOnlyIfBranch()
+    {
+        this.assertScriptType(" if a > b then\n  5\nendif", ValueType.LONG);
+        this.assertScriptType(" if a > b then\n  5.5 + 1\nendif", ValueType.DOUBLE);
+        this.assertScriptType(" if a > b then\n  '5'\nendif", ValueType.STRING);
+    }
+
+    @Test
+    public void expressionIncompatibleTypes()
+    {
+        this.assertError(
+                "x = 5\ny = 'abc'\nx + y",
+                2,
+                TypeInferenceVisitor.ERR_TXT_TYPES_IN_EXPRESSION);
+    }
+
+    @Test
+    public void conditionalIncompatibleTypes()
+    {
+        this.assertError(
+                "x = 5\nif a > b then\n  x\nelse\n  'abc'\nendif",
+                1,
+                TypeInferenceVisitor.ERR_TXT_IF_ELSE);
+    }
+
+    private void assertError(String scriptString, int errorExpressionIndex, String errorText)
+    {
+        Script script = ExpressionTestUtil.toScript(scriptString);
+        TypeInferenceVisitor visitor = new TypeInferenceVisitor();
+        script.accept(visitor);
+
+        System.out.println(visitor.getErrorDescription());
+        System.out.println(visitor.getErrorExpressionString());
+
+        Assert.assertTrue(visitor.isError());
+        Assert.assertEquals(errorText, visitor.getErrorDescription());
+        Assert.assertEquals(
+                PrettyPrintVisitor.exprToString(script.getExpressions().get(errorExpressionIndex)),
+                visitor.getErrorExpressionString());
     }
 
     private void assertScriptType(String scriptAsString, ValueType valueType)

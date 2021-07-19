@@ -30,6 +30,9 @@ import org.eclipse.collections.impl.factory.Stacks;
 public class TypeInferenceVisitor
 implements ExpressionVisitor
 {
+    public static final String ERR_TXT_IF_ELSE = "Incompatible types in branches of if-else";
+    public static final String ERR_TXT_TYPES_IN_EXPRESSION = "Incompatible operand types in expression";
+
     private final MutableStack<ValueType> expressionTypeStack = Stacks.mutable.of();
     private final MutableMap<String, ValueType> variableTypes = Maps.mutable.of();
 
@@ -37,6 +40,10 @@ implements ExpressionVisitor
     private MutableMap<String, FunctionScript> functions;
 
     private final EvalContext evalContext;
+
+    private boolean error;
+    private String errorDescription = "";
+    private String errorExpressionString = "";
 
     public TypeInferenceVisitor()
     {
@@ -83,24 +90,10 @@ implements ExpressionVisitor
             ValueType type1 = this.expressionTypeStack.pop();
             ValueType type2 = this.expressionTypeStack.pop();
 
-            if (type1.isString() && type2.isString())
+            resultType = this.typeCompatibleWith(type1, type2);
+            if (resultType.isVoid())
             {
-                resultType = ValueType.STRING;
-            }
-            else if (type1.isNumber() && type2.isNumber())
-            {
-                if (type1.isDouble() || type2.isDouble())
-                {
-                    resultType = ValueType.DOUBLE;
-                }
-                else
-                {
-                    resultType = ValueType.LONG;
-                }
-            }
-            else
-            {
-                throw new RuntimeException("Incompatible operand types in expression " + PrettyPrintVisitor.exprToString(expr));
+                this.recordError(ERR_TXT_TYPES_IN_EXPRESSION, PrettyPrintVisitor.exprToString(expr));
             }
         }
         else
@@ -109,6 +102,43 @@ implements ExpressionVisitor
         }
 
         this.store(resultType);
+    }
+
+    private void recordError(String description, String expressionString)
+    {
+        this.error = true;
+        this.errorDescription = description;
+        this.errorExpressionString = expressionString;
+    }
+
+    public boolean isError()
+    {
+        return this.error;
+    }
+
+    public String getErrorDescription()
+    {
+        return this.errorDescription;
+    }
+
+    public String getErrorExpressionString()
+    {
+        return this.errorExpressionString;
+    }
+
+    private ValueType typeCompatibleWith(ValueType type1, ValueType type2)
+    {
+        if (type1.equals(type2))
+        {
+            return type1;
+        }
+
+        if (type1.isNumber() && type2.isNumber())
+        {
+            return (type1.isDouble() || type2.isDouble()) ? ValueType.DOUBLE : ValueType.LONG;
+        }
+
+        return ValueType.VOID;
     }
 
     @Override
@@ -225,8 +255,25 @@ implements ExpressionVisitor
     @Override
     public void visitIfElseExpr(IfElseExpr expr)
     {
-        // todo: implement
-        this.store(ValueType.VOID);
+        expr.getIfScript().accept(this);
+        ValueType ifType = this.expressionTypeStack.pop();
+
+        if (expr.hasElseSection())
+        {
+            expr.getElseScript().accept(this);
+            ValueType elseType = this.expressionTypeStack.pop();
+
+            ValueType valueType = this.typeCompatibleWith(ifType, elseType);
+            this.store(valueType);
+            if (valueType.isVoid())
+            {
+                this.recordError(ERR_TXT_IF_ELSE, PrettyPrintVisitor.exprToString(expr));
+            }
+        }
+        else
+        {
+            this.store(ifType);
+        }
     }
 
     public ValueType getLastExpressionType()
