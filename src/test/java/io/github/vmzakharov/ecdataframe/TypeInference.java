@@ -134,9 +134,6 @@ public class TypeInference
         TypeInferenceVisitor visitor = new TypeInferenceVisitor();
         script.accept(visitor);
 
-        System.out.println(visitor.getErrorDescription());
-        System.out.println(visitor.getErrorExpressionString());
-
         Assert.assertTrue(visitor.isError());
         Assert.assertEquals(errorText, visitor.getErrorDescription());
         Assert.assertEquals(
