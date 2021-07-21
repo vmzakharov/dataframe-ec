@@ -3,6 +3,8 @@ package io.github.vmzakharov.ecdataframe.dataset;
 import io.github.vmzakharov.ecdataframe.dataframe.DataFrame;
 import io.github.vmzakharov.ecdataframe.util.Stopwatch;
 
+import java.nio.file.Paths;
+
 public class CsvCodeScratchpad
 {
     public static void main(String[] args)
@@ -16,11 +18,13 @@ public class CsvCodeScratchpad
 
     private void readStuff()
     {
-//        String fileName = "src/test/resources/employees.csv";
-//        String fileNameOut = "src/test/resources/employees_out.csv";
-        String fileName = "src/test/resources/employees_1mm.csv";
-        String fileNameOut = "src/test/resources/employees_1mm_out.csv";
-        CsvDataSet dataSet = new CsvDataSet(fileName, "Employee");
+        String fileName = "src/test/resources/employees.csv";
+        String fileNameOut = "src/test/resources/employees_out.csv";
+//        String fileName = "src/test/resources/employees_1mm.csv";
+//        String fileNameOut = "src/test/resources/employees_1mm_out.csv";
+
+//        CsvDataSet dataSet = new CsvDataSet(fileName, "Employee");
+        CsvDataSet dataSet = new CsvDataSet(Paths.get(fileName), "Employee");
         dataSet.convertEmptyElementsToNulls();
 
         Stopwatch stopwatch = new Stopwatch();
@@ -33,7 +37,7 @@ public class CsvCodeScratchpad
         this.report("Loaded", dataFrame1.rowCount(), stopwatch);
 
         stopwatch.start();
-        CsvDataSet dataSetOut = new CsvDataSet(fileNameOut, "Employee");
+        CsvDataSet dataSetOut = new CsvDataSet(Paths.get(fileNameOut), "Employee");
         dataSetOut.write(dataFrame1);
         stopwatch.stop();
         this.report("Wrote", dataFrame1.rowCount(), stopwatch);

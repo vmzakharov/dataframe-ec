@@ -1,6 +1,5 @@
 package io.github.vmzakharov.ecdataframe.dataset;
 
-import java.io.IOException;
 import java.io.Reader;
 import java.io.StringReader;
 import java.io.StringWriter;
@@ -26,14 +25,12 @@ extends CsvDataSet
 
     @Override
     protected Reader createReader()
-    throws IOException
     {
         return new StringReader(this.data);
     }
 
     @Override
     protected Writer createWriter()
-    throws IOException
     {
         this.writer.getBuffer().setLength(0); // to mimic the behavior of the superclass
         return this.writer;

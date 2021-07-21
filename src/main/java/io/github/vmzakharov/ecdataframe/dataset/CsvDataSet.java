@@ -16,12 +16,14 @@ import org.eclipse.collections.impl.factory.Lists;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileReader;
-import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
 import java.io.Reader;
 import java.io.Writer;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
@@ -32,7 +34,7 @@ extends DataSetAbstract
 {
     public static final int BUFFER_SIZE = 65_536;
 
-    private final String dataFileName;
+    private final Path dataFilePath;
 
     private boolean emptyElementsConvertedToNulls = false;
 
@@ -40,22 +42,39 @@ extends DataSetAbstract
 
     private DateTimeFormatter[] formatters;
 
-    public CsvDataSet(String dataFileName, String newName)
+    public CsvDataSet(String newDataFileName, String newName)
     {
-        this(dataFileName, newName, null);
+        this(newDataFileName, newName, null);
     }
 
-    public CsvDataSet(String dataFileName, String newName, CsvSchema newSchema)
+    public CsvDataSet(Path newDataFilePath, String newName)
+    {
+        this(newDataFilePath, newName, null);
+    }
+
+    public CsvDataSet(String newDataFileName, String newName, CsvSchema newSchema)
     {
         super(newName);
-        this.dataFileName = dataFileName;
+        this.dataFilePath = Paths.get(newDataFileName);
         this.schema = newSchema;
+    }
+
+    public CsvDataSet(Path newDataFilePath, String newName, CsvSchema newSchema)
+    {
+        super(newName);
+        this.dataFilePath = newDataFilePath;
+        this.schema = newSchema;
+    }
+
+    private String getDataFileName()
+    {
+        return this.dataFilePath.toString();
     }
 
     @Override
     public void openFileForReading()
     {
-        File file = new File(this.dataFileName);
+        // Not needed for CVS files
     }
 
     public void convertEmptyElementsToNulls()
@@ -78,7 +97,7 @@ extends DataSetAbstract
     @Override
     public void close()
     {
-//
+        // Not needed for CVS files
     }
 
     public void write(DataFrame dataFrame)
@@ -120,7 +139,7 @@ extends DataSetAbstract
         }
         catch (IOException e)
         {
-            throw new RuntimeException("Failed write data frame to '" + this.dataFileName + "'", e);
+            throw new RuntimeException("Failed write data frame to '" + this.getDataFileName() + "'", e);
         }
     }
 
@@ -179,13 +198,13 @@ extends DataSetAbstract
     protected Writer createWriter()
     throws IOException
     {
-        return new FileWriter(this.dataFileName);
+        return new OutputStreamWriter(Files.newOutputStream(this.dataFilePath));
     }
 
     protected Reader createReader()
     throws IOException
     {
-        return new FileReader(this.dataFileName);
+        return new InputStreamReader(Files.newInputStream(this.dataFilePath));
     }
 
     public DataFrame loadAsDataFrame()
@@ -277,7 +296,7 @@ extends DataSetAbstract
         }
         catch (IOException e)
         {
-            throw new RuntimeException("Failed to load file as a data frame. File '" + this.dataFileName + "'", e);
+            throw new RuntimeException("Failed to load as a data frame '" + this.getDataFileName() + "'", e);
         }
 
         return df;
