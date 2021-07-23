@@ -15,6 +15,7 @@ public class TypeInferenceTest
     {
         this.assertExpressionType("(1 + 2) * 3", ValueType.LONG);
         this.assertExpressionType("x = (1 + 2) * 3", ValueType.LONG);
+        this.assertExpressionType("-123", ValueType.LONG);
     }
 
     @Test
@@ -23,6 +24,7 @@ public class TypeInferenceTest
         this.assertExpressionType("(1.0 + 2.0) * 3.0", ValueType.DOUBLE);
         this.assertExpressionType("x = 1.0 + 2.0", ValueType.DOUBLE);
         this.assertExpressionType("x = (1 + 2) * 3.0", ValueType.DOUBLE);
+        this.assertExpressionType("-4.56", ValueType.DOUBLE);
     }
 
     @Test
@@ -30,6 +32,16 @@ public class TypeInferenceTest
     {
         this.assertExpressionType("\"abc\"", ValueType.STRING);
         this.assertExpressionType("x = \"abc\" + \"def\"", ValueType.STRING);
+    }
+
+    @Test
+    public void booleanTypeInference()
+    {
+        this.assertExpressionType("'abc' == 'xyz'", ValueType.BOOLEAN);
+        this.assertExpressionType("1 in (1, 2, 3)", ValueType.BOOLEAN);
+        this.assertExpressionType("(1, 2, 3) is empty", ValueType.BOOLEAN);
+        this.assertExpressionType("'' is not empty", ValueType.BOOLEAN);
+        this.assertExpressionType("not ((5 > 6) or (x in y))", ValueType.BOOLEAN);
     }
 
     @Test
