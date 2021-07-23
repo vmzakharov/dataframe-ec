@@ -12,7 +12,7 @@ import org.junit.Assert;
 import org.junit.Test;
 import io.github.vmzakharov.ecdataframe.dsl.visitor.InMemoryEvaluationVisitor;
 
-public class HandcraftedExpressions
+public class HandcraftedExpressionTreeTest
 {
     private InMemoryEvaluationVisitor evaluationVisitor;
 

@@ -8,7 +8,7 @@ import io.github.vmzakharov.ecdataframe.dsl.visitor.TypeInferenceVisitor;
 import org.junit.Assert;
 import org.junit.Test;
 
-public class TypeInference
+public class TypeInferenceTest
 {
     @Test
     public void intTypeInference()
