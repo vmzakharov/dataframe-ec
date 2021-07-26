@@ -9,7 +9,7 @@ For more on Eclipse Collections see: https://www.eclipse.org/collections/.
 <dependency>
   <groupId>io.github.vmzakharov</groupId>
   <artifactId>dataframe-ec</artifactId>
-  <version>0.7.1</version>
+  <version>0.8.1</version>
 </dependency>
 ```
 
@@ -31,6 +31,7 @@ For more on Eclipse Collections see: https://www.eclipse.org/collections/.
 
 #### Creating a Data Frame
 A data frame can be **loaded from a CSV file**. Let's say there is a file called "donut_orders.csv" with the following contents:
+
 ```
 Customer,  Count,  Price,  Date
 "Archibald", 5.0, 23.45, 2020-10-15
@@ -49,6 +50,18 @@ Customer |   Count |   Price |   Date
 "Archibald" | 5.0000 | 23.4500 | 2020-10-15
 "Bridget" | 10.0000 | 40.3400 | 2020-11-10
 "Clyde" | 4.0000 | 19.5000 | 2020-10-19
+
+The `loadAsDataFrame()` method can take a numeric parameter, which specifies how many rows of data to load. For example:
+```
+DataFrame firstTwoOrders = new CsvDataSet("donut_orders.csv", "Donut Orders").loadAsDataFrame(2);
+```
+
+`firstTwoOrders`
+
+Customer |   Count |   Price |   Date
+---|---:|---:|---
+"Archibald" | 5.0000 | 23.4500 | 2020-10-15
+"Bridget" | 10.0000 | 40.3400 | 2020-11-10
 
 A data frame can be created **programmatically**:
 ```
