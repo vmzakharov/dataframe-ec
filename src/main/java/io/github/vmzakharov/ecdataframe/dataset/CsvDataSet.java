@@ -74,7 +74,7 @@ extends DataSetAbstract
     @Override
     public void openFileForReading()
     {
-        // Not needed for CVS files
+        // Not needed for CSV files
     }
 
     public void convertEmptyElementsToNulls()
@@ -97,7 +97,7 @@ extends DataSetAbstract
     @Override
     public void close()
     {
-        // Not needed for CVS files
+        // Not needed for CSV files
     }
 
     public void write(DataFrame dataFrame)

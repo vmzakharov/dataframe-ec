@@ -175,7 +175,7 @@ public class DataFrame
         int columnCount = this.columnCount();
         String[] row = new String[columnCount];
 
-        int last = limit < 0 ? this.rowCount() : Math.max(limit, this.rowCount);
+        int last = limit < 0 ? this.rowCount() : Math.min(limit, this.rowCount());
 
         for (int rowIndex = 0; rowIndex < last; rowIndex++)
         {
