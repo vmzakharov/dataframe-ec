@@ -20,13 +20,13 @@ public class DataFrameToStringTest
                 ;
 
         Assert.assertEquals(
-                "Name, EmployeeId, HireDate, Dept, Salary\n" +
-                "\"Alice\", 1234, 2020-01-01, \"Accounting\", 110000.0\n" +
-                "\"Bob\", 1233, 2010-01-01, \"Bee-bee-boo-boo\", 100000.0\n" +
-                "\"Carl\", 10000, 2005-11-21, \"Controllers\", 130000.0\n" +
-                "\"Diane\", 10001, 2012-09-20, \"\", 130000.0\n" +
-                "\"Ed\", 10002, , \"\", 0.0\n" +
-                "",
+                  "Name, EmployeeId, HireDate, Dept, Salary\n"
+                + "\"Alice\", 1234, 2020-01-01, \"Accounting\", 110000.0\n"
+                + "\"Bob\", 1233, 2010-01-01, \"Bee-bee-boo-boo\", 100000.0\n"
+                + "\"Carl\", 10000, 2005-11-21, \"Controllers\", 130000.0\n"
+                + "\"Diane\", 10001, 2012-09-20, \"\", 130000.0\n"
+                + "\"Ed\", 10002, , \"\", 0.0\n"
+                + "",
                 dataFrame.asCsvString());
     }
 
@@ -43,11 +43,11 @@ public class DataFrameToStringTest
                 ;
 
         Assert.assertEquals(
-                "Name, EmployeeId, HireDate, Dept, Salary\n" +
-                "\"Alice\", 1234, 2020-01-01, \"Accounting\", 110000.0\n" +
-                "\"Bob\", 1233, 2010-01-01, \"Bee-bee-boo-boo\", 100000.0\n" +
-                "\"Carl\", 10000, 2005-11-21, \"Controllers\", 130000.0\n" +
-                "",
+                  "Name, EmployeeId, HireDate, Dept, Salary\n"
+                + "\"Alice\", 1234, 2020-01-01, \"Accounting\", 110000.0\n"
+                + "\"Bob\", 1233, 2010-01-01, \"Bee-bee-boo-boo\", 100000.0\n"
+                + "\"Carl\", 10000, 2005-11-21, \"Controllers\", 130000.0\n"
+                + "",
                 dataFrame.asCsvString(3));
     }
 
