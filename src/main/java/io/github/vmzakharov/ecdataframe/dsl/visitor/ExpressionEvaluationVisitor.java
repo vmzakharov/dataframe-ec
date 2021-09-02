@@ -3,7 +3,6 @@ package io.github.vmzakharov.ecdataframe.dsl.visitor;
 import io.github.vmzakharov.ecdataframe.dsl.AnonymousScript;
 import io.github.vmzakharov.ecdataframe.dsl.AssingExpr;
 import io.github.vmzakharov.ecdataframe.dsl.BinaryExpr;
-import io.github.vmzakharov.ecdataframe.dsl.ConstExpr;
 import io.github.vmzakharov.ecdataframe.dsl.FunctionCallExpr;
 import io.github.vmzakharov.ecdataframe.dsl.FunctionScript;
 import io.github.vmzakharov.ecdataframe.dsl.IfElseExpr;
@@ -24,7 +23,7 @@ public interface ExpressionEvaluationVisitor
 
     Value visitUnaryExpr(UnaryExpr expr);
 
-    Value visitConstExpr(ConstExpr expr);
+    Value visitConstExpr(Value expr);
 
     Value visitFunctionCallExpr(FunctionCallExpr expr);
 

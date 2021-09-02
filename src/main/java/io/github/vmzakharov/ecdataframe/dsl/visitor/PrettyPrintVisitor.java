@@ -4,7 +4,6 @@ import io.github.vmzakharov.ecdataframe.dsl.AliasExpr;
 import io.github.vmzakharov.ecdataframe.dsl.AnonymousScript;
 import io.github.vmzakharov.ecdataframe.dsl.AssingExpr;
 import io.github.vmzakharov.ecdataframe.dsl.BinaryExpr;
-import io.github.vmzakharov.ecdataframe.dsl.ConstExpr;
 import io.github.vmzakharov.ecdataframe.dsl.Expression;
 import io.github.vmzakharov.ecdataframe.dsl.FunctionCallExpr;
 import io.github.vmzakharov.ecdataframe.dsl.FunctionScript;
@@ -16,6 +15,7 @@ import io.github.vmzakharov.ecdataframe.dsl.StatementSequenceScript;
 import io.github.vmzakharov.ecdataframe.dsl.UnaryExpr;
 import io.github.vmzakharov.ecdataframe.dsl.VarExpr;
 import io.github.vmzakharov.ecdataframe.dsl.VectorExpr;
+import io.github.vmzakharov.ecdataframe.dsl.value.Value;
 import io.github.vmzakharov.ecdataframe.util.CollectingPrinter;
 import io.github.vmzakharov.ecdataframe.util.Printer;
 import io.github.vmzakharov.ecdataframe.util.PrinterFactory;
@@ -75,9 +75,9 @@ implements ExpressionVisitor
     }
 
     @Override
-    public void visitConstExpr(ConstExpr expr)
+    public void visitConstExpr(Value expr)
     {
-        this.print(expr.getValue().asStringLiteral());
+        this.print(expr.asStringLiteral());
     }
 
     @Override

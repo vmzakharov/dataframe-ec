@@ -3,7 +3,6 @@ package io.github.vmzakharov.ecdataframe;
 import io.github.vmzakharov.ecdataframe.dsl.AnonymousScript;
 import io.github.vmzakharov.ecdataframe.dsl.BinaryExpr;
 import io.github.vmzakharov.ecdataframe.dsl.BinaryOp;
-import io.github.vmzakharov.ecdataframe.dsl.ConstExpr;
 import io.github.vmzakharov.ecdataframe.dsl.Expression;
 import io.github.vmzakharov.ecdataframe.dsl.value.BooleanValue;
 import io.github.vmzakharov.ecdataframe.dsl.value.DateValue;
@@ -68,7 +67,7 @@ final public class ExpressionTestUtil
     public static boolean evaluate(BinaryOp op, Value value1, Value value2)
     {
         InMemoryEvaluationVisitor evaluationVisitor = new InMemoryEvaluationVisitor();
-        Expression expression = new BinaryExpr(new ConstExpr(value1), new ConstExpr(value2), op);
+        Expression expression = new BinaryExpr(value1, value2, op);
         return ((BooleanValue) expression.evaluate(evaluationVisitor)).isTrue();
     }
 }

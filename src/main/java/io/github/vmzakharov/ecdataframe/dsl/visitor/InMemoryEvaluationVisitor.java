@@ -5,7 +5,6 @@ import io.github.vmzakharov.ecdataframe.dataset.HierarchicalDataSet;
 import io.github.vmzakharov.ecdataframe.dsl.AnonymousScript;
 import io.github.vmzakharov.ecdataframe.dsl.AssingExpr;
 import io.github.vmzakharov.ecdataframe.dsl.BinaryExpr;
-import io.github.vmzakharov.ecdataframe.dsl.ConstExpr;
 import io.github.vmzakharov.ecdataframe.dsl.EvalContext;
 import io.github.vmzakharov.ecdataframe.dsl.Expression;
 import io.github.vmzakharov.ecdataframe.dsl.FunctionCallExpr;
@@ -67,9 +66,9 @@ implements ExpressionEvaluationVisitor
     }
 
     @Override
-    public Value visitConstExpr(ConstExpr expr)
+    public Value visitConstExpr(Value expr)
     {
-        return expr.getValue();
+        return expr;
     }
 
     @Override

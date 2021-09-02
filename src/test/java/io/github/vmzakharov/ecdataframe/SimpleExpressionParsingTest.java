@@ -2,7 +2,6 @@ package io.github.vmzakharov.ecdataframe;
 
 import io.github.vmzakharov.ecdataframe.dsl.AssingExpr;
 import io.github.vmzakharov.ecdataframe.dsl.BinaryExpr;
-import io.github.vmzakharov.ecdataframe.dsl.ConstExpr;
 import io.github.vmzakharov.ecdataframe.dsl.EvalContext;
 import io.github.vmzakharov.ecdataframe.dsl.Expression;
 import io.github.vmzakharov.ecdataframe.dsl.FunctionCallExpr;
@@ -13,6 +12,7 @@ import io.github.vmzakharov.ecdataframe.dsl.UnaryExpr;
 import io.github.vmzakharov.ecdataframe.dsl.UnaryOp;
 import io.github.vmzakharov.ecdataframe.dsl.VectorExpr;
 import io.github.vmzakharov.ecdataframe.dsl.value.LongValue;
+import io.github.vmzakharov.ecdataframe.dsl.value.Value;
 import io.github.vmzakharov.ecdataframe.dsl.visitor.InMemoryEvaluationVisitor;
 import org.eclipse.collections.impl.factory.Lists;
 import org.junit.Assert;
@@ -58,7 +58,7 @@ public class SimpleExpressionParsingTest
         Expression param1 = fcExpr.getParameters().get(0);
         Expression param2 = fcExpr.getParameters().get(1);
 
-        Assert.assertEquals(ConstExpr.class, param1.getClass());
+        Assert.assertEquals(LongValue.class, param1.getClass());
         Assert.assertEquals(BinaryExpr.class, param2.getClass());
     }
 
@@ -125,6 +125,6 @@ public class SimpleExpressionParsingTest
 
         Assert.assertEquals(
                 Lists.immutable.of("\"a\"", "\"b\"", "\"c\""),
-                vectorExpr.getElements().collect(e -> ((ConstExpr) e).getValue().asStringLiteral()));
+                vectorExpr.getElements().collect(e -> ((Value) e).asStringLiteral()));
     }
 }

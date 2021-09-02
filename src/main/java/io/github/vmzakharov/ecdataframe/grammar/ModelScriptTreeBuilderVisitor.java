@@ -7,7 +7,6 @@ import io.github.vmzakharov.ecdataframe.dsl.AssingExpr;
 import io.github.vmzakharov.ecdataframe.dsl.BinaryExpr;
 import io.github.vmzakharov.ecdataframe.dsl.BooleanOp;
 import io.github.vmzakharov.ecdataframe.dsl.ComparisonOp;
-import io.github.vmzakharov.ecdataframe.dsl.ConstExpr;
 import io.github.vmzakharov.ecdataframe.dsl.ContainsOp;
 import io.github.vmzakharov.ecdataframe.dsl.Expression;
 import io.github.vmzakharov.ecdataframe.dsl.FunctionCallExpr;
@@ -43,13 +42,6 @@ extends ModelScriptBaseVisitor<Expression>
         this.scriptStack.push(new AnonymousScript());
     }
 
-//    @Override
-//    public Expression visitScript(ModelScriptParser.ScriptContext ctx)
-//    {
-//        // todo: need it?
-//        return super.visitScript(ctx);
-//    }
-//
     @Override
     public Expression visitFreeExp(ModelScriptParser.FreeExpContext ctx)
     {
@@ -89,7 +81,7 @@ extends ModelScriptBaseVisitor<Expression>
     @Override
     public Expression visitStringLiteralExpr(ModelScriptParser.StringLiteralExprContext ctx)
     {
-        return new ConstExpr(new StringValue(this.stripQuotes(ctx.STRING().getText())));
+        return new StringValue(this.stripQuotes(ctx.STRING().getText()));
     }
 
     @Override
@@ -101,13 +93,13 @@ extends ModelScriptBaseVisitor<Expression>
     @Override
     public Expression visitIntLiteralExpr(ModelScriptParser.IntLiteralExprContext ctx)
     {
-        return new ConstExpr(new LongValue(Integer.parseInt(ctx.INT().getText())));
+        return new LongValue(Integer.parseInt(ctx.INT().getText()));
     }
 
     @Override
     public Expression visitDoubleLiteralExpr(ModelScriptParser.DoubleLiteralExprContext ctx)
     {
-        return new ConstExpr(new DoubleValue(Double.parseDouble(ctx.DOUBLE().getText())));
+        return new DoubleValue(Double.parseDouble(ctx.DOUBLE().getText()));
     }
 
     @Override

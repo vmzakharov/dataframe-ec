@@ -2,15 +2,14 @@ package io.github.vmzakharov.ecdataframe;
 
 import io.github.vmzakharov.ecdataframe.dsl.ArithmeticOp;
 import io.github.vmzakharov.ecdataframe.dsl.BinaryExpr;
-import io.github.vmzakharov.ecdataframe.dsl.ConstExpr;
 import io.github.vmzakharov.ecdataframe.dsl.value.DoubleValue;
 import io.github.vmzakharov.ecdataframe.dsl.value.LongValue;
 import io.github.vmzakharov.ecdataframe.dsl.value.StringValue;
 import io.github.vmzakharov.ecdataframe.dsl.value.Value;
-import org.junit.Before;
-import org.junit.Assert;
-import org.junit.Test;
 import io.github.vmzakharov.ecdataframe.dsl.visitor.InMemoryEvaluationVisitor;
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Test;
 
 public class HandcraftedExpressionTreeTest
 {
@@ -26,8 +25,8 @@ public class HandcraftedExpressionTreeTest
     public void intAddition()
     {
         Value result = new BinaryExpr(
-                new ConstExpr(new LongValue(123)),
-                new ConstExpr(new LongValue(456)),
+                new LongValue(123),
+                new LongValue(456),
                 ArithmeticOp.ADD
         ).evaluate(this.evaluationVisitor);
 
@@ -38,8 +37,8 @@ public class HandcraftedExpressionTreeTest
     public void doubleAddition()
     {
         Value result = new BinaryExpr(
-                new ConstExpr(new DoubleValue(123.321)),
-                new ConstExpr(new DoubleValue(456.025)),
+                new DoubleValue(123.321),
+                new DoubleValue(456.025),
                 ArithmeticOp.ADD
         ).evaluate(this.evaluationVisitor);
 
@@ -50,8 +49,8 @@ public class HandcraftedExpressionTreeTest
     public void stringAddition()
     {
         Value result = new BinaryExpr(
-                new ConstExpr(new StringValue("Oompa")),
-                new ConstExpr(new StringValue("Loompa")),
+                new StringValue("Oompa"),
+                new StringValue("Loompa"),
                 ArithmeticOp.ADD
         ).evaluate(this.evaluationVisitor);
 

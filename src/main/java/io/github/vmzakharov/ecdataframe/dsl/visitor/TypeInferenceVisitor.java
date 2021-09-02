@@ -6,7 +6,6 @@ import io.github.vmzakharov.ecdataframe.dsl.AnonymousScript;
 import io.github.vmzakharov.ecdataframe.dsl.ArithmeticOp;
 import io.github.vmzakharov.ecdataframe.dsl.AssingExpr;
 import io.github.vmzakharov.ecdataframe.dsl.BinaryExpr;
-import io.github.vmzakharov.ecdataframe.dsl.ConstExpr;
 import io.github.vmzakharov.ecdataframe.dsl.EvalContext;
 import io.github.vmzakharov.ecdataframe.dsl.Expression;
 import io.github.vmzakharov.ecdataframe.dsl.FunctionCallExpr;
@@ -166,9 +165,9 @@ implements ExpressionVisitor
     }
 
     @Override
-    public void visitConstExpr(ConstExpr expr)
+    public void visitConstExpr(Value expr)
     {
-        this.store(expr.getValue().getType());
+        this.store(expr.getType());
     }
 
     @Override

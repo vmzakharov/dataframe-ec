@@ -1,11 +1,14 @@
 package io.github.vmzakharov.ecdataframe.dsl.value;
 
 import io.github.vmzakharov.ecdataframe.dsl.ArithmeticOp;
+import io.github.vmzakharov.ecdataframe.dsl.Expression;
 import io.github.vmzakharov.ecdataframe.dsl.PredicateOp;
 import io.github.vmzakharov.ecdataframe.dsl.UnaryOp;
+import io.github.vmzakharov.ecdataframe.dsl.visitor.ExpressionEvaluationVisitor;
+import io.github.vmzakharov.ecdataframe.dsl.visitor.ExpressionVisitor;
 
 public interface Value
-extends Comparable<Value>
+extends Expression, Comparable<Value>
 {
     Value VOID = new Value()
     {
@@ -42,6 +45,18 @@ extends Comparable<Value>
     default BooleanValue applyPredicate(Value another, PredicateOp operation)
     {
         throw new UnsupportedOperationException("Undefined operation " + operation.asString() + " on " + this.asStringLiteral());
+    }
+
+    @Override
+    default Value evaluate(ExpressionEvaluationVisitor visitor)
+    {
+        return visitor.visitConstExpr(this);
+    }
+
+    @Override
+    default void accept(ExpressionVisitor visitor)
+    {
+        visitor.visitConstExpr(this);
     }
 
     ValueType getType();
