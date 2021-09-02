@@ -239,7 +239,7 @@ public class DataFrameAggregationTest
         DataFrame summed = df.sumBy(Lists.immutable.of("BarBar", "BazBaz"), Lists.immutable.of("Name", "aFoo"));
 
         DataFrame expected = new DataFrame("Expected")
-                .addStringColumn("Name").addStringColumn("Foo").addLongColumn("BarBar").addDoubleColumn("BazBaz")
+                .addStringColumn("Name").addStringColumn("aFoo").addLongColumn("BarBar").addDoubleColumn("BazBaz")
                 .addRow("Bob",   "aDef",  1134L,  48.0)
                 .addRow("Bob",   "aAbc",   246L,  88.0)
                 .addRow("Alice", "aQqq",   246L,  20.0)

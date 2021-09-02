@@ -234,7 +234,7 @@ extends DataSetAbstract
 
         try (BufferedReader reader = new BufferedReader(this.createReader(), BUFFER_SIZE))
         {
-            MutableList<String> headers = this.splitMindingQs(reader.readLine());
+            MutableList<String> headers = this.splitMindingQs(reader.readLine()).collect(c->this.removeSurroundingQuotes(c));
 
             String dataRow = reader.readLine();
 
@@ -300,6 +300,18 @@ extends DataSetAbstract
         }
 
         return df;
+    }
+
+    private String removeSurroundingQuotes(String aString)
+    {
+        int size = aString.length();
+
+        if (this.isQuote(aString.charAt(0)) && this.isQuote(aString.charAt(size - 1)))
+        {
+            return aString.substring(1, size - 1);
+        }
+
+        return aString;
     }
 
     private void addDataFrameColumn(DataFrame df, CsvSchemaColumn col, MutableList<Procedure<String>> columnPopulators)

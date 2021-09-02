@@ -6,11 +6,18 @@ import io.github.vmzakharov.ecdataframe.dsl.visitor.ExpressionVisitor;
 
 public class VarExpr implements Expression
 {
-    private String variableName;
+    private final String variableName;
+    private final boolean escaped;
 
-    public VarExpr(String newVariableName)
+    public VarExpr(String newVariableName, boolean newEscaped)
     {
         this.variableName = newVariableName;
+        this.escaped = newEscaped;
+    }
+
+    public boolean isEscaped()
+    {
+        return this.escaped;
     }
 
     @Override

@@ -173,4 +173,25 @@ public class BasicDataFrameTest
 
         df.keepColumns(Lists.immutable.of("Name", "Giraffe"));
     }
+
+    @Test
+    public void escapingColumnNames()
+    {
+        DataFrame df = new DataFrame("df1")
+                .addStringColumn("Person's Name").addLongColumn("Pet Count").addStringColumn("number-as-string").addStringColumn("Three letters")
+                .addRow("Alice", 5, "1", "abc")
+                .addRow("Deb",   1, "2", "xyz");
+
+        df.addStringColumn("First Letter plus", "substr(${Person's Name}, 0, 1) + ' ' + ${Three letters}");
+        df.addLongColumn("Math, and stuff", "${Pet Count} * toLong(${number-as-string})");
+
+        DataFrameUtil.assertEquals(
+                new DataFrame("expected")
+                        .addStringColumn("Person's Name").addLongColumn("Pet Count").addStringColumn("number-as-string")
+                        .addStringColumn("Three letters").addStringColumn("First Letter plus").addLongColumn("Math, and stuff")
+                        .addRow("Alice", 5, "1", "abc", "A abc", 5)
+                        .addRow("Deb",   1, "2", "xyz", "D xyz", 2)
+                , df);
+    }
+
 }

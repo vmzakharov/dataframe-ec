@@ -143,4 +143,34 @@ public class ScriptFromStringTest
         Value result = script.evaluate();
         Assert.assertEquals(6, ((LongValue) result).longValue());
     }
+
+    @Test
+    public void escapedVariableNames()
+    {
+        String scriptText =
+                  "${x} = 1\n"
+                + "${a-b} = 2\n"
+                + "${It was a cold day} = ${x} + ${a-b}\n"
+                + "2 * ${It was a cold day}";
+
+        AnonymousScript script = ExpressionTestUtil.toScript(scriptText);
+        Value result = script.evaluate(new InMemoryEvaluationVisitor());
+        Assert.assertTrue(result.isLong());
+        Assert.assertEquals(6, ((LongValue) result).longValue());
+    }
+
+    @Test
+    public void escapedVariableNamesWithQuotes()
+    {
+        String scriptText =
+                  "${Bob's Number} = 1\n"
+                + "${\"Alice\"} = 2\n"
+                + "${\"Alice\"} - ${Bob's Number}\n";
+
+        AnonymousScript script = ExpressionTestUtil.toScript(scriptText);
+        Value result = script.evaluate(new InMemoryEvaluationVisitor());
+        Assert.assertTrue(result.isLong());
+        Assert.assertEquals(1, ((LongValue) result).longValue());
+    }
+
 }

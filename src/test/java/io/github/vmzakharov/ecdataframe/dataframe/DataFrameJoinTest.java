@@ -58,7 +58,7 @@ public class DataFrameJoinTest
         DataFrame joined = df1.join(df2, "Baz", "Number");
 
         DataFrame expected = new DataFrame("expected")
-                .addStringColumn("Foo").addLongColumn("Bar").addStringColumn("Name")
+                .addStringColumn("Foo").addLongColumn("Baz").addStringColumn("Name")
                 .addRow("Blinky", 7, "Apple")
                 .addRow("Pinky",  8, "Grapefruit")
                 .addRow("Inky",   9, "Mint")

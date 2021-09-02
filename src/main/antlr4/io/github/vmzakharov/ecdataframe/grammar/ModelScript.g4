@@ -25,7 +25,7 @@ statement :
     ;
 
 projectionStatement :
-    'project'? '{' exprList '}' ('where' expr)?
+    'project' '{' exprList '}' ('where' expr)?
     ;
 
 expr :
@@ -86,7 +86,7 @@ THEN  : 'then' | 'THEN';
 ELSE  : 'else' | 'ELSE';
 ENDIF : 'endif' | 'ENDIF';
 
-ID : LETTER (LETTER|DIGIT)*;
+ID : '${' .*? '}' |  LETTER (LETTER|DIGIT)* ;
 INT : DIGIT+;
 DOUBLE : ('.' DIGIT+ | DIGIT+ ('.' DIGIT*)? ) ;
 LINE_COMMENT : '//' ~[\r\n]* -> skip;

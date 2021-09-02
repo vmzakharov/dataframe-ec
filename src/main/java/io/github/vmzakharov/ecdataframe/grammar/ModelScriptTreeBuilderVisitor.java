@@ -33,7 +33,7 @@ import org.eclipse.collections.impl.factory.Lists;
 import org.eclipse.collections.impl.utility.ListIterate;
 
 public class ModelScriptTreeBuilderVisitor
-extends ModelScriptBaseVisitor<Expression>
+        extends ModelScriptBaseVisitor<Expression>
 {
     private final MutableStack<Script> scriptStack = Stacks.mutable.of();
 
@@ -58,7 +58,22 @@ extends ModelScriptBaseVisitor<Expression>
             throw new RuntimeException("Malformed assignment statement");
         }
         Expression expression = this.visit(ctx.expr());
-        return this.addStatementToCurrentScriptContext(new AssingExpr(varName, expression));
+        return this.addStatementToCurrentScriptContext(new AssingExpr(this.unEscape(varName), expression));
+    }
+
+    private String unEscape(String varName)
+    {
+        if (this.isEscaped(varName))
+        {
+            return varName.substring(2, varName.length() - 1);
+        }
+
+        return varName;
+    }
+
+    private boolean isEscaped(String varName)
+    {
+        return varName.startsWith("${") && varName.endsWith("}");
     }
 
     private Expression addStatementToCurrentScriptContext(Expression expression)
@@ -87,7 +102,9 @@ extends ModelScriptBaseVisitor<Expression>
     @Override
     public Expression visitVarExpr(ModelScriptParser.VarExprContext ctx)
     {
-        return new VarExpr(ctx.ID().getText());
+        String varName = ctx.ID().getText();
+
+        return new VarExpr(this.unEscape(varName), this.isEscaped(varName));
     }
 
     @Override
@@ -105,13 +122,13 @@ extends ModelScriptBaseVisitor<Expression>
     @Override
     public Expression visitAddSubExpr(ModelScriptParser.AddSubExprContext ctx)
     {
-        return  this.visitBinaryOperation(ctx.expr(0), ctx.expr(1), ctx.op);
+        return this.visitBinaryOperation(ctx.expr(0), ctx.expr(1), ctx.op);
     }
 
     @Override
     public Expression visitMulDivExpr(ModelScriptParser.MulDivExprContext ctx)
     {
-        return  this.visitBinaryOperation(ctx.expr(0), ctx.expr(1), ctx.op);
+        return this.visitBinaryOperation(ctx.expr(0), ctx.expr(1), ctx.op);
     }
 
     private Expression visitBinaryOperation(ModelScriptParser.ExprContext exprContext1, ModelScriptParser.ExprContext exprContext2, Token opToken)
@@ -285,8 +302,8 @@ extends ModelScriptBaseVisitor<Expression>
     public Expression visitIndexVectorExpr(ModelScriptParser.IndexVectorExprContext ctx)
     {
         return new IndexExpr(
-            this.visit(ctx.expr(0)),
-            this.visit(ctx.expr(1))
+                this.visit(ctx.expr(0)),
+                this.visit(ctx.expr(1))
         );
     }
 
@@ -357,7 +374,7 @@ extends ModelScriptBaseVisitor<Expression>
 
     private String stripQuotes(String aString)
     {
-        if (aString.length() < 2) return aString;
+        if (aString.length() < 2) {return aString;}
 
         if (aString.charAt(0) == '"' && aString.charAt(aString.length() - 1) == '"')
         {
