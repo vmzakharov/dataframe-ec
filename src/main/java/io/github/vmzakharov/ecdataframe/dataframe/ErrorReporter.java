@@ -2,6 +2,8 @@ package io.github.vmzakharov.ecdataframe.dataframe;
 
 import io.github.vmzakharov.ecdataframe.util.PrinterFactory;
 
+import java.util.function.Supplier;
+
 final public class ErrorReporter
 {
     private ErrorReporter()
@@ -14,6 +16,14 @@ final public class ErrorReporter
         if (badThingHappened)
         {
             ErrorReporter.reportAndThrow(errorText);
+        }
+    }
+
+    public static void reportAndThrow(boolean badThingHappened, Supplier<String> errorTextSupplier)
+    {
+        if (badThingHappened)
+        {
+            ErrorReporter.reportAndThrow(errorTextSupplier.get());
         }
     }
 

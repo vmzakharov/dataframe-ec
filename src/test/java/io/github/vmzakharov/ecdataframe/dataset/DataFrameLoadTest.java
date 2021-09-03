@@ -3,6 +3,8 @@ package io.github.vmzakharov.ecdataframe.dataset;
 import io.github.vmzakharov.ecdataframe.dataframe.DataFrame;
 import io.github.vmzakharov.ecdataframe.dataframe.DataFrameUtil;
 import io.github.vmzakharov.ecdataframe.dsl.value.ValueType;
+import org.eclipse.collections.api.map.MutableMap;
+import org.eclipse.collections.impl.block.factory.Functions;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -89,12 +91,12 @@ public class DataFrameLoadTest
     public void dateParsingFormat3()
     {
         CsvDataSet dataSet = new StringBasedCsvDataSet("Foo", "Dates",
-                "Name,Date\n"
-                        + "\"Alice\",01/01/2020\n"
-                        + "\"Bob\",  1/01/2010\n"
-                        + "\"Carl\", 11/21/2005\n"
-                        + "\"Diane\",09/2/2012\n"
-                        + "\"Ed\","
+                  "Name,Date\n"
+                + "\"Alice\",01/01/2020\n"
+                + "\"Bob\",  1/01/2010\n"
+                + "\"Carl\", 11/21/2005\n"
+                + "\"Diane\",09/2/2012\n"
+                + "\"Ed\","
         );
 
         DataFrame loaded = dataSet.loadAsDataFrame();
@@ -349,7 +351,7 @@ public class DataFrameLoadTest
     }
 
     @Test
-    public void headZeroLines()
+    public void headZeroOrNegativeLines()
     {
         CsvDataSet dataSet = new StringBasedCsvDataSet("Foo", "Employees",
                 "Name,EmployeeId,HireDate,Dept,Salary\n"
@@ -361,6 +363,11 @@ public class DataFrameLoadTest
         );
 
         DataFrame loaded = dataSet.loadAsDataFrame(0);
+
+        Assert.assertNotNull(loaded);
+        Assert.assertEquals(0, loaded.rowCount());
+
+        loaded = dataSet.loadAsDataFrame(-1);
 
         Assert.assertNotNull(loaded);
         Assert.assertEquals(0, loaded.rowCount());
@@ -437,4 +444,56 @@ public class DataFrameLoadTest
                 , loaded);
     }
 
+    @Test
+    public void columnTypeInference()
+    {
+        CsvDataSet dataSet = new StringBasedCsvDataSet("Foo", "Employees",
+                  "Name,EmployeeId,DeptNo,HireDate,Salary,MaybeNumber\n"
+                + "\"Alice\",1234,,2020-01-01,110000,\n"
+                + "\"Bob\",1235,100,2010-01-01,100000.50,12\n"
+                + "\"Carl\",1236,100,Wednesday,100000.60,12.34\n"
+                + "\"Doris\",1237,101,2010-01-01,100000.70,Hi\n"
+        );
+
+        DataFrame loaded = dataSet.loadAsDataFrame();
+
+        CsvSchema schema = dataSet.getSchema();
+
+        MutableMap<String, ValueType> typeByName =
+                schema.getColumns().toMap(CsvSchemaColumn::getName, CsvSchemaColumn::getType);
+
+        Assert.assertEquals(ValueType.STRING, typeByName.get("Name"));
+        Assert.assertEquals(ValueType.LONG,   typeByName.get("EmployeeId"));
+        Assert.assertEquals(ValueType.LONG,   typeByName.get("DeptNo"));
+        Assert.assertEquals(ValueType.STRING, typeByName.get("HireDate"));
+        Assert.assertEquals(ValueType.DOUBLE, typeByName.get("Salary"));
+        Assert.assertEquals(ValueType.STRING, typeByName.get("MaybeNumber"));
+    }
+
+    @Test
+    public void columnTypeInferenceWithMoreEmptyValues()
+    {
+        CsvDataSet dataSet = new StringBasedCsvDataSet("Foo", "Employees",
+                  "Name,EmployeeId,DeptNo,HireDate,OtherDate,Salary,MaybeNumber\n"
+                + ",1234,,2020-01-01,2020-01-01,110000,\n"
+                + "\"Bob\",1235,100,2010-01-01,2010-01-01,100000.50,12\n"
+                + ",1236,,10/25/2015,2015-10-25,,12.34\n"
+                + "\"Doris\",,101,2010-01-01,2010-01-01,100000.70,Hi\n"
+        );
+
+        DataFrame loaded = dataSet.loadAsDataFrame();
+
+        CsvSchema schema = dataSet.getSchema();
+
+        MutableMap<String, ValueType> typeByName =
+                schema.getColumns().toMap(CsvSchemaColumn::getName, CsvSchemaColumn::getType);
+
+        Assert.assertEquals(ValueType.STRING, typeByName.get("Name"));
+        Assert.assertEquals(ValueType.LONG,   typeByName.get("EmployeeId"));
+        Assert.assertEquals(ValueType.LONG,   typeByName.get("DeptNo"));
+        Assert.assertEquals(ValueType.STRING, typeByName.get("HireDate"));
+        Assert.assertEquals(ValueType.DATE,   typeByName.get("OtherDate"));
+        Assert.assertEquals(ValueType.DOUBLE, typeByName.get("Salary"));
+        Assert.assertEquals(ValueType.STRING, typeByName.get("MaybeNumber"));
+    }
 }

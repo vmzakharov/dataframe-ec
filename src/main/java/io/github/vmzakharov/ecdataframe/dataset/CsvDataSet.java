@@ -12,7 +12,10 @@ import io.github.vmzakharov.ecdataframe.dsl.value.ValueType;
 import org.eclipse.collections.api.block.procedure.Procedure;
 import org.eclipse.collections.api.list.ListIterable;
 import org.eclipse.collections.api.list.MutableList;
+import org.eclipse.collections.api.map.primitive.MutableIntObjectMap;
 import org.eclipse.collections.impl.factory.Lists;
+import org.eclipse.collections.impl.factory.primitive.IntObjectMaps;
+import org.eclipse.collections.impl.list.Interval;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -28,6 +31,8 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.time.format.ResolverStyle;
+
+import static io.github.vmzakharov.ecdataframe.dsl.value.ValueType.*;
 
 public class CsvDataSet
 extends DataSetAbstract
@@ -234,7 +239,7 @@ extends DataSetAbstract
 
         try (BufferedReader reader = new BufferedReader(this.createReader(), BUFFER_SIZE))
         {
-            MutableList<String> headers = this.splitMindingQs(reader.readLine()).collect(c->this.removeSurroundingQuotes(c));
+            MutableList<String> headers = this.splitMindingQs(reader.readLine()).collect(this::removeSurroundingQuotes);
 
             String dataRow = reader.readLine();
 
@@ -242,7 +247,7 @@ extends DataSetAbstract
             {
                 if (this.getSchema().columnCount() == 0)
                 {
-                    headers.forEach(header -> this.schema.addColumn(header, ValueType.STRING));
+                    headers.forEach(header -> this.schema.addColumn(header, STRING));
                 }
 
                 this.getSchema().getColumns().forEach(col -> df.addColumn(col.getName(), col.getType()));
@@ -250,20 +255,27 @@ extends DataSetAbstract
                 return df;
             }
 
-            MutableList<String> firstRowElements = this.splitMindingQs(dataRow);
+            int lineCountForTypeInference = 20;
+            MutableList<String> lineBuffer = Lists.mutable.withInitialCapacity(lineCountForTypeInference);
+            lineBuffer.add(dataRow);
 
-            ErrorReporter.reportAndThrow(headers.size() != firstRowElements.size(),
-                    "The number of elements in the header does not match the number of elements in the first data row ("
-                    + headers.size() + ", " + firstRowElements.size() + ")");
-
+            // the schema is empty, need to infer columns properties from the first lineCountForTypeInference columns
             if (this.getSchema().columnCount() == 0)
             {
-                this.inferSchema(headers, firstRowElements);
+                int loadedLineCount = 1; // already have one in the buffer
+                while (loadedLineCount++ < lineCountForTypeInference
+                        && (dataRow = reader.readLine()) != null)
+                {
+                    lineBuffer.add(dataRow);
+                }
+                this.inferSchema(headers, lineBuffer);
             }
-
-            ErrorReporter.reportAndThrow(this.getSchema().columnCount() != firstRowElements.size(),
-                    "The number of columns in the schema does not match the number of elements in the first data row ("
-                    + this.getSchema().columnCount() + ", " + firstRowElements.size() + ")");
+            else if (headers.size() != this.schema.columnCount())
+            {
+                ErrorReporter.reportAndThrow(String.format(
+                                "The number of elements in the header does not match the number of columns in the schema %d vs %d",
+                                headers.size(), this.schema.columnCount()));
+            }
 
             MutableList<Procedure<String>> columnPopulators = Lists.mutable.of();
 
@@ -272,24 +284,15 @@ extends DataSetAbstract
             int columnCount = this.getSchema().columnCount();
             MutableList<String> lineElements = Lists.mutable.withInitialCapacity(columnCount);
 
-            if (loadAllLines)
-            {
-                do
-                {
-                    this.parseAndAddLineToDataFrame(dataRow, lineElements, columnCount, columnPopulators);
-                }
-                while ((dataRow = reader.readLine()) != null);
-            }
-            else if (headLineCount > 0)
-            {
-                int lineCount = 0;
+            int lineNumber = 0;
 
-                do
-                {
-                    lineCount++;
-                    this.parseAndAddLineToDataFrame(dataRow, lineElements, columnCount, columnPopulators);
-                }
-                while ((dataRow = reader.readLine()) != null && lineCount != headLineCount);
+            while (
+                    (dataRow = this.getNextLine(lineBuffer, reader, lineNumber)) != null
+                    && (loadAllLines || (lineNumber < headLineCount))
+            )
+            {
+                this.parseAndAddLineToDataFrame(dataRow, lineElements, columnCount, columnPopulators);
+                lineNumber++;
             }
 
             df.seal();
@@ -300,6 +303,17 @@ extends DataSetAbstract
         }
 
         return df;
+    }
+
+    private String getNextLine(MutableList<String> lineBuffer, BufferedReader reader, int lineNumber)
+    throws IOException
+    {
+        if (lineNumber < lineBuffer.size())
+        {
+            return lineBuffer.get(lineNumber);
+        }
+
+        return reader.readLine();
     }
 
     private String removeSurroundingQuotes(String aString)
@@ -341,42 +355,92 @@ extends DataSetAbstract
         }
     }
 
-    private void inferSchema(MutableList<String> headers, MutableList<String> elements)
+    private void inferSchema(MutableList<String> headers, MutableList<String> topDataLines)
     {
-        int columnCount = elements.size();
+        int columnCount = headers.size();
 
-        for (int i = 0; i < columnCount; i++)
+        ValueType[] types = new ValueType[columnCount];
+        String[] formats = new String[columnCount];
+
+        for (int lineIndex = 0; lineIndex < topDataLines.size(); lineIndex++)
         {
-            String element = elements.get(i);
-            ValueType guessedType;
-            String matchingFormat = null;
+            String dataLine = topDataLines.get(lineIndex);
 
-            if (this.getSchema().surroundedByQuotes(element))
+            MutableList<String> elements = this.splitMindingQs(dataLine);
+
+            if (headers.size() != elements.size())
             {
-                guessedType = ValueType.STRING;
+                ErrorReporter.reportAndThrow(
+                        "The number of elements in the header does not match the number of elements in the data row " + 1 + " ("
+                                + headers.size() + " vs " + elements.size() + ")");
             }
-            else
-            {
-                matchingFormat = this.findMatchingDateFormat(element);
 
-                if (matchingFormat != null)
+            for (int columnIndex = 0; columnIndex < columnCount; columnIndex++)
+            {
+                String element = elements.get(columnIndex);
+
+                String matchingFormat = null;
+
+                ValueType guessedType;
+
+                if (element.isEmpty())
                 {
-                    guessedType = ValueType.DATE;
+                    continue;
                 }
-                else if (this.canParseAsLong(element))
+
+                if (this.getSchema().surroundedByQuotes(element))
                 {
-                    guessedType = ValueType.LONG;
-                }
-                else if (this.canParseAsDouble(element))
-                {
-                    guessedType = ValueType.DOUBLE;
+                    guessedType = STRING;
                 }
                 else
                 {
-                    guessedType = ValueType.STRING;
+                    if ((matchingFormat = this.findMatchingDateFormat(element)) != null)
+                    {
+                        guessedType = DATE;
+                    }
+                    else if (this.canParseAsLong(element))
+                    {
+                        guessedType = LONG;
+                    }
+                    else if (this.canParseAsDouble(element))
+                    {
+                        guessedType = DOUBLE;
+                    }
+                    else
+                    {
+                        guessedType = STRING;
+                    }
+                }
+
+                if (types[columnIndex] == null)
+                {
+                    types[columnIndex] = guessedType;
+                    formats[columnIndex] = matchingFormat;
+                }
+                else if (guessedType == STRING)
+                {
+                    types[columnIndex] = guessedType;
+                }
+                else if (guessedType == DOUBLE && types[columnIndex] == LONG)
+                {
+                    types[columnIndex] = DOUBLE;
+                }
+                else if (guessedType == DATE && types[columnIndex] == DATE &&
+                        !matchingFormat.equals(formats[columnIndex]))
+                {
+                    // still a date but mismatched formats
+                    types[columnIndex] = STRING;
+                    formats[columnIndex] = null;
                 }
             }
-            this.schema.addColumn(headers.get(i), guessedType, matchingFormat);
+        }
+
+        for (int columnIndex = 0; columnIndex < columnCount; columnIndex++)
+        {
+            this.schema.addColumn(
+                    headers.get(columnIndex),
+                    types[columnIndex] == null ? STRING : types[columnIndex],
+                    formats[columnIndex]);
         }
     }
 
@@ -393,6 +457,12 @@ extends DataSetAbstract
     private void parseAndAddLineToDataFrame(String line, MutableList<String> elements, int columnCount, MutableList<Procedure<String>> columnPopulators)
     {
         this.splitMindingQsInto(line, elements);
+
+        ErrorReporter.reportAndThrow(
+                this.getSchema().columnCount() != elements.size(),
+                "The number of columns in the schema does not match the number of elements in the data row " + 0
+                + " (" + this.getSchema().columnCount() + ", " + elements.size() + ")");
+
         for (int i = 0; i < columnCount; i++)
         {
             String element = elements.get(i);
