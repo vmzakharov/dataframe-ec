@@ -38,6 +38,7 @@ public class CsvDataSet
 extends DataSetAbstract
 {
     public static final int BUFFER_SIZE = 65_536;
+    public static final int LINE_COUNT_FOR_TYPE_INFERENCE = 100;
 
     private final Path dataFilePath;
 
@@ -222,6 +223,40 @@ extends DataSetAbstract
         return this.loadAsDataFrame(headLineCount, false);
     }
 
+    /**
+     * Infers schema from the data file defined by this data set. This is done by reading the first several lines of
+     * the file and attempting to parse elements using different formats.
+     * If the data set already has the schema defined, it gets overridden with the inferred one.
+     * @return the inferred schema
+     */
+    public CsvSchema inferSchema()
+    {
+        this.schema = new CsvSchema();
+
+        try (BufferedReader reader = new BufferedReader(this.createReader(), BUFFER_SIZE))
+        {
+            MutableList<String> headers = this.splitMindingQs(reader.readLine()).collect(this::removeSurroundingQuotes);
+
+            MutableList<String> lineBuffer = Lists.mutable.withInitialCapacity(LINE_COUNT_FOR_TYPE_INFERENCE);
+
+            String dataRow;
+            for (int loadedLineCount = 0;
+                 loadedLineCount < LINE_COUNT_FOR_TYPE_INFERENCE && (dataRow = reader.readLine()) != null;
+                 loadedLineCount++)
+            {
+                lineBuffer.add(dataRow);
+            }
+
+            this.inferSchema(headers, lineBuffer);
+        }
+        catch (IOException e)
+        {
+            ErrorReporter.reportAndThrow("Failed to infer schema from  '" + this.getDataFileName() + "'", e);
+        }
+
+        return this.schema;
+    }
+
     private DataFrame loadAsDataFrame(int headLineCount, boolean loadAllLines)
     {
         DataFrame df = new DataFrame(this.getName());
@@ -255,15 +290,14 @@ extends DataSetAbstract
                 return df;
             }
 
-            int lineCountForTypeInference = 20;
-            MutableList<String> lineBuffer = Lists.mutable.withInitialCapacity(lineCountForTypeInference);
+            MutableList<String> lineBuffer = Lists.mutable.withInitialCapacity(LINE_COUNT_FOR_TYPE_INFERENCE);
             lineBuffer.add(dataRow);
 
             // the schema is empty, need to infer columns properties from the first lineCountForTypeInference columns
             if (this.getSchema().columnCount() == 0)
             {
                 int loadedLineCount = 1; // already have one in the buffer
-                while (loadedLineCount++ < lineCountForTypeInference
+                while (loadedLineCount++ < LINE_COUNT_FOR_TYPE_INFERENCE
                         && (dataRow = reader.readLine()) != null)
                 {
                     lineBuffer.add(dataRow);
@@ -299,7 +333,7 @@ extends DataSetAbstract
         }
         catch (IOException e)
         {
-            throw new RuntimeException("Failed to load as a data frame '" + this.getDataFileName() + "'", e);
+            ErrorReporter.reportAndThrow("Failed to load as a data frame '" + this.getDataFileName() + "'", e);
         }
 
         return df;

@@ -10,6 +10,9 @@ import org.junit.Test;
 
 import java.time.LocalDate;
 
+import static io.github.vmzakharov.ecdataframe.dsl.value.ValueType.*;
+import static io.github.vmzakharov.ecdataframe.dsl.value.ValueType.STRING;
+
 public class DataFrameLoadTest
 {
     @Test
@@ -116,11 +119,11 @@ public class DataFrameLoadTest
     public void loadDataWithSchema()
     {
         CsvSchema schema = new CsvSchema();
-        schema.addColumn("Name", ValueType.STRING);
-        schema.addColumn("EmployeeId", ValueType.LONG);
-        schema.addColumn("HireDate", ValueType.DATE, "uuuu-M-d");
-        schema.addColumn("Dept", ValueType.STRING);
-        schema.addColumn("Salary", ValueType.DOUBLE);
+        schema.addColumn("Name", STRING);
+        schema.addColumn("EmployeeId", LONG);
+        schema.addColumn("HireDate", DATE, "uuuu-M-d");
+        schema.addColumn("Dept", STRING);
+        schema.addColumn("Salary", DOUBLE);
 
         CsvDataSet dataSet = new StringBasedCsvDataSet("Foo", "Employees", schema,
                 "Name,EmployeeId,HireDate,Dept,Salary\n"
@@ -148,8 +151,8 @@ public class DataFrameLoadTest
     public void dateParsingWithSchemaFormat1()
     {
         CsvSchema schema = new CsvSchema();
-        schema.addColumn("Name", ValueType.STRING);
-        schema.addColumn("Date", ValueType.DATE, "d-MMM-uuuu");
+        schema.addColumn("Name", STRING);
+        schema.addColumn("Date", DATE, "d-MMM-uuuu");
 
         CsvDataSet dataSet = new StringBasedCsvDataSet("Foo", "Dates", schema,
                 "Name,Date\n"
@@ -177,8 +180,8 @@ public class DataFrameLoadTest
     public void dateParsingWithSchemaFormat2()
     {
         CsvSchema schema = new CsvSchema();
-        schema.addColumn("Name", ValueType.STRING);
-        schema.addColumn("Date", ValueType.DATE, "M/d/uuuu h:m:s a");
+        schema.addColumn("Name", STRING);
+        schema.addColumn("Date", DATE, "M/d/uuuu h:m:s a");
 
         CsvDataSet dataSet = new StringBasedCsvDataSet("Foo", "Dates", schema,
                 "Name,Date\n"
@@ -227,9 +230,9 @@ public class DataFrameLoadTest
     {
 
         CsvSchema schema = new CsvSchema();
-        schema.addColumn("Name", ValueType.STRING);
-        schema.addColumn("Date", ValueType.DATE, "d-MMM-uuuu");
-        schema.addColumn("Number", ValueType.LONG);
+        schema.addColumn("Name", STRING);
+        schema.addColumn("Date", DATE, "d-MMM-uuuu");
+        schema.addColumn("Number", LONG);
 
         CsvDataSet dataSet = new StringBasedCsvDataSet("Foo", "Dates", schema,
                 "Name,Date\n"
@@ -251,8 +254,8 @@ public class DataFrameLoadTest
     {
 
         CsvSchema schema = new CsvSchema();
-        schema.addColumn("Name", ValueType.STRING);
-        schema.addColumn("Date", ValueType.DATE, "d-MMM-uuuu");
+        schema.addColumn("Name", STRING);
+        schema.addColumn("Date", DATE, "d-MMM-uuuu");
 
         CsvDataSet dataSet = new StringBasedCsvDataSet("Foo", "Dates", schema,
                 "Name,Date,Number\n"
@@ -276,10 +279,10 @@ public class DataFrameLoadTest
                 .separator('|')
                 .quoteCharacter('\'')
                 .nullMarker("-NULL-");
-        schema.addColumn("Name", ValueType.STRING);
-        schema.addColumn("EmployeeId", ValueType.LONG);
-        schema.addColumn("HireDate", ValueType.DATE);
-        schema.addColumn("Salary", ValueType.DOUBLE);
+        schema.addColumn("Name", STRING);
+        schema.addColumn("EmployeeId", LONG);
+        schema.addColumn("HireDate", DATE);
+        schema.addColumn("Salary", DOUBLE);
 
         CsvDataSet dataSet = new StringBasedCsvDataSet("Foo", "Employees", schema,
                 "Name|EmployeeId|HireDate|Salary\n"
@@ -390,9 +393,9 @@ public class DataFrameLoadTest
     public void loadEmptyWithSchema()
     {
         CsvSchema schema = new CsvSchema();
-        schema.addColumn("Name", ValueType.STRING);
-        schema.addColumn("Date", ValueType.DATE, "d-MMM-uuuu");
-        schema.addColumn("Number", ValueType.LONG);
+        schema.addColumn("Name", STRING);
+        schema.addColumn("Date", DATE, "d-MMM-uuuu");
+        schema.addColumn("Number", LONG);
 
         CsvDataSet dataSet = new StringBasedCsvDataSet("Foo", "Dates", schema,
                 "Name,Date,Number\n"
@@ -445,7 +448,7 @@ public class DataFrameLoadTest
     }
 
     @Test
-    public void columnTypeInference()
+    public void inferSchema()
     {
         CsvDataSet dataSet = new StringBasedCsvDataSet("Foo", "Employees",
                   "Name,EmployeeId,DeptNo,HireDate,Salary,MaybeNumber\n"
@@ -455,45 +458,171 @@ public class DataFrameLoadTest
                 + "\"Doris\",1237,101,2010-01-01,100000.70,Hi\n"
         );
 
-        DataFrame loaded = dataSet.loadAsDataFrame();
-
-        CsvSchema schema = dataSet.getSchema();
+        CsvSchema schema = dataSet.inferSchema();
 
         MutableMap<String, ValueType> typeByName =
                 schema.getColumns().toMap(CsvSchemaColumn::getName, CsvSchemaColumn::getType);
 
-        Assert.assertEquals(ValueType.STRING, typeByName.get("Name"));
-        Assert.assertEquals(ValueType.LONG,   typeByName.get("EmployeeId"));
-        Assert.assertEquals(ValueType.LONG,   typeByName.get("DeptNo"));
-        Assert.assertEquals(ValueType.STRING, typeByName.get("HireDate"));
-        Assert.assertEquals(ValueType.DOUBLE, typeByName.get("Salary"));
-        Assert.assertEquals(ValueType.STRING, typeByName.get("MaybeNumber"));
+        Assert.assertEquals(STRING, typeByName.get("Name"));
+        Assert.assertEquals(LONG,   typeByName.get("EmployeeId"));
+        Assert.assertEquals(LONG,   typeByName.get("DeptNo"));
+        Assert.assertEquals(STRING, typeByName.get("HireDate"));
+        Assert.assertEquals(DOUBLE, typeByName.get("Salary"));
+        Assert.assertEquals(STRING, typeByName.get("MaybeNumber"));
     }
 
     @Test
-    public void columnTypeInferenceWithMoreEmptyValues()
+    public void inferSchemaFromOneDataLine()
     {
         CsvDataSet dataSet = new StringBasedCsvDataSet("Foo", "Employees",
-                  "Name,EmployeeId,DeptNo,HireDate,OtherDate,Salary,MaybeNumber\n"
-                + ",1234,,2020-01-01,2020-01-01,110000,\n"
-                + "\"Bob\",1235,100,2010-01-01,2010-01-01,100000.50,12\n"
-                + ",1236,,10/25/2015,2015-10-25,,12.34\n"
-                + "\"Doris\",,101,2010-01-01,2010-01-01,100000.70,Hi\n"
+                "Name,EmployeeId,DeptNo,HireDate,Salary,MaybeNumber\n"
+                        + "\"Alice\",1234,,2020-01-01,110000.12,Hi\n"
+        );
+
+        CsvSchema schema = dataSet.inferSchema();
+
+        MutableMap<String, ValueType> typeByName =
+                schema.getColumns().toMap(CsvSchemaColumn::getName, CsvSchemaColumn::getType);
+
+        Assert.assertEquals(STRING, typeByName.get("Name"));
+        Assert.assertEquals(LONG,   typeByName.get("EmployeeId"));
+        Assert.assertEquals(STRING, typeByName.get("DeptNo"));
+        Assert.assertEquals(DATE,   typeByName.get("HireDate"));
+        Assert.assertEquals(DOUBLE, typeByName.get("Salary"));
+        Assert.assertEquals(STRING, typeByName.get("MaybeNumber"));
+    }
+
+    @Test
+    public void inferSchemaFromNoDataLines()
+    {
+        CsvDataSet dataSet = new StringBasedCsvDataSet("Foo", "Employees",
+                "Name,EmployeeId,DeptNo,HireDate,Salary,MaybeNumber\n"
+        );
+
+        CsvSchema schema = dataSet.inferSchema();
+
+        MutableMap<String, ValueType> typeByName =
+                schema.getColumns().toMap(CsvSchemaColumn::getName, CsvSchemaColumn::getType);
+
+        Assert.assertEquals(STRING, typeByName.get("Name"));
+        Assert.assertEquals(STRING, typeByName.get("EmployeeId"));
+        Assert.assertEquals(STRING, typeByName.get("DeptNo"));
+        Assert.assertEquals(STRING, typeByName.get("HireDate"));
+        Assert.assertEquals(STRING, typeByName.get("Salary"));
+        Assert.assertEquals(STRING, typeByName.get("MaybeNumber"));
+    }
+
+    @Test
+    public void inferSchemaMakeSureTheFirstLineProcessed()
+    {
+        CsvDataSet dataSet = new StringBasedCsvDataSet("Foo", "Employees",
+                "Name,EmployeeId,DeptNo,HireDate,Salary,MaybeNumber\n"
+                        + "\"Alice\",One,Two,Three,Four,Five\n"
+                        + "\"Bob\",1235,100,2010-01-01,100000.50,12\n"
+                        + "\"Doris\",1237,101,2010-01-01,100000.70,15\n"
+        );
+
+        CsvSchema schema = dataSet.inferSchema();
+
+        MutableMap<String, ValueType> typeByName =
+                schema.getColumns().toMap(CsvSchemaColumn::getName, CsvSchemaColumn::getType);
+
+        Assert.assertEquals(STRING, typeByName.get("Name"));
+        Assert.assertEquals(STRING, typeByName.get("EmployeeId"));
+        Assert.assertEquals(STRING, typeByName.get("DeptNo"));
+        Assert.assertEquals(STRING, typeByName.get("HireDate"));
+        Assert.assertEquals(STRING, typeByName.get("Salary"));
+        Assert.assertEquals(STRING, typeByName.get("MaybeNumber"));
+    }
+
+    @Test(expected = RuntimeException.class)
+    public void inferSchemaWithMismatchedRowsFails()
+    {
+        CsvDataSet dataSet = new StringBasedCsvDataSet("Foo", "Employees",
+                "Name,EmployeeId,DeptNo,HireDate,Salary,MaybeNumber\n"
+                        + "\"Alice\",1234,,110000,\n"
+                        + "\"Bob\",1235,100,2010-01-01,100000.50,12\n"
+        );
+
+        CsvSchema schema = dataSet.inferSchema();
+        Assert.assertNotNull(schema);
+    }
+
+    @Test
+    public void inferSchemaOnLoad()
+    {
+        CsvDataSet dataSet = new StringBasedCsvDataSet("Foo", "Employees",
+                "Name,EmployeeId,DeptNo,HireDate,Salary,MaybeNumber\n"
+                        + "\"Alice\",1234,,2020-01-01,110000,\n"
+                        + "\"Bob\",1235,100,2010-01-01,100000.50,12\n"
+                        + "\"Carl\",1236,100,Wednesday,100000.60,12.34\n"
+                        + "\"Doris\",1237,101,2010-01-01,100000.70,Hi\n"
         );
 
         DataFrame loaded = dataSet.loadAsDataFrame();
 
-        CsvSchema schema = dataSet.getSchema();
+        DataFrame expected = new DataFrame("expected")
+                .addStringColumn("Name").addLongColumn("EmployeeId").addLongColumn("DeptNo").addStringColumn("HireDate")
+                .addDoubleColumn("Salary").addStringColumn("MaybeNumber")
+                .addRow("Alice", 1234,   0, "2020-01-01", 110000.00, "")
+                .addRow("Bob",   1235, 100, "2010-01-01", 100000.50, "12")
+                .addRow("Carl",  1236, 100, "Wednesday",  100000.60, "12.34")
+                .addRow("Doris", 1237, 101, "2010-01-01", 100000.70, "Hi")
+                ;
+
+        DataFrameUtil.assertEquals(expected, loaded);
+    }
+
+    @Test
+    public void inferSchemaAndThenLoad()
+    {
+        CsvDataSet dataSet = new StringBasedCsvDataSet("Foo", "Employees",
+                "Name,EmployeeId,DeptNo,HireDate,Salary,MaybeNumber\n"
+                        + "\"Alice\",1234,,2020-01-01,110000,\n"
+                        + "\"Bob\",1235,100,2010-01-01,100000.50,12\n"
+                        + "\"Carl\",1236,100,Wednesday,100000.60,12.34\n"
+                        + "\"Doris\",1237,101,2010-01-01,100000.70,Hi\n"
+        );
+
+        dataSet.inferSchema();
+
+        DataFrame loaded = dataSet.loadAsDataFrame();
+
+        DataFrame expected = new DataFrame("expected")
+                .addStringColumn("Name").addLongColumn("EmployeeId").addLongColumn("DeptNo").addStringColumn("HireDate")
+                .addDoubleColumn("Salary").addStringColumn("MaybeNumber")
+                .addRow("Alice", 1234,   0, "2020-01-01", 110000.00, "")
+                .addRow("Bob",   1235, 100, "2010-01-01", 100000.50, "12")
+                .addRow("Carl",  1236, 100, "Wednesday",  100000.60, "12.34")
+                .addRow("Doris", 1237, 101, "2010-01-01", 100000.70, "Hi")
+                ;
+
+        DataFrameUtil.assertEquals(expected, loaded);
+    }
+
+    @Test
+    public void inferSchemaWithMoreEmptyValues()
+    {
+        CsvDataSet dataSet = new StringBasedCsvDataSet("Foo", "Employees",
+                  "Name,EmployeeId,DeptNo,HireDate,OtherDate,Salary,All Empty,MaybeNumber\n"
+                + ",1234,,2020-01-01,2020-01-01,110000,,\n"
+                + "\"Bob\",1235,100,2010-01-01,2010-01-01,100000.50,,12\n"
+                + ",1236,,10/25/2015,2015-10-25,,,12.34\n"
+                + "\"Doris\",,101,2010-01-01,2010-01-01,100000.70,,Hi\n"
+        );
+
+        CsvSchema schema = dataSet.inferSchema();
 
         MutableMap<String, ValueType> typeByName =
                 schema.getColumns().toMap(CsvSchemaColumn::getName, CsvSchemaColumn::getType);
 
-        Assert.assertEquals(ValueType.STRING, typeByName.get("Name"));
-        Assert.assertEquals(ValueType.LONG,   typeByName.get("EmployeeId"));
-        Assert.assertEquals(ValueType.LONG,   typeByName.get("DeptNo"));
-        Assert.assertEquals(ValueType.STRING, typeByName.get("HireDate"));
-        Assert.assertEquals(ValueType.DATE,   typeByName.get("OtherDate"));
-        Assert.assertEquals(ValueType.DOUBLE, typeByName.get("Salary"));
-        Assert.assertEquals(ValueType.STRING, typeByName.get("MaybeNumber"));
+        Assert.assertEquals(STRING, typeByName.get("Name"));
+        Assert.assertEquals(LONG,   typeByName.get("EmployeeId"));
+        Assert.assertEquals(LONG,   typeByName.get("DeptNo"));
+        Assert.assertEquals(STRING, typeByName.get("HireDate"));
+        Assert.assertEquals(DATE,   typeByName.get("OtherDate"));
+        Assert.assertEquals(DOUBLE, typeByName.get("Salary"));
+        Assert.assertEquals(STRING, typeByName.get("All Empty"));
+        Assert.assertEquals(STRING, typeByName.get("MaybeNumber"));
     }
 }
