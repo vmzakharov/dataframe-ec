@@ -1,5 +1,5 @@
 # dataframe-ec
-A tabular data structure (aka a data frame) based on the Eclipse Collections framework. A data frame store is columnar, with focus on memory optimization achieved by using efficient Eclipse Collections data structures and APIs.
+A tabular data structure (aka a data frame) based on the Eclipse Collections framework. The underlying data frame structure is columnar, with focus on memory optimization achieved by using efficient Eclipse Collections data structures and APIs.
 
 For more on Eclipse Collections see: https://www.eclipse.org/collections/.
 
@@ -9,7 +9,7 @@ For more on Eclipse Collections see: https://www.eclipse.org/collections/.
 <dependency>
   <groupId>io.github.vmzakharov</groupId>
   <artifactId>dataframe-ec</artifactId>
-  <version>0.8.1</version>
+  <version>0.9.0</version>
 </dependency>
 ```
 
