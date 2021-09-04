@@ -12,10 +12,7 @@ import io.github.vmzakharov.ecdataframe.dsl.value.ValueType;
 import org.eclipse.collections.api.block.procedure.Procedure;
 import org.eclipse.collections.api.list.ListIterable;
 import org.eclipse.collections.api.list.MutableList;
-import org.eclipse.collections.api.map.primitive.MutableIntObjectMap;
 import org.eclipse.collections.impl.factory.Lists;
-import org.eclipse.collections.impl.factory.primitive.IntObjectMaps;
-import org.eclipse.collections.impl.list.Interval;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -32,7 +29,10 @@ import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.time.format.ResolverStyle;
 
-import static io.github.vmzakharov.ecdataframe.dsl.value.ValueType.*;
+import static io.github.vmzakharov.ecdataframe.dsl.value.ValueType.DATE;
+import static io.github.vmzakharov.ecdataframe.dsl.value.ValueType.DOUBLE;
+import static io.github.vmzakharov.ecdataframe.dsl.value.ValueType.LONG;
+import static io.github.vmzakharov.ecdataframe.dsl.value.ValueType.STRING;
 
 public class CsvDataSet
 extends DataSetAbstract
@@ -428,7 +428,8 @@ extends DataSetAbstract
                 }
                 else
                 {
-                    if ((matchingFormat = this.findMatchingDateFormat(element)) != null)
+                    matchingFormat = this.findMatchingDateFormat(element);
+                    if (matchingFormat != null)
                     {
                         guessedType = DATE;
                     }
@@ -459,8 +460,8 @@ extends DataSetAbstract
                 {
                     types[columnIndex] = DOUBLE;
                 }
-                else if (guessedType == DATE && types[columnIndex] == DATE &&
-                        !matchingFormat.equals(formats[columnIndex]))
+                else if (guessedType == DATE && types[columnIndex] == DATE
+                        && !matchingFormat.equals(formats[columnIndex]))
                 {
                     // still a date but mismatched formats
                     types[columnIndex] = STRING;

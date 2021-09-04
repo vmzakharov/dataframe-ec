@@ -374,7 +374,10 @@ public class ModelScriptTreeBuilderVisitor
 
     private String stripQuotes(String aString)
     {
-        if (aString.length() < 2) {return aString;}
+        if (aString.length() < 2)
+        {
+            return aString;
+        }
 
         if (aString.charAt(0) == '"' && aString.charAt(aString.length() - 1) == '"')
         {
