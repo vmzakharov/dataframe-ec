@@ -137,6 +137,29 @@ public class Printing
     }
 
     @Test
+    public void weirdVariableNames()
+    {
+        String scriptText =
+                  "${hello, friend} = 'hello'\n"
+                + "if ${a b} > ${b-c} then\n"
+                + "  ${a b}\n"
+                + "else\n"
+                + "  ${b-c}\n"
+                + "endif";
+        AnonymousScript script = ExpressionTestUtil.toScript(scriptText);
+
+        String result = PrettyPrintVisitor.exprToString(script);
+
+        Assert.assertEquals(
+                  "${hello, friend} = \"hello\"\n"
+                + "if ${a b} > ${b-c} then\n"
+                + "  ${a b}\n"
+                + "else\n"
+                + "  ${b-c}\n"
+                + "endif\n", result);
+    }
+
+    @Test
     public void expressionToString()
     {
         String expressionAsString = "(1 + 2)/ (7.0 +9)";
