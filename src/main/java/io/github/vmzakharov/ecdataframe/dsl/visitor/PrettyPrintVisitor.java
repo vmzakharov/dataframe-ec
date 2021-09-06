@@ -50,7 +50,14 @@ implements ExpressionVisitor
     @Override
     public void visitAssignExpr(AssingExpr expr)
     {
-        this.print(expr.getVarName()).print(" = ").printExpression(expr.getExpression());
+        this.print(this.escapeVarNameIfNeeded(expr.getVarName(), expr.isEscaped()))
+            .print(" = ")
+            .printExpression(expr.getExpression());
+    }
+
+    private String escapeVarNameIfNeeded(String name, boolean escaped)
+    {
+        return escaped ? "${" + name +"}" : name;
     }
 
     @Override
@@ -162,7 +169,7 @@ implements ExpressionVisitor
     @Override
     public void visitVarExpr(VarExpr expr)
     {
-        this.print(expr.getVariableName());
+          this.print(this.escapeVarNameIfNeeded(expr.getVariableName(), expr.isEscaped()));
     }
 
     @Override

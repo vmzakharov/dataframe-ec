@@ -8,11 +8,13 @@ public class AssingExpr
 implements Expression
 {
     private final String varName;
+    private final boolean escaped;
     private final Expression expression;
 
-    public AssingExpr(String newVarName, Expression newExpression)
+    public AssingExpr(String newVarName, boolean newEscaped, Expression newExpression)
     {
         this.varName = newVarName;
+        this.escaped = newEscaped;
         this.expression = newExpression;
     }
 
@@ -25,6 +27,11 @@ implements Expression
     public String getVarName()
     {
         return this.varName;
+    }
+
+    public boolean isEscaped()
+    {
+        return this.escaped;
     }
 
     public Expression getExpression()

@@ -5,7 +5,7 @@ import io.github.vmzakharov.ecdataframe.dsl.visitor.PrettyPrintVisitor;
 import org.junit.Assert;
 import org.junit.Test;
 
-public class Printing
+public class PrettyPrintingTest
 {
     @Test
     public void script()
@@ -152,7 +152,7 @@ public class Printing
 
         Assert.assertEquals(
                   "${hello, friend} = \"hello\"\n"
-                + "if ${a b} > ${b-c} then\n"
+                + "if (${a b} > ${b-c}) then\n"
                 + "  ${a b}\n"
                 + "else\n"
                 + "  ${b-c}\n"

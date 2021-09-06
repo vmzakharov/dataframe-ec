@@ -58,7 +58,8 @@ public class ModelScriptTreeBuilderVisitor
             throw new RuntimeException("Malformed assignment statement");
         }
         Expression expression = this.visit(ctx.expr());
-        return this.addStatementToCurrentScriptContext(new AssingExpr(this.unEscape(varName), expression));
+        return this.addStatementToCurrentScriptContext(
+                new AssingExpr(this.unEscape(varName), this.isEscaped(varName), expression));
     }
 
     private String unEscape(String varName)
