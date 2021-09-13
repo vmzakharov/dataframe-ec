@@ -57,7 +57,7 @@ implements ExpressionVisitor
 
     private String escapeVarNameIfNeeded(String name, boolean escaped)
     {
-        return escaped ? "${" + name +"}" : name;
+        return escaped ? "${" + name + "}" : name;
     }
 
     @Override
