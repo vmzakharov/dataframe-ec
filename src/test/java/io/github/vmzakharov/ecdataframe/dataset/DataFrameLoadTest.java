@@ -473,6 +473,30 @@ public class DataFrameLoadTest
     }
 
     @Test
+    public void inferSchemaFromFirstTwoLines()
+    {
+        CsvDataSet dataSet = new StringBasedCsvDataSet("Foo", "Employees",
+                  "Name,EmployeeId,DeptNo,HireDate,Salary,MaybeNumber\n"
+                  + "\"Alice\",1234,,2020-01-01,110000,\n"
+                  + "\"Bob\",1235,100,2010-01-01,100000.50,12\n"
+                  + "\"Carl\",1236,100,Wednesday,100000.60,12.34\n"
+                  + "\"Doris\",1237,101,2010-01-01,100000.70,Hi\n"
+        );
+
+        CsvSchema schema = dataSet.inferSchema(2);
+
+        MutableMap<String, ValueType> typeByName =
+                schema.getColumns().toMap(CsvSchemaColumn::getName, CsvSchemaColumn::getType);
+
+        Assert.assertEquals(STRING, typeByName.get("Name"));
+        Assert.assertEquals(LONG,   typeByName.get("EmployeeId"));
+        Assert.assertEquals(LONG,   typeByName.get("DeptNo"));
+        Assert.assertEquals(DATE,   typeByName.get("HireDate"));
+        Assert.assertEquals(DOUBLE, typeByName.get("Salary"));
+        Assert.assertEquals(LONG,   typeByName.get("MaybeNumber"));
+    }
+
+    @Test
     public void inferSchemaFromOneDataLine()
     {
         CsvDataSet dataSet = new StringBasedCsvDataSet("Foo", "Employees",

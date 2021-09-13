@@ -213,11 +213,22 @@ extends DataSetAbstract
         return new InputStreamReader(Files.newInputStream(this.dataFilePath));
     }
 
+    /**
+     * Load the first lines of the data set as a data frame.
+     * If a schema is not specified for this data set, an attempt will be made to infer the schema from the data in
+     * the first several lines of the data set.
+     * @return a data frame representing the contents of the data set
+     */
     public DataFrame loadAsDataFrame()
     {
         return this.loadAsDataFrame(0, true);
     }
 
+    /**
+     * load the first lines of the data set as a data frame
+     * @param headLineCount the number of lines to load from the beginning of the data set
+     * @return a data frame representing the first {@code headLineCount} lines in the data set
+     */
     public DataFrame loadAsDataFrame(int headLineCount)
     {
         return this.loadAsDataFrame(headLineCount, false);
@@ -227,9 +238,24 @@ extends DataSetAbstract
      * Infers schema from the data file defined by this data set. This is done by reading the first several lines of
      * the file and attempting to parse elements using different formats.
      * If the data set already has the schema defined, it gets overridden with the inferred one.
+     * By default, the first 100 lines of the file are used to infer column types
      * @return the inferred schema
      */
     public CsvSchema inferSchema()
+    {
+        return this.inferSchema(LINE_COUNT_FOR_TYPE_INFERENCE);
+    }
+
+    /**
+     * Infers schema from the data file defined by this data set. This is done by reading the first several lines of
+     * the file and attempting to parse elements using different formats. The inferred schema becomes the schema of the
+     * data set.
+     * If the data set already has the schema defined, it gets overridden with the inferred one.
+     * @param numberOfLinesToInferFrom the number of lines from the beginning of the file to be used
+     *                                 to infer column types
+     * @return the inferred data set schema
+     */
+    public CsvSchema inferSchema(int numberOfLinesToInferFrom)
     {
         this.schema = new CsvSchema();
 
@@ -237,11 +263,11 @@ extends DataSetAbstract
         {
             MutableList<String> headers = this.splitMindingQs(reader.readLine()).collect(this::removeSurroundingQuotes);
 
-            MutableList<String> lineBuffer = Lists.mutable.withInitialCapacity(LINE_COUNT_FOR_TYPE_INFERENCE);
+            MutableList<String> lineBuffer = Lists.mutable.withInitialCapacity(numberOfLinesToInferFrom);
 
             String dataRow;
             for (int loadedLineCount = 0;
-                 loadedLineCount < LINE_COUNT_FOR_TYPE_INFERENCE && (dataRow = reader.readLine()) != null;
+                 loadedLineCount < numberOfLinesToInferFrom && (dataRow = reader.readLine()) != null;
                  loadedLineCount++)
             {
                 lineBuffer.add(dataRow);
