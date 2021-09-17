@@ -129,7 +129,9 @@ implements ExpressionVisitor
             this.recordError("Unknown operation " + expr.getOperation(), PrettyPrintVisitor.exprToString(expr));
         }
 
-        if (resultType.isVoid())
+        // if type1 or type2 is void it means we have already failed in evaluating them expression
+        // so no point in propagating this error as we can't meaningfully evaluate expression
+        if (resultType.isVoid() && !type1.isVoid() && !type2.isVoid())
         {
             this.recordError(ERR_TYPES_IN_EXPRESSION, PrettyPrintVisitor.exprToString(expr));
         }
@@ -330,7 +332,9 @@ implements ExpressionVisitor
     {
         expr.getCondition().accept(this);
         ValueType conditionType = this.expressionTypeStack.pop();
-        if (conditionType != ValueType.BOOLEAN)
+
+        // void means we have already failed in the condition expression so no point in propagating this error
+        if (!conditionType.isBoolean() && !conditionType.isVoid())
         {
             this.recordError(ERR_CONDITION_NOT_BOOLEAN, PrettyPrintVisitor.exprToString(expr));
         }

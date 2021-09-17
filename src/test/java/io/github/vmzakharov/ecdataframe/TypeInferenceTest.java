@@ -9,8 +9,14 @@ import io.github.vmzakharov.ecdataframe.dsl.value.StringValue;
 import io.github.vmzakharov.ecdataframe.dsl.value.ValueType;
 import io.github.vmzakharov.ecdataframe.dsl.visitor.PrettyPrintVisitor;
 import io.github.vmzakharov.ecdataframe.dsl.visitor.TypeInferenceVisitor;
+import org.eclipse.collections.api.list.ListIterable;
+import org.eclipse.collections.api.tuple.Twin;
+import org.eclipse.collections.impl.factory.Lists;
+import org.eclipse.collections.impl.tuple.Tuples;
 import org.junit.Assert;
 import org.junit.Test;
+
+import static io.github.vmzakharov.ecdataframe.dsl.visitor.TypeInferenceVisitor.*;
 
 public class TypeInferenceTest
 {
@@ -128,8 +134,8 @@ public class TypeInferenceTest
     @Test
     public void containsIncompatibleTypes()
     {
-        this.assertError("1 in 'abc'", 0, TypeInferenceVisitor.ERR_TYPES_IN_EXPRESSION);
-        this.assertError("1.1 not in 'abc'", 0, TypeInferenceVisitor.ERR_TYPES_IN_EXPRESSION);
+        this.assertError("1 in 'abc'", 0, ERR_TYPES_IN_EXPRESSION);
+        this.assertError("1.1 not in 'abc'", 0, ERR_TYPES_IN_EXPRESSION);
     }
 
     @Test
@@ -138,7 +144,7 @@ public class TypeInferenceTest
         this.assertError(
                 "x = 5\ny = 'abc'\nx + y",
                 2,
-                TypeInferenceVisitor.ERR_TYPES_IN_EXPRESSION);
+                ERR_TYPES_IN_EXPRESSION);
     }
 
     @Test
@@ -154,7 +160,7 @@ public class TypeInferenceTest
                 + "  'abc'\n"
                 + "endif",
                 3,
-                TypeInferenceVisitor.ERR_IF_ELSE_INCOMPATIBLE);
+                ERR_IF_ELSE_INCOMPATIBLE);
     }
 
     @Test
@@ -167,7 +173,7 @@ public class TypeInferenceTest
         this.assertError(context,
                 "x = 5\nif a > b then\n  x\nelse\n y\nendif",
                 1,
-                TypeInferenceVisitor.ERR_IF_ELSE_INCOMPATIBLE);
+                ERR_IF_ELSE_INCOMPATIBLE);
     }
 
     @Test
@@ -176,26 +182,47 @@ public class TypeInferenceTest
         this.assertError(
                 "x = 5\nx == 'abc'\n",
                 1,
-                TypeInferenceVisitor.ERR_TYPES_IN_EXPRESSION);
+                ERR_TYPES_IN_EXPRESSION);
     }
 
+    /*
+     * note that the "cascading" errors are ignored, i.e. we won't generate an error for
+     * x + 1 if x is undefined if we have already generated an error for x being undefined
+     */
     @Test
-    public void manyErrorsInOneScriptCatchesTheFirstError()
+    public void manyErrorsInOneScriptCatchesAllErrors()
     {
-        this.assertError(
+        this.assertErrors(
                   "x = 5\n"
                 + "x + 'abc'\n"
                 + "'x' < 1\n",
-                1,
-                TypeInferenceVisitor.ERR_TYPES_IN_EXPRESSION);
+                Lists.immutable.of(
+                        Tuples.twin(ERR_TYPES_IN_EXPRESSION, "(x + \"abc\")"),
+                        Tuples.twin(ERR_TYPES_IN_EXPRESSION, "(\"x\" < 1)")
+                ));
 
-        this.assertError(
+        this.assertErrors(
+                  "y = 5\n"
+                + "x + 1\n"
+                + "'x' < y\n",
+                Lists.immutable.of(
+                        Tuples.twin(ERR_UNDEFINED_VARIABLE, "x"),
+                        Tuples.twin(ERR_TYPES_IN_EXPRESSION, "(\"x\" < y)")
+                ));
+
+        this.assertErrors(
                   "if x > 3\n"
                 + "then 'abc'\n"
                 + "else 1\n"
                 + "endif",
-                "x",
-                TypeInferenceVisitor.ERR_UNDEFINED_VARIABLE);
+                Lists.immutable.of(
+                        Tuples.twin(ERR_UNDEFINED_VARIABLE, "x"),
+                        Tuples.twin(ERR_IF_ELSE_INCOMPATIBLE, "if (x > 3) then\n"
+                                + "  \"abc\"\n"
+                                + "else\n"
+                                + "  1\n"
+                                + "endif")
+                ));
     }
 
     @Test
@@ -206,20 +233,31 @@ public class TypeInferenceTest
         this.assertError(context,
                 "x == 'abc'\n",
                 0,
-                TypeInferenceVisitor.ERR_TYPES_IN_EXPRESSION);
+                ERR_TYPES_IN_EXPRESSION);
     }
 
     @Test
     public void undefinedVariables()
     {
-        this.assertError("1 + abc", "abc", TypeInferenceVisitor.ERR_UNDEFINED_VARIABLE);
-        this.assertError("x == 'abc'\ny + x", "x", TypeInferenceVisitor.ERR_UNDEFINED_VARIABLE);
+        this.assertError("1 + abc", "abc", ERR_UNDEFINED_VARIABLE);
+        this.assertError("x == 'abc'\ny + x", "x", ERR_UNDEFINED_VARIABLE);
         this.assertError(
                   "if x == 4\n"
                 + "then 'four'\n"
                 + "else 'not four'\n"
                 + "endif",
-                "x", TypeInferenceVisitor.ERR_UNDEFINED_VARIABLE);
+                "x", ERR_UNDEFINED_VARIABLE);
+    }
+
+    private void assertErrors(String scriptString, ListIterable<Twin<String>> expectedErrors)
+    {
+        Script script = ExpressionTestUtil.toScript(scriptString);
+        TypeInferenceVisitor visitor = new TypeInferenceVisitor();
+        script.accept(visitor);
+
+        Assert.assertTrue("Expected a type inference error", visitor.hasErrors());
+
+        Assert.assertEquals(expectedErrors, visitor.getErrors());
     }
 
     private void assertError(String scriptString, int errorExpressionIndex, String errorText)
