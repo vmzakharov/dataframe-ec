@@ -1,7 +1,11 @@
 package io.github.vmzakharov.ecdataframe;
 
+import io.github.vmzakharov.ecdataframe.dsl.EvalContext;
 import io.github.vmzakharov.ecdataframe.dsl.Expression;
 import io.github.vmzakharov.ecdataframe.dsl.Script;
+import io.github.vmzakharov.ecdataframe.dsl.SimpleEvalContext;
+import io.github.vmzakharov.ecdataframe.dsl.value.LongValue;
+import io.github.vmzakharov.ecdataframe.dsl.value.StringValue;
 import io.github.vmzakharov.ecdataframe.dsl.value.ValueType;
 import io.github.vmzakharov.ecdataframe.dsl.visitor.PrettyPrintVisitor;
 import io.github.vmzakharov.ecdataframe.dsl.visitor.TypeInferenceVisitor;
@@ -41,7 +45,7 @@ public class TypeInferenceTest
         this.assertExpressionType("1 in (1, 2, 3)", ValueType.BOOLEAN);
         this.assertExpressionType("(1, 2, 3) is empty", ValueType.BOOLEAN);
         this.assertExpressionType("'' is not empty", ValueType.BOOLEAN);
-        this.assertExpressionType("not ((5 > 6) or (x in y))", ValueType.BOOLEAN);
+        this.assertExpressionType("not ((5 > 6) or (1 in (1, 2, 3)))", ValueType.BOOLEAN);
     }
 
     @Test
@@ -122,34 +126,137 @@ public class TypeInferenceTest
     }
 
     @Test
+    public void containsIncompatibleTypes()
+    {
+        this.assertError("1 in 'abc'", 0, TypeInferenceVisitor.ERR_TYPES_IN_EXPRESSION);
+        this.assertError("1.1 not in 'abc'", 0, TypeInferenceVisitor.ERR_TYPES_IN_EXPRESSION);
+    }
+
+    @Test
     public void expressionIncompatibleTypes()
     {
         this.assertError(
                 "x = 5\ny = 'abc'\nx + y",
                 2,
-                TypeInferenceVisitor.ERR_TXT_TYPES_IN_EXPRESSION);
+                TypeInferenceVisitor.ERR_TYPES_IN_EXPRESSION);
     }
 
     @Test
     public void conditionalIncompatibleTypes()
     {
         this.assertError(
-                "x = 5\nif a > b then\n  x\nelse\n  'abc'\nendif",
+                   "a = 1\n"
+                + "b = 2\n"
+                + "x = 5\n"
+                + "if a > b then\n"
+                + "  x\n"
+                + "else\n"
+                + "  'abc'\n"
+                + "endif",
+                3,
+                TypeInferenceVisitor.ERR_IF_ELSE_INCOMPATIBLE);
+    }
+
+    @Test
+    public void conditionalIncompatibleTypesWithContextVariables()
+    {
+        SimpleEvalContext context = new SimpleEvalContext();
+        context.setVariable("a", new LongValue(5));
+        context.setVariable("b", new LongValue(7));
+        context.setVariable("y", new StringValue("abc"));
+        this.assertError(context,
+                "x = 5\nif a > b then\n  x\nelse\n y\nendif",
                 1,
-                TypeInferenceVisitor.ERR_TXT_IF_ELSE);
+                TypeInferenceVisitor.ERR_IF_ELSE_INCOMPATIBLE);
+    }
+
+    @Test
+    public void comparisonIncompatibleTypes()
+    {
+        this.assertError(
+                "x = 5\nx == 'abc'\n",
+                1,
+                TypeInferenceVisitor.ERR_TYPES_IN_EXPRESSION);
+    }
+
+    @Test
+    public void manyErrorsInOneScriptCatchesTheFirstError()
+    {
+        this.assertError(
+                  "x = 5\n"
+                + "x + 'abc'\n"
+                + "'x' < 1\n",
+                1,
+                TypeInferenceVisitor.ERR_TYPES_IN_EXPRESSION);
+
+        this.assertError(
+                  "if x > 3\n"
+                + "then 'abc'\n"
+                + "else 1\n"
+                + "endif",
+                "x",
+                TypeInferenceVisitor.ERR_UNDEFINED_VARIABLE);
+    }
+
+    @Test
+    public void comparisonIncompatibleTypesWithContextVariables()
+    {
+        SimpleEvalContext context = new SimpleEvalContext();
+        context.setVariable("x", new LongValue(1));
+        this.assertError(context,
+                "x == 'abc'\n",
+                0,
+                TypeInferenceVisitor.ERR_TYPES_IN_EXPRESSION);
+    }
+
+    @Test
+    public void undefinedVariables()
+    {
+        this.assertError("1 + abc", "abc", TypeInferenceVisitor.ERR_UNDEFINED_VARIABLE);
+        this.assertError("x == 'abc'\ny + x", "x", TypeInferenceVisitor.ERR_UNDEFINED_VARIABLE);
+        this.assertError(
+                  "if x == 4\n"
+                + "then 'four'\n"
+                + "else 'not four'\n"
+                + "endif",
+                "x", TypeInferenceVisitor.ERR_UNDEFINED_VARIABLE);
     }
 
     private void assertError(String scriptString, int errorExpressionIndex, String errorText)
     {
+        this.assertError(new SimpleEvalContext(), scriptString, errorExpressionIndex, errorText);
+    }
+
+    private void assertError(String scriptString, String errorDescription, String errorText)
+    {
+        this.assertError(new SimpleEvalContext(), scriptString, errorDescription, errorText);
+    }
+
+    private void assertError(EvalContext context, String scriptString, int errorExpressionIndex, String errorText)
+    {
+        this.assertError(context, scriptString, errorExpressionIndex, null, errorText);
+    }
+
+    private void assertError(EvalContext context, String scriptString, String errorDescription, String errorText)
+    {
+        this.assertError(context, scriptString, -1, errorDescription, errorText);
+    }
+
+    private void assertError(EvalContext context, String scriptString,  int errorExpressionIndex, String errorDescription, String errorText)
+    {
         Script script = ExpressionTestUtil.toScript(scriptString);
-        TypeInferenceVisitor visitor = new TypeInferenceVisitor();
+        TypeInferenceVisitor visitor = new TypeInferenceVisitor(context);
         script.accept(visitor);
 
-        Assert.assertTrue(visitor.isError());
-        Assert.assertEquals(errorText, visitor.getErrorDescription());
-        Assert.assertEquals(
-                PrettyPrintVisitor.exprToString(script.getExpressions().get(errorExpressionIndex)),
-                visitor.getErrorExpressionString());
+        Assert.assertTrue("Expected a type inference error", visitor.hasErrors());
+        Assert.assertEquals("Error type", errorText, visitor.getErrorDescription());
+
+        String expectedErrorExpression =
+                errorExpressionIndex >= 0
+                        ? PrettyPrintVisitor.exprToString(script.getExpressions().get(errorExpressionIndex))
+                        : errorDescription;
+
+        Assert.assertEquals("Error expression", expectedErrorExpression, visitor.getErrorExpressionString());
     }
 
     private void assertScriptType(String scriptAsString, ValueType valueType)
@@ -164,7 +271,12 @@ public class TypeInferenceTest
 
     private void assertType(Expression expression, ValueType valueType)
     {
-        TypeInferenceVisitor visitor = new TypeInferenceVisitor();
+        this.assertType(new SimpleEvalContext(), expression, valueType);
+    }
+
+    private void assertType(EvalContext context, Expression expression, ValueType valueType)
+    {
+        TypeInferenceVisitor visitor = new TypeInferenceVisitor(context);
         expression.accept(visitor);
         Assert.assertEquals(valueType, visitor.getLastExpressionType());
     }

@@ -145,4 +145,10 @@ public class StandaloneExpressionFromStringTest
         Assert.assertEquals("Ah", ExpressionTestUtil.evaluateToString("5 > 6 ? 'Huh' : 'Ah'"));
         Assert.assertEquals(110, ExpressionTestUtil.evaluateToLong("toUpper('Times') == 'TIMES' ? 10 * 11 : 10 + 11"));
     }
+
+    @Test(expected = RuntimeException.class)
+    public void incompatibleComparison()
+    {
+        ExpressionTestUtil.evaluateToBoolean("'abc' ==  1");
+    }
 }
