@@ -134,8 +134,8 @@ public class TypeInferenceTest
     @Test
     public void containsIncompatibleTypes()
     {
-        this.assertError("1 in 'abc'", 0, ERR_TYPES_IN_EXPRESSION);
-        this.assertError("1.1 not in 'abc'", 0, ERR_TYPES_IN_EXPRESSION);
+        this.assertError("1 in 'abc'", this.prettyPrint("1 in 'abc'"), ERR_TYPES_IN_EXPRESSION);
+        this.assertError("1.1 not in 'abc'", this.prettyPrint("1.1 not in 'abc'"), ERR_TYPES_IN_EXPRESSION);
     }
 
     @Test
@@ -143,7 +143,7 @@ public class TypeInferenceTest
     {
         this.assertError(
                 "x = 5\ny = 'abc'\nx + y",
-                2,
+                "(x + y)",
                 ERR_TYPES_IN_EXPRESSION);
     }
 
@@ -159,7 +159,11 @@ public class TypeInferenceTest
                 + "else\n"
                 + "  'abc'\n"
                 + "endif",
-                3,
+                this.prettyPrint("if a > b then\n"
+                        + "  x\n"
+                        + "else\n"
+                        + "  'abc'\n"
+                        + "endif"),
                 ERR_IF_ELSE_INCOMPATIBLE);
     }
 
@@ -172,7 +176,7 @@ public class TypeInferenceTest
         context.setVariable("y", new StringValue("abc"));
         this.assertError(context,
                 "x = 5\nif a > b then\n  x\nelse\n y\nendif",
-                1,
+                this.prettyPrint("if a > b then\n  x\nelse\n y\nendif"),
                 ERR_IF_ELSE_INCOMPATIBLE);
     }
 
@@ -181,7 +185,7 @@ public class TypeInferenceTest
     {
         this.assertError(
                 "x = 5\nx == 'abc'\n",
-                1,
+                this.prettyPrint("x == 'abc'"),
                 ERR_TYPES_IN_EXPRESSION);
     }
 
@@ -232,7 +236,7 @@ public class TypeInferenceTest
         context.setVariable("x", new LongValue(1));
         this.assertError(context,
                 "x == 'abc'\n",
-                0,
+                this.prettyPrint("x == 'abc'"),
                 ERR_TYPES_IN_EXPRESSION);
     }
 
@@ -260,27 +264,12 @@ public class TypeInferenceTest
         Assert.assertEquals(expectedErrors, visitor.getErrors());
     }
 
-    private void assertError(String scriptString, int errorExpressionIndex, String errorText)
-    {
-        this.assertError(new SimpleEvalContext(), scriptString, errorExpressionIndex, errorText);
-    }
-
     private void assertError(String scriptString, String errorDescription, String errorText)
     {
         this.assertError(new SimpleEvalContext(), scriptString, errorDescription, errorText);
     }
 
-    private void assertError(EvalContext context, String scriptString, int errorExpressionIndex, String errorText)
-    {
-        this.assertError(context, scriptString, errorExpressionIndex, null, errorText);
-    }
-
     private void assertError(EvalContext context, String scriptString, String errorDescription, String errorText)
-    {
-        this.assertError(context, scriptString, -1, errorDescription, errorText);
-    }
-
-    private void assertError(EvalContext context, String scriptString,  int errorExpressionIndex, String errorDescription, String errorText)
     {
         Script script = ExpressionTestUtil.toScript(scriptString);
         TypeInferenceVisitor visitor = new TypeInferenceVisitor(context);
@@ -289,12 +278,7 @@ public class TypeInferenceTest
         Assert.assertTrue("Expected a type inference error", visitor.hasErrors());
         Assert.assertEquals("Error type", errorText, visitor.getErrorDescription());
 
-        String expectedErrorExpression =
-                errorExpressionIndex >= 0
-                        ? PrettyPrintVisitor.exprToString(script.getExpressions().get(errorExpressionIndex))
-                        : errorDescription;
-
-        Assert.assertEquals("Error expression", expectedErrorExpression, visitor.getErrorExpressionString());
+        Assert.assertEquals("Error expression", errorDescription, visitor.getErrorExpressionString());
     }
 
     private void assertScriptType(String scriptAsString, ValueType valueType)
@@ -317,5 +301,11 @@ public class TypeInferenceTest
         TypeInferenceVisitor visitor = new TypeInferenceVisitor(context);
         expression.accept(visitor);
         Assert.assertEquals(valueType, visitor.getLastExpressionType());
+    }
+
+    private String prettyPrint(String expressionString)
+    {
+        return PrettyPrintVisitor.exprToString(
+                ExpressionTestUtil.toScript(expressionString).getExpressions().get(0));
     }
 }
