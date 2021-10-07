@@ -1,7 +1,6 @@
 package io.github.vmzakharov.ecdataframe;
 
 import io.github.vmzakharov.ecdataframe.dsl.EvalContext;
-import io.github.vmzakharov.ecdataframe.dsl.Expression;
 import io.github.vmzakharov.ecdataframe.dsl.Script;
 import io.github.vmzakharov.ecdataframe.dsl.SimpleEvalContext;
 import io.github.vmzakharov.ecdataframe.dsl.value.LongValue;
@@ -16,53 +15,56 @@ import org.eclipse.collections.impl.tuple.Tuples;
 import org.junit.Assert;
 import org.junit.Test;
 
-import static io.github.vmzakharov.ecdataframe.dsl.visitor.TypeInferenceVisitor.*;
+import static io.github.vmzakharov.ecdataframe.TypeInferenceUtil.assertScriptType;
+import static io.github.vmzakharov.ecdataframe.dsl.visitor.TypeInferenceVisitor.ERR_IF_ELSE_INCOMPATIBLE;
+import static io.github.vmzakharov.ecdataframe.dsl.visitor.TypeInferenceVisitor.ERR_TYPES_IN_EXPRESSION;
+import static io.github.vmzakharov.ecdataframe.dsl.visitor.TypeInferenceVisitor.ERR_UNDEFINED_VARIABLE;
 
 public class TypeInferenceTest
 {
     @Test
     public void intTypeInference()
     {
-        this.assertExpressionType("(1 + 2) * 3", ValueType.LONG);
-        this.assertExpressionType("x = (1 + 2) * 3", ValueType.LONG);
-        this.assertExpressionType("-123", ValueType.LONG);
+        assertScriptType("(1 + 2) * 3", ValueType.LONG);
+        assertScriptType("x = (1 + 2) * 3", ValueType.LONG);
+        assertScriptType("-123", ValueType.LONG);
     }
 
     @Test
     public void doubleTypeInference()
     {
-        this.assertExpressionType("(1.0 + 2.0) * 3.0", ValueType.DOUBLE);
-        this.assertExpressionType("x = 1.0 + 2.0", ValueType.DOUBLE);
-        this.assertExpressionType("x = (1 + 2) * 3.0", ValueType.DOUBLE);
-        this.assertExpressionType("-4.56", ValueType.DOUBLE);
+        assertScriptType("(1.0 + 2.0) * 3.0", ValueType.DOUBLE);
+        assertScriptType("x = 1.0 + 2.0", ValueType.DOUBLE);
+        assertScriptType("x = (1 + 2) * 3.0", ValueType.DOUBLE);
+        assertScriptType("-4.56", ValueType.DOUBLE);
     }
 
     @Test
     public void stringTypeInference()
     {
-        this.assertExpressionType("\"abc\"", ValueType.STRING);
-        this.assertExpressionType("x = \"abc\" + \"def\"", ValueType.STRING);
+        assertScriptType("\"abc\"", ValueType.STRING);
+        assertScriptType("x = \"abc\" + \"def\"", ValueType.STRING);
     }
 
     @Test
     public void booleanTypeInference()
     {
-        this.assertExpressionType("'abc' == 'xyz'", ValueType.BOOLEAN);
-        this.assertExpressionType("1 in (1, 2, 3)", ValueType.BOOLEAN);
-        this.assertExpressionType("(1, 2, 3) is empty", ValueType.BOOLEAN);
-        this.assertExpressionType("'' is not empty", ValueType.BOOLEAN);
-        this.assertExpressionType("not ((5 > 6) or (1 in (1, 2, 3)))", ValueType.BOOLEAN);
+        assertScriptType("'abc' == 'xyz'", ValueType.BOOLEAN);
+        assertScriptType("1 in (1, 2, 3)", ValueType.BOOLEAN);
+        assertScriptType("(1, 2, 3) is empty", ValueType.BOOLEAN);
+        assertScriptType("'' is not empty", ValueType.BOOLEAN);
+        assertScriptType("not ((5 > 6) or (1 in (1, 2, 3)))", ValueType.BOOLEAN);
     }
 
     @Test
     public void scriptTypeInference()
     {
-        this.assertScriptType(
+        assertScriptType(
                    "1\n"
                 + "2.0\n"
                 + "\"abc\"", ValueType.STRING);
 
-        this.assertScriptType(
+        assertScriptType(
                   "a = 1\n"
                 + "b = 2.0\n"
                 + "c = a + b", ValueType.DOUBLE);
@@ -71,7 +73,7 @@ public class TypeInferenceTest
     @Test
     public void functionTypeInference()
     {
-        this.assertScriptType(
+        assertScriptType(
                   "function sum(a, b)\n"
                 + "{\n"
                 + "    a + b\n"
@@ -80,7 +82,7 @@ public class TypeInferenceTest
                 + "y = 2.0\n"
                 + "sum(x, y)", ValueType.DOUBLE);
 
-        this.assertScriptType(
+        assertScriptType(
                   "function sum(a, b)\n"
                 + "{\n"
                 + "    a + b\n"
@@ -89,7 +91,7 @@ public class TypeInferenceTest
                 + "y = 2\n"
                 + "sum(x, y)", ValueType.LONG);
 
-        this.assertScriptType(
+        assertScriptType(
                   "function sum(a, b)\n"
                 + "{\n"
                 + "    a + b\n"
@@ -98,7 +100,7 @@ public class TypeInferenceTest
                 + "y = \"world!\"\n"
                 + "sum(x, y)", ValueType.STRING);
 
-        this.assertScriptType(
+        assertScriptType(
                   "function sum(a, b)\n"
                 + "{\n"
                 + "    a + b\n"
@@ -107,7 +109,7 @@ public class TypeInferenceTest
                 + "y = 2.0\n"
                 + "sum(x, y)", ValueType.DOUBLE);
 
-        this.assertScriptType(
+        assertScriptType(
                   "function isItBigger(a, b) { a > b }\n"
                 + "x = 1\n"
                 + "y = 2.0\n"
@@ -117,18 +119,27 @@ public class TypeInferenceTest
     @Test
     public void conditionalStatement()
     {
-        this.assertExpressionType(" a > b ? 5 : 7", ValueType.LONG);
-        this.assertExpressionType(" a > b ? 5.0 : 7", ValueType.DOUBLE);
-        this.assertExpressionType(" a > b ? 'foo' : 'bar'", ValueType.STRING);
-        this.assertExpressionType(" a > b ? 'foo' : 7", ValueType.VOID);
+        assertScriptType(" a > b ? 5 : 7", ValueType.LONG);
+        assertScriptType(" a > b ? 5.0 : 7", ValueType.DOUBLE);
+        assertScriptType(" a > b ? 'foo' : 'bar'", ValueType.STRING);
+        assertScriptType(" a > b ? 'foo' : 7", ValueType.VOID);
     }
 
     @Test
     public void conditionalOnlyIfBranch()
     {
-        this.assertScriptType(" if a > b then\n  5\nendif", ValueType.LONG);
-        this.assertScriptType(" if a > b then\n  5.5 + 1\nendif", ValueType.DOUBLE);
-        this.assertScriptType(" if a > b then\n  '5'\nendif", ValueType.STRING);
+        assertScriptType(" if a > b then\n  5\nendif", ValueType.LONG);
+        assertScriptType(" if a > b then\n  5.5 + 1\nendif", ValueType.DOUBLE);
+        assertScriptType(" if a > b then\n  '5'\nendif", ValueType.STRING);
+    }
+
+    @Test
+    public void withContext()
+    {
+        SimpleEvalContext context = new SimpleEvalContext();
+        context.setVariable("a", new LongValue(5));
+        context.setVariable("b", new LongValue(7));
+        assertScriptType("a + b", context, ValueType.LONG);
     }
 
     @Test
@@ -280,29 +291,7 @@ public class TypeInferenceTest
 
         Assert.assertEquals("Error expression", errorDescription, visitor.getErrorExpressionString());
     }
-
-    private void assertScriptType(String scriptAsString, ValueType valueType)
-    {
-        this.assertType(ExpressionTestUtil.toScript(scriptAsString), valueType);
-    }
-
-    private void assertExpressionType(String expressionAsString, ValueType valueType)
-    {
-        this.assertType(ExpressionTestUtil.toExpression(expressionAsString), valueType);
-    }
-
-    private void assertType(Expression expression, ValueType valueType)
-    {
-        this.assertType(new SimpleEvalContext(), expression, valueType);
-    }
-
-    private void assertType(EvalContext context, Expression expression, ValueType valueType)
-    {
-        TypeInferenceVisitor visitor = new TypeInferenceVisitor(context);
-        expression.accept(visitor);
-        Assert.assertEquals(valueType, visitor.getLastExpressionType());
-    }
-
+    
     private String prettyPrint(String expressionString)
     {
         return PrettyPrintVisitor.exprToString(

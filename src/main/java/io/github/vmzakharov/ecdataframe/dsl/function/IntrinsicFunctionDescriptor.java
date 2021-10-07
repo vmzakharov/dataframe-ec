@@ -53,6 +53,11 @@ implements FunctionDescriptor
         return this.parameterNames.size() > 0;
     }
 
+    public ValueType returnType(ListIterable<ValueType> parameterTypes)
+    {
+        return ValueType.VOID;
+    }
+
     public Value evaluate(EvalContext context)
     {
         return this.evaluate((VectorValue) context.getVariableOrDefault(this.magicalParameterName(), VectorValue.EMPTY));

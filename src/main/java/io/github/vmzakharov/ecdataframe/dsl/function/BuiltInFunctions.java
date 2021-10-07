@@ -11,7 +11,8 @@ import io.github.vmzakharov.ecdataframe.dsl.value.VectorValue;
 import io.github.vmzakharov.ecdataframe.util.Printer;
 import io.github.vmzakharov.ecdataframe.util.PrinterFactory;
 import org.eclipse.collections.api.list.ImmutableList;
-import org.eclipse.collections.api.map.ImmutableMap;
+import org.eclipse.collections.api.list.ListIterable;
+import org.eclipse.collections.api.map.MutableMap;
 import org.eclipse.collections.impl.factory.Lists;
 
 import java.time.LocalDate;
@@ -59,6 +60,12 @@ final public class BuiltInFunctions
             {
                 return "Usage: " + this.getName() + "(string, prefix)";
             }
+
+            @Override
+            public ValueType returnType(ListIterable<ValueType> paraValueTypes)
+            {
+                return ValueType.BOOLEAN;
+            }
         },
 
         new IntrinsicFunctionDescriptor("contains") {
@@ -78,6 +85,12 @@ final public class BuiltInFunctions
             {
                 return "Usage: " + this.getName() + "(string, substring)";
             }
+
+            @Override
+            public ValueType returnType(ListIterable<ValueType> paraValueTypes)
+            {
+                return ValueType.BOOLEAN;
+            }
         },
 
         new IntrinsicFunctionDescriptor("toUpper") {
@@ -93,6 +106,12 @@ final public class BuiltInFunctions
             public String usageString()
             {
                 return "Usage: " + this.getName() + "(string)";
+            }
+
+            @Override
+            public ValueType returnType(ListIterable<ValueType> parameterTypes)
+            {
+                return ValueType.STRING;
             }
         },
 
@@ -116,6 +135,12 @@ final public class BuiltInFunctions
                     aString.substring(beginIndex, (int) ((LongValue) parameters.get(2)).longValue());
 
                 return new StringValue(substring);
+            }
+
+            @Override
+            public ValueType returnType(ListIterable<ValueType> paraValueTypes)
+            {
+                return ValueType.STRING;
             }
 
             @Override
@@ -151,6 +176,13 @@ final public class BuiltInFunctions
             {
                 return "Usage: " + this.getName() + "(number)";
             }
+
+            @Override
+            public ValueType returnType(ListIterable<ValueType> parameterTypes)
+            {
+                // todo - error handling
+                return parameterTypes.get(0);
+            }
         },
 
         new IntrinsicFunctionDescriptor("toString") {
@@ -162,6 +194,12 @@ final public class BuiltInFunctions
                 Value value = parameters.get(0);
 
                 return new StringValue(value.stringValue());
+            }
+
+            @Override
+            public ValueType returnType(ListIterable<ValueType> paraValueTypes)
+            {
+                return ValueType.STRING;
             }
 
             @Override
@@ -183,51 +221,69 @@ final public class BuiltInFunctions
             }
 
             @Override
+            public ValueType returnType(ListIterable<ValueType> parameterTypes)
+            {
+                return ValueType.DATE;
+            }
+
+            @Override
             public String usageString()
             {
                 return "Usage: " + this.getName() + "(yyyy-mm-dd)";
             }
         },
 
-            new IntrinsicFunctionDescriptor("toLong") {
-                @Override
-                public Value evaluate(VectorValue parameters)
-                {
-                    this.assertParameterCount(1, parameters.size());
-                    Value parameter = parameters.get(0);
-                    this.assertParameterType(ValueType.STRING, parameter.getType());
-                    String aString = parameter.stringValue();
+        new IntrinsicFunctionDescriptor("toLong") {
+            @Override
+            public Value evaluate(VectorValue parameters)
+            {
+                this.assertParameterCount(1, parameters.size());
+                Value parameter = parameters.get(0);
+                this.assertParameterType(ValueType.STRING, parameter.getType());
+                String aString = parameter.stringValue();
 
-                    return new LongValue(Long.parseLong(aString));
-                }
+                return new LongValue(Long.parseLong(aString));
+            }
 
-                @Override
-                public String usageString()
-                {
-                    return "Usage: " + this.getName() + "(string)";
-                }
-            },
+            @Override
+            public ValueType returnType(ListIterable<ValueType> parameterTypes)
+            {
+                return ValueType.LONG;
+            }
 
-            new IntrinsicFunctionDescriptor("toDouble") {
-                @Override
-                public Value evaluate(VectorValue parameters)
-                {
-                    this.assertParameterCount(1, parameters.size());
-                    Value parameter = parameters.get(0);
-                    this.assertParameterType(ValueType.STRING, parameter.getType());
-                    String aString = parameter.stringValue();
+            @Override
+            public String usageString()
+            {
+                return "Usage: " + this.getName() + "(string)";
+            }
+        },
 
-                    return new DoubleValue(Double.parseDouble(aString));
-                }
+        new IntrinsicFunctionDescriptor("toDouble") {
+            @Override
+            public Value evaluate(VectorValue parameters)
+            {
+                this.assertParameterCount(1, parameters.size());
+                Value parameter = parameters.get(0);
+                this.assertParameterType(ValueType.STRING, parameter.getType());
+                String aString = parameter.stringValue();
 
-                @Override
-                public String usageString()
-                {
-                    return "Usage: " + this.getName() + "(string)";
-                }
-            },
+                return new DoubleValue(Double.parseDouble(aString));
+            }
 
-            new IntrinsicFunctionDescriptor("withinDays") {
+            @Override
+            public ValueType returnType(ListIterable<ValueType> paraValueTypes)
+            {
+                return ValueType.DOUBLE;
+            }
+
+            @Override
+            public String usageString()
+            {
+                return "Usage: " + this.getName() + "(string)";
+            }
+        },
+
+        new IntrinsicFunctionDescriptor("withinDays") {
             @Override
             public Value evaluate(VectorValue parameters)
             {
@@ -243,6 +299,12 @@ final public class BuiltInFunctions
             }
 
             @Override
+            public ValueType returnType(ListIterable<ValueType> paraValueTypes)
+            {
+                return ValueType.BOOLEAN;
+            }
+
+            @Override
             public String usageString()
             {
                 return "Usage: " + this.getName() + "(date1, date2, numberOfDays)";
@@ -250,12 +312,17 @@ final public class BuiltInFunctions
         }
     );
 
-    private static final ImmutableMap<String, IntrinsicFunctionDescriptor> FUNCTIONS_BY_NAME =
-            FUNCTIONS.toMap(fd -> fd.getNormalizedName(), fd -> fd).toImmutable();
+    private static final MutableMap<String, IntrinsicFunctionDescriptor> FUNCTIONS_BY_NAME =
+            FUNCTIONS.toMap(fd -> fd.getNormalizedName(), fd -> fd);
 
     private BuiltInFunctions()
     {
         // Utility class
+    }
+
+    public static void addFunctionDescriptor(IntrinsicFunctionDescriptor fd)
+    {
+        FUNCTIONS_BY_NAME.put(fd.getNormalizedName(), fd);
     }
 
     public static IntrinsicFunctionDescriptor getFunctionDescriptor(String name)

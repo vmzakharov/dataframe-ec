@@ -23,6 +23,8 @@ import io.github.vmzakharov.ecdataframe.dsl.UnaryExpr;
 import io.github.vmzakharov.ecdataframe.dsl.UnaryOp;
 import io.github.vmzakharov.ecdataframe.dsl.VarExpr;
 import io.github.vmzakharov.ecdataframe.dsl.VectorExpr;
+import io.github.vmzakharov.ecdataframe.dsl.function.BuiltInFunctions;
+import io.github.vmzakharov.ecdataframe.dsl.function.IntrinsicFunctionDescriptor;
 import io.github.vmzakharov.ecdataframe.dsl.value.Value;
 import io.github.vmzakharov.ecdataframe.dsl.value.ValueType;
 import org.eclipse.collections.api.list.ListIterable;
@@ -36,11 +38,12 @@ import org.eclipse.collections.impl.factory.Stacks;
 import org.eclipse.collections.impl.tuple.Tuples;
 
 public class TypeInferenceVisitor
-implements ExpressionVisitor
+        implements ExpressionVisitor
 {
     public static final String ERR_IF_ELSE_INCOMPATIBLE = "Incompatible types in branches of if-else";
     public static final String ERR_TYPES_IN_EXPRESSION = "Incompatible operand types in expression";
     public static final String ERR_UNDEFINED_VARIABLE = "Undefined variable";
+    public static final String ERR_UNDEFINED_FUNCTION = "Undefined function";
     public static final String ERR_CONDITION_NOT_BOOLEAN = "Condition type is not boolean";
 
     private final MutableStack<ValueType> expressionTypeStack = Stacks.mutable.of();
@@ -148,8 +151,8 @@ implements ExpressionVisitor
     }
 
     /**
-     * @deprecated use {@code hasErrors()}
      * @return true if the visitor encountered incompatible or undefined expression types, false otherwise
+     * @deprecated use {@code hasErrors()}
      */
     public boolean isError()
     {
@@ -236,16 +239,44 @@ implements ExpressionVisitor
     @Override
     public void visitFunctionCallExpr(FunctionCallExpr expr)
     {
-        FunctionScript functionScript = this.getFunction(expr.getNormalizedFunctionName());
+        IntrinsicFunctionDescriptor functionDescriptor = BuiltInFunctions.getFunctionDescriptor(expr.getNormalizedFunctionName());
+        if (functionDescriptor != null)
+        {
+            this.processBuiltInFunction(expr, functionDescriptor);
+        }
+        else
+        {
+            FunctionScript functionScript = this.getFunction(expr.getNormalizedFunctionName());
+            if (functionScript != null)
+            {
+                this.processDeclaredFunction(expr, functionScript);
+            }
+            else
+            {
+                this.recordError(ERR_UNDEFINED_FUNCTION, expr.getFunctionName());
+            }
+        }
+    }
 
+    private void processBuiltInFunction(FunctionCallExpr expr, IntrinsicFunctionDescriptor functionDescriptor)
+    {
+        ListIterable<ValueType> parameterTypes = expr.getParameters().collect(p -> {
+            p.accept(this);
+            return this.getLastExpressionType();
+        });
+
+        this.store(functionDescriptor.returnType(parameterTypes));
+    }
+
+    private void processDeclaredFunction(FunctionCallExpr expr, FunctionScript functionScript)
+    {
         TypeInferenceVisitor functionCallContextVisitor = new TypeInferenceVisitor();
         expr.getParameters().forEachWithIndex((p, i) -> {
-                String paramName = functionScript.getParameterNames().get(i);
-                p.accept(this);
-                functionCallContextVisitor.storeVariableType(paramName, this.getLastExpressionType());
-            }
+                    String paramName = functionScript.getParameterNames().get(i);
+                    p.accept(this);
+                    functionCallContextVisitor.storeVariableType(paramName, this.getLastExpressionType());
+                }
         );
-
         functionScript.accept(functionCallContextVisitor);
         this.store(functionCallContextVisitor.getLastExpressionType());
     }
