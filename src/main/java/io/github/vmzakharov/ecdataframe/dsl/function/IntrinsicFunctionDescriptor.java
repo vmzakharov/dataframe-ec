@@ -15,6 +15,7 @@ implements FunctionDescriptor
     private final String name;
     private final String normalizedName;
     private final ListIterable<String> parameterNames;
+    private ListIterable<ValueType> expectedParameterTypes;
 
     public IntrinsicFunctionDescriptor(String newName, ListIterable<String> newParameterNames)
     {
@@ -26,11 +27,6 @@ implements FunctionDescriptor
     public IntrinsicFunctionDescriptor(String newName)
     {
         this(newName, Lists.immutable.of());
-    }
-
-    public IntrinsicFunctionDescriptor(String newName, String... parameterNames)
-    {
-        this(newName, Lists.immutable.of(parameterNames));
     }
 
     public String getName()
@@ -63,7 +59,11 @@ implements FunctionDescriptor
         return this.evaluate((VectorValue) context.getVariableOrDefault(this.magicalParameterName(), VectorValue.EMPTY));
     }
 
-    abstract public Value evaluate(VectorValue parameters);
+    public Value evaluate(VectorValue parameters)
+    {
+        ErrorReporter.reportAndThrow("Function " + this.name + " is not implemented");
+        return Value.VOID;
+    }
 
     public String usageString()
     {

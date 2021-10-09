@@ -1,5 +1,6 @@
 package io.github.vmzakharov.ecdataframe.dsl.function;
 
+import io.github.vmzakharov.ecdataframe.dsl.EvalContext;
 import io.github.vmzakharov.ecdataframe.dsl.value.BooleanValue;
 import io.github.vmzakharov.ecdataframe.dsl.value.DateValue;
 import io.github.vmzakharov.ecdataframe.dsl.value.DoubleValue;
@@ -43,69 +44,45 @@ final public class BuiltInFunctions
             }
         },
 
-        new IntrinsicFunctionDescriptor("startsWith") {
+        new IntrinsicFunctionDescriptor("startsWith", Lists.immutable.of("string", "prefix")) {
             @Override
-            public Value evaluate(VectorValue parameters)
+            public Value evaluate(EvalContext context)
             {
-                this.assertParameterCount(parameters.size(), 2);
-
-                String aString = parameters.get(0).stringValue();
-                String aPrefix = parameters.get(1).stringValue();
+                String aString = context.getVariable("string").stringValue();
+                String aPrefix = context.getVariable("prefix").stringValue();
 
                 return BooleanValue.valueOf(aString.startsWith(aPrefix));
             }
 
             @Override
-            public String usageString()
-            {
-                return "Usage: " + this.getName() + "(string, prefix)";
-            }
-
-            @Override
             public ValueType returnType(ListIterable<ValueType> paraValueTypes)
             {
                 return ValueType.BOOLEAN;
             }
         },
 
-        new IntrinsicFunctionDescriptor("contains") {
+        new IntrinsicFunctionDescriptor("contains", Lists.immutable.of("string", "substring")) {
             @Override
-            public Value evaluate(VectorValue parameters)
+            public Value evaluate(EvalContext context)
             {
-                this.assertParameterCount(parameters.size(), 2);
-
-                String aString = parameters.get(0).stringValue();
-                String substring = parameters.get(1).stringValue();
+                String aString = context.getVariable("string").stringValue();
+                String substring = context.getVariable("substring").stringValue();
 
                 return BooleanValue.valueOf(aString.contains(substring));
             }
 
             @Override
-            public String usageString()
-            {
-                return "Usage: " + this.getName() + "(string, substring)";
-            }
-
-            @Override
             public ValueType returnType(ListIterable<ValueType> paraValueTypes)
             {
                 return ValueType.BOOLEAN;
             }
         },
 
-        new IntrinsicFunctionDescriptor("toUpper") {
+        new IntrinsicFunctionDescriptor("toUpper", Lists.immutable.of("string")) {
             @Override
-            public Value evaluate(VectorValue parameters)
+            public Value evaluate(EvalContext context)
             {
-                this.assertParameterCount(parameters.size(), 1);
-
-                return new StringValue(parameters.get(0).stringValue().toUpperCase());
-            }
-
-            @Override
-            public String usageString()
-            {
-                return "Usage: " + this.getName() + "(string)";
+                return new StringValue(context.getVariable("string").stringValue().toUpperCase());
             }
 
             @Override
@@ -233,12 +210,11 @@ final public class BuiltInFunctions
             }
         },
 
-        new IntrinsicFunctionDescriptor("toLong") {
+        new IntrinsicFunctionDescriptor("toLong", Lists.immutable.of("string")) {
             @Override
-            public Value evaluate(VectorValue parameters)
+            public Value evaluate(EvalContext context)
             {
-                this.assertParameterCount(1, parameters.size());
-                Value parameter = parameters.get(0);
+                Value parameter = context.getVariable("string");
                 this.assertParameterType(ValueType.STRING, parameter.getType());
                 String aString = parameter.stringValue();
 
@@ -250,20 +226,13 @@ final public class BuiltInFunctions
             {
                 return ValueType.LONG;
             }
-
-            @Override
-            public String usageString()
-            {
-                return "Usage: " + this.getName() + "(string)";
-            }
         },
 
-        new IntrinsicFunctionDescriptor("toDouble") {
+        new IntrinsicFunctionDescriptor("toDouble", Lists.immutable.of("string")) {
             @Override
-            public Value evaluate(VectorValue parameters)
+            public Value evaluate(EvalContext context)
             {
-                this.assertParameterCount(1, parameters.size());
-                Value parameter = parameters.get(0);
+                Value parameter = context.getVariable("string");
                 this.assertParameterType(ValueType.STRING, parameter.getType());
                 String aString = parameter.stringValue();
 
@@ -275,23 +244,15 @@ final public class BuiltInFunctions
             {
                 return ValueType.DOUBLE;
             }
-
-            @Override
-            public String usageString()
-            {
-                return "Usage: " + this.getName() + "(string)";
-            }
         },
 
-        new IntrinsicFunctionDescriptor("withinDays") {
+        new IntrinsicFunctionDescriptor("withinDays", Lists.immutable.of("date1", "date2", "numberOfDays")) {
             @Override
-            public Value evaluate(VectorValue parameters)
+            public Value evaluate(EvalContext context)
             {
-                this.assertParameterCount(3, parameters.size());
-
-                LocalDate date1 = ((DateValue) parameters.get(0)).dateValue();
-                LocalDate date2 = ((DateValue) parameters.get(1)).dateValue();
-                long numberOfDays = ((LongValue) parameters.get(2)).longValue();
+                LocalDate date1 = ((DateValue) context.getVariable("date1")).dateValue();
+                LocalDate date2 = ((DateValue) context.getVariable("date2")).dateValue();
+                long numberOfDays = ((LongValue) context.getVariable("numberOfDays")).longValue();;
 
                 Period period = Period.between(date1, date2);
 
@@ -302,12 +263,6 @@ final public class BuiltInFunctions
             public ValueType returnType(ListIterable<ValueType> paraValueTypes)
             {
                 return ValueType.BOOLEAN;
-            }
-
-            @Override
-            public String usageString()
-            {
-                return "Usage: " + this.getName() + "(date1, date2, numberOfDays)";
             }
         }
     );
