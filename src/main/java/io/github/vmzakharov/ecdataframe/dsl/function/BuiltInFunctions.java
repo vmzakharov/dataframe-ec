@@ -252,7 +252,7 @@ final public class BuiltInFunctions
             {
                 LocalDate date1 = ((DateValue) context.getVariable("date1")).dateValue();
                 LocalDate date2 = ((DateValue) context.getVariable("date2")).dateValue();
-                long numberOfDays = ((LongValue) context.getVariable("numberOfDays")).longValue();;
+                long numberOfDays = ((LongValue) context.getVariable("numberOfDays")).longValue();
 
                 Period period = Period.between(date1, date2);
 
