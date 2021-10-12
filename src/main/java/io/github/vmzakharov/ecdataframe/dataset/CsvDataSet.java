@@ -14,9 +14,11 @@ import org.eclipse.collections.api.list.ListIterable;
 import org.eclipse.collections.api.list.MutableList;
 import org.eclipse.collections.impl.factory.Lists;
 
+import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.Reader;
@@ -28,6 +30,10 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.time.format.ResolverStyle;
+import java.util.zip.GZIPInputStream;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipFile;
+import java.util.zip.ZipInputStream;
 
 import static io.github.vmzakharov.ecdataframe.dsl.value.ValueType.DATE;
 import static io.github.vmzakharov.ecdataframe.dsl.value.ValueType.DOUBLE;
@@ -210,6 +216,30 @@ extends DataSetAbstract
     protected Reader createReader()
     throws IOException
     {
+        String fileName = this.dataFilePath.getFileName().toString();
+
+        if (fileName.endsWith(".zip"))
+        {
+//            ZipFile zf = new ZipFile(this.dataFilePath.toString());
+//            ZipEntry entry = zf.entries().nextElement();
+//            InputStream zipEntryInputStream = zf.getInputStream(entry);
+//            return new InputStreamReader(zipEntryInputStream);
+
+            InputStream fis = Files.newInputStream(this.dataFilePath);
+//            BufferedInputStream bis = new BufferedInputStream(fis);
+            ZipInputStream zis = new ZipInputStream(fis);
+
+            ZipEntry entry = zis.getNextEntry();
+            return new InputStreamReader(zis);
+        }
+        else if (fileName.endsWith(".gz"))
+        {
+            InputStream fis = Files.newInputStream(this.dataFilePath);
+            GZIPInputStream gzis = new GZIPInputStream(fis);
+
+            return new InputStreamReader(gzis);
+        }
+
         return new InputStreamReader(Files.newInputStream(this.dataFilePath));
     }
 
