@@ -20,10 +20,7 @@ public class CsvCodeScratchpad
     {
         String fileName = "src/test/resources/employees.csv";
         String fileNameOut = "src/test/resources/employees_out.csv";
-//        String fileName = "src/test/resources/employees_1mm.csv";
-//        String fileNameOut = "src/test/resources/employees_1mm_out.csv";
 
-//        CsvDataSet dataSet = new CsvDataSet(fileName, "Employee");
         CsvDataSet dataSet = new CsvDataSet(Paths.get(fileName), "Employee");
         dataSet.convertEmptyElementsToNulls();
 
@@ -41,16 +38,6 @@ public class CsvCodeScratchpad
         dataSetOut.write(dataFrame1);
         stopwatch.stop();
         this.report("Wrote", dataFrame1.rowCount(), stopwatch);
-
-//        stopwatch.start();
-//        DataFrame dataFrame2 = dataSet.loadAsDataFrame();
-//        stopwatch.stop();
-//        this.report("Loaded", dataFrame2.rowCount(), stopwatch);
-//
-//        stopwatch.start();
-//        DataFrame dataFrame3 = dataSet.loadAsDataFrame();
-//        stopwatch.stop();
-//        this.report("Loaded", dataFrame3.rowCount(), stopwatch);
     }
 
     private void report(String message, int rowCount, Stopwatch stopwatch)

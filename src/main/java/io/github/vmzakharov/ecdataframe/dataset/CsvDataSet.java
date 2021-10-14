@@ -87,6 +87,7 @@ extends DataSetAbstract
         // Not needed for CSV files
     }
 
+    // todo: if set, interferes with type inference
     public void convertEmptyElementsToNulls()
     {
         this.emptyElementsConvertedToNulls = true;
