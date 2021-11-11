@@ -8,6 +8,7 @@ import io.github.vmzakharov.ecdataframe.dsl.value.Value;
 import io.github.vmzakharov.ecdataframe.dsl.value.ValueType;
 import io.github.vmzakharov.ecdataframe.dsl.visitor.InMemoryEvaluationVisitor;
 import io.github.vmzakharov.ecdataframe.util.ExpressionParserHelper;
+import org.eclipse.collections.api.block.function.primitive.IntIntToIntFunction;
 import org.eclipse.collections.api.block.predicate.primitive.BooleanPredicate;
 import org.eclipse.collections.api.list.ImmutableList;
 import org.eclipse.collections.api.list.ListIterable;
@@ -17,6 +18,7 @@ import org.eclipse.collections.api.list.primitive.IntList;
 import org.eclipse.collections.api.list.primitive.MutableBooleanList;
 import org.eclipse.collections.api.list.primitive.MutableIntList;
 import org.eclipse.collections.api.map.MutableMap;
+import org.eclipse.collections.api.tuple.Triplet;
 import org.eclipse.collections.api.tuple.Twin;
 import org.eclipse.collections.impl.factory.Lists;
 import org.eclipse.collections.impl.factory.Maps;
@@ -814,35 +816,71 @@ public class DataFrame
      * present in the join.
      *
      * @param other               the data frame to join to
-     * @param thisJoinColumnName  the name of the column in the data frame to use a join key
-     * @param otherJoinColumnName the name of the column in the data frame to use a join
+     * @param thisJoinColumnName  the name of the column in this data frame to use as the join key
+     * @param otherJoinColumnName the name of the column in the other data frame to use as the join key
      * @return a data frame that is a join of this data frame and the data frame passed as a parameter
      */
     public DataFrame join(DataFrame other, String thisJoinColumnName, String otherJoinColumnName)
     {
-        return this.join(other, false, thisJoinColumnName, otherJoinColumnName);
+        return this.join(other, false, Lists.immutable.of(thisJoinColumnName), Lists.immutable.of(otherJoinColumnName));
     }
 
     /**
-     * A basic outer join - creates a data frame that is this an join of this data frame and another one, based on
+     * A very basic join - creates a data frame that is this an join of this data frame and another one, based on
+     * the key column values. Rows with the same values of the key column will be combined in the resulting data frame
+     * into one wide row. This is an inner join so rows for which there is no match in the other data frame will not be
+     * present in the join.
+     *
+     * @param other                the data frame to join to
+     * @param thisJoinColumnNames  the name of the columns in this data frame to use as the join keys
+     * @param otherJoinColumnNames the name of the columns in the other data frame to use as the join keys, they will be
+     *                             compared to the columns in this data frame in the order they are specified
+     * @return a data frame that is a join of this data frame and the data frame passed as a parameter
+     */
+    public DataFrame join(DataFrame other, ListIterable<String> thisJoinColumnNames, ListIterable<String> otherJoinColumnNames)
+    {
+        return this.join(other, false, thisJoinColumnNames, otherJoinColumnNames);
+    }
+
+    /**
+     * A basic outer join - creates a data frame that is a join of this data frame and another one, based on
      * the key column values. Rows with the same values of the key column will be combined in the resulting data frame
      * into one wide row. The rows for which there is no match in the other data frame will have the missing values
      * filled with nulls for object column types or zeros for numeric column types.
      *
      * @param other               the data frame to join to
-     * @param thisJoinColumnName  the name of the column in the data frame to use a join key
-     * @param otherJoinColumnName the name of the column in the data frame to use a join
+     * @param thisJoinColumnName  the name of the column in this data frame to use as the join key
+     * @param otherJoinColumnName the name of the column in the other data frame to use as the join key
      * @return a data frame that is a join of this data frame and the data frame passed as a parameter
      */
     public DataFrame outerJoin(DataFrame other, String thisJoinColumnName, String otherJoinColumnName)
     {
-        return this.join(other, true, thisJoinColumnName, otherJoinColumnName);
+        return this.join(other, true, Lists.immutable.of(thisJoinColumnName), Lists.immutable.of(otherJoinColumnName));
     }
 
-    // todo: multi column join
+    /**
+     * A basic outer join - creates a data frame that is a join of this data frame and another one, based on
+     * the key column values. Rows with the same values of the key columns will be combined in the resulting data frame
+     * into one wide row. The rows for which there is no match in the other data frame will have the missing values
+     * filled with nulls for object column types or zeros for numeric column types.
+     *
+     * @param other               the data frame to join to
+     * @param thisJoinColumnNames  the name of the columns in this data frame to use as the join keys
+     * @param otherJoinColumnNames the name of the columns in the other data frame to use as the join keys
+     * @return a data frame that is a join of this data frame and the data frame passed as a parameter
+     */
+    public DataFrame outerJoin(DataFrame other, ListIterable<String> thisJoinColumnNames, ListIterable<String> otherJoinColumnNames)
+    {
+        return this.join(other, true, thisJoinColumnNames, otherJoinColumnNames);
+    }
+
     // todo: data frame difference
     // todo: do not override sort order (use external sort)
-    private DataFrame join(DataFrame other, boolean outerJoin, String thisJoinColumnName, String otherJoinColumnName)
+    private DataFrame join(
+            DataFrame other,
+            boolean outerJoin,
+            ListIterable<String> thisJoinColumnNames,
+            ListIterable<String> otherJoinColumnNames)
     {
         DataFrame joined = this.cloneStructureAsStored(this.getName() + "_" + other.getName());
 
@@ -863,11 +901,11 @@ public class DataFrame
         );
 
         other.columns
-                .reject(c -> c.getName().equals(otherJoinColumnName))
-                .forEach(c -> joined.addColumn(otherColumnNameMap.get(c.getName()), c.getType()));
+                .reject(col -> otherJoinColumnNames.contains(col.getName()))
+                .forEach(col -> joined.addColumn(otherColumnNameMap.get(col.getName()), col.getType()));
 
-        this.sortBy(Lists.immutable.of(thisJoinColumnName));
-        other.sortBy(Lists.immutable.of(otherJoinColumnName));
+        this.sortBy(thisJoinColumnNames);
+        other.sortBy(otherJoinColumnNames);
 
         int thisRowIndex = 0;
         int otherRowIndex = 0;
@@ -880,15 +918,34 @@ public class DataFrame
         ListIterable<String> theseColumnNames = this.columns.collect(DfColumn::getName);
         int theseColumnCount = theseColumnNames.size();
 
-        int joinColumnIndex = theseColumnNames.detectIndex(e -> e.equals(thisJoinColumnName));
+        IntList joinColumnIndices = thisJoinColumnNames.collectInt(theseColumnNames::indexOf);
 
-        ListIterable<String> otherColumnNames = other.columns.collect(DfColumn::getName).rejectWith(String::equals, otherJoinColumnName);
+        ListIterable<String> otherColumnNames = other.columns
+                .collect(DfColumn::getName)
+                .reject(otherJoinColumnNames::contains);
 
+        IntIntToIntFunction keyComparator = (thisIndex, otherIndex) -> {
+            for (int i = 0; i < joinColumnIndices.size(); i++)
+            {
+                int result =
+                        ((Comparable<Object>) this.getObject(thisJoinColumnNames.get(i), thisIndex)).compareTo(
+                        other.getObject(otherJoinColumnNames.get(i), otherIndex));
+                if (result != 0)
+                {
+                    return result;
+                }
+            }
+            return 0;
+        };
+/*
+ ((Comparable<Object>) this.getObject(thisJoinColumnNames, thisRowIndex)).compareTo(
+                    other.getObject(otherJoinColumnNames, otherRowIndex));
+
+  */
         int comparison;
         while (thisRowIndex < thisRowCount && otherRowIndex < otherRowCount)
         {
-            comparison = ((Comparable<Object>) this.getObject(thisJoinColumnName, thisRowIndex)).compareTo(
-                    other.getObject(otherJoinColumnName, otherRowIndex));
+            comparison = keyComparator.valueOf(thisRowIndex, otherRowIndex);
 
             final int thisMakeFinal = thisRowIndex;
             final int otherMakeFinal = otherRowIndex;
@@ -922,7 +979,12 @@ public class DataFrame
                     if (outerJoin)
                     {
                         Arrays.fill(rowData, null);
-                        rowData[joinColumnIndex] = other.getObject(otherJoinColumnName, otherMakeFinal);
+
+                        joinColumnIndices.forEachWithIndex(
+                            (joinColumnIndex, sourceKeyIndex)
+                                    -> rowData[joinColumnIndex] = other.getObject(otherJoinColumnNames.get(sourceKeyIndex), otherMakeFinal)
+                        );
+
                         otherColumnNames.forEachWithIndex((colName, i) -> rowData[theseColumnCount + i] = other.getObject(colName, otherMakeFinal));
 
                         joined.addRow(rowData);
@@ -952,7 +1014,12 @@ public class DataFrame
                 int otherMakeFinal = otherRowIndex;
 
                 Arrays.fill(rowData, null);
-                rowData[joinColumnIndex] = other.getObject(otherJoinColumnName, otherMakeFinal);
+
+                joinColumnIndices.forEachWithIndex(
+                        (joinColumnIndex, sourceKeyIndex)
+                                -> rowData[joinColumnIndex] = other.getObject(otherJoinColumnNames.get(sourceKeyIndex), otherMakeFinal)
+                );
+
                 otherColumnNames.forEachWithIndex((colName, i) -> rowData[theseColumnCount + i] = other.getObject(colName, otherMakeFinal));
 
                 joined.addRow(rowData);
@@ -962,6 +1029,27 @@ public class DataFrame
         }
 
         return joined;
+    }
+
+    /**
+     * Performs intersection and complement set operations between two data frames based on the provided keys and
+     * returns their results as a triplet of data frames.
+     * The result of the intersection is equivalent to inner join of two data frames, and the result of each complement
+     * is the subset of the rows of each data frame that does not have corresponding keys in the other data frame
+     * @param other
+     * @param thisJoinColumnNames
+     * @param otherJoinColumnNames
+     * @return a triplet containing the complement of the other dataframe in this one, the joined dataframe, and the
+     * complement of this data frame in the other one
+     */
+    public Triplet<DataFrame> joinWithComplements(
+            DataFrame other,
+            ListIterable<String> thisJoinColumnNames,
+            ImmutableList<String> otherJoinColumnNames)
+    {
+        DataFrame thisComplementOther = this.cloneStructureAsStored(this.getName() + "-" + other.getName());
+        DataFrame otherComplementThis = this.cloneStructureAsStored(other.getName() + "-" + this.getName());
+        return Tuples.triplet(thisComplementOther, new DataFrame(this.getName() + "+" + other.getName()), otherComplementThis);
     }
 
     /**
