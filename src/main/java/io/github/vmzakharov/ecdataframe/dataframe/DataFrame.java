@@ -17,7 +17,9 @@ import org.eclipse.collections.api.list.primitive.BooleanList;
 import org.eclipse.collections.api.list.primitive.IntList;
 import org.eclipse.collections.api.list.primitive.MutableBooleanList;
 import org.eclipse.collections.api.list.primitive.MutableIntList;
+import org.eclipse.collections.api.map.MapIterable;
 import org.eclipse.collections.api.map.MutableMap;
+import org.eclipse.collections.api.set.MutableSet;
 import org.eclipse.collections.api.tuple.Triplet;
 import org.eclipse.collections.api.tuple.Twin;
 import org.eclipse.collections.impl.factory.Lists;
@@ -822,7 +824,7 @@ public class DataFrame
      */
     public DataFrame join(DataFrame other, String thisJoinColumnName, String otherJoinColumnName)
     {
-        return this.join(other, false, Lists.immutable.of(thisJoinColumnName), Lists.immutable.of(otherJoinColumnName));
+        return this.join(other, Lists.immutable.of(thisJoinColumnName), Lists.immutable.of(otherJoinColumnName));
     }
 
     /**
@@ -839,7 +841,7 @@ public class DataFrame
      */
     public DataFrame join(DataFrame other, ListIterable<String> thisJoinColumnNames, ListIterable<String> otherJoinColumnNames)
     {
-        return this.join(other, false, thisJoinColumnNames, otherJoinColumnNames);
+        return this.join(other, JoinType.INNER_JOIN, thisJoinColumnNames, otherJoinColumnNames).getTwo();
     }
 
     /**
@@ -855,7 +857,7 @@ public class DataFrame
      */
     public DataFrame outerJoin(DataFrame other, String thisJoinColumnName, String otherJoinColumnName)
     {
-        return this.join(other, true, Lists.immutable.of(thisJoinColumnName), Lists.immutable.of(otherJoinColumnName));
+        return this.outerJoin(other, Lists.immutable.of(thisJoinColumnName), Lists.immutable.of(otherJoinColumnName));
     }
 
     /**
@@ -864,41 +866,32 @@ public class DataFrame
      * into one wide row. The rows for which there is no match in the other data frame will have the missing values
      * filled with nulls for object column types or zeros for numeric column types.
      *
-     * @param other               the data frame to join to
+     * @param other                the data frame to join to
      * @param thisJoinColumnNames  the name of the columns in this data frame to use as the join keys
      * @param otherJoinColumnNames the name of the columns in the other data frame to use as the join keys
      * @return a data frame that is a join of this data frame and the data frame passed as a parameter
      */
     public DataFrame outerJoin(DataFrame other, ListIterable<String> thisJoinColumnNames, ListIterable<String> otherJoinColumnNames)
     {
-        return this.join(other, true, thisJoinColumnNames, otherJoinColumnNames);
+        return this.join(other, JoinType.OUTER_JOIN, thisJoinColumnNames, otherJoinColumnNames).getTwo();
     }
 
     // todo: data frame difference
     // todo: do not override sort order (use external sort)
-    private DataFrame join(
+    private Triplet<DataFrame> join(
             DataFrame other,
-            boolean outerJoin,
+            JoinType joinType,
             ListIterable<String> thisJoinColumnNames,
             ListIterable<String> otherJoinColumnNames)
     {
         DataFrame joined = this.cloneStructureAsStored(this.getName() + "_" + other.getName());
 
-        MutableList<String> uniqueColumnNames = this.columns.collect(DfColumn::getName);
+        DataFrame thisComplementOther = this.cloneStructureAsStored(this.getName() + "-" + other.getName());
+        DataFrame otherComplementThis = other.cloneStructureAsStored(other.getName() + "-" + this.getName());
 
-        MutableMap<String, String> otherColumnNameMap = Maps.mutable.of();
-
-        other.columns.collect(DfColumn::getName).forEach(e ->
-            {
-                String newName = e;
-                while (uniqueColumnNames.contains(newName))
-                {
-                    newName += "_B";
-                }
-                uniqueColumnNames.add(newName);
-                otherColumnNameMap.put(e, newName);
-            }
-        );
+        MapIterable<String, String> otherColumnNameMap = this.resolveDuplicateNames(
+                this.columns.collect(DfColumn::getName),
+                other.columns.collect(DfColumn::getName));
 
         other.columns
                 .reject(col -> otherJoinColumnNames.contains(col.getName()))
@@ -925,10 +918,11 @@ public class DataFrame
                 .reject(otherJoinColumnNames::contains);
 
         IntIntToIntFunction keyComparator = (thisIndex, otherIndex) -> {
-            for (int i = 0; i < joinColumnIndices.size(); i++)
+            for (int i = 0; i < thisJoinColumnNames.size(); i++)
             {
                 int result =
-                        ((Comparable<Object>) this.getObject(thisJoinColumnNames.get(i), thisIndex)).compareTo(
+                        ((Comparable<Object>) this.getObject(thisJoinColumnNames.get(i), thisIndex))
+                        .compareTo(
                         other.getObject(otherJoinColumnNames.get(i), otherIndex));
                 if (result != 0)
                 {
@@ -937,11 +931,7 @@ public class DataFrame
             }
             return 0;
         };
-/*
- ((Comparable<Object>) this.getObject(thisJoinColumnNames, thisRowIndex)).compareTo(
-                    other.getObject(otherJoinColumnNames, otherRowIndex));
 
-  */
         int comparison;
         while (thisRowIndex < thisRowCount && otherRowIndex < otherRowCount)
         {
@@ -964,19 +954,23 @@ public class DataFrame
                 if (comparison < 0)
                 {
                     // this side is behind
-                    if (outerJoin)
+                    if (joinType.isOuterJoin())
                     {
                         Arrays.fill(rowData, null);
                         theseColumnNames.forEachWithIndex((colName, i) -> rowData[i] = this.getObject(colName, thisMakeFinal));
 
                         joined.addRow(rowData);
                     }
+                    else if (joinType.isJoinWithComplements())
+                    {
+                        thisComplementOther.copyRowFrom(this, thisMakeFinal);
+                    }
                     thisRowIndex++;
                 }
                 else
                 {
                     // the other side is behind
-                    if (outerJoin)
+                    if (joinType.isOuterJoin())
                     {
                         Arrays.fill(rowData, null);
 
@@ -989,13 +983,17 @@ public class DataFrame
 
                         joined.addRow(rowData);
                     }
+                    else if (joinType.isJoinWithComplements())
+                    {
+                        otherComplementThis.copyRowFrom(other, otherMakeFinal);
+                    }
                     otherRowIndex++;
                 }
             }
         }
 
         //   leftovers go here
-        if (outerJoin)
+        if (joinType.isOuterJoin())
         {
             while (thisRowIndex < thisRowCount)
             {
@@ -1027,8 +1025,48 @@ public class DataFrame
                 otherRowIndex++;
             }
         }
+        else if (joinType.isJoinWithComplements())
+        {
+            while (thisRowIndex < thisRowCount)
+            {
+                thisComplementOther.copyRowFrom(this, thisRowIndex);
+                thisRowIndex++;
+            }
 
-        return joined;
+            while (otherRowIndex < otherRowCount)
+            {
+                otherComplementThis.copyRowFrom(other, otherRowIndex);
+                otherRowIndex++;
+            }
+        }
+
+        thisComplementOther.seal();
+        otherComplementThis.seal();
+        return Tuples.triplet(thisComplementOther, joined, otherComplementThis);
+    }
+
+    private MapIterable<String, String> resolveDuplicateNames(
+            ListIterable<String> theseNames,
+            ListIterable<String> otherNames
+    )
+    {
+        MutableSet<String> uniqueColumnNames = theseNames.toSet();
+
+        MutableMap<String, String> otherColumnNameMap = Maps.mutable.of();
+
+        otherNames.forEach(e ->
+                {
+                    String newName = e;
+                    while (uniqueColumnNames.contains(newName))
+                    {
+                        newName += "_B";
+                    }
+                    uniqueColumnNames.add(newName);
+                    otherColumnNameMap.put(e, newName);
+                }
+        );
+
+        return otherColumnNameMap;
     }
 
     /**
@@ -1036,9 +1074,9 @@ public class DataFrame
      * returns their results as a triplet of data frames.
      * The result of the intersection is equivalent to inner join of two data frames, and the result of each complement
      * is the subset of the rows of each data frame that does not have corresponding keys in the other data frame
-     * @param other
-     * @param thisJoinColumnNames
-     * @param otherJoinColumnNames
+     * @param other                 the data frame to join to
+     * @param thisJoinColumnNames  the name of the columns in this data frame to use as the join keys
+     * @param otherJoinColumnNames the name of the columns in the other data frame to use as the join keys
      * @return a triplet containing the complement of the other dataframe in this one, the joined dataframe, and the
      * complement of this data frame in the other one
      */
@@ -1047,9 +1085,7 @@ public class DataFrame
             ListIterable<String> thisJoinColumnNames,
             ImmutableList<String> otherJoinColumnNames)
     {
-        DataFrame thisComplementOther = this.cloneStructureAsStored(this.getName() + "-" + other.getName());
-        DataFrame otherComplementThis = this.cloneStructureAsStored(other.getName() + "-" + this.getName());
-        return Tuples.triplet(thisComplementOther, new DataFrame(this.getName() + "+" + other.getName()), otherComplementThis);
+        return this.join(other, JoinType.JOIN_WITH_COMPLEMENTS, thisJoinColumnNames, otherJoinColumnNames);
     }
 
     /**
@@ -1079,5 +1115,20 @@ public class DataFrame
         MutableList<String> columnNamesToDrop = this.columns.collect(DfColumn::getName).reject(columnNamesToKeep::contains);
 
         return this.dropColumns(columnNamesToDrop);
+    }
+
+    private enum JoinType
+    {
+        INNER_JOIN, OUTER_JOIN, JOIN_WITH_COMPLEMENTS;
+
+        public boolean isOuterJoin()
+        {
+            return this == OUTER_JOIN;
+        }
+
+        public boolean isJoinWithComplements()
+        {
+            return this == JOIN_WITH_COMPLEMENTS;
+        }
     }
 }
