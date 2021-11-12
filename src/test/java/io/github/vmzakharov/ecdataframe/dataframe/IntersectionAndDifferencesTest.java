@@ -53,8 +53,8 @@ public class IntersectionAndDifferencesTest
     {
         DataFrame sideA = new DataFrame("Side A")
                 .addLongColumn("Value").addStringColumn("Key")
-                .addRow(1, "A")
                 .addRow(2, "B")
+                .addRow(1, "A")
                 .addRow(3, "C")
                 ;
 
@@ -132,6 +132,64 @@ public class IntersectionAndDifferencesTest
                 new DataFrame("Complement of A in B")
                         .addStringColumn("Id").addLongColumn("Count").addLongColumn("DoubleCount")
                         .addRow("Dx", 30, 60)
+                ,
+                result.getThree()
+        );
+    }
+
+    @Test
+    public void withAdditionalSortOrder()
+    {
+        DataFrame sideA = new DataFrame("Side A")
+                .addStringColumn("Key").addLongColumn("Count").addDoubleColumn("Value")
+                .addRow("B", 4, 11.0)
+                .addRow("B", 3, 12.0)
+                .addRow("A", 2, 13.0)
+                .addRow("A", 1, 14.0)
+                .addRow("C", 3, 15.0)
+                .addRow("C", 5, 16.0)
+                ;
+
+        DataFrame sideB = new DataFrame("Side B")
+                .addStringColumn("Id").addLongColumn("Number").addDoubleColumn("Price")
+                .addRow("B",  5, 3.03)
+                .addRow("A",  2, 1.01)
+                .addRow("B",  3, 2.02)
+                .addRow("D", 30, 6.06)
+                .addRow("C", 20, 4.04)
+                .addRow("D", 20, 5.05)
+                ;
+
+        Triplet<DataFrame> result = sideA.joinWithComplements(
+                sideB,
+                Lists.immutable.of("Key"), Lists.immutable.of("Count"),
+                Lists.immutable.of("Id"), Lists.immutable.of("Number"));
+
+        DataFrameUtil.assertEquals(
+                new DataFrame("Complement of B in A")
+                        .addStringColumn("Key").addLongColumn("Count").addDoubleColumn("Value")
+                        .addRow("A", 2, 13.0)
+                        .addRow("C", 5, 16.0)
+                ,
+                result.getOne()
+        );
+
+        DataFrameUtil.assertEquals(
+                new DataFrame("Join of A and B - intersection of keys")
+                        .addStringColumn("Key").addLongColumn("Count").addDoubleColumn("Value").addLongColumn("Number").addDoubleColumn("Price")
+                        .addRow("A", 1, 14.0,  2, 1.01)
+                        .addRow("B", 3, 12.0,  3, 2.02)
+                        .addRow("B", 4, 11.0,  5, 3.03)
+                        .addRow("C", 3, 15.0, 20, 4.04)
+                ,
+                result.getTwo()
+        );
+
+        DataFrameUtil.assertEquals(
+                new DataFrame("Complement of A in B")
+                        .addStringColumn("Id").addLongColumn("Number").addDoubleColumn("Price")
+                        .addRow("D", 20, 5.05)
+                        .addRow("D", 30, 6.06)
                 ,
                 result.getThree()
         );

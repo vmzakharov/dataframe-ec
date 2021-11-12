@@ -614,6 +614,11 @@ public class DataFrame
         }
     }
 
+    private void copyIndexedRowFrom(DataFrame source, int rowIndex)
+    {
+        this.copyRowFrom(source, source.rowIndexMap(rowIndex));
+    }
+
     public DataFrame cloneStructure(String newName)
     {
         DataFrame cloned = new DataFrame(newName);
@@ -841,7 +846,11 @@ public class DataFrame
      */
     public DataFrame join(DataFrame other, ListIterable<String> thisJoinColumnNames, ListIterable<String> otherJoinColumnNames)
     {
-        return this.join(other, JoinType.INNER_JOIN, thisJoinColumnNames, otherJoinColumnNames).getTwo();
+        return this.join(
+                other, JoinType.INNER_JOIN,
+                thisJoinColumnNames, Lists.immutable.empty(),
+                otherJoinColumnNames, Lists.immutable.empty()
+            ).getTwo();
     }
 
     /**
@@ -873,16 +882,72 @@ public class DataFrame
      */
     public DataFrame outerJoin(DataFrame other, ListIterable<String> thisJoinColumnNames, ListIterable<String> otherJoinColumnNames)
     {
-        return this.join(other, JoinType.OUTER_JOIN, thisJoinColumnNames, otherJoinColumnNames).getTwo();
+        return this.join(
+                other, JoinType.OUTER_JOIN,
+                thisJoinColumnNames, Lists.immutable.empty(),
+                otherJoinColumnNames, Lists.immutable.empty()
+            ).getTwo();
     }
 
-    // todo: data frame difference
+    /**
+     * Performs intersection and complement set operations between two data frames based on the provided keys and
+     * returns their results as a triplet of data frames.
+     * The result of the intersection is equivalent to inner join of two data frames, and the result of each complement
+     * is the subset of the rows of each data frame that does not have corresponding keys in the other data frame
+     * @param other                 the data frame to join to
+     * @param thisJoinColumnNames  the name of the columns in this data frame to use as the join keys
+     * @param otherJoinColumnNames the name of the columns in the other data frame to use as the join keys
+     * @return a triplet containing the complement of the other dataframe in this one, the joined dataframe, and the
+     * complement of this data frame in the other one
+     */
+    public Triplet<DataFrame> joinWithComplements(
+            DataFrame other,
+            ListIterable<String> thisJoinColumnNames,
+            ListIterable<String> otherJoinColumnNames)
+    {
+        return this.join(
+                other, JoinType.JOIN_WITH_COMPLEMENTS,
+                thisJoinColumnNames, Lists.immutable.empty(),
+                otherJoinColumnNames, Lists.immutable.empty());
+    }
+
+    /**
+     * Performs intersection and complement set operations between two data frames based on the provided keys and
+     * returns their results as a triplet of data frames.
+     * The result of the intersection is equivalent to inner join of two data frames, and the result of each complement
+     * is the subset of the rows of each data frame that does not have corresponding keys in the other data frame
+     * @param other                 the data frame to join to
+     * @param thisJoinColumnNames  the name of the columns in this data frame to use as the join keys
+     * @param thisAdditionalSortColumnNames specifies columns for sort order on this data frame's side in addition to
+     *                                      the order of the values of its key columns
+     * @param otherJoinColumnNames the name of the columns in the other data frame to use as the join keys
+     * @param otherAdditionalSortColumnNames specifies columns for sort order on the other data frame's side in addition
+     *                                       to the order of the values of its key columns
+     * @return a triplet containing the complement of the other dataframe in this one, the joined dataframe, and the
+     * complement of this data frame in the other one
+     */
+    public Triplet<DataFrame> joinWithComplements(
+            DataFrame other,
+            ListIterable<String> thisJoinColumnNames,
+            ListIterable<String> thisAdditionalSortColumnNames,
+            ListIterable<String> otherJoinColumnNames,
+            ListIterable<String> otherAdditionalSortColumnNames)
+    {
+        return this.join(
+                other, JoinType.JOIN_WITH_COMPLEMENTS,
+                thisJoinColumnNames, thisAdditionalSortColumnNames,
+                otherJoinColumnNames, otherAdditionalSortColumnNames);
+    }
+
     // todo: do not override sort order (use external sort)
     private Triplet<DataFrame> join(
             DataFrame other,
             JoinType joinType,
             ListIterable<String> thisJoinColumnNames,
-            ListIterable<String> otherJoinColumnNames)
+            ListIterable<String> thisAdditionalSortColumnNames,
+            ListIterable<String> otherJoinColumnNames,
+            ListIterable<String> otherAdditionalSortColumnNames
+    )
     {
         DataFrame joined = this.cloneStructureAsStored(this.getName() + "_" + other.getName());
 
@@ -897,8 +962,8 @@ public class DataFrame
                 .reject(col -> otherJoinColumnNames.contains(col.getName()))
                 .forEach(col -> joined.addColumn(otherColumnNameMap.get(col.getName()), col.getType()));
 
-        this.sortBy(thisJoinColumnNames);
-        other.sortBy(otherJoinColumnNames);
+        this.sortBy(thisJoinColumnNames.toList().withAll(thisAdditionalSortColumnNames));
+        other.sortBy(otherJoinColumnNames.toList().withAll(otherAdditionalSortColumnNames));
 
         int thisRowIndex = 0;
         int otherRowIndex = 0;
@@ -963,7 +1028,7 @@ public class DataFrame
                     }
                     else if (joinType.isJoinWithComplements())
                     {
-                        thisComplementOther.copyRowFrom(this, thisMakeFinal);
+                        thisComplementOther.copyIndexedRowFrom(this, thisMakeFinal);
                     }
                     thisRowIndex++;
                 }
@@ -985,7 +1050,7 @@ public class DataFrame
                     }
                     else if (joinType.isJoinWithComplements())
                     {
-                        otherComplementThis.copyRowFrom(other, otherMakeFinal);
+                        otherComplementThis.copyIndexedRowFrom(other, otherMakeFinal);
                     }
                     otherRowIndex++;
                 }
@@ -1029,13 +1094,13 @@ public class DataFrame
         {
             while (thisRowIndex < thisRowCount)
             {
-                thisComplementOther.copyRowFrom(this, thisRowIndex);
+                thisComplementOther.copyIndexedRowFrom(this, thisRowIndex);
                 thisRowIndex++;
             }
 
             while (otherRowIndex < otherRowCount)
             {
-                otherComplementThis.copyRowFrom(other, otherRowIndex);
+                otherComplementThis.copyIndexedRowFrom(other, otherRowIndex);
                 otherRowIndex++;
             }
         }
@@ -1067,25 +1132,6 @@ public class DataFrame
         );
 
         return otherColumnNameMap;
-    }
-
-    /**
-     * Performs intersection and complement set operations between two data frames based on the provided keys and
-     * returns their results as a triplet of data frames.
-     * The result of the intersection is equivalent to inner join of two data frames, and the result of each complement
-     * is the subset of the rows of each data frame that does not have corresponding keys in the other data frame
-     * @param other                 the data frame to join to
-     * @param thisJoinColumnNames  the name of the columns in this data frame to use as the join keys
-     * @param otherJoinColumnNames the name of the columns in the other data frame to use as the join keys
-     * @return a triplet containing the complement of the other dataframe in this one, the joined dataframe, and the
-     * complement of this data frame in the other one
-     */
-    public Triplet<DataFrame> joinWithComplements(
-            DataFrame other,
-            ListIterable<String> thisJoinColumnNames,
-            ImmutableList<String> otherJoinColumnNames)
-    {
-        return this.join(other, JoinType.JOIN_WITH_COMPLEMENTS, thisJoinColumnNames, otherJoinColumnNames);
     }
 
     /**

@@ -40,6 +40,38 @@ public class DataFrameJoinTest
     }
 
     @Test
+    public void duplicateKeys()
+    {
+        DataFrame df1 = new DataFrame("df1")
+                .addStringColumn("Foo").addStringColumn("Bar").addLongColumn("Baz")
+                .addRow("Blinky", "pink",  7)
+                .addRow("Pinky",  "cyan",  8)
+                .addRow("Inky",   "cyan",  9)
+                .addRow("Clyde",  "pink", 10)
+                ;
+
+        DataFrame df2 = new DataFrame("df2")
+                .addStringColumn("Name").addStringColumn("Color").addLongColumn("Number")
+                .addRow("Grapefruit", "cyan", 2)
+                .addRow("Orange",     "pink", 4)
+                .addRow("Mint",       "cyan", 3)
+                .addRow("Apple",      "pink", 1)
+                ;
+
+        DataFrame joined = df1.join(df2, "Bar", "Color");
+
+        DataFrame expected = new DataFrame("expected")
+                .addStringColumn("Foo").addStringColumn("Bar").addLongColumn("Baz").addStringColumn("Name").addLongColumn("Number")
+                .addRow("Pinky",  "cyan",  8, "Grapefruit", 2)
+                .addRow("Inky",   "cyan",  9, "Mint",       3)
+                .addRow("Blinky", "pink",  7, "Orange",     4)
+                .addRow("Clyde",  "pink", 10, "Apple",      1)
+                ;
+
+        DataFrameUtil.assertEquals(expected, joined);
+    }
+
+    @Test
     public void multipleKeyJoin()
     {
         DataFrame df1 = new DataFrame("df1")
