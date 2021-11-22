@@ -4,7 +4,9 @@ import io.github.vmzakharov.ecdataframe.dataframe.DataFrame;
 import io.github.vmzakharov.ecdataframe.dataframe.DfColumn;
 import io.github.vmzakharov.ecdataframe.dataframe.DfDateColumn;
 import io.github.vmzakharov.ecdataframe.dataframe.DfDateColumnStored;
+import io.github.vmzakharov.ecdataframe.dataframe.DfDoubleColumn;
 import io.github.vmzakharov.ecdataframe.dataframe.DfDoubleColumnStored;
+import io.github.vmzakharov.ecdataframe.dataframe.DfLongColumn;
 import io.github.vmzakharov.ecdataframe.dataframe.DfLongColumnStored;
 import io.github.vmzakharov.ecdataframe.dataframe.DfStringColumnStored;
 import io.github.vmzakharov.ecdataframe.dataframe.ErrorReporter;
@@ -164,29 +166,35 @@ extends DataSetAbstract
     private void writeValue(Writer writer, DataFrame dataFrame, int rowIndex, int columnIndex)
     throws IOException
     {
-        DfColumn column = dataFrame.getColumnAt(columnIndex);
+        DfColumn dfColumn = dataFrame.getColumnAt(columnIndex);
+        CsvSchemaColumn schemaColumn = this.getSchema().columnAt(columnIndex);
 
         String valueAsLiteral;
-        switch (column.getType())
+        switch (dfColumn.getType())
         {
             case LONG:
+                long longValue = ((DfLongColumn) dfColumn).getLong(rowIndex);
+                valueAsLiteral = schemaColumn.getLongFormatter().format(longValue);
+                break;
             case DOUBLE:
-                valueAsLiteral = column.getValueAsStringLiteral(rowIndex);
+//                if (dfColumn.isNull(rowIndex)) {}
+                double doubleValue = ((DfDoubleColumn) dfColumn).getDouble(rowIndex);
+                valueAsLiteral = schemaColumn.getDoubleFormatter().format(doubleValue);
                 break;
             case STRING:
-                String stringValue = column.getValueAsString(rowIndex);
+                String stringValue = dfColumn.getValueAsString(rowIndex);
                 valueAsLiteral = stringValue == null ? "" : this.schema.getQuoteCharacter() + stringValue + this.schema.getQuoteCharacter();
                 break;
             case DATE:
-                LocalDate dateValue = ((DfDateColumn) column).getDate(rowIndex);
+                LocalDate dateValue = ((DfDateColumn) dfColumn).getDate(rowIndex);
                 valueAsLiteral = dateValue == null ? "" : this.formatterForColumn(columnIndex).format(dateValue);
                 break;
             default:
-                ErrorReporter.reportAndThrow("Do not know how to convert value of type " + column.getType() + " to a string");
+                ErrorReporter.reportAndThrow("Do not know how to convert value of type " + dfColumn.getType() + " to a string");
                 valueAsLiteral = null;
         }
 
-        assert valueAsLiteral != null;
+//        assert valueAsLiteral != null;
         writer.write(valueAsLiteral);
     }
 
@@ -540,10 +548,12 @@ extends DataSetAbstract
     {
         this.splitMindingQsInto(line, elements);
 
-        ErrorReporter.reportAndThrow(
-                this.getSchema().columnCount() != elements.size(),
-                "The number of columns in the schema does not match the number of elements in the data row " + 0
-                + " (" + this.getSchema().columnCount() + ", " + elements.size() + ")");
+        if (this.getSchema().columnCount() != elements.size())
+        {
+            ErrorReporter.reportAndThrow(
+                    "The number of columns in the schema does not match the number of elements in the data row " + 0
+                    + " (" + this.getSchema().columnCount() + ", " + elements.size() + ")");
+        }
 
         for (int i = 0; i < columnCount; i++)
         {

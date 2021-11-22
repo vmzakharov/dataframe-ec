@@ -253,7 +253,6 @@ public class DataFrameLoadTest
     @Test(expected = RuntimeException.class)
     public void schemaHeaderMismatchThrowsException()
     {
-
         CsvSchema schema = new CsvSchema();
         schema.addColumn("Name", STRING);
         schema.addColumn("Date", DATE, "d-MMM-uuuu");

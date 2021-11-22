@@ -1,10 +1,17 @@
 package io.github.vmzakharov.ecdataframe.dataset;
 
 import io.github.vmzakharov.ecdataframe.dsl.value.ValueType;
+import org.eclipse.collections.api.block.function.Function;
+import org.eclipse.collections.api.block.function.primitive.DoubleFunction;
+import org.eclipse.collections.api.block.function.primitive.LongFunction;
+import org.eclipse.collections.impl.utility.StringIterate;
 
+import java.text.DecimalFormat;
+import java.text.ParseException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.ResolverStyle;
+import java.util.regex.Pattern;
 
 public class CsvSchemaColumn
 {
@@ -14,6 +21,8 @@ public class CsvSchemaColumn
 
     transient private final CsvSchema csvSchema;
     transient private DateTimeFormatter dateTimeFormatter;
+    transient private DoubleFormatter doubleFormatter;
+    transient private LongFormatter longFormatter;
 
     public CsvSchemaColumn(CsvSchema newCsvSchema, String newName, ValueType newType, String newPattern)
     {
@@ -25,6 +34,14 @@ public class CsvSchemaColumn
         if (this.type.isDate() || this.type.isDateTime())
         {
             this.dateTimeFormatter = DateTimeFormatter.ofPattern(this.pattern).withResolverStyle(ResolverStyle.STRICT);
+        }
+        else if (this.type.isDouble())
+        {
+            this.doubleFormatter = new DoubleFormatter(this.pattern);
+        }
+        else if (this.type.isLong())
+        {
+            this.longFormatter = new LongFormatter(this.pattern);
         }
     }
 
@@ -57,26 +74,26 @@ public class CsvSchemaColumn
 
     public double parseAsDouble(String aString)
     {
-        if (aString == null || aString.isEmpty())
-        {
-            return 0.0;
-        }
-
-        return Double.parseDouble(aString);
+        return this.doubleFormatter.parseAsDouble(aString);
     }
 
     public long parseAsLong(String aString)
     {
-        if (aString == null || aString.isEmpty())
-        {
-            return 0L;
-        }
-
-        return Long.parseLong(aString);
+        return this.longFormatter.parseAsLong(aString);
     }
 
     public String parseAsString(String aString)
     {
         return this.csvSchema.stripQuotesIfAny(aString);
+    }
+
+    public DoubleFormatter getDoubleFormatter()
+    {
+        return this.doubleFormatter;
+    }
+
+    public LongFormatter getLongFormatter()
+    {
+        return this.longFormatter;
     }
 }
