@@ -79,7 +79,7 @@ public class FormattedColumnsTest
                 + "\"Carl\",\"$101.01\",\"0\",\"A\"\n"
                 + "\"Diane\",\"$100.00\",\"0\",\"A\"\n"
                 + "\"Ed\",\"($100.15)\",\"0\",\"A\"\n"
-                + "\"Frank\",\"$1,100.15\",\"0\",\"A\""
+                + "\"Frank\",\"$1,100.15\",\"0\",\"A\"\n"
                 ,
                 dataSet.getWrittenData()
         );
