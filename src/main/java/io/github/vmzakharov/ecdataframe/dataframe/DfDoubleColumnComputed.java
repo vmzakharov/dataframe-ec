@@ -82,4 +82,10 @@ implements DfColumnComputed
     {
         this.throwUnmodifiableColumnException();
     }
+
+    @Override
+    public boolean isNull(int rowIndex)
+    {
+        return this.getObject(rowIndex) == null;
+    }
 }

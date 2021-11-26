@@ -62,6 +62,12 @@ extends DfColumnAbstract
     protected abstract void addAllItems(ListIterable<LocalDate> items);
 
     @Override
+    public boolean isNull(int rowIndex)
+    {
+        return this.getDate(rowIndex) == null;
+    }
+
+    @Override
     public DfColumn mergeWithInto(DfColumn other, DataFrame target)
     {
         DfDateColumn mergedCol = (DfDateColumn) this.validateAndCreateTargetColumn(other, target);

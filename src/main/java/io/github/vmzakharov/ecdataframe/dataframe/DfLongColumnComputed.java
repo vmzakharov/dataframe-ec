@@ -52,6 +52,12 @@ implements DfColumnComputed
     }
 
     @Override
+    public boolean isNull(int rowIndex)
+    {
+        return this.getObject(rowIndex) == null;
+    }
+
+    @Override
     public Number aggregate(AggregateFunction aggregateFunction)
     {
         if (this.getSize() == 0)

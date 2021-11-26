@@ -15,6 +15,8 @@ public interface DfColumn
 
     String getValueAsStringLiteral(int rowIndex);
 
+    boolean isNull(int rowIndex);
+
     Object getObject(int rowIndex);
 
     DataFrame getDataFrame();

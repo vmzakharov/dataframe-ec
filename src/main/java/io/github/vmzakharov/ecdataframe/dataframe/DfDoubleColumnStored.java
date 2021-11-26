@@ -62,7 +62,12 @@ implements DfColumnStored
     @Override
     public Object getObject(int rowIndex)
     {
-        return this.getDouble(rowIndex);
+        if (this.isNull(rowIndex))
+        {
+            return null;
+        }
+
+        return this.getDoubleWithoutNullCheck(rowIndex);
     }
 
     public double getDouble(int rowIndex)
@@ -72,6 +77,11 @@ implements DfColumnStored
             throw new NullPointerException("Null value at " + this.getName() + "[" + rowIndex + "]");
         }
 
+        return this.getDoubleWithoutNullCheck(rowIndex);
+    }
+
+    private double getDoubleWithoutNullCheck(int rowIndex)
+    {
         return this.values.get(rowIndex);
     }
 
@@ -115,7 +125,6 @@ implements DfColumnStored
     public void addEmptyValue()
     {
         this.values.add(Double.NaN);
-//        this.values.add(0.0);
     }
 
     @Override
@@ -134,7 +143,8 @@ implements DfColumnStored
         this.values = DoubleLists.mutable.withInitialCapacity(newCapacity);
     }
 
-    private boolean isNull(int rowIndex)
+    @Override
+    public boolean isNull(int rowIndex)
     {
         return Double.isNaN(this.values.get(rowIndex));
     }

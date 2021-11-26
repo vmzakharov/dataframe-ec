@@ -79,6 +79,11 @@ extends BinaryOp
 
     default Value apply(Value operand1, Value operand2)
     {
+        if (operand1.isVoid() || operand2.isVoid())
+        {
+            return Value.VOID;
+        }
+
         return operand1.apply(operand2, this);
     }
 

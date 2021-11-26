@@ -10,6 +10,10 @@ extends BinaryOp
 {
     default BooleanValue apply(Value operand1, Value operand2)
     {
+        if (operand1.isVoid() || operand2.isVoid())
+        {
+            throw new NullPointerException("Cannot apply a comparison operation to null values");
+        }
         return operand1.applyPredicate(operand2, this);
     }
 

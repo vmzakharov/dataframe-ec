@@ -36,6 +36,12 @@ extends DfColumnAbstract
     }
 
     @Override
+    public boolean isNull(int rowIndex)
+    {
+        return this.getObject(rowIndex) == null;
+    }
+
+    @Override
     public Value getValue(int rowIndex)
     {
         return new StringValue(this.getString(rowIndex));

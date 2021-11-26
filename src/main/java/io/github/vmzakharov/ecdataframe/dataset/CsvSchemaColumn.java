@@ -1,5 +1,8 @@
 package io.github.vmzakharov.ecdataframe.dataset;
 
+import io.github.vmzakharov.ecdataframe.dataframe.DfColumn;
+import io.github.vmzakharov.ecdataframe.dataframe.DfDoubleColumnStored;
+import io.github.vmzakharov.ecdataframe.dataframe.DfLongColumnStored;
 import io.github.vmzakharov.ecdataframe.dsl.value.ValueType;
 import org.eclipse.collections.api.block.function.Function;
 import org.eclipse.collections.api.block.function.primitive.DoubleFunction;
@@ -72,14 +75,26 @@ public class CsvSchemaColumn
         return trimmed.isEmpty() ? null : LocalDate.parse(trimmed, this.dateTimeFormatter);
     }
 
-    public double parseAsDouble(String aString)
+    public void parseAsDoubleAndAdd(String aString, DfColumn dfColumn)
     {
-        return this.doubleFormatter.parseAsDouble(aString);
+        if (aString == null)
+        {
+            dfColumn.addEmptyValue();
+            return;
+        }
+
+        ((DfDoubleColumnStored) dfColumn).addDouble(this.doubleFormatter.parseAsDouble(aString));
     }
 
-    public long parseAsLong(String aString)
+    public void parseAsLongAndAdd(String aString, DfColumn dfColumn)
     {
-        return this.longFormatter.parseAsLong(aString);
+        if (aString == null)
+        {
+            dfColumn.addEmptyValue();
+            return;
+        }
+
+        ((DfLongColumnStored) dfColumn).addLong(this.longFormatter.parseAsLong(aString));
     }
 
     public String parseAsString(String aString)

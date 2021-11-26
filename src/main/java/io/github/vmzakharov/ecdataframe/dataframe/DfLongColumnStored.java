@@ -48,9 +48,10 @@ implements DfColumnStored
     {
         if (this.nullsAreEnabled() && this.isNull(rowIndex))
         {
-            throw new NullPointerException();
+            throw new NullPointerException("Null value at " + this.getName() + "[" + rowIndex + "]");
         }
-        return this.values.get(rowIndex);
+
+        return this.getLongWithoutNullCheck(rowIndex);
     }
 
     @Override
@@ -135,7 +136,23 @@ implements DfColumnStored
         }
     }
 
-    private boolean isNull(int rowIndex)
+    public Object getObject(int rowIndex)
+    {
+        if (this.isNull(rowIndex))
+        {
+            return null;
+        }
+
+        return this.getLongWithoutNullCheck(rowIndex);
+    }
+
+    private long getLongWithoutNullCheck(int rowIndex)
+    {
+        return this.values.get(rowIndex);
+    }
+
+    @Override
+    public boolean isNull(int rowIndex)
     {
         return this.nullsEnabled && this.nullMap.get(rowIndex);
     }

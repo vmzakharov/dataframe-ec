@@ -417,27 +417,27 @@ extends DataSetAbstract
         return aString;
     }
 
-    private void addDataFrameColumn(DataFrame df, CsvSchemaColumn col, MutableList<Procedure<String>> columnPopulators)
+    private void addDataFrameColumn(DataFrame df, CsvSchemaColumn schemaCol, MutableList<Procedure<String>> columnPopulators)
     {
-        ValueType columnType = col.getType();
+        ValueType columnType = schemaCol.getType();
 
-        df.addColumn(col.getName(), col.getType());
+        df.addColumn(schemaCol.getName(), schemaCol.getType());
 
         DfColumn lastColumn = df.getColumnAt(df.columnCount() - 1);
 
         switch (columnType)
         {
             case LONG:
-                columnPopulators.add(s -> ((DfLongColumnStored) lastColumn).addLong(col.parseAsLong(s)));
+                columnPopulators.add(s -> schemaCol.parseAsLongAndAdd(s, lastColumn));
                 break;
             case DOUBLE:
-                columnPopulators.add(s -> ((DfDoubleColumnStored) lastColumn).addDouble(col.parseAsDouble(s)));
+                columnPopulators.add(s -> schemaCol.parseAsDoubleAndAdd(s, lastColumn));
                 break;
             case STRING:
-                columnPopulators.add(s -> ((DfStringColumnStored) lastColumn).addString(col.parseAsString(s)));
+                columnPopulators.add(s -> ((DfStringColumnStored) lastColumn).addString(schemaCol.parseAsString(s)));
                 break;
             case DATE:
-                columnPopulators.add(s -> ((DfDateColumnStored) lastColumn).addDate(col.parseAsLocalDate(s)));
+                columnPopulators.add(s -> ((DfDateColumnStored) lastColumn).addDate(schemaCol.parseAsLocalDate(s)));
                 break;
             default:
                 throw new RuntimeException("Don't know what to do with the column type: " + columnType);
@@ -472,7 +472,8 @@ extends DataSetAbstract
 
                 ValueType guessedType;
 
-                if (element.isEmpty())
+                // element can be null if it is a null marker or if it and empty element (0-length)
+                if (element == null || element.isEmpty())
                 {
                     continue;
                 }

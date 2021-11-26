@@ -223,7 +223,6 @@ public class DataFrameLoadTest
         DataFrame loaded = dataSet.loadAsDataFrame();
 
         Assert.assertNotNull(loaded);
-        Assert.fail("Didn't throw");
     }
 
     @Test(expected = RuntimeException.class)
@@ -246,8 +245,7 @@ public class DataFrameLoadTest
 
         DataFrame loaded = dataSet.loadAsDataFrame();
 
-        Assert.assertNotNull(loaded);
-        Assert.fail("Didn't throw");
+        Assert.assertNotNull(loaded);;
     }
 
     @Test(expected = RuntimeException.class)
@@ -269,7 +267,6 @@ public class DataFrameLoadTest
         DataFrame loaded = dataSet.loadAsDataFrame();
 
         Assert.assertNotNull(loaded);
-        Assert.fail("Didn't throw");
     }
 
     @Test
@@ -298,7 +295,7 @@ public class DataFrameLoadTest
         DataFrame expected = new DataFrame("Expected")
                 .addStringColumn("Name").addLongColumn("EmployeeId").addDateColumn("HireDate").addDoubleColumn("Salary")
                 .addRow("Alice", 1234, LocalDate.of(2020, 1, 1), 110000.0)
-                .addRow("Bob", 1233, LocalDate.of(2010, 1, 1), 0.0)
+                .addRow("Bob", 1233, LocalDate.of(2010, 1, 1), null)
                 .addRow("Carl", 0, LocalDate.of(2005, 11, 21), 130000.0)
                 .addRow("Diane", 10001, LocalDate.of(2012, 9, 20), 130000.0)
                 .addRow("Ed", 10002, null, 0.0);
@@ -648,5 +645,39 @@ public class DataFrameLoadTest
         Assert.assertEquals(DOUBLE, typeByName.get("Salary"));
         Assert.assertEquals(STRING, typeByName.get("All Empty"));
         Assert.assertEquals(STRING, typeByName.get("MaybeNumber"));
+    }
+
+    @Test
+    public void loadNulls()
+    {
+        CsvSchema schema = new CsvSchema();
+        schema.addColumn("Name", STRING);
+        schema.addColumn("EmployeeId", LONG);
+        schema.addColumn("HireDate", DATE, "uuuu-M-d");
+        schema.addColumn("Dept", STRING);
+        schema.addColumn("Salary", DOUBLE);
+
+        CsvDataSet dataSet = new StringBasedCsvDataSet("Foo", "Employees", schema,
+                "Name,EmployeeId,HireDate,Dept,Salary\n"
+                        + "\"Diane\",10001,2012-09-20,\"\",\n"
+                        + "\"Alice\",1234,2020-01-01,\"Accounting\",110000.00\n"
+                        + "\"Bob\",1233,2010-01-01,\"Bee-bee-boo-boo\",100000.00\n"
+                        + "\"Carl\",,2005-11-21,\"Controllers\",130000.00\n"
+                        + "\"Ed\",10002,,,0.00"
+        );
+
+        dataSet.convertEmptyElementsToNulls();
+
+        DataFrame loaded = dataSet.loadAsDataFrame();
+
+        DataFrame expected = new DataFrame("Expected")
+                .addStringColumn("Name").addLongColumn("EmployeeId").addDateColumn("HireDate").addStringColumn("Dept").addDoubleColumn("Salary")
+                .addRow("Diane", 10001, LocalDate.of(2012, 9, 20), "", null)
+                .addRow("Alice", 1234, LocalDate.of(2020, 1, 1), "Accounting", 110000.0)
+                .addRow("Bob", 1233, LocalDate.of(2010, 1, 1), "Bee-bee-boo-boo", 100000.0)
+                .addRow("Carl", null, LocalDate.of(2005, 11, 21), "Controllers", 130000.0)
+                .addRow("Ed", 10002, null, null, 0.0);
+
+        DataFrameUtil.assertEquals(expected, loaded);
     }
 }
