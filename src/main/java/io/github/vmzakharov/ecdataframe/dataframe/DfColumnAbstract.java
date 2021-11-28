@@ -25,7 +25,7 @@ implements DfColumn
     @Override
     public String getValueAsStringLiteral(int rowIndex)
     {
-        return this.getValueAsString(rowIndex);
+        return this.isNull(rowIndex) ? "" : this.getValueAsString(rowIndex);
     }
 
     @Override

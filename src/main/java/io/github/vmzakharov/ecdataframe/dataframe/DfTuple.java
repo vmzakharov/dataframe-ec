@@ -47,18 +47,22 @@ implements Comparable<DfTuple>
 
             if (thisItem == null)
             {
-                return (thatItem == null) ? 0 : -1;
+                if (thatItem != null)
+                {
+                    return -1;
+                }
             }
-
-            if (thatItem == null)
+            else if (thatItem == null)
             {
                 return 1;
             }
-
-            int result = ((Comparable) thisItem).compareTo(thatItem);
-            if (result != 0)
+            else
             {
-                return result;
+                int result = ((Comparable) thisItem).compareTo(thatItem);
+                if (result != 0)
+                {
+                    return result;
+                }
             }
         }
 

@@ -94,7 +94,7 @@ public class CsvSchemaColumn
             return;
         }
 
-        ((DfLongColumnStored) dfColumn).addLong(this.longFormatter.parseAsLong(aString));
+        ((DfLongColumnStored) dfColumn).addLong(this.longFormatter.parseAsLong(aString), false);
     }
 
     public String parseAsString(String aString)

@@ -173,7 +173,7 @@ public class DataFrame
     {
         StringBuilder s = new StringBuilder();
 
-        s.append(this.columns.collect(DfColumn::getName).makeString());
+        s.append(this.columns.collect(DfColumn::getName).makeString(","));
         s.append('\n');
 
         int columnCount = this.columnCount();
@@ -187,7 +187,7 @@ public class DataFrame
             {
                 row[columnIndex] = this.getValueAsStringLiteral(rowIndex, columnIndex);
             }
-            s.append(ArrayIterate.makeString(row));
+            s.append(ArrayIterate.makeString(row, ","));
             s.append('\n');
         }
 
@@ -495,8 +495,7 @@ public class DataFrame
 
         ListIterable<DfColumn> accumulatorColumns = aggregators
                 .collect(AggregateFunction::getTargetColumnName)
-                .collect(aggregatedDataFrame::getColumnNamed)
-                .tap(DfColumn::enableNulls);
+                .collect(aggregatedDataFrame::getColumnNamed);
 
         DfUniqueIndex index = new DfUniqueIndex(aggregatedDataFrame, columnsToGroupByNames);
 

@@ -60,6 +60,95 @@ public class DataFrameSortTest
     }
 
     @Test
+    public void oneColumnSortWithNullValues()
+    {
+        DataFrame dataFrame = new DataFrame("FrameOfData")
+                .addStringColumn("Name").addStringColumn("Foo").addLongColumn("Bar").addDoubleColumn("Baz")
+                .addRow("Alice",  null,  11L, 10.0)
+                .addRow(null,     "Xyz",  14L, 14.0)
+                .addRow("Albert", "Def",  12L, 12.0)
+                .addRow("Bob",    null,  13L, 13.0)
+                .addRow(null,     "Def",  15L, 15.0)
+                ;
+
+        dataFrame.sortBy(Lists.immutable.of("Name"));
+
+        DataFrame expected = new DataFrame("Expected Sorted By Name")
+                .addStringColumn("Name").addStringColumn("Foo").addLongColumn("Bar").addDoubleColumn("Baz")
+                .addRow(null,     "Xyz", 14L, 14.0)
+                .addRow(null,     "Def", 15L, 15.0)
+                .addRow("Albert", "Def", 12L, 12.0)
+                .addRow("Alice",  null,  11L, 10.0)
+                .addRow("Bob",    null,  13L, 13.0)
+                ;
+
+        DataFrameUtil.assertEquals(expected, dataFrame);
+
+        dataFrame.sortBy(Lists.immutable.of("Foo"));
+
+        expected = new DataFrame("Expected Re-Sorted By Foo")
+                .addStringColumn("Name").addStringColumn("Foo").addLongColumn("Bar").addDoubleColumn("Baz")
+                .addRow("Alice",  null,  11L, 10.0)
+                .addRow("Bob",    null,  13L, 13.0)
+                .addRow("Albert", "Def", 12L, 12.0)
+                .addRow(null,     "Def", 15L, 15.0)
+                .addRow(null,     "Xyz", 14L, 14.0)
+        ;
+
+        DataFrameUtil.assertEquals(expected, dataFrame);
+
+        dataFrame.unsort();
+
+        DataFrame expectedUnsorted = new DataFrame("Unsorted FrameOfData")
+                .addStringColumn("Name").addStringColumn("Foo").addLongColumn("Bar").addDoubleColumn("Baz")
+                .addRow("Alice",  null,  11L, 10.0)
+                .addRow(null,     "Xyz",  14L, 14.0)
+                .addRow("Albert", "Def",  12L, 12.0)
+                .addRow("Bob",    null,  13L, 13.0)
+                .addRow(null,     "Def",  15L, 15.0)
+                ;
+
+        DataFrameUtil.assertEquals(expectedUnsorted, dataFrame);
+    }
+
+    @Test
+    public void multiColumnSortWithNullValues()
+    {
+        DataFrame dataFrame = new DataFrame("FrameOfData")
+                .addStringColumn("Name").addStringColumn("Foo").addLongColumn("Bar").addDoubleColumn("Baz").addDoubleColumn("Qux")
+                .addRow("Abigail", "456", 11L,  10.0, 20.0)
+                .addRow("Carol",   "Xyz", 15L,  28.0, 40.0)
+                .addRow(null,      "123", 15L,  15.0, 10.0)
+                .addRow("Bob",     "Def", 13L,  13.0, 25.0)
+                .addRow("Carol",   "Zzz", null, 14.0, 40.0)
+                .addRow(null,      "789", null, 12.0, 11.0)
+                .addRow(null,      "Yyy", null, null, 11.0)
+                ;
+
+        dataFrame.sortBy(Lists.immutable.of("Name", "Bar", "Baz"));
+
+        DataFrame expected = new DataFrame("Expected FrameOfData")
+                .addStringColumn("Name").addStringColumn("Foo").addLongColumn("Bar").addDoubleColumn("Baz").addDoubleColumn("Qux")
+                .addRow(null,      "Yyy", null, null, 11.0)
+                .addRow(null,      "789", null, 12.0, 11.0)
+                .addRow(null,      "123", 15L,  15.0, 10.0)
+                .addRow("Abigail", "456", 11L,  10.0, 20.0)
+                .addRow("Bob",     "Def", 13L,  13.0, 25.0)
+                .addRow("Carol",   "Zzz", null, 14.0, 40.0)
+                .addRow("Carol",   "Xyz", 15L,  28.0, 40.0)
+                ;
+
+        DataFrameUtil.assertEquals(expected, dataFrame);
+
+        Assert.assertEquals(15.0, dataFrame.getObject("Baz", 2));
+        Assert.assertEquals(15.0, dataFrame.getDouble("Baz", 2), 0.000001);
+        Assert.assertEquals(0, new DoubleValue(15.0).compareTo(dataFrame.getValue("Baz", 2)));
+
+        Assert.assertEquals(15.0, dataFrame.getObject(2, 3));
+        Assert.assertEquals(0, new DoubleValue(15.0).compareTo(dataFrame.getValue(2, 3)));
+    }
+
+    @Test
     public void multiColumnSort()
     {
         DataFrame dataFrame = new DataFrame("FrameOfData")

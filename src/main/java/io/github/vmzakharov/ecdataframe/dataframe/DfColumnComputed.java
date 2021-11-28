@@ -50,6 +50,6 @@ extends DfColumn
 
     default void throwUnmodifiableColumnException()
     {
-        throw new UnsupportedOperationException("Cannot modify computed column '" + this.getName() + "'");
+        throw new UnsupportedOperationException("Cannot directly modify computed column '" + this.getName() + "'");
     }
 }

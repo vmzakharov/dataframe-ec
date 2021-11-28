@@ -13,8 +13,8 @@ public class DfLongColumnStored
 extends DfLongColumn
 implements DfColumnStored
 {
-    private boolean nullsEnabled = false;
-    private MutableBooleanList nullMap = null;
+    static private final long NULL_FILLER = Long.MIN_VALUE; // not the actual null marker, but makes debugging easier
+    private MutableBooleanList nullMap = BooleanLists.mutable.of();
 
     private MutableLongList values = LongLists.mutable.of();
 
@@ -28,7 +28,11 @@ implements DfColumnStored
     {
         if (value.isLong())
         {
-            this.addLong(((LongValue) value).longValue());
+            this.addLong(((LongValue) value).longValue(), false);
+        }
+        else if (value.isVoid())
+        {
+            this.addEmptyValue();
         }
         else
         {
@@ -39,14 +43,15 @@ implements DfColumnStored
         }
     }
 
-    public void addLong(long aLong)
+    public void addLong(long aLong, boolean isNullValue)
     {
         this.values.add(aLong);
+        this.nullMap.add(isNullValue);
     }
 
     public long getLong(int rowIndex)
     {
-        if (this.nullsAreEnabled() && this.isNull(rowIndex))
+        if (this.isNull(rowIndex))
         {
             throw new NullPointerException("Null value at " + this.getName() + "[" + rowIndex + "]");
         }
@@ -71,16 +76,13 @@ implements DfColumnStored
     {
         if (newObject == null)
         {
-            this.addLong(0L);
-
-            if (this.nullsAreEnabled())
-            {
-                this.nullMap.add(true);
-            }
+            this.values.add(NULL_FILLER);
+            this.nullMap.add(true);
         }
         else
         {
-            this.addLong(((Number) newObject).longValue());
+            this.values.add(((Number) newObject).longValue());
+            this.nullMap.add(false);
         }
     }
 
@@ -95,8 +97,8 @@ implements DfColumnStored
     {
         if (anObject == null)
         {
+            this.values.set(rowIndex, NULL_FILLER);
             this.setNull(rowIndex);
-            this.values.set(rowIndex, 0L);
         }
         else
         {
@@ -122,18 +124,12 @@ implements DfColumnStored
 
     private void clearNull(int rowIndex)
     {
-        if (this.nullsAreEnabled())
-        {
-            this.nullMap.set(rowIndex, false);
-        }
+        this.nullMap.set(rowIndex, false);
     }
 
     private void setNull(int rowIndex)
     {
-        if (this.nullsAreEnabled())
-        {
-            this.nullMap.set(rowIndex, true);
-        }
+        this.nullMap.set(rowIndex, true);
     }
 
     public Object getObject(int rowIndex)
@@ -154,45 +150,31 @@ implements DfColumnStored
     @Override
     public boolean isNull(int rowIndex)
     {
-        return this.nullsEnabled && this.nullMap.get(rowIndex);
+        return this.nullMap.get(rowIndex);
     }
 
     @Override
     public void addEmptyValue()
     {
-        this.values.add(0L);
-
-        if (this.nullsEnabled)
-        {
-            this.nullMap.add(true);
-        }
+        this.values.add(NULL_FILLER);
+        this.nullMap.add(true);
     }
 
     @Override
     public void ensureCapacity(int newCapacity)
     {
         this.values = LongLists.mutable.withInitialCapacity(newCapacity);
+        this.nullMap = BooleanLists.mutable.withInitialCapacity(newCapacity);
     }
 
-    protected void addAllItems(LongIterable items)
+    @Override
+    protected void addAllItemsFrom(DfLongColumn longColumn)
     {
-        this.values.addAll(items);
-    }
-
-    public void enableNulls()
-    {
-        this.nullsEnabled = true;
-        this.nullMap = BooleanLists.mutable.withInitialCapacity(this.getSize());
-    }
-
-    public void disableNulls()
-    {
-        this.nullsEnabled = false;
-        this.nullMap = null;
-    }
-
-    public boolean nullsAreEnabled()
-    {
-        return this.nullsEnabled;
+        int size = longColumn.getSize();
+        for (int rowIndex = 0; rowIndex < size; rowIndex++)
+        {
+            this.values.add(longColumn.getLong(rowIndex));
+            this.nullMap.add(longColumn.isNull(rowIndex));
+        }
     }
 }

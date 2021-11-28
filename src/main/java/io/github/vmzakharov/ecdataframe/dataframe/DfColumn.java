@@ -47,11 +47,6 @@ public interface DfColumn
         return null; // will not get here
     }
 
-    default void enableNulls()
-    {
-        // noop by default
-    }
-
     void applyAggregator(int targetRowIndex, DfColumn sourceColumn, int sourceRowIndex, AggregateFunction aggregateFunction);
 
     DfColumn cloneSchemaAndAttachTo(DataFrame attachTo);

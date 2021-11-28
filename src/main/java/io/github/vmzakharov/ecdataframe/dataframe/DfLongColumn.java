@@ -44,7 +44,7 @@ extends DfColumnAbstract
     @Override
     public void addRowToColumn(int rowIndex, DfColumn target)
     {
-        ((DfLongColumnStored) target).addLong(this.getLong(rowIndex));
+        ((DfLongColumnStored) target).addLong(this.getLong(rowIndex), this.isNull(rowIndex));
     }
 
     @Override
@@ -52,11 +52,11 @@ extends DfColumnAbstract
     {
         DfLongColumn mergedCol = (DfLongColumn) this.validateAndCreateTargetColumn(other, target);
 
-        mergedCol.addAllItems(this.toLongList());
-        mergedCol.addAllItems(((DfLongColumn) other).toLongList());
+        mergedCol.addAllItemsFrom(this);
+        mergedCol.addAllItemsFrom((DfLongColumn) other);
 
         return mergedCol;
     }
 
-    protected abstract void addAllItems(LongIterable items);
+    protected abstract void addAllItemsFrom(DfLongColumn items);
 }

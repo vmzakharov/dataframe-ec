@@ -441,7 +441,7 @@ public class DataFrameJoinTest
 
         DataFrame expected = new DataFrame("expected")
                 .addStringColumn("Foo").addStringColumn("Bar").addLongColumn("Baz").addStringColumn("Name").addLongColumn("Number")
-                .addRow("Inky",   "cyan",    9, null,         0)
+                .addRow("Inky",   "cyan",    9, null,         null)
                 .addRow("Clyde",  "orange", 10, "Orange",     4)
                 .addRow(null,     "pink", null, "Grapefruit", 2)
                 .addRow("Blinky", "red",     7, "Apple",      1)
@@ -470,10 +470,10 @@ public class DataFrameJoinTest
 
         DataFrame expected = new DataFrame("expected")
                 .addStringColumn("Foo").addStringColumn("Bar").addLongColumn("Baz").addStringColumn("Name").addLongColumn("Number")
-                .addRow("Inky",   "cyan",    9, null,         0)
+                .addRow("Inky",   "cyan",    9, null,         null)
                 .addRow("Clyde",  "orange", 10, "Orange",     4)
                 .addRow(null,     "pink", null, "Grapefruit", 2)
-                .addRow(null,     "red",     0, "Apple",      1)
+                .addRow(null,     "red",  null, "Apple",      1)
                 ;
 
         DataFrameUtil.assertEquals(expected, joined);
@@ -503,7 +503,7 @@ public class DataFrameJoinTest
                 .addRow("Inky",   "cyan",    9, "Mint",       3)
                 .addRow("Clyde",  "orange", 10, "Orange",     4)
                 .addRow(null,     "pink", null, "Grapefruit", 2)
-                .addRow("Blinky", "red",     7, null,         0)
+                .addRow("Blinky", "red",     7, null,         null)
                 ;
 
         DataFrameUtil.assertEquals(expected, joined);
