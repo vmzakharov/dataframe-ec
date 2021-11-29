@@ -4,17 +4,10 @@ import io.github.vmzakharov.ecdataframe.dataframe.DfColumn;
 import io.github.vmzakharov.ecdataframe.dataframe.DfDoubleColumnStored;
 import io.github.vmzakharov.ecdataframe.dataframe.DfLongColumnStored;
 import io.github.vmzakharov.ecdataframe.dsl.value.ValueType;
-import org.eclipse.collections.api.block.function.Function;
-import org.eclipse.collections.api.block.function.primitive.DoubleFunction;
-import org.eclipse.collections.api.block.function.primitive.LongFunction;
-import org.eclipse.collections.impl.utility.StringIterate;
 
-import java.text.DecimalFormat;
-import java.text.ParseException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.ResolverStyle;
-import java.util.regex.Pattern;
 
 public class CsvSchemaColumn
 {

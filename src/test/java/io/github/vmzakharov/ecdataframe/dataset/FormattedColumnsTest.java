@@ -184,7 +184,7 @@ public class FormattedColumnsTest
         }
         catch (ParseException e)
         {
-            throw new RuntimeException("failed to parse '" + source +"'", e);
+            throw new RuntimeException("failed to parse '" + source + "'", e);
         }
     }
 

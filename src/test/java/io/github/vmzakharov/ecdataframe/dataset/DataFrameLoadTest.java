@@ -245,7 +245,7 @@ public class DataFrameLoadTest
 
         DataFrame loaded = dataSet.loadAsDataFrame();
 
-        Assert.assertNotNull(loaded);;
+        Assert.assertNotNull(loaded);
     }
 
     @Test(expected = RuntimeException.class)

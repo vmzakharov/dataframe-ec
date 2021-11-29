@@ -136,6 +136,38 @@ public class DataFrameJoinTest
     }
 
     @Test
+    public void multipleKeyJoinWithNulls()
+    {
+        DataFrame df1 = new DataFrame("df1")
+                .addStringColumn("Foo").addStringColumn("Bar").addLongColumn("Baz")
+                .addRow("Blinky", null,     7)
+                .addRow("Pinky",  null,     null)
+                .addRow("Inky",   "cyan",   9)
+                .addRow("Clyde",  "orange", null)
+                ;
+
+        DataFrame df2 = new DataFrame("df2")
+                .addStringColumn("Name").addStringColumn("Color").addLongColumn("Number")
+                .addRow("Grapefruit", null,      null)
+                .addRow("Orange",     "orange",  null)
+                .addRow("Mint",       "cyan",    9)
+                .addRow("Apple",      null,      7)
+                ;
+
+        DataFrame joined = df1.join(df2, Lists.immutable.of("Bar", "Baz"), Lists.immutable.of("Color", "Number"));
+
+        DataFrame expected = new DataFrame("expected")
+                .addStringColumn("Foo").addStringColumn("Bar").addLongColumn("Baz").addStringColumn("Name")
+                .addRow("Pinky",  null,     null, "Grapefruit")
+                .addRow("Blinky", null,        7,      "Apple")
+                .addRow("Inky",   "cyan",      9,       "Mint")
+                .addRow("Clyde",  "orange", null,     "Orange")
+                ;
+
+        DataFrameUtil.assertEquals(expected, joined);
+    }
+
+    @Test
     public void multipleKeyJoinWithMismatchedKeys()
     {
         DataFrame df1 = new DataFrame("df1")

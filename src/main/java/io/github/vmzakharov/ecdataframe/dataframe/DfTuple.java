@@ -14,6 +14,20 @@ implements Comparable<DfTuple>
         this.items = newItems;
     }
 
+    public static int compareMindingNulls(Object thisItem, Object thatItem)
+    {
+        if (thisItem == null)
+        {
+            return thatItem == null ? 0 : -1;
+        }
+        else if (thatItem == null)
+        {
+            return 1;
+        }
+
+        return ((Comparable) thisItem).compareTo(thatItem);
+    }
+
     @Override
     public boolean equals(Object o)
     {
@@ -42,27 +56,10 @@ implements Comparable<DfTuple>
 
         for (int i = 0; i < these.length; i++)
         {
-            Object thisItem = these[i];
-            Object thatItem = others[i];
-
-            if (thisItem == null)
+            int result = compareMindingNulls(these[i], others[i]);
+            if (result != 0)
             {
-                if (thatItem != null)
-                {
-                    return -1;
-                }
-            }
-            else if (thatItem == null)
-            {
-                return 1;
-            }
-            else
-            {
-                int result = ((Comparable) thisItem).compareTo(thatItem);
-                if (result != 0)
-                {
-                    return result;
-                }
+                return result;
             }
         }
 

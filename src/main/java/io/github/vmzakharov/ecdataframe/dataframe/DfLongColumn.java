@@ -3,7 +3,6 @@ package io.github.vmzakharov.ecdataframe.dataframe;
 import io.github.vmzakharov.ecdataframe.dsl.value.LongValue;
 import io.github.vmzakharov.ecdataframe.dsl.value.Value;
 import io.github.vmzakharov.ecdataframe.dsl.value.ValueType;
-import org.eclipse.collections.api.LongIterable;
 import org.eclipse.collections.api.list.primitive.ImmutableLongList;
 
 abstract public class DfLongColumn
@@ -44,7 +43,14 @@ extends DfColumnAbstract
     @Override
     public void addRowToColumn(int rowIndex, DfColumn target)
     {
-        ((DfLongColumnStored) target).addLong(this.getLong(rowIndex), this.isNull(rowIndex));
+        if (this.isNull(rowIndex))
+        {
+            target.addEmptyValue();
+        }
+        else
+        {
+            ((DfLongColumnStored) target).addLong(this.getLong(rowIndex), false);
+        }
     }
 
     @Override

@@ -938,7 +938,7 @@ public class DataFrame
                 otherJoinColumnNames, otherAdditionalSortColumnNames);
     }
 
-    // todo: do not override sort order (use external sort)
+    // todo: do not override sort order (use an external sort)
     private Triplet<DataFrame> join(
             DataFrame other,
             JoinType joinType,
@@ -984,10 +984,13 @@ public class DataFrame
         IntIntToIntFunction keyComparator = (thisIndex, otherIndex) -> {
             for (int i = 0; i < thisJoinColumnNames.size(); i++)
             {
-                int result =
-                        ((Comparable<Object>) this.getObject(thisJoinColumnNames.get(i), thisIndex))
-                        .compareTo(
-                        other.getObject(otherJoinColumnNames.get(i), otherIndex));
+                int result = DfTuple.compareMindingNulls(
+                        this.getObject(thisJoinColumnNames.get(i), thisIndex),
+                        other.getObject(otherJoinColumnNames.get(i), otherIndex)
+                );
+//                        ((Comparable<Object>) this.getObject(thisJoinColumnNames.get(i), thisIndex))
+//                        .compareTo(
+//                        other.getObject(otherJoinColumnNames.get(i), otherIndex));
                 if (result != 0)
                 {
                     return result;
