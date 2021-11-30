@@ -428,7 +428,7 @@ public class DataFrameLoadTest
     public void headersWithSpaces()
     {
         CsvDataSet dataSet = new StringBasedCsvDataSet("Foo", "Employees",
-                "Name,Employee Id,Hire Date,Dept,Salary in USD\n"
+                "Name,\"Employee Id\",Hire Date,Dept,Salary in USD\n"
                         + "\"Alice\",1234,2020-01-01,\"Accounting\",110000.00\n"
                         + "\"Bob\",1233,2010-01-01,\"Bee-bee-boo-boo\",100000.00\n"
         );
@@ -679,5 +679,29 @@ public class DataFrameLoadTest
                 .addRow("Ed", 10002, null, null, 0.0);
 
         DataFrameUtil.assertEquals(expected, loaded);
+    }
+
+    @Test(expected = RuntimeException.class)
+    public void emptyHeader()
+    {
+        CsvDataSet dataSet = new StringBasedCsvDataSet("Foo", "Employees",
+                "Name,EmployeeId,,HireDate,Salary,MaybeNumber\n"
+                        + "\"Bob\",1235,100,2010-01-01,100000.50,12\n"
+                        + "\"Doris\",1237,101,2010-01-01,100000.70,15\n"
+        );
+
+        DataFrame df = dataSet.loadAsDataFrame();
+    }
+
+    @Test(expected = RuntimeException.class)
+    public void duplicateHeader()
+    {
+        CsvDataSet dataSet = new StringBasedCsvDataSet("Foo", "Employees",
+                "Name,EmployeeId,EmployeeId,HireDate,Salary,MaybeNumber\n"
+                        + "\"Bob\",1235,100,2010-01-01,100000.50,12\n"
+                        + "\"Doris\",1237,101,2010-01-01,100000.70,15\n"
+        );
+
+        DataFrame df = dataSet.loadAsDataFrame();
     }
 }

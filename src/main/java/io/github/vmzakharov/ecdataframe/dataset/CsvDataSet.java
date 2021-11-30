@@ -329,6 +329,11 @@ extends DataSetAbstract
         {
             MutableList<String> headers = this.splitMindingQs(reader.readLine()).collect(this::removeSurroundingQuotes);
 
+            if (headers.anySatisfy(String::isEmpty))
+            {
+                ErrorReporter.reportAndThrow("Error parsing a CSV file: a column header cannot be empty");
+            }
+
             String dataRow = reader.readLine();
 
             if (dataRow == null) // no data, just headers
@@ -407,9 +412,12 @@ extends DataSetAbstract
     {
         int size = aString.length();
 
-        if (this.isQuote(aString.charAt(0)) && this.isQuote(aString.charAt(size - 1)))
+        if (size > 1)
         {
-            return aString.substring(1, size - 1);
+            if (this.isQuote(aString.charAt(0)) && this.isQuote(aString.charAt(size - 1)))
+            {
+                return aString.substring(1, size - 1);
+            }
         }
 
         return aString;
