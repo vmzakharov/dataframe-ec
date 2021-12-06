@@ -2,10 +2,13 @@ package io.github.vmzakharov.ecdataframe.dataframe;
 
 import io.github.vmzakharov.ecdataframe.dsl.value.ValueType;
 import org.eclipse.collections.api.factory.Lists;
+import org.eclipse.collections.impl.factory.primitive.BooleanLists;
+import org.eclipse.collections.impl.list.Interval;
 import org.junit.Assert;
 import org.junit.Test;
 
 import java.time.LocalDate;
+import java.util.Objects;
 
 public class BasicDataFrameTest
 {
@@ -101,6 +104,38 @@ public class BasicDataFrameTest
             .addRow("Deb",   "xyz");
 
         DataFrameUtil.assertEquals(expected, df);
+    }
+
+    @Test
+    public void isNull()
+    {
+        DataFrame df = new DataFrame("df1")
+                .addStringColumn("Name").addLongColumn("Count").addDoubleColumn("Value").addDateColumn("Foo")
+                .addRow("Deb",   0,  7.89, null)
+                .addRow("Bob", null, 23.45, LocalDate.of(2020, 10, 20))
+                .addRow(null, 5, 23.45, LocalDate.of(2020, 10, 20))
+                .addRow("Carl", 5, null, LocalDate.of(2020, 10, 20))
+                ;
+
+        this.assertNullValuesInColumn(df, "Name", false, false, true, false);
+        this.assertNullValuesInColumn(df, "Count", false, true, false, false);
+        this.assertNullValuesInColumn(df, "Value", false, false, false, true);
+        this.assertNullValuesInColumn(df, "Foo", true, false, false, false);
+
+        df.sortBy(Lists.immutable.of("Name"));
+
+        this.assertNullValuesInColumn(df, "Name", true, false, false, false);
+        this.assertNullValuesInColumn(df, "Count", false, true, false, false);
+        this.assertNullValuesInColumn(df, "Value", false, false, true, false);
+        this.assertNullValuesInColumn(df, "Foo", false, false, false, true);
+    }
+
+    private void assertNullValuesInColumn(DataFrame df, String columnName, boolean... expectedValues)
+    {
+        Assert.assertEquals(columnName,
+                BooleanLists.immutable.of(expectedValues),
+                Interval.zeroTo(df.rowCount() - 1).collectBoolean(e -> df.isNull(columnName, e)).toList()
+        );
     }
 
     @Test

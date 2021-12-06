@@ -132,8 +132,10 @@ public class DataFrame
     {
         DfColumn column = this.columnsByName.get(columnName);
 
-        ErrorReporter.reportAndThrow(column == null,
-                "Column '" + columnName + "' does not exist in data frame '" + this.getName() + "'");
+        if (column == null)
+        {
+            ErrorReporter.reportAndThrow("Column '" + columnName + "' does not exist in data frame '" + this.getName() + "'");
+        }
 
         return column;
     }
@@ -303,7 +305,12 @@ public class DataFrame
 
     public Object getObject(String columnName, int rowIndex)
     {
-        return this.columnsByName.get(columnName).getObject(this.rowIndexMap(rowIndex));
+        return this.getColumnNamed(columnName).getObject(this.rowIndexMap(rowIndex));
+    }
+
+    public boolean isNull(String columnName, int rowIndex)
+    {
+        return this.getColumnNamed(columnName).isNull(this.rowIndexMap(rowIndex));
     }
 
     public Value getValue(int rowIndex, int columnIndex)
