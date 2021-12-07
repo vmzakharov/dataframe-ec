@@ -839,7 +839,7 @@ public class DataFrame
     }
 
     /**
-     * A very basic join - creates a data frame that is this an join of this data frame and another one, based on
+     * A basic inner join - creates a data frame that is a join of this data frame and another one, based on
      * the key column values. Rows with the same values of the key column will be combined in the resulting data frame
      * into one wide row. This is an inner join so rows for which there is no match in the other data frame will not be
      * present in the join.
@@ -855,7 +855,34 @@ public class DataFrame
         return this.join(
                 other, JoinType.INNER_JOIN,
                 thisJoinColumnNames, Lists.immutable.empty(),
-                otherJoinColumnNames, Lists.immutable.empty()
+                otherJoinColumnNames, Lists.immutable.empty(),
+                Maps.mutable.of()
+            ).getTwo();
+    }
+
+    /**
+     * A basic inner join - creates a data frame that is a join of this data frame and another one, based on
+     * the key column values. Rows with the same values of the key column will be combined in the resulting data frame
+     * into one wide row. This is an inner join so rows for which there is no match in the other data frame will not be
+     * present in the join.
+     *
+     * @param other                the data frame to join to
+     * @param thisJoinColumnNames  the name of the columns in this data frame to use as the join keys
+     * @param otherJoinColumnNames the name of the columns in the other data frame to use as the join keys, they will be
+     *                             compared to the columns in this data frame in the order they are specified
+     * @return a data frame that is a join of this data frame and the data frame passed as a parameter
+     */
+    public DataFrame join(
+            DataFrame other,
+            ListIterable<String> thisJoinColumnNames,
+            ListIterable<String> otherJoinColumnNames,
+            MutableMap<String, String> renamedOtherColumns)
+    {
+        return this.join(
+                other, JoinType.INNER_JOIN,
+                thisJoinColumnNames, Lists.immutable.empty(),
+                otherJoinColumnNames, Lists.immutable.empty(),
+                renamedOtherColumns
             ).getTwo();
     }
 
@@ -891,8 +918,36 @@ public class DataFrame
         return this.join(
                 other, JoinType.OUTER_JOIN,
                 thisJoinColumnNames, Lists.immutable.empty(),
-                otherJoinColumnNames, Lists.immutable.empty()
+                otherJoinColumnNames, Lists.immutable.empty(),
+                Maps.mutable.of()
             ).getTwo();
+    }
+
+    /**
+     * A basic outer join - creates a data frame that is a join of this data frame and another one, based on
+     * the key column values. Rows with the same values of the key columns will be combined in the resulting data frame
+     * into one wide row. The rows for which there is no match in the other data frame will have the missing values
+     * filled with nulls for object column types or zeros for numeric column types.
+     *
+     * @param other                the data frame to join to
+     * @param thisJoinColumnNames  the name of the columns in this data frame to use as the join keys
+     * @param otherJoinColumnNames the name of the columns in the other data frame to use as the join keys
+     * @param renamedOtherColumns  the map which will be populated with the column names on the other data frame renamed
+     *                             in the join to avoid column name collisions
+     * @return a data frame that is a join of this data frame and the data frame passed as a parameter
+     */
+    public DataFrame outerJoin(
+            DataFrame other,
+            ListIterable<String> thisJoinColumnNames,
+            ListIterable<String> otherJoinColumnNames,
+            MutableMap<String, String> renamedOtherColumns)
+    {
+        return this.join(
+                other, JoinType.OUTER_JOIN,
+                thisJoinColumnNames, Lists.immutable.empty(),
+                otherJoinColumnNames, Lists.immutable.empty(),
+                renamedOtherColumns
+        ).getTwo();
     }
 
     /**
@@ -914,7 +969,8 @@ public class DataFrame
         return this.join(
                 other, JoinType.JOIN_WITH_COMPLEMENTS,
                 thisJoinColumnNames, Lists.immutable.empty(),
-                otherJoinColumnNames, Lists.immutable.empty());
+                otherJoinColumnNames, Lists.immutable.empty(),
+                Maps.mutable.of());
     }
 
     /**
@@ -942,7 +998,40 @@ public class DataFrame
         return this.join(
                 other, JoinType.JOIN_WITH_COMPLEMENTS,
                 thisJoinColumnNames, thisAdditionalSortColumnNames,
-                otherJoinColumnNames, otherAdditionalSortColumnNames);
+                otherJoinColumnNames, otherAdditionalSortColumnNames,
+                Maps.mutable.of());
+    }
+
+    /**
+     * Performs intersection and complement set operations between two data frames based on the provided keys and
+     * returns their results as a triplet of data frames.
+     * The result of the intersection is equivalent to inner join of two data frames, and the result of each complement
+     * is the subset of the rows of each data frame that does not have corresponding keys in the other data frame
+     * @param other                the data frame to join to
+     * @param thisJoinColumnNames  the name of the columns in this data frame to use as the join keys
+     * @param thisAdditionalSortColumnNames specifies columns for sort order on this data frame's side in addition to
+     *                                      the order of the values of its key columns
+     * @param otherJoinColumnNames the name of the columns in the other data frame to use as the join keys
+     * @param otherAdditionalSortColumnNames specifies columns for sort order on the other data frame's side in addition
+     *                                       to the order of the values of its key columns
+     * @param renamedOtherColumns the map which will be populated with the column names on the other data frame renamed
+     *                            in the join to avoid column name collisions
+     * @return a triplet containing the complement of the other dataframe in this one, the joined dataframe, and the
+     * complement of this data frame in the other one
+     */
+    public Triplet<DataFrame> joinWithComplements(
+            DataFrame other,
+            ListIterable<String> thisJoinColumnNames,
+            ListIterable<String> thisAdditionalSortColumnNames,
+            ListIterable<String> otherJoinColumnNames,
+            ListIterable<String> otherAdditionalSortColumnNames,
+            MutableMap<String, String> renamedOtherColumns)
+    {
+        return this.join(
+                other, JoinType.JOIN_WITH_COMPLEMENTS,
+                thisJoinColumnNames, thisAdditionalSortColumnNames,
+                otherJoinColumnNames, otherAdditionalSortColumnNames,
+                renamedOtherColumns);
     }
 
     // todo: do not override sort order (use an external sort)
@@ -952,7 +1041,8 @@ public class DataFrame
             ListIterable<String> thisJoinColumnNames,
             ListIterable<String> thisAdditionalSortColumnNames,
             ListIterable<String> otherJoinColumnNames,
-            ListIterable<String> otherAdditionalSortColumnNames
+            ListIterable<String> otherAdditionalSortColumnNames,
+            MutableMap<String, String> renamedOtherColumns
     )
     {
         DataFrame joined = this.cloneStructureAsStored(this.getName() + "_" + other.getName());
@@ -963,6 +1053,9 @@ public class DataFrame
         MapIterable<String, String> otherColumnNameMap = this.resolveDuplicateNames(
                 this.columns.collect(DfColumn::getName),
                 other.columns.collect(DfColumn::getName));
+
+        otherColumnNameMap.forEachKeyValue(renamedOtherColumns::put);
+        otherJoinColumnNames.forEachInBoth(thisJoinColumnNames, renamedOtherColumns::put);
 
         other.columns
                 .reject(col -> otherJoinColumnNames.contains(col.getName()))
@@ -995,9 +1088,6 @@ public class DataFrame
                         this.getObject(thisJoinColumnNames.get(i), thisIndex),
                         other.getObject(otherJoinColumnNames.get(i), otherIndex)
                 );
-//                        ((Comparable<Object>) this.getObject(thisJoinColumnNames.get(i), thisIndex))
-//                        .compareTo(
-//                        other.getObject(otherJoinColumnNames.get(i), otherIndex));
                 if (result != 0)
                 {
                     return result;

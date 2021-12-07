@@ -1,6 +1,9 @@
 package io.github.vmzakharov.ecdataframe.dataframe;
 
+import org.eclipse.collections.api.map.MutableMap;
 import org.eclipse.collections.impl.factory.Lists;
+import org.eclipse.collections.impl.factory.Maps;
+import org.junit.Assert;
 import org.junit.Test;
 
 import java.time.LocalDate;
@@ -12,29 +15,26 @@ public class DataFrameJoinTest
     {
         DataFrame df1 = new DataFrame("df1")
                 .addStringColumn("Foo").addStringColumn("Bar").addLongColumn("Baz")
-                .addRow("Blinky", "red",     7)
-                .addRow("Pinky",  "pink",    8)
-                .addRow("Inky",   "cyan",    9)
-                .addRow("Clyde",  "orange", 10)
-                ;
+                .addRow("Blinky", "red", 7)
+                .addRow("Pinky", "pink", 8)
+                .addRow("Inky", "cyan", 9)
+                .addRow("Clyde", "orange", 10);
 
         DataFrame df2 = new DataFrame("df2")
                 .addStringColumn("Name").addStringColumn("Color").addLongColumn("Number")
-                .addRow("Grapefruit", "pink",   2)
-                .addRow("Orange",     "orange", 4)
-                .addRow("Mint",       "cyan",   3)
-                .addRow("Apple",      "red",    1)
-                ;
+                .addRow("Grapefruit", "pink", 2)
+                .addRow("Orange", "orange", 4)
+                .addRow("Mint", "cyan", 3)
+                .addRow("Apple", "red", 1);
 
         DataFrame joined = df1.join(df2, "Bar", "Color");
 
         DataFrame expected = new DataFrame("expected")
                 .addStringColumn("Foo").addStringColumn("Bar").addLongColumn("Baz").addStringColumn("Name").addLongColumn("Number")
-                .addRow("Inky",   "cyan",    9, "Mint",       3)
-                .addRow("Clyde",  "orange", 10, "Orange",     4)
-                .addRow("Pinky",  "pink",    8, "Grapefruit", 2)
-                .addRow("Blinky", "red",     7, "Apple",      1)
-                ;
+                .addRow("Inky", "cyan", 9, "Mint", 3)
+                .addRow("Clyde", "orange", 10, "Orange", 4)
+                .addRow("Pinky", "pink", 8, "Grapefruit", 2)
+                .addRow("Blinky", "red", 7, "Apple", 1);
 
         DataFrameUtil.assertEquals(expected, joined);
     }
@@ -44,29 +44,26 @@ public class DataFrameJoinTest
     {
         DataFrame df1 = new DataFrame("df1")
                 .addStringColumn("Foo").addStringColumn("Bar").addLongColumn("Baz")
-                .addRow("Blinky", "pink",  7)
-                .addRow("Pinky",  "cyan",  8)
-                .addRow("Inky",   "cyan",  9)
-                .addRow("Clyde",  "pink", 10)
-                ;
+                .addRow("Blinky", "pink", 7)
+                .addRow("Pinky", "cyan", 8)
+                .addRow("Inky", "cyan", 9)
+                .addRow("Clyde", "pink", 10);
 
         DataFrame df2 = new DataFrame("df2")
                 .addStringColumn("Name").addStringColumn("Color").addLongColumn("Number")
                 .addRow("Grapefruit", "cyan", 2)
-                .addRow("Orange",     "pink", 4)
-                .addRow("Mint",       "cyan", 3)
-                .addRow("Apple",      "pink", 1)
-                ;
+                .addRow("Orange", "pink", 4)
+                .addRow("Mint", "cyan", 3)
+                .addRow("Apple", "pink", 1);
 
         DataFrame joined = df1.join(df2, "Bar", "Color");
 
         DataFrame expected = new DataFrame("expected")
                 .addStringColumn("Foo").addStringColumn("Bar").addLongColumn("Baz").addStringColumn("Name").addLongColumn("Number")
-                .addRow("Pinky",  "cyan",  8, "Grapefruit", 2)
-                .addRow("Inky",   "cyan",  9, "Mint",       3)
-                .addRow("Blinky", "pink",  7, "Orange",     4)
-                .addRow("Clyde",  "pink", 10, "Apple",      1)
-                ;
+                .addRow("Pinky", "cyan", 8, "Grapefruit", 2)
+                .addRow("Inky", "cyan", 9, "Mint", 3)
+                .addRow("Blinky", "pink", 7, "Orange", 4)
+                .addRow("Clyde", "pink", 10, "Apple", 1);
 
         DataFrameUtil.assertEquals(expected, joined);
     }
@@ -76,29 +73,26 @@ public class DataFrameJoinTest
     {
         DataFrame df1 = new DataFrame("df1")
                 .addStringColumn("Foo").addStringColumn("Bar").addStringColumn("Letter").addLongColumn("Baz")
-                .addRow("Blinky", "red",    "A",  7)
-                .addRow("Pinky",  "pink",   "B",  8)
-                .addRow("Inky",   "cyan",   "C",  9)
-                .addRow("Clyde",  "orange", "D", 10)
-                ;
+                .addRow("Blinky", "red", "A", 7)
+                .addRow("Pinky", "pink", "B", 8)
+                .addRow("Inky", "cyan", "C", 9)
+                .addRow("Clyde", "orange", "D", 10);
 
         DataFrame df2 = new DataFrame("df2")
                 .addStringColumn("Name").addStringColumn("Color").addStringColumn("Code").addLongColumn("Number")
-                .addRow("Grapefruit", "pink",   "B", 2)
-                .addRow("Orange",     "orange", "D", 4)
-                .addRow("Mint",       "cyan",   "C", 3)
-                .addRow("Apple",      "red",    "A", 1)
-                ;
+                .addRow("Grapefruit", "pink", "B", 2)
+                .addRow("Orange", "orange", "D", 4)
+                .addRow("Mint", "cyan", "C", 3)
+                .addRow("Apple", "red", "A", 1);
 
         DataFrame joined = df1.join(df2, Lists.immutable.of("Bar", "Letter"), Lists.immutable.of("Color", "Code"));
 
         DataFrame expected = new DataFrame("expected")
                 .addStringColumn("Foo").addStringColumn("Bar").addStringColumn("Letter").addLongColumn("Baz").addStringColumn("Name").addLongColumn("Number")
-                .addRow("Inky",   "cyan",   "C",  9, "Mint",       3)
-                .addRow("Clyde",  "orange", "D", 10, "Orange",     4)
-                .addRow("Pinky",  "pink",   "B",  8, "Grapefruit", 2)
-                .addRow("Blinky", "red",    "A",  7, "Apple",      1)
-                ;
+                .addRow("Inky", "cyan", "C", 9, "Mint", 3)
+                .addRow("Clyde", "orange", "D", 10, "Orange", 4)
+                .addRow("Pinky", "pink", "B", 8, "Grapefruit", 2)
+                .addRow("Blinky", "red", "A", 7, "Apple", 1);
 
         DataFrameUtil.assertEquals(expected, joined);
     }
@@ -108,29 +102,26 @@ public class DataFrameJoinTest
     {
         DataFrame df1 = new DataFrame("df1")
                 .addStringColumn("Foo").addStringColumn("Bar").addDateColumn("Date").addLongColumn("Baz")
-                .addRow("Blinky", "red",    LocalDate.of(2021, 11, 12),  7)
-                .addRow("Pinky",  "pink",   LocalDate.of(2021, 11, 13),  8)
-                .addRow("Inky",   "cyan",   LocalDate.of(2021, 11, 14),  9)
-                .addRow("Clyde",  "orange", LocalDate.of(2021, 11, 15), 10)
-                ;
+                .addRow("Blinky", "red", LocalDate.of(2021, 11, 12), 7)
+                .addRow("Pinky", "pink", LocalDate.of(2021, 11, 13), 8)
+                .addRow("Inky", "cyan", LocalDate.of(2021, 11, 14), 9)
+                .addRow("Clyde", "orange", LocalDate.of(2021, 11, 15), 10);
 
         DataFrame df2 = new DataFrame("df2")
                 .addStringColumn("Name").addStringColumn("Color").addDateColumn("Code").addLongColumn("Number")
-                .addRow("Grapefruit", "pink",   LocalDate.of(2021, 11, 13), 2)
-                .addRow("Orange",     "orange", LocalDate.of(2021, 11, 15), 4)
-                .addRow("Mint",       "cyan",   LocalDate.of(2021, 11, 14), 3)
-                .addRow("Apple",      "red",    LocalDate.of(2021, 11, 12), 1)
-                ;
+                .addRow("Grapefruit", "pink", LocalDate.of(2021, 11, 13), 2)
+                .addRow("Orange", "orange", LocalDate.of(2021, 11, 15), 4)
+                .addRow("Mint", "cyan", LocalDate.of(2021, 11, 14), 3)
+                .addRow("Apple", "red", LocalDate.of(2021, 11, 12), 1);
 
         DataFrame joined = df1.join(df2, Lists.immutable.of("Bar", "Date"), Lists.immutable.of("Color", "Code"));
 
         DataFrame expected = new DataFrame("expected")
                 .addStringColumn("Foo").addStringColumn("Bar").addDateColumn("Date").addLongColumn("Baz").addStringColumn("Name").addLongColumn("Number")
-                .addRow("Inky",   "cyan",   LocalDate.of(2021, 11, 14),  9, "Mint",       3)
-                .addRow("Clyde",  "orange", LocalDate.of(2021, 11, 15), 10, "Orange",     4)
-                .addRow("Pinky",  "pink",   LocalDate.of(2021, 11, 13),  8, "Grapefruit", 2)
-                .addRow("Blinky", "red",    LocalDate.of(2021, 11, 12),  7, "Apple",      1)
-                ;
+                .addRow("Inky", "cyan", LocalDate.of(2021, 11, 14), 9, "Mint", 3)
+                .addRow("Clyde", "orange", LocalDate.of(2021, 11, 15), 10, "Orange", 4)
+                .addRow("Pinky", "pink", LocalDate.of(2021, 11, 13), 8, "Grapefruit", 2)
+                .addRow("Blinky", "red", LocalDate.of(2021, 11, 12), 7, "Apple", 1);
 
         DataFrameUtil.assertEquals(expected, joined);
     }
@@ -140,29 +131,26 @@ public class DataFrameJoinTest
     {
         DataFrame df1 = new DataFrame("df1")
                 .addStringColumn("Foo").addStringColumn("Bar").addLongColumn("Baz")
-                .addRow("Blinky", null,     7)
-                .addRow("Pinky",  null,     null)
-                .addRow("Inky",   "cyan",   9)
-                .addRow("Clyde",  "orange", null)
-                ;
+                .addRow("Blinky", null, 7)
+                .addRow("Pinky", null, null)
+                .addRow("Inky", "cyan", 9)
+                .addRow("Clyde", "orange", null);
 
         DataFrame df2 = new DataFrame("df2")
                 .addStringColumn("Name").addStringColumn("Color").addLongColumn("Number")
-                .addRow("Grapefruit", null,      null)
-                .addRow("Orange",     "orange",  null)
-                .addRow("Mint",       "cyan",    9)
-                .addRow("Apple",      null,      7)
-                ;
+                .addRow("Grapefruit", null, null)
+                .addRow("Orange", "orange", null)
+                .addRow("Mint", "cyan", 9)
+                .addRow("Apple", null, 7);
 
         DataFrame joined = df1.join(df2, Lists.immutable.of("Bar", "Baz"), Lists.immutable.of("Color", "Number"));
 
         DataFrame expected = new DataFrame("expected")
                 .addStringColumn("Foo").addStringColumn("Bar").addLongColumn("Baz").addStringColumn("Name")
-                .addRow("Pinky",  null,     null, "Grapefruit")
-                .addRow("Blinky", null,        7,      "Apple")
-                .addRow("Inky",   "cyan",      9,       "Mint")
-                .addRow("Clyde",  "orange", null,     "Orange")
-                ;
+                .addRow("Pinky", null, null, "Grapefruit")
+                .addRow("Blinky", null, 7, "Apple")
+                .addRow("Inky", "cyan", 9, "Mint")
+                .addRow("Clyde", "orange", null, "Orange");
 
         DataFrameUtil.assertEquals(expected, joined);
     }
@@ -172,25 +160,22 @@ public class DataFrameJoinTest
     {
         DataFrame df1 = new DataFrame("df1")
                 .addStringColumn("Foo").addStringColumn("Bar").addStringColumn("Letter").addLongColumn("Baz")
-                .addRow("Pinky",  "pink",   "B",  8)
-                .addRow("Inky",   "cyan",   "C",  9)
-                .addRow("Clyde",  "orange", "D", 10)
-                ;
+                .addRow("Pinky", "pink", "B", 8)
+                .addRow("Inky", "cyan", "C", 9)
+                .addRow("Clyde", "orange", "D", 10);
 
         DataFrame df2 = new DataFrame("df2")
                 .addStringColumn("Name").addStringColumn("Color").addStringColumn("Code").addLongColumn("Number")
-                .addRow("Grapefruit", "pink",   "B", 2)
-                .addRow("Orange",     "orange", "D", 4)
-                .addRow("Apple",      "red",    "A", 1)
-                ;
+                .addRow("Grapefruit", "pink", "B", 2)
+                .addRow("Orange", "orange", "D", 4)
+                .addRow("Apple", "red", "A", 1);
 
         DataFrame joined = df1.join(df2, Lists.immutable.of("Bar", "Letter"), Lists.immutable.of("Color", "Code"));
 
         DataFrame expected = new DataFrame("expected")
                 .addStringColumn("Foo").addStringColumn("Bar").addStringColumn("Letter").addLongColumn("Baz").addStringColumn("Name").addLongColumn("Number")
-                .addRow("Clyde",  "orange", "D", 10, "Orange",     4)
-                .addRow("Pinky",  "pink",   "B",  8, "Grapefruit", 2)
-                ;
+                .addRow("Clyde", "orange", "D", 10, "Orange", 4)
+                .addRow("Pinky", "pink", "B", 8, "Grapefruit", 2);
 
         DataFrameUtil.assertEquals(expected, joined);
     }
@@ -200,27 +185,24 @@ public class DataFrameJoinTest
     {
         DataFrame df1 = new DataFrame("df1")
                 .addStringColumn("Foo").addStringColumn("Bar").addStringColumn("Letter").addLongColumn("Baz")
-                .addRow("Pinky",  "pink",   "B",  8)
-                .addRow("Inky",   "cyan",   "C",  9)
-                .addRow("Clyde",  "orange", "D", 10)
-                ;
+                .addRow("Pinky", "pink", "B", 8)
+                .addRow("Inky", "cyan", "C", 9)
+                .addRow("Clyde", "orange", "D", 10);
 
         DataFrame df2 = new DataFrame("df2")
                 .addStringColumn("Name").addStringColumn("Color").addStringColumn("Code").addLongColumn("Number")
-                .addRow("Grapefruit", "pink",   "B", 2)
-                .addRow("Orange",     "orange", "D", 4)
-                .addRow("Apple",      "red",    "A", 1)
-                ;
+                .addRow("Grapefruit", "pink", "B", 2)
+                .addRow("Orange", "orange", "D", 4)
+                .addRow("Apple", "red", "A", 1);
 
         DataFrame joined = df1.outerJoin(df2, Lists.immutable.of("Bar", "Letter"), Lists.immutable.of("Color", "Code"));
 
         DataFrame expected = new DataFrame("expected")
                 .addStringColumn("Foo").addStringColumn("Bar").addStringColumn("Letter").addLongColumn("Baz").addStringColumn("Name").addLongColumn("Number")
-                .addRow("Inky",   "cyan",   "C",    9,  null,     null)
-                .addRow("Clyde",  "orange", "D",   10, "Orange",     4)
-                .addRow("Pinky",  "pink",   "B",    8, "Grapefruit", 2)
-                .addRow(null,     "red",    "A", null, "Apple",      1)
-                ;
+                .addRow("Inky", "cyan", "C", 9, null, null)
+                .addRow("Clyde", "orange", "D", 10, "Orange", 4)
+                .addRow("Pinky", "pink", "B", 8, "Grapefruit", 2)
+                .addRow(null, "red", "A", null, "Apple", 1);
 
         DataFrameUtil.assertEquals(expected, joined);
     }
@@ -230,29 +212,26 @@ public class DataFrameJoinTest
     {
         DataFrame df1 = new DataFrame("df1")
                 .addStringColumn("Foo").addLongColumn("Baz")
-                .addRow("Blinky",  7)
-                .addRow("Pinky",   8)
-                .addRow("Inky",    9)
-                .addRow("Clyde",  10)
-                ;
+                .addRow("Blinky", 7)
+                .addRow("Pinky", 8)
+                .addRow("Inky", 9)
+                .addRow("Clyde", 10);
 
         DataFrame df2 = new DataFrame("df2")
                 .addStringColumn("Name").addLongColumn("Number")
-                .addRow("Grapefruit",  8)
-                .addRow("Orange",     10)
-                .addRow("Mint",        9)
-                .addRow("Apple",       7)
-                ;
+                .addRow("Grapefruit", 8)
+                .addRow("Orange", 10)
+                .addRow("Mint", 9)
+                .addRow("Apple", 7);
 
         DataFrame joined = df1.join(df2, "Baz", "Number");
 
         DataFrame expected = new DataFrame("expected")
                 .addStringColumn("Foo").addLongColumn("Baz").addStringColumn("Name")
                 .addRow("Blinky", 7, "Apple")
-                .addRow("Pinky",  8, "Grapefruit")
-                .addRow("Inky",   9, "Mint")
-                .addRow("Clyde", 10, "Orange")
-                ;
+                .addRow("Pinky", 8, "Grapefruit")
+                .addRow("Inky", 9, "Mint")
+                .addRow("Clyde", 10, "Orange");
 
         DataFrameUtil.assertEquals(expected, joined);
     }
@@ -262,28 +241,25 @@ public class DataFrameJoinTest
     {
         DataFrame df1 = new DataFrame("df1")
                 .addStringColumn("Foo").addStringColumn("AbcBar").addLongColumn("Baz")
-                .addRow("Blinky", "abcred",     7)
-                .addRow("Pinky",  "abcpink",    8)
-                .addRow("Inky",   "abccyan",    9)
-                ;
+                .addRow("Blinky", "abcred", 7)
+                .addRow("Pinky", "abcpink", 8)
+                .addRow("Inky", "abccyan", 9);
 
         df1.addStringColumn("Bar", "substr(AbcBar, 3)");
 
         DataFrame df2 = new DataFrame("df2")
                 .addStringColumn("Name").addStringColumn("Color").addLongColumn("Number")
-                .addRow("Grapefruit", "pink",   2)
-                .addRow("Mint",       "cyan",   3)
-                .addRow("Apple",      "red",    1)
-                ;
+                .addRow("Grapefruit", "pink", 2)
+                .addRow("Mint", "cyan", 3)
+                .addRow("Apple", "red", 1);
 
         DataFrame joined = df1.join(df2, "Bar", "Color");
 
         DataFrame expected = new DataFrame("expected")
                 .addStringColumn("Foo").addStringColumn("AbcBar").addLongColumn("Baz").addStringColumn("Bar").addStringColumn("Name").addLongColumn("Number")
-                .addRow("Inky",   "abccyan", 9, "cyan", "Mint",       3)
-                .addRow("Pinky",  "abcpink", 8, "pink", "Grapefruit", 2)
-                .addRow("Blinky", "abcred",  7, "red",  "Apple",      1)
-                ;
+                .addRow("Inky", "abccyan", 9, "cyan", "Mint", 3)
+                .addRow("Pinky", "abcpink", 8, "pink", "Grapefruit", 2)
+                .addRow("Blinky", "abcred", 7, "red", "Apple", 1);
 
         DataFrameUtil.assertEquals(expected, joined);
     }
@@ -294,28 +270,25 @@ public class DataFrameJoinTest
         DataFrame df1 = new DataFrame("df1")
                 .addStringColumn("Foo").addStringColumn("Bar").addLongColumn("Baz", "123")
                 .addRow("Blinky", "red")
-                .addRow("Pinky",  "pink")
-                .addRow("Inky",   "cyan")
-                .addRow("Clyde",  "orange")
-                ;
+                .addRow("Pinky", "pink")
+                .addRow("Inky", "cyan")
+                .addRow("Clyde", "orange");
 
         DataFrame df2 = new DataFrame("df2")
                 .addStringColumn("Name").addStringColumn("Color").addLongColumn("Number").addStringColumn("Counted", "'One ' + Name")
-                .addRow("Grapefruit", "pink",   2)
-                .addRow("Orange",     "orange", 4)
-                .addRow("Mint",       "cyan",   3)
-                .addRow("Apple",      "red",    1)
-                ;
+                .addRow("Grapefruit", "pink", 2)
+                .addRow("Orange", "orange", 4)
+                .addRow("Mint", "cyan", 3)
+                .addRow("Apple", "red", 1);
 
         DataFrame joined = df1.join(df2, "Bar", "Color");
 
         DataFrame expected = new DataFrame("expected")
                 .addStringColumn("Foo").addStringColumn("Bar").addLongColumn("Baz").addStringColumn("Name").addLongColumn("Number").addStringColumn("Counted")
-                .addRow("Inky",   "cyan",   123, "Mint",       3, "One Mint")
-                .addRow("Clyde",  "orange", 123, "Orange",     4, "One Orange")
-                .addRow("Pinky",  "pink",   123, "Grapefruit", 2, "One Grapefruit")
-                .addRow("Blinky", "red",    123, "Apple",      1, "One Apple")
-                ;
+                .addRow("Inky", "cyan", 123, "Mint", 3, "One Mint")
+                .addRow("Clyde", "orange", 123, "Orange", 4, "One Orange")
+                .addRow("Pinky", "pink", 123, "Grapefruit", 2, "One Grapefruit")
+                .addRow("Blinky", "red", 123, "Apple", 1, "One Apple");
 
         DataFrameUtil.assertEquals(expected, joined);
     }
@@ -325,25 +298,22 @@ public class DataFrameJoinTest
     {
         DataFrame df1 = new DataFrame("df1")
                 .addStringColumn("Foo").addStringColumn("Bar").addLongColumn("Baz")
-                .addRow("Blinky", "red",     7)
-                .addRow("Inky",   "cyan",    9)
-                .addRow("Clyde",  "orange", 10)
-                ;
+                .addRow("Blinky", "red", 7)
+                .addRow("Inky", "cyan", 9)
+                .addRow("Clyde", "orange", 10);
 
         DataFrame df2 = new DataFrame("df2")
                 .addStringColumn("Name").addStringColumn("Color").addLongColumn("Number")
-                .addRow("Grapefruit", "pink",   2)
-                .addRow("Orange",     "orange", 4)
-                .addRow("Apple",      "red",    1)
-                ;
+                .addRow("Grapefruit", "pink", 2)
+                .addRow("Orange", "orange", 4)
+                .addRow("Apple", "red", 1);
 
         DataFrame joined = df1.join(df2, "Bar", "Color");
 
         DataFrame expected = new DataFrame("expected")
                 .addStringColumn("Foo").addStringColumn("Bar").addLongColumn("Baz").addStringColumn("Name").addLongColumn("Number")
-                .addRow("Clyde",  "orange", 10, "Orange",     4)
-                .addRow("Blinky", "red",     7, "Apple",      1)
-                ;
+                .addRow("Clyde", "orange", 10, "Orange", 4)
+                .addRow("Blinky", "red", 7, "Apple", 1);
 
         DataFrameUtil.assertEquals(expected, joined);
     }
@@ -353,25 +323,22 @@ public class DataFrameJoinTest
     {
         DataFrame df1 = new DataFrame("df1")
                 .addStringColumn("Foo").addStringColumn("Bar").addLongColumn("Baz")
-                .addRow("Blinky", "red",     7)
-                .addRow("Pinky",  "pink",    8)
-                .addRow("Inky",   "cyan",    9)
-                .addRow("Clyde",  "orange", 10)
-                ;
+                .addRow("Blinky", "red", 7)
+                .addRow("Pinky", "pink", 8)
+                .addRow("Inky", "cyan", 9)
+                .addRow("Clyde", "orange", 10);
 
         DataFrame df2 = new DataFrame("df2")
                 .addStringColumn("Name").addStringColumn("Color").addLongColumn("Number")
-                .addRow("Grapefruit", "pink",   2)
-                .addRow("Mint",       "cyan",   3)
-                ;
+                .addRow("Grapefruit", "pink", 2)
+                .addRow("Mint", "cyan", 3);
 
         DataFrame joined = df1.join(df2, "Bar", "Color");
 
         DataFrame expected = new DataFrame("expected")
                 .addStringColumn("Foo").addStringColumn("Bar").addLongColumn("Baz").addStringColumn("Name").addLongColumn("Number")
-                .addRow("Inky",   "cyan",    9, "Mint",       3)
-                .addRow("Pinky",  "pink",    8, "Grapefruit", 2)
-                ;
+                .addRow("Inky", "cyan", 9, "Mint", 3)
+                .addRow("Pinky", "pink", 8, "Grapefruit", 2);
 
         DataFrameUtil.assertEquals(expected, joined);
     }
@@ -381,21 +348,18 @@ public class DataFrameJoinTest
     {
         DataFrame df1 = new DataFrame("df1")
                 .addStringColumn("Foo").addStringColumn("Bar").addLongColumn("Baz")
-                .addRow("Blinky", "red",     7)
-                .addRow("Pinky",  "pink",    8)
-                .addRow("Inky",   "cyan",    9)
-                .addRow("Clyde",  "orange", 10)
-                ;
+                .addRow("Blinky", "red", 7)
+                .addRow("Pinky", "pink", 8)
+                .addRow("Inky", "cyan", 9)
+                .addRow("Clyde", "orange", 10);
 
         DataFrame df2 = new DataFrame("df2")
-                .addStringColumn("Name").addStringColumn("Color").addLongColumn("Number")
-                ;
+                .addStringColumn("Name").addStringColumn("Color").addLongColumn("Number");
 
         DataFrame joined = df1.join(df2, "Bar", "Color");
 
         DataFrame expected = new DataFrame("expected")
-                .addStringColumn("Foo").addStringColumn("Bar").addLongColumn("Baz").addStringColumn("Name").addLongColumn("Number")
-                ;
+                .addStringColumn("Foo").addStringColumn("Bar").addLongColumn("Baz").addStringColumn("Name").addLongColumn("Number");
 
         DataFrameUtil.assertEquals(expected, joined);
     }
@@ -404,18 +368,15 @@ public class DataFrameJoinTest
     public void joinEmptyToEmpty()
     {
         DataFrame df1 = new DataFrame("df1")
-                .addStringColumn("Foo").addStringColumn("Bar").addLongColumn("Baz")
-                ;
+                .addStringColumn("Foo").addStringColumn("Bar").addLongColumn("Baz");
 
         DataFrame df2 = new DataFrame("df2")
-                .addStringColumn("Name").addStringColumn("Color").addLongColumn("Number")
-                ;
+                .addStringColumn("Name").addStringColumn("Color").addLongColumn("Number");
 
         DataFrame joined = df1.join(df2, "Bar", "Color");
 
         DataFrame expected = new DataFrame("expected")
-                .addStringColumn("Foo").addStringColumn("Bar").addLongColumn("Baz").addStringColumn("Name").addLongColumn("Number")
-                ;
+                .addStringColumn("Foo").addStringColumn("Bar").addLongColumn("Baz").addStringColumn("Name").addLongColumn("Number");
 
         DataFrameUtil.assertEquals(expected, joined);
     }
@@ -425,29 +386,26 @@ public class DataFrameJoinTest
     {
         DataFrame df1 = new DataFrame("df1")
                 .addStringColumn("Foo").addStringColumn("Bar").addLongColumn("Baz")
-                .addRow("Blinky", "red",     7)
-                .addRow("Pinky",  "pink",    8)
-                .addRow("Inky",   "cyan",    9)
-                .addRow("Clyde",  "orange", 10)
-                ;
+                .addRow("Blinky", "red", 7)
+                .addRow("Pinky", "pink", 8)
+                .addRow("Inky", "cyan", 9)
+                .addRow("Clyde", "orange", 10);
 
         DataFrame df2 = new DataFrame("df2")
                 .addStringColumn("Name").addStringColumn("Color").addLongColumn("Number")
-                .addRow("Grapefruit", "pink",   2)
-                .addRow("Orange",     "orange", 4)
-                .addRow("Mint",       "cyan",   3)
-                .addRow("Apple",      "red",    1)
-                ;
+                .addRow("Grapefruit", "pink", 2)
+                .addRow("Orange", "orange", 4)
+                .addRow("Mint", "cyan", 3)
+                .addRow("Apple", "red", 1);
 
         DataFrame joined = df1.outerJoin(df2, "Bar", "Color");
 
         DataFrame expected = new DataFrame("expected")
                 .addStringColumn("Foo").addStringColumn("Bar").addLongColumn("Baz").addStringColumn("Name").addLongColumn("Number")
-                .addRow("Inky",   "cyan",    9, "Mint",       3)
-                .addRow("Clyde",  "orange", 10, "Orange",     4)
-                .addRow("Pinky",  "pink",    8, "Grapefruit", 2)
-                .addRow("Blinky", "red",     7, "Apple",      1)
-                ;
+                .addRow("Inky", "cyan", 9, "Mint", 3)
+                .addRow("Clyde", "orange", 10, "Orange", 4)
+                .addRow("Pinky", "pink", 8, "Grapefruit", 2)
+                .addRow("Blinky", "red", 7, "Apple", 1);
 
         DataFrameUtil.assertEquals(expected, joined);
     }
@@ -457,27 +415,24 @@ public class DataFrameJoinTest
     {
         DataFrame df1 = new DataFrame("df1")
                 .addStringColumn("Foo").addStringColumn("Bar").addLongColumn("Baz")
-                .addRow("Blinky", "red",     7)
-                .addRow("Inky",   "cyan",    9)
-                .addRow("Clyde",  "orange", 10)
-                ;
+                .addRow("Blinky", "red", 7)
+                .addRow("Inky", "cyan", 9)
+                .addRow("Clyde", "orange", 10);
 
         DataFrame df2 = new DataFrame("df2")
                 .addStringColumn("Name").addStringColumn("Color").addLongColumn("Number")
-                .addRow("Grapefruit", "pink",   2)
-                .addRow("Orange",     "orange", 4)
-                .addRow("Apple",      "red",    1)
-                ;
+                .addRow("Grapefruit", "pink", 2)
+                .addRow("Orange", "orange", 4)
+                .addRow("Apple", "red", 1);
 
         DataFrame joined = df1.outerJoin(df2, "Bar", "Color");
 
         DataFrame expected = new DataFrame("expected")
                 .addStringColumn("Foo").addStringColumn("Bar").addLongColumn("Baz").addStringColumn("Name").addLongColumn("Number")
-                .addRow("Inky",   "cyan",    9, null,         null)
-                .addRow("Clyde",  "orange", 10, "Orange",     4)
-                .addRow(null,     "pink", null, "Grapefruit", 2)
-                .addRow("Blinky", "red",     7, "Apple",      1)
-                ;
+                .addRow("Inky", "cyan", 9, null, null)
+                .addRow("Clyde", "orange", 10, "Orange", 4)
+                .addRow(null, "pink", null, "Grapefruit", 2)
+                .addRow("Blinky", "red", 7, "Apple", 1);
 
         DataFrameUtil.assertEquals(expected, joined);
     }
@@ -487,26 +442,23 @@ public class DataFrameJoinTest
     {
         DataFrame df1 = new DataFrame("df1")
                 .addStringColumn("Foo").addStringColumn("Bar").addLongColumn("Baz")
-                .addRow("Inky",   "cyan",    9)
-                .addRow("Clyde",  "orange", 10)
-                ;
+                .addRow("Inky", "cyan", 9)
+                .addRow("Clyde", "orange", 10);
 
         DataFrame df2 = new DataFrame("df2")
                 .addStringColumn("Name").addStringColumn("Color").addLongColumn("Number")
-                .addRow("Grapefruit", "pink",   2)
-                .addRow("Orange",     "orange", 4)
-                .addRow("Apple",      "red",    1)
-                ;
+                .addRow("Grapefruit", "pink", 2)
+                .addRow("Orange", "orange", 4)
+                .addRow("Apple", "red", 1);
 
         DataFrame joined = df1.outerJoin(df2, "Bar", "Color");
 
         DataFrame expected = new DataFrame("expected")
                 .addStringColumn("Foo").addStringColumn("Bar").addLongColumn("Baz").addStringColumn("Name").addLongColumn("Number")
-                .addRow("Inky",   "cyan",    9, null,         null)
-                .addRow("Clyde",  "orange", 10, "Orange",     4)
-                .addRow(null,     "pink", null, "Grapefruit", 2)
-                .addRow(null,     "red",  null, "Apple",      1)
-                ;
+                .addRow("Inky", "cyan", 9, null, null)
+                .addRow("Clyde", "orange", 10, "Orange", 4)
+                .addRow(null, "pink", null, "Grapefruit", 2)
+                .addRow(null, "red", null, "Apple", 1);
 
         DataFrameUtil.assertEquals(expected, joined);
     }
@@ -516,27 +468,24 @@ public class DataFrameJoinTest
     {
         DataFrame df1 = new DataFrame("df1")
                 .addStringColumn("Foo").addStringColumn("Bar").addLongColumn("Baz")
-                .addRow("Blinky", "red",     7)
-                .addRow("Inky",   "cyan",    9)
-                .addRow("Clyde",  "orange", 10)
-                ;
+                .addRow("Blinky", "red", 7)
+                .addRow("Inky", "cyan", 9)
+                .addRow("Clyde", "orange", 10);
 
         DataFrame df2 = new DataFrame("df2")
                 .addStringColumn("Name").addStringColumn("Color").addLongColumn("Number")
-                .addRow("Grapefruit", "pink",   2)
-                .addRow("Orange",     "orange", 4)
-                .addRow("Mint",       "cyan",   3)
-                ;
+                .addRow("Grapefruit", "pink", 2)
+                .addRow("Orange", "orange", 4)
+                .addRow("Mint", "cyan", 3);
 
         DataFrame joined = df1.outerJoin(df2, "Bar", "Color");
 
         DataFrame expected = new DataFrame("expected")
                 .addStringColumn("Foo").addStringColumn("Bar").addLongColumn("Baz").addStringColumn("Name").addLongColumn("Number")
-                .addRow("Inky",   "cyan",    9, "Mint",       3)
-                .addRow("Clyde",  "orange", 10, "Orange",     4)
-                .addRow(null,     "pink", null, "Grapefruit", 2)
-                .addRow("Blinky", "red",     7, null,         null)
-                ;
+                .addRow("Inky", "cyan", 9, "Mint", 3)
+                .addRow("Clyde", "orange", 10, "Orange", 4)
+                .addRow(null, "pink", null, "Grapefruit", 2)
+                .addRow("Blinky", "red", 7, null, null);
 
         DataFrameUtil.assertEquals(expected, joined);
     }
@@ -546,25 +495,27 @@ public class DataFrameJoinTest
     {
         DataFrame df1 = new DataFrame("df1")
                 .addStringColumn("Name").addStringColumn("Color").addLongColumn("Number")
-                .addRow("Pinky",  "pink",    8)
-                .addRow("Clyde",  "orange", 10)
-                ;
+                .addRow("Pinky", "pink", 8)
+                .addRow("Clyde", "orange", 10);
 
         DataFrame df2 = new DataFrame("df2")
                 .addStringColumn("Name").addStringColumn("Color").addLongColumn("Number")
-                .addRow("Grapefruit", "pink",   2)
-                .addRow("Orange",     "orange", 4)
-                ;
+                .addRow("Grapefruit", "pink", 2)
+                .addRow("Orange", "orange", 4);
 
-        DataFrame joined = df1.join(df2, "Color", "Color");
+        MutableMap<String, String> renamedSideB = Maps.mutable.of();
+
+        DataFrame joined = df1.join(df2, Lists.immutable.of("Color"), Lists.immutable.of("Color"), renamedSideB);
 
         DataFrame expected = new DataFrame("expected")
                 .addStringColumn("Name").addStringColumn("Color").addLongColumn("Number").addStringColumn("Name_B").addLongColumn("Number_B")
-                .addRow("Clyde",  "orange", 10, "Orange",     4)
-                .addRow("Pinky",  "pink",    8, "Grapefruit", 2)
-                ;
-
+                .addRow("Clyde", "orange", 10, "Orange", 4)
+                .addRow("Pinky", "pink", 8, "Grapefruit", 2);
         DataFrameUtil.assertEquals(expected, joined);
+
+        Assert.assertEquals(
+                Maps.mutable.of("Name", "Name_B", "Color", "Color", "Number", "Number_B"),
+                renamedSideB);
     }
 
     @Test
@@ -572,24 +523,53 @@ public class DataFrameJoinTest
     {
         DataFrame df1 = new DataFrame("df1")
                 .addStringColumn("Foo").addStringColumn("Foo_B_B").addLongColumn("Foo_B_B_B")
-                .addRow("Pinky",  "pink",    8)
-                .addRow("Clyde",  "orange", 10)
-                ;
+                .addRow("Pinky", "pink", 8)
+                .addRow("Clyde", "orange", 10);
 
         DataFrame df2 = new DataFrame("df2")
                 .addStringColumn("Foo").addStringColumn("Color").addLongColumn("Foo_B")
-                .addRow("Grapefruit", "pink",   2)
-                .addRow("Orange",     "orange", 4)
-                ;
+                .addRow("Grapefruit", "pink", 2)
+                .addRow("Orange", "orange", 4);
 
         DataFrame joined = df1.join(df2, "Foo_B_B", "Color");
 
         DataFrame expected = new DataFrame("expected")
                 .addStringColumn("Foo").addStringColumn("Foo_B_B").addLongColumn("Foo_B_B_B").addStringColumn("Foo_B").addLongColumn("Foo_B_B_B_B")
-                .addRow("Clyde",  "orange", 10, "Orange",     4)
-                .addRow("Pinky",  "pink",    8, "Grapefruit", 2)
-                ;
+                .addRow("Clyde", "orange", 10, "Orange", 4)
+                .addRow("Pinky", "pink", 8, "Grapefruit", 2);
 
         DataFrameUtil.assertEquals(expected, joined);
+    }
+
+    @Test
+    public void outerJoinWithNameCollision()
+    {
+        DataFrame df1 = new DataFrame("df1")
+                .addStringColumn("Foo").addStringColumn("Bar").addLongColumn("Baz")
+                .addRow("Blinky", "red", 7)
+                .addRow("Inky", "cyan", 9)
+                .addRow("Clyde", "orange", 10);
+
+        DataFrame df2 = new DataFrame("df2")
+                .addStringColumn("Name").addStringColumn("Color").addLongColumn("Baz")
+                .addRow("Grapefruit", "pink", 2)
+                .addRow("Orange", "orange", 4)
+                .addRow("Mint", "cyan", 3);
+
+        MutableMap<String, String> renamedColumnsSideB = Maps.mutable.of();
+        DataFrame joined = df1.outerJoin(df2, Lists.immutable.of("Bar"), Lists.immutable.of("Color"), renamedColumnsSideB);
+
+        DataFrame expected = new DataFrame("expected")
+                .addStringColumn("Foo").addStringColumn("Bar").addLongColumn("Baz").addStringColumn("Name").addLongColumn("Baz_B")
+                .addRow("Inky", "cyan", 9, "Mint", 3)
+                .addRow("Clyde", "orange", 10, "Orange", 4)
+                .addRow(null, "pink", null, "Grapefruit", 2)
+                .addRow("Blinky", "red", 7, null, null);
+
+        DataFrameUtil.assertEquals(expected, joined);
+
+        Assert.assertEquals(
+                Maps.mutable.of("Color", "Bar", "Baz", "Baz_B", "Name", "Name"),
+                renamedColumnsSideB);
     }
 }
