@@ -9,7 +9,7 @@ For more on Eclipse Collections see: https://www.eclipse.org/collections/.
 <dependency>
   <groupId>io.github.vmzakharov</groupId>
   <artifactId>dataframe-ec</artifactId>
-  <version>0.9.0</version>
+  <version>0.12.1</version>
 </dependency>
 ```
 
@@ -23,7 +23,9 @@ For more on Eclipse Collections see: https://www.eclipse.org/collections/.
 - select a subset of rows based on a criteria
 - sort by one or more columns or by an expression
 - union - concatenating data frames with the same schemas
-- join with another data frame, based on the specified column value, inner and outer joins are supported
+- join with another data frame, based on the specified column values, inner and outer joins are supported
+- join with complements, a single operation that returns three data frames - a complement of this data frame in another one, an inner join of the data frames, and a complement of the other data frame in this one
+- find relative complements (set differences) of two data frames based on the specified column values
 - aggregation - aggregating the entire data frame or grouping by the specified column values and aggregating within a group
 - flag rows - individually or matching a criteria.
 
@@ -235,6 +237,74 @@ Customer | Count | Price | Date
 "Carl" | 11 | 44.7800 | 2020-12-25
 "Doris" | 1 | 5.0000 | 2020-09-01
 "Eve" | 2 | 9.8000 | 2020-12-05
+
+#### Join
+```
+DataFrame joining1 = new DataFrame("df1")
+        .addStringColumn("Foo").addStringColumn("Bar").addStringColumn("Letter").addLongColumn("Baz")
+        .addRow("Pinky", "pink", "B", 8)
+        .addRow("Inky", "cyan", "C", 9)
+        .addRow("Clyde", "orange", "D", 10);
+
+DataFrame joining2 = new DataFrame("df2")
+        .addStringColumn("Name").addStringColumn("Color").addStringColumn("Code").addLongColumn("Number")
+        .addRow("Grapefruit", "pink", "B", 2)
+        .addRow("Orange", "orange", "D", 4)
+        .addRow("Apple", "red", "A", 1);
+
+DataFrame joined = joining1.outerJoin(joining2, Lists.immutable.of("Bar", "Letter"), Lists.immutable.of("Color", "Code"));
+```
+`joined`
+
+Foo | Bar | Letter | Baz | Name | Number
+---|---|---|---:|---|---:
+"Inky" | "cyan" | "C" | 9 | null | null
+"Clyde" | "orange" | "D" | 10 | "Orange" | 4
+"Pinky" | "pink" | "B" | 8 | "Grapefruit" | 2
+null | "red" | "A" | null | "Apple" | 1
+
+#### Join With Complements
+```
+DataFrame sideA = new DataFrame("Side A")
+        .addStringColumn("Key").addLongColumn("Value")
+        .addRow("A", 1)
+        .addRow("B", 2)
+        .addRow("X", 3)
+        ;
+
+DataFrame sideB = new DataFrame("Side B")
+        .addStringColumn("Id").addLongColumn("Count")
+        .addRow("X", 30)
+        .addRow("B", 10)
+        .addRow("C", 20)
+        ;
+
+Triplet<DataFrame> result = sideA.joinWithComplements(sideB, Lists.immutable.of("Key"), Lists.immutable.of("Id"));
+```
+Complement of B in A:
+
+`result.getOne()`
+
+Key | Value
+---|---:
+"A" | 1
+
+Intersection (inner join) of A and B based on the key columns:
+
+`result.getTwo()`
+
+Key | Value | Count
+---|---:|---:
+"B" | 2 | 10
+"X" | 3 | 30
+
+Complement of A in B:
+
+`result.getThree()`
+
+Id | Count
+---|---:
+"C" | 20
 
 ## Domain Specific Language
 
