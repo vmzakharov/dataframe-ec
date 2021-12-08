@@ -40,7 +40,7 @@ public class DataFrame
     private final MutableList<DfColumn> columns = Lists.mutable.of();
     private int rowCount = 0;
 
-    private final DataFrameEvalContext evalContext; // todo: make threadlocal?
+    private final DataFrameEvalContext evalContext; // todo: thread safety?
     private IntList virtualRowMap = null;
     private boolean poolingEnabled = false;
 
@@ -167,7 +167,7 @@ public class DataFrame
 
     /**
      * Convert the data frame into a multi-line CSV string. The output will include column headers.
-     * @param limit number of rows to convert, all rows if the value if  negative. If the value is zero the result will
+     * @param limit number of rows to convert, all rows if the value is negative. If the value is zero the result will
      *              only contain column names.
      * @return a string representation of the data frame.
      */
@@ -444,15 +444,7 @@ public class DataFrame
 
     private ListIterable<DfColumn> getColumnsToAggregate(ListIterable<String> columnNames)
     {
-        ListIterable<DfColumn> columnsToAggregate = this.columnsNamed(columnNames);
-
-//        ListIterable<DfColumn> nonNumericColumns = columnsToAggregate.reject(each -> each.getType().isNumber());
-//
-//        ErrorReporter.reportAndThrow(nonNumericColumns.notEmpty(),
-//                "Attempting to aggregate non-numeric columns: "
-//                        + nonNumericColumns.collect(DfColumn::getName).makeString() + " in data frame '" + this.getName() + "'");
-
-        return columnsToAggregate;
+        return this.columnsNamed(columnNames);
     }
 
     public DataFrame aggregateBy(
@@ -823,7 +815,7 @@ public class DataFrame
     }
 
     /**
-     * A very basic join - creates a data frame that is this an join of this data frame and another one, based on
+     * A very basic join - creates a data frame that is a join of this data frame and another one, based on
      * the key column values. Rows with the same values of the key column will be combined in the resulting data frame
      * into one wide row. This is an inner join so rows for which there is no match in the other data frame will not be
      * present in the join.
@@ -870,6 +862,8 @@ public class DataFrame
      * @param thisJoinColumnNames  the name of the columns in this data frame to use as the join keys
      * @param otherJoinColumnNames the name of the columns in the other data frame to use as the join keys, they will be
      *                             compared to the columns in this data frame in the order they are specified
+     * @param renamedOtherColumns  the map, which will be populated with the column names on the other data frame renamed
+     *                             in the join to avoid column name collisions
      * @return a data frame that is a join of this data frame and the data frame passed as a parameter
      */
     public DataFrame join(
@@ -932,7 +926,7 @@ public class DataFrame
      * @param other                the data frame to join to
      * @param thisJoinColumnNames  the name of the columns in this data frame to use as the join keys
      * @param otherJoinColumnNames the name of the columns in the other data frame to use as the join keys
-     * @param renamedOtherColumns  the map which will be populated with the column names on the other data frame renamed
+     * @param renamedOtherColumns  the map, which will be populated with the column names on the other data frame renamed
      *                             in the join to avoid column name collisions
      * @return a data frame that is a join of this data frame and the data frame passed as a parameter
      */
