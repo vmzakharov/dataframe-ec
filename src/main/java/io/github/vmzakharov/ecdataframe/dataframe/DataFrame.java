@@ -980,6 +980,32 @@ public class DataFrame
      * is the subset of the rows of each data frame that does not have corresponding keys in the other data frame
      * @param other                 the data frame to join to
      * @param thisJoinColumnNames  the name of the columns in this data frame to use as the join keys
+     * @param otherJoinColumnNames the name of the columns in the other data frame to use as the join keys
+     * @param renamedOtherColumns the map which will be populated with the column names on the other data frame renamed
+     *                            in the join to avoid column name collisions
+     * @return a triplet containing the complement of the other dataframe in this one, the joined dataframe, and the
+     * complement of this data frame in the other one
+     */
+    public Triplet<DataFrame> joinWithComplements(
+            DataFrame other,
+            ListIterable<String> thisJoinColumnNames,
+            ListIterable<String> otherJoinColumnNames,
+            MutableMap<String, String> renamedOtherColumns)
+    {
+        return this.join(
+                other, JoinType.JOIN_WITH_COMPLEMENTS,
+                thisJoinColumnNames, Lists.immutable.empty(),
+                otherJoinColumnNames, Lists.immutable.empty(),
+                renamedOtherColumns);
+    }
+
+    /**
+     * Performs intersection and complement set operations between two data frames based on the provided keys and
+     * returns their results as a triplet of data frames.
+     * The result of the intersection is equivalent to inner join of two data frames, and the result of each complement
+     * is the subset of the rows of each data frame that does not have corresponding keys in the other data frame
+     * @param other                 the data frame to join to
+     * @param thisJoinColumnNames  the name of the columns in this data frame to use as the join keys
      * @param thisAdditionalSortColumnNames specifies columns for sort order on this data frame's side in addition to
      *                                      the order of the values of its key columns
      * @param otherJoinColumnNames the name of the columns in the other data frame to use as the join keys
@@ -1045,6 +1071,12 @@ public class DataFrame
             MutableMap<String, String> renamedOtherColumns
     )
     {
+        if (thisJoinColumnNames.size() != otherJoinColumnNames.size())
+        {
+            ErrorReporter.reportAndThrow("Attempting to join dataframes by different number of key on each side: "
+             + thisJoinColumnNames.makeString() + " to " + otherJoinColumnNames.makeString());
+        }
+
         DataFrame joined = this.cloneStructureAsStored(this.getName() + "_" + other.getName());
 
         DataFrame thisComplementOther = this.cloneStructureAsStored(this.getName() + "-" + other.getName());

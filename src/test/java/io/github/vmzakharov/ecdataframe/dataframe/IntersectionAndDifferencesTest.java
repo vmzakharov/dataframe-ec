@@ -1,7 +1,10 @@
 package io.github.vmzakharov.ecdataframe.dataframe;
 
 import org.eclipse.collections.api.factory.Lists;
+import org.eclipse.collections.api.map.MutableMap;
 import org.eclipse.collections.api.tuple.Triplet;
+import org.eclipse.collections.impl.factory.Maps;
+import org.junit.Assert;
 import org.junit.Test;
 
 public class IntersectionAndDifferencesTest
@@ -257,5 +260,137 @@ public class IntersectionAndDifferencesTest
                 ,
                 result.getThree()
         );
+    }
+
+    @Test
+    public void columnNameCollision()
+    {
+        DataFrame sideA = new DataFrame("Side A")
+                .addStringColumn("Key").addStringColumn("Key2").addLongColumn("Qty").addDoubleColumn("Value")
+                .addRow("A", "aaa", 1, 2.22)
+                .addRow("B", "zzz", 2, 3.33)
+                .addRow("B", "zzz", 2, 3.33)
+                ;
+
+        DataFrame sideB = new DataFrame("Side B")
+                .addStringColumn("Id").addStringColumn("Key2").addLongColumn("Qty").addDoubleColumn("Value")
+                .addRow("B", "zzz", 10, 4.44)
+                .addRow("C", "yyy", 20, 5.55)
+                .addRow("B", "zzz", 10, 4.44)
+                ;
+
+        MutableMap<String, String> renamedColumnsSideB = Maps.mutable.of();
+
+        Triplet<DataFrame> result =
+                sideA.joinWithComplements(sideB,
+                        Lists.immutable.of("Key", "Key2"), Lists.immutable.of("Id", "Key2"), renamedColumnsSideB);
+
+        System.out.println(result.getTwo().asCsvString());
+
+        DataFrameUtil.assertEquals(
+                new DataFrame("Complement of B in A")
+                    .addStringColumn("Key").addStringColumn("Key2").addLongColumn("Qty").addDoubleColumn("Value")
+                    .addRow("A", "aaa", 1, 2.22)
+                ,
+                result.getOne()
+        );
+
+        Assert.assertEquals(
+                Maps.mutable.of("Id", "Key", "Key2", "Key2", "Qty", "Qty_B", "Value", "Value_B"),
+                renamedColumnsSideB);
+
+        DataFrameUtil.assertEquals(
+                new DataFrame("Join of A and B - intersection of keys")
+                        .addStringColumn("Key").addStringColumn("Key2")
+                        .addLongColumn("Qty").addDoubleColumn("Value")
+                        .addLongColumn("Qty_B").addDoubleColumn("Value_B")
+                        .addRow("B", "zzz", 2, 3.33, 10, 4.44)
+                        .addRow("B", "zzz", 2, 3.33, 10, 4.44)
+                ,
+                result.getTwo()
+        );
+
+        DataFrameUtil.assertEquals(
+                new DataFrame("Complement of A in B")
+                        .addStringColumn("Id").addStringColumn("Key2").addLongColumn("Qty").addDoubleColumn("Value")
+                        .addRow("C", "yyy", 20, 5.55)
+                ,
+                result.getThree()
+        );
+    }
+
+    @Test
+    public void columnNameCollisionWithSort()
+    {
+        DataFrame sideA = new DataFrame("Side A")
+                .addStringColumn("Key").addStringColumn("Key2").addLongColumn("Qty").addDoubleColumn("Value")
+                .addRow("A", "aaa", 1, 2.22)
+                .addRow("B", "zzz", 3, 6.66)
+                .addRow("B", "zzz", 2, 3.33)
+                ;
+
+        DataFrame sideB = new DataFrame("Side B")
+                .addStringColumn("Id").addStringColumn("Key2").addLongColumn("Qty").addDoubleColumn("Value")
+                .addRow("B", "zzz", 25, 8.88)
+                .addRow("B", "zzz", 45, 4.44)
+                .addRow("C", "yyy", 20, 5.55)
+                ;
+
+        MutableMap<String, String> renamedColumnsSideB = Maps.mutable.of();
+
+        Triplet<DataFrame> result =
+                sideA.joinWithComplements(sideB,
+                        Lists.immutable.of("Key", "Key2"), Lists.immutable.of("Qty"),
+                        Lists.immutable.of("Id", "Key2"), Lists.immutable.of("Value"),
+                        renamedColumnsSideB);
+
+        DataFrameUtil.assertEquals(
+                new DataFrame("Complement of B in A")
+                    .addStringColumn("Key").addStringColumn("Key2").addLongColumn("Qty").addDoubleColumn("Value")
+                    .addRow("A", "aaa", 1, 2.22)
+                ,
+                result.getOne()
+        );
+
+        Assert.assertEquals(
+                Maps.mutable.of("Id", "Key", "Key2", "Key2", "Qty", "Qty_B", "Value", "Value_B"),
+                renamedColumnsSideB);
+
+        DataFrameUtil.assertEquals(
+                new DataFrame("Join of A and B - intersection of keys")
+                        .addStringColumn("Key").addStringColumn("Key2")
+                        .addLongColumn("Qty").addDoubleColumn("Value")
+                        .addLongColumn("Qty_B").addDoubleColumn("Value_B")
+                        .addRow("B", "zzz", 2, 3.33, 45, 4.44)
+                        .addRow("B", "zzz", 3, 6.66, 25, 8.88)
+                ,
+                result.getTwo()
+        );
+
+        DataFrameUtil.assertEquals(
+                new DataFrame("Complement of A in B")
+                        .addStringColumn("Id").addStringColumn("Key2").addLongColumn("Qty").addDoubleColumn("Value")
+                        .addRow("C", "yyy", 20, 5.55)
+                ,
+                result.getThree()
+        );
+    }
+
+    @Test(expected = RuntimeException.class)
+    public void joiningByDifferentNumberOfKeysThrows()
+    {
+        DataFrame sideA = new DataFrame("Side A")
+                .addStringColumn("Key").addLongColumn("Value")
+                .addRow("A", 1)
+                .addRow("B", 2)
+                ;
+
+        DataFrame sideB = new DataFrame("Side B")
+                .addStringColumn("Id").addLongColumn("Count")
+                .addRow("B", 10)
+                .addRow("C", 20)
+                ;
+
+        sideA.joinWithComplements(sideB, Lists.immutable.of("Key", "Value"), Lists.immutable.of("Id"));
     }
 }
