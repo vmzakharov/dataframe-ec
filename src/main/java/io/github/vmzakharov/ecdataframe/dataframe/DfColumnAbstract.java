@@ -80,7 +80,7 @@ implements DfColumn
     protected DfColumn validateAndCreateTargetColumn(DfColumn other, DataFrame target)
     {
         ErrorReporter.reportAndThrow(!this.getType().equals(other.getType()),
-                        "Attempting to merge columns of different types: "
+                () -> "Attempting to merge columns of different types: "
                         + this.getName() + " (" + this.getType() + ") and " + other.getName() + " (" + other.getType() + ")");
 
         target.addColumn(this.getName(), this.getType());
@@ -90,5 +90,10 @@ implements DfColumn
         newColumn.ensureCapacity(this.getSize() + other.getSize());
 
         return newColumn;
+    }
+
+    protected int dataFrameRowIndex(int virtualRowIndex)
+    {
+        return this.getDataFrame().rowIndexMap(virtualRowIndex);
     }
 }

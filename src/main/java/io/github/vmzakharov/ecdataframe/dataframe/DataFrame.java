@@ -269,7 +269,7 @@ public class DataFrame
         return this;
     }
 
-    private int rowIndexMap(int virtualRowIndex)
+    protected int rowIndexMap(int virtualRowIndex)
     {
         if (this.isIndexed())
         {
@@ -1286,6 +1286,14 @@ public class DataFrame
         MutableList<String> columnNamesToDrop = this.columns.collect(DfColumn::getName).reject(columnNamesToKeep::contains);
 
         return this.dropColumns(columnNamesToDrop);
+    }
+
+    public IntIntToIntFunction columnComparator(DataFrame other, String thisColumnName, String otherColumnName)
+    {
+        final DfColumn thisColumn = this.getColumnNamed(thisColumnName);
+        final DfColumn otherColumn = other.getColumnNamed(otherColumnName);
+
+        return thisColumn.columnComparator(otherColumn);
     }
 
     private enum JoinType

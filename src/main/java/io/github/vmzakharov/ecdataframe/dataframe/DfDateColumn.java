@@ -3,6 +3,7 @@ package io.github.vmzakharov.ecdataframe.dataframe;
 import io.github.vmzakharov.ecdataframe.dsl.value.DateValue;
 import io.github.vmzakharov.ecdataframe.dsl.value.Value;
 import io.github.vmzakharov.ecdataframe.dsl.value.ValueType;
+import org.eclipse.collections.api.block.function.primitive.IntIntToIntFunction;
 import org.eclipse.collections.api.list.ImmutableList;
 import org.eclipse.collections.api.list.ListIterable;
 
@@ -75,5 +76,28 @@ extends DfColumnAbstract
         mergedCol.addAllItems(this.toList());
         mergedCol.addAllItems(((DfDateColumn) other).toList());
         return mergedCol;
+    }
+
+    private int nullAwareStringCompare(LocalDate thisDate, LocalDate otherDate)
+    {
+        if (thisDate == null)
+        {
+            return otherDate == null ? 0 : -1;
+        }
+        else if (otherDate == null)
+        {
+            return 1;
+        }
+
+        return thisDate.compareTo(otherDate);
+    }
+
+    @Override
+    public IntIntToIntFunction columnComparator(DfColumn otherColumn)
+    {
+        DfDateColumn otherStringColumn = (DfDateColumn) otherColumn;
+        return (thisRowIndex, otherRowIndex) -> this.nullAwareStringCompare(
+                this.getDate(this.dataFrameRowIndex(thisRowIndex)),
+                otherStringColumn.getDate(otherStringColumn.dataFrameRowIndex(otherRowIndex)));
     }
 }

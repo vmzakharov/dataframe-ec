@@ -79,13 +79,13 @@ implements FunctionDescriptor
     {
         ErrorReporter.reportAndThrow(
                 expectedCount != actualCount,
-                "Invalid number of parameters in a call to '" + this.getName() + "'. " + this.usageString());
+                () -> "Invalid number of parameters in a call to '" + this.getName() + "'. " + this.usageString());
     }
 
     protected void assertParameterType(ValueType expected, ValueType actual)
     {
         ErrorReporter.reportAndThrow(
                 expected != actual,
-                "Invalid parameter type in a call to '" + this.getName() + "'. " + this.usageString());
+                () -> "Invalid parameter type in a call to '" + this.getName() + "'. " + this.usageString());
     }
 }

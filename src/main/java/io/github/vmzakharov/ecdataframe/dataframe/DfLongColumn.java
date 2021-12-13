@@ -3,6 +3,7 @@ package io.github.vmzakharov.ecdataframe.dataframe;
 import io.github.vmzakharov.ecdataframe.dsl.value.LongValue;
 import io.github.vmzakharov.ecdataframe.dsl.value.Value;
 import io.github.vmzakharov.ecdataframe.dsl.value.ValueType;
+import org.eclipse.collections.api.block.function.primitive.IntIntToIntFunction;
 import org.eclipse.collections.api.list.primitive.ImmutableLongList;
 
 abstract public class DfLongColumn
@@ -65,4 +66,29 @@ extends DfColumnAbstract
     }
 
     protected abstract void addAllItemsFrom(DfLongColumn items);
+
+    private int nullAwareLongCompare(DfLongColumn otherColumn, int thisRowIndex, int otherRowIndex)
+    {
+        if (this.isNull(thisRowIndex))
+        {
+            return otherColumn.isNull(otherRowIndex) ? 0 : -1;
+        }
+        else if (otherColumn.isNull(otherRowIndex))
+        {
+            return 1;
+        }
+
+        return Long.compare(this.getLong(thisRowIndex), otherColumn.getLong(otherRowIndex));
+    }
+
+    @Override
+    public IntIntToIntFunction columnComparator(DfColumn otherColumn)
+    {
+        DfLongColumn otherLongColumn = (DfLongColumn) otherColumn;
+
+        return (thisRowIndex, otherRowIndex) -> this.nullAwareLongCompare(
+                otherLongColumn,
+                this.dataFrameRowIndex(thisRowIndex),
+                otherLongColumn.dataFrameRowIndex(otherRowIndex));
+    }
 }
