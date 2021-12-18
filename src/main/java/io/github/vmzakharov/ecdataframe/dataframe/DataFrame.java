@@ -1288,7 +1288,7 @@ public class DataFrame
         return this.dropColumns(columnNamesToDrop);
     }
 
-    public IntIntToIntFunction columnComparator(DataFrame other, String thisColumnName, String otherColumnName)
+    public DfCellComparator columnComparator(DataFrame other, String thisColumnName, String otherColumnName)
     {
         final DfColumn thisColumn = this.getColumnNamed(thisColumnName);
         final DfColumn otherColumn = other.getColumnNamed(otherColumnName);

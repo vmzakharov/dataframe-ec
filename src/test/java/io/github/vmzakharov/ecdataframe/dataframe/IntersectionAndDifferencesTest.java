@@ -285,8 +285,6 @@ public class IntersectionAndDifferencesTest
                 sideA.joinWithComplements(sideB,
                         Lists.immutable.of("Key", "Key2"), Lists.immutable.of("Id", "Key2"), renamedColumnsSideB);
 
-        System.out.println(result.getTwo().asCsvString());
-
         DataFrameUtil.assertEquals(
                 new DataFrame("Complement of B in A")
                     .addStringColumn("Key").addStringColumn("Key2").addLongColumn("Qty").addDoubleColumn("Value")

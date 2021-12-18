@@ -59,4 +59,22 @@ extends DfColumnAbstract
 
         return mergedCol;
     }
+
+    @Override
+    public DfCellComparator columnComparator(DfColumn otherColumn)
+    {
+        DfDoubleColumn otherDoubleColumn = (DfDoubleColumn) otherColumn;
+
+        return (thisRowIndex, otherRowIndex) -> {
+            int thisMappedIndex = this.dataFrameRowIndex(thisRowIndex);
+            int otherMappedIndex = otherDoubleColumn.dataFrameRowIndex(otherRowIndex);
+
+            return new ComparisonResult.DoubleComparisonResult(
+                    () -> this.getDouble(thisMappedIndex),
+                    () -> otherDoubleColumn.getDouble(otherMappedIndex),
+                    this.isNull(thisMappedIndex),
+                    otherDoubleColumn.isNull(otherMappedIndex)
+            );
+        };
+    }
 }
