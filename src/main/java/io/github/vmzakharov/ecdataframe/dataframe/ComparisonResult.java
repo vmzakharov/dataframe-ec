@@ -13,8 +13,36 @@ abstract public class ComparisonResult
 {
     private NullSide nullSide = NO_NULLS;
 
-    abstract public int asDirection();
+    /**
+     * result of comparison that follows the contract of a Java comparator
+     * @return zero if the values in the data frame cells being compared are equals, a negative values if the first
+     * value is less than the second one, a positive value if the first value greater than the second one
+     */
+    abstract public int result();
 
+    /**
+     * Calculates the difference as a {@code long} value for the compared values, where applicable (e.g., for integer values).
+     * If there is no "natural" difference that can be computed the value follows the contract of the regular Java
+     * compare method but is meaningless otherwise
+     * @return the difference between the values being compared, if applicable
+     */
+    abstract public long delta();
+
+    /**
+     * Calculates the difference as a {@code double} value for the compared values, where applicable (e.g., for double values).
+     * If there is no "natural" difference that can be computed then the value follows the contract of the regular Java
+     * compare method but is meaningless otherwise
+     * @return the difference between the values being compared, if applicable
+     */
+    public double dDelta()
+    {
+        return this.delta();
+    }
+
+    /*
+    used to populate the delta value in case one of the values being compared is null. Otherwise, populating delta is
+    delegated to the relevant type specific subclass
+     */
     abstract protected void delta(int newDelta);
 
     public boolean bothAreNulls()
@@ -95,7 +123,14 @@ abstract public class ComparisonResult
             }
         }
 
-        public double delta()
+        @Override
+        public long delta()
+        {
+            return Math.round(this.delta);
+        }
+
+        @Override
+        public double dDelta()
         {
             return this.delta;
         }
@@ -107,7 +142,7 @@ abstract public class ComparisonResult
         }
 
         @Override
-        public int asDirection()
+        public int result()
         {
             return Double.compare(this.delta, 0.0);
         }
@@ -129,26 +164,18 @@ abstract public class ComparisonResult
                 this.delta = thisValue - otherValue;
 
                 // check for overflows
-                if (thisValue > otherValue)
+                if ((thisValue > otherValue) && (this.delta < 0))
                 {
-                    if (this.delta < 0)
-                    {
-                        this.delta = Long.MAX_VALUE;
-                    }
+                    this.delta = Long.MAX_VALUE;
                 }
-                else
+                else if ((thisValue < otherValue) && (this.delta > 0))
                 {
-                    if (thisValue < otherValue)
-                    {
-                        if (this.delta > 0)
-                        {
-                            this.delta = Long.MIN_VALUE;
-                        }
-                    }
+                    this.delta = Long.MIN_VALUE;
                 }
             }
         }
 
+        @Override
         public long delta()
         {
             return this.delta;
@@ -161,7 +188,7 @@ abstract public class ComparisonResult
         }
 
         @Override
-        public int asDirection()
+        public int result()
         {
             return this.delta == 0 ? 0 : (this.delta > 0 ? 1 : -1);
         }
@@ -182,18 +209,20 @@ abstract public class ComparisonResult
             }
         }
 
-        public int delta()
+        @Override
+        public long delta()
         {
             return this.delta;
         }
 
+        @Override
         protected void delta(int newDelta)
         {
             this.delta = newDelta;
         }
 
         @Override
-        public int asDirection()
+        public int result()
         {
             return this.delta;
         }
