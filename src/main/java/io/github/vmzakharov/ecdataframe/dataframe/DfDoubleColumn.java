@@ -44,7 +44,14 @@ extends DfColumnAbstract
     @Override
     public void addRowToColumn(int rowIndex, DfColumn target)
     {
-        ((DfDoubleColumnStored) target).addDouble(this.getDouble(rowIndex));
+        if (this.isNull(rowIndex))
+        {
+            target.addEmptyValue();
+        }
+        else
+        {
+            ((DfDoubleColumnStored) target).addDouble(this.getDouble(rowIndex));
+        }
     }
 
     protected abstract void addAllItems(DoubleIterable items);

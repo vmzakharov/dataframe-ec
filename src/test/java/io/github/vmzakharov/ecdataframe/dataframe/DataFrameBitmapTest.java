@@ -56,7 +56,7 @@ public class DataFrameBitmapTest
     }
 
     @Test
-    public void selectionOfMarkedRowsOnSortedDataFrame()
+    public void selectionOfFlaggedRowsOnSortedDataFrame()
     {
         this.dataFrame.sortBy(Lists.immutable.of("Foo"));
 
@@ -78,7 +78,7 @@ public class DataFrameBitmapTest
     }
 
     @Test
-    public void selectionOfNotMarkedRows()
+    public void selectionOfNotFlaggedRows()
     {
         this.dataFrame.enableBitmap();
 
@@ -110,7 +110,7 @@ public class DataFrameBitmapTest
     }
 
     @Test
-    public void selectionOfNotMarkedRowsOnSortedDataFrame()
+    public void selectionOfNotFlaggedRowsOnSortedDataFrame()
     {
         this.dataFrame.sortBy(Lists.immutable.of("Foo"));
 
@@ -138,5 +138,37 @@ public class DataFrameBitmapTest
                 .collectBoolean(this.dataFrame::isFlagged, BooleanLists.mutable.of());
 
         Assert.assertEquals(BooleanLists.immutable.of(false, true, false, false, true), flags);
+    }
+
+    @Test
+    public void selectionWithNulls()
+    {
+        this.dataFrame = new DataFrame("FrameOfData")
+                .addStringColumn("Name").addStringColumn("Foo").addLongColumn("Bar").addDoubleColumn("Baz").addDoubleColumn("Qux")
+                .addRow(null,      "Pqr",  11L, 10.0, 20.0)
+                .addRow("Albert",   null,  12L, 12.0, 10.0)
+                .addRow("Bob",     "Def", null, 13.0, 25.0)
+                .addRow("Carol",   "Xyz",  14L, null, 40.0)
+                .addRow("Abigail", "Def",  15L, 15.0, null)
+        ;
+
+        this.dataFrame.flagRowsBy("Foo in ('Def', 'Pqr')");
+
+        DataFrame flagged = this.dataFrame.selectFlagged();
+
+        DataFrameUtil.assertEquals(new DataFrame("expected flagged")
+                     .addStringColumn("Name").addStringColumn("Foo").addLongColumn("Bar").addDoubleColumn("Baz").addDoubleColumn("Qux")
+                     .addRow(null,      "Pqr",  11L, 10.0, 20.0)
+                     .addRow("Bob",     "Def", null, 13.0, 25.0)
+                     .addRow("Abigail", "Def",  15L, 15.0, null)
+                , flagged);
+
+        DataFrame notFlagged = this.dataFrame.selectNotFlagged();
+
+        DataFrameUtil.assertEquals(new DataFrame("expected not flagged")
+                        .addStringColumn("Name").addStringColumn("Foo").addLongColumn("Bar").addDoubleColumn("Baz").addDoubleColumn("Qux")
+                        .addRow("Albert",   null,  12L, 12.0, 10.0)
+                        .addRow("Carol",   "Xyz",  14L, null, 40.0)
+                , notFlagged);
     }
 }

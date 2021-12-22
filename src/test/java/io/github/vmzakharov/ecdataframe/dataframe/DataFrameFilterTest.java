@@ -74,4 +74,35 @@ public class DataFrameFilterTest
         DataFrameUtil.assertEquals(expectedSelected, selectedAndRejected.getOne());
         DataFrameUtil.assertEquals(expectedRejected, selectedAndRejected.getTwo());
     }
+
+    @Test
+    public void selectAndRejectWithNulls()
+    {
+        this.dataFrame = new DataFrame("FrameOfData")
+                .addStringColumn("Name").addStringColumn("Foo").addLongColumn("Bar").addDoubleColumn("Baz").addDoubleColumn("Qux")
+                .addRow("Alice",   "Pqr",  11L, 10.0, null)
+                .addRow(null,      "Abc",  12L, 12.0, 10.0)
+                .addRow("Bob",      null,  13L, 13.0, 25.0)
+                .addRow("Carol",   "Xyz", null, 14.0, 40.0)
+                .addRow("Abigail", "Def",  15L, null, 11.0)
+        ;
+
+        Twin<DataFrame> selectedAndRejected = this.dataFrame.partition("Foo == \"Def\" or Foo == \"Abc\"");
+
+        DataFrame expectedSelected = new DataFrame("FrameOfData")
+                .addStringColumn("Name").addStringColumn("Foo").addLongColumn("Bar").addDoubleColumn("Baz").addDoubleColumn("Qux")
+                .addRow(null,      "Abc",  12L, 12.0, 10.0)
+                .addRow("Abigail", "Def",  15L, null, 11.0)
+                ;
+
+        DataFrame expectedRejected = new DataFrame("FrameOfData")
+                .addStringColumn("Name").addStringColumn("Foo").addLongColumn("Bar").addDoubleColumn("Baz").addDoubleColumn("Qux")
+                .addRow("Alice",   "Pqr",  11L, 10.0, null)
+                .addRow("Bob",     null,   13L, 13.0, 25.0)
+                .addRow("Carol",   "Xyz", null, 14.0, 40.0)
+                ;
+
+        DataFrameUtil.assertEquals(expectedSelected, selectedAndRejected.getOne());
+        DataFrameUtil.assertEquals(expectedRejected, selectedAndRejected.getTwo());
+    }
 }
