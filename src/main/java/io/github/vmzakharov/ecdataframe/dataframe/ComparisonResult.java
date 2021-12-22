@@ -18,7 +18,7 @@ abstract public class ComparisonResult
      * @return zero if the values in the data frame cells being compared are equals, a negative values if the first
      * value is less than the second one, a positive value if the first value greater than the second one
      */
-    abstract public int result();
+    abstract public int compared();
 
     /**
      * Calculates the difference as a {@code long} value for the compared values, where applicable (e.g., for integer values).
@@ -142,7 +142,7 @@ abstract public class ComparisonResult
         }
 
         @Override
-        public int result()
+        public int compared()
         {
             return Double.compare(this.delta, 0.0);
         }
@@ -188,7 +188,7 @@ abstract public class ComparisonResult
         }
 
         @Override
-        public int result()
+        public int compared()
         {
             return this.delta == 0 ? 0 : (this.delta > 0 ? 1 : -1);
         }
@@ -222,7 +222,7 @@ abstract public class ComparisonResult
         }
 
         @Override
-        public int result()
+        public int compared()
         {
             return this.delta;
         }
