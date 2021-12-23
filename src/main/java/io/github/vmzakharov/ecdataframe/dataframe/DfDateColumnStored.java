@@ -111,7 +111,7 @@ implements DfColumnStored
     }
 
     @Override
-    public void ensureCapacity(int newCapacity)
+    public void ensureInitialCapacity(int newCapacity)
     {
         this.values = Lists.mutable.withInitialCapacity(newCapacity);
     }

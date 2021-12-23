@@ -87,7 +87,7 @@ implements DfColumn
 
         DfColumnStored newColumn = (DfColumnStored) target.getColumnAt(target.columnCount() - 1);
 
-        newColumn.ensureCapacity(this.getSize() + other.getSize());
+        newColumn.ensureInitialCapacity(this.getSize() + other.getSize());
 
         return newColumn;
     }

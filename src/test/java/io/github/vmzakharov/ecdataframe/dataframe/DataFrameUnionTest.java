@@ -1,6 +1,9 @@
 package io.github.vmzakharov.ecdataframe.dataframe;
 
+import org.eclipse.collections.impl.factory.Lists;
 import org.junit.Test;
+
+import java.time.LocalDate;
 
 public class DataFrameUnionTest
 {
@@ -33,6 +36,79 @@ public class DataFrameUnionTest
                 .addRow("Heidi", 2, 22.34)
                 .addRow("Ivan",  3, 36.78)
                 .addRow("Judy",  4, 47.89);
+
+        DataFrameUtil.assertEquals(expected, union);
+    }
+
+    @Test
+    public void unionWithNulls()
+    {
+        DataFrame df1 = new DataFrame("df1")
+                .addStringColumn("Name").addLongColumn("Count").addDoubleColumn("Value").addDateColumn("Date")
+                .addRow(null, 5, 23.45, LocalDate.of(2020, 7, 10))
+                .addRow("Bob", null, 12.34, LocalDate.of(2020, 7, 10))
+                .addRow("Carl", 11, null, LocalDate.of(2020, 7, 10))
+                .addRow("Deb", 0, 7.89, null)
+                ;
+
+        DataFrame df2 = new DataFrame("df1")
+                .addStringColumn("Name").addLongColumn("Count").addDoubleColumn("Value").addDateColumn("Date")
+                .addRow("Grace", 1, 13.45, null)
+                .addRow("Heidi", 2, null, LocalDate.of(2020, 8, 11))
+                .addRow("Ivan", null, 36.78, LocalDate.of(2020, 8, 12))
+                .addRow(null, 4, 47.89, LocalDate.of(2020, 8, 10))
+                ;
+
+        DataFrame union = df1.union(df2);
+
+        DataFrame expected = new DataFrame("expected")
+                .addStringColumn("Name").addLongColumn("Count").addDoubleColumn("Value").addDateColumn("Date")
+                .addRow(null, 5, 23.45, LocalDate.of(2020, 7, 10))
+                .addRow("Bob", null, 12.34, LocalDate.of(2020, 7, 10))
+                .addRow("Carl", 11, null, LocalDate.of(2020, 7, 10))
+                .addRow("Deb", 0, 7.89, null)
+                .addRow("Grace", 1, 13.45, null)
+                .addRow("Heidi", 2, null, LocalDate.of(2020, 8, 11))
+                .addRow("Ivan", null, 36.78, LocalDate.of(2020, 8, 12))
+                .addRow(null, 4, 47.89, LocalDate.of(2020, 8, 10));
+
+        DataFrameUtil.assertEquals(expected, union);
+    }
+
+    @Test
+    public void unionOfSorted()
+    {
+        DataFrame df1 = new DataFrame("df1")
+                .addStringColumn("Name").addLongColumn("Count").addDoubleColumn("Value")
+                .addRow("Alice", 10, 23.45)
+                .addRow("Bob", 5, 12.34)
+                .addRow("Carl", 11, 56.78)
+                .addRow("Deb", 0, 7.89);
+
+        df1.sortBy(Lists.immutable.of("Count"));
+
+        DataFrame df2 = new DataFrame("df1")
+                .addStringColumn("Name").addLongColumn("Count").addDoubleColumn("Value")
+                .addRow("Grace", 5, 13.45)
+                .addRow("Heidi", 2, 22.34)
+                .addRow("Ivan", 3, 36.78)
+                .addRow("Judy", 4, 47.89);
+
+        df2.sortBy(Lists.immutable.of("Count"));
+
+        DataFrame union = df1.union(df2);
+
+        DataFrame expected = new DataFrame("expected")
+                .addStringColumn("Name").addLongColumn("Count").addDoubleColumn("Value")
+                .addRow("Alice", 10, 23.45)
+                .addRow("Bob", 5, 12.34)
+                .addRow("Carl", 11, 56.78)
+                .addRow("Deb", 0, 7.89)
+                .addRow("Grace", 5, 13.45)
+                .addRow("Heidi", 2, 22.34)
+                .addRow("Ivan", 3, 36.78)
+                .addRow("Judy", 4, 47.89)
+                ;
 
         DataFrameUtil.assertEquals(expected, union);
     }

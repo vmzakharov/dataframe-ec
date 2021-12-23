@@ -6,5 +6,5 @@ extends DfColumn
     @Override
     default boolean isStored() { return true; }
 
-    void ensureCapacity(int newCapacity);
+    void ensureInitialCapacity(int newCapacity);
 }

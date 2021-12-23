@@ -160,7 +160,7 @@ implements DfColumnStored
     }
 
     @Override
-    public void ensureCapacity(int newCapacity)
+    public void ensureInitialCapacity(int newCapacity)
     {
         this.values = LongLists.mutable.withInitialCapacity(newCapacity);
         this.nullMap = BooleanLists.mutable.withInitialCapacity(newCapacity);
@@ -169,10 +169,11 @@ implements DfColumnStored
     @Override
     protected void addAllItemsFrom(DfLongColumn longColumn)
     {
+        this.values.addAll(longColumn.toLongList());
+
         int size = longColumn.getSize();
         for (int rowIndex = 0; rowIndex < size; rowIndex++)
         {
-            this.values.add(longColumn.getLong(rowIndex));
             this.nullMap.add(longColumn.isNull(rowIndex));
         }
     }
