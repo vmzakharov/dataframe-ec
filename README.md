@@ -9,7 +9,7 @@ For more on Eclipse Collections see: https://www.eclipse.org/collections/.
 <dependency>
   <groupId>io.github.vmzakharov</groupId>
   <artifactId>dataframe-ec</artifactId>
-  <version>0.12.1</version>
+  <version>0.14.1</version>
 </dependency>
 ```
 
@@ -17,8 +17,8 @@ For more on Eclipse Collections see: https://www.eclipse.org/collections/.
 
 - create a data frame programmatically or load from a csv file
 - add a column to a data frame, columns can be
-  - stored or computed
-  - of type: string, integer (long), double, date
+    - stored or computed
+    - of type: string, integer (long), double, date
 - drop one or more columns
 - select a subset of rows based on a criteria
 - sort by one or more columns or by an expression
@@ -378,7 +378,25 @@ There are two types of functions - intrinsic (built-in) and explicitly declared 
 
 Recursion (direct or indirect) is not supported.
 
-#### Example 1
+#### Built-in functions
+
+Function | Usage
+--- | ---
+abs | abs(number)
+contains | contains(string, substring)
+print | print()
+println | println()
+startsWith | startsWith(string, prefix)
+substr | substr(string, beginIndex[, endIndex])
+toDate | toDate(string in the yyyy-mm-dd format)
+toDouble | toDouble(string)
+toLong | toLong(string)
+toString | toString(number)
+toUpper | toUpper(string)
+withinDays | withinDays(date1, date2, numberOfDays)
+
+
+#### User Declared Function Example 1
 ```
 function abs(x)
 {
@@ -391,7 +409,7 @@ function abs(x)
 abs(-123)
 ```
 
-#### Example 2
+#### User Declared Function Example 2
 ```
 function hello()
 {
