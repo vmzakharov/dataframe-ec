@@ -38,7 +38,7 @@ extends AbstractValue
 
     private DateTimeFormatter getFormatter()
     {
-        return this.FORMATTER;
+        return FORMATTER;
     }
 
     @Override

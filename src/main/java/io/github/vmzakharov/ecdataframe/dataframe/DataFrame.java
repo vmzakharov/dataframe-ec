@@ -717,7 +717,7 @@ public class DataFrame
      */
     public DataFrame union(DataFrame other)
     {
-        ErrorReporter.reportAndThrow(this.columnCount() != other.columnCount(), "Attempting to union data frames with different number of columns");
+        ErrorReporter.reportAndThrow(this.columnCount() != other.columnCount(), "Attempting to union data frames with different numbers of columns");
         DataFrame dfUnion = new DataFrame("union");
 
         this.columns.forEach(
@@ -1067,7 +1067,7 @@ public class DataFrame
     {
         if (thisJoinColumnNames.size() != otherJoinColumnNames.size())
         {
-            ErrorReporter.reportAndThrow("Attempting to join dataframes by different number of key on each side: "
+            ErrorReporter.reportAndThrow("Attempting to join dataframes by different number of keys on each side: "
              + thisJoinColumnNames.makeString() + " to " + otherJoinColumnNames.makeString());
         }
 
