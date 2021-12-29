@@ -4,6 +4,9 @@ import io.github.vmzakharov.ecdataframe.dsl.Script;
 import io.github.vmzakharov.ecdataframe.dsl.visitor.InMemoryEvaluationVisitor;
 import io.github.vmzakharov.ecdataframe.util.CollectingPrinter;
 import io.github.vmzakharov.ecdataframe.util.PrinterFactory;
+import org.eclipse.collections.api.list.MutableList;
+import org.eclipse.collections.api.map.MapIterable;
+import org.eclipse.collections.impl.factory.Lists;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -126,5 +129,22 @@ public class BuiltInFunctionTest
     {
         Assert.assertEquals(123.0, evaluateToDouble("toDouble('123')"), TOLERANCE);
         Assert.assertEquals(-456.789, evaluateToDouble("toDouble('-456.789')"), TOLERANCE);
+    }
+
+    @Test
+    public void listAllFunctions()
+    {
+        BuiltInFunctions.resetFunctionList();
+
+        MapIterable<String, IntrinsicFunctionDescriptor> functionsByName = BuiltInFunctions.getFunctionsByName();
+
+        MutableList<String> expectedFunctionNames = Lists.mutable.of(
+            "abs", "contains", "print", "println", "startsWith", "substr", "toDate", "toDouble", "toLong", "toString",
+            "toUpper", "withinDays"
+        );
+
+        Assert.assertEquals(expectedFunctionNames.size(), functionsByName.size());
+
+        Assert.assertTrue(expectedFunctionNames.collect(String::toUpperCase).allSatisfy(functionsByName::containsKey));
     }
 }

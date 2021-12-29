@@ -11,10 +11,11 @@ import io.github.vmzakharov.ecdataframe.dsl.value.ValueType;
 import io.github.vmzakharov.ecdataframe.dsl.value.VectorValue;
 import io.github.vmzakharov.ecdataframe.util.Printer;
 import io.github.vmzakharov.ecdataframe.util.PrinterFactory;
-import org.eclipse.collections.api.list.ImmutableList;
 import org.eclipse.collections.api.list.ListIterable;
+import org.eclipse.collections.api.map.MapIterable;
 import org.eclipse.collections.api.map.MutableMap;
 import org.eclipse.collections.impl.factory.Lists;
+import org.eclipse.collections.impl.factory.Maps;
 
 import java.time.LocalDate;
 import java.time.Period;
@@ -22,8 +23,28 @@ import java.time.format.DateTimeFormatter;
 
 final public class BuiltInFunctions
 {
-    private static final ImmutableList<IntrinsicFunctionDescriptor> FUNCTIONS = Lists.immutable.of(
-        new IntrinsicFunctionDescriptor("print") {
+    private static final MutableMap<String, IntrinsicFunctionDescriptor> FUNCTIONS_BY_NAME = Maps.mutable.of();
+
+    static
+    {
+        resetFunctionList();
+    }
+
+    private BuiltInFunctions()
+    {
+        // Utility class
+    }
+
+    /**
+     * Clears out and repopulates the list of the intrinsic (built-in) functions. This operation will reset the
+     * list to its initial state so any functions added later programmatically will no longer be available.
+     */
+    public static void resetFunctionList()
+    {
+        FUNCTIONS_BY_NAME.clear();
+
+        addFunctionDescriptor(new IntrinsicFunctionDescriptor("print")
+        {
             @Override
             public Value evaluate(VectorValue parameters)
             {
@@ -31,9 +52,10 @@ final public class BuiltInFunctions
                 parameters.getElements().collect(Value::stringValue).forEach(printer::print);
                 return Value.VOID;
             }
-        },
+        });
 
-        new IntrinsicFunctionDescriptor("println") {
+        addFunctionDescriptor(new IntrinsicFunctionDescriptor("println")
+        {
             @Override
             public Value evaluate(VectorValue parameters)
             {
@@ -42,9 +64,10 @@ final public class BuiltInFunctions
                 printer.newLine();
                 return Value.VOID;
             }
-        },
+        });
 
-        new IntrinsicFunctionDescriptor("startsWith", Lists.immutable.of("string", "prefix")) {
+        addFunctionDescriptor(new IntrinsicFunctionDescriptor("startsWith", Lists.immutable.of("string", "prefix"))
+        {
             @Override
             public Value evaluate(EvalContext context)
             {
@@ -59,9 +82,10 @@ final public class BuiltInFunctions
             {
                 return ValueType.BOOLEAN;
             }
-        },
+        });
 
-        new IntrinsicFunctionDescriptor("contains", Lists.immutable.of("string", "substring")) {
+        addFunctionDescriptor(new IntrinsicFunctionDescriptor("contains", Lists.immutable.of("string", "substring"))
+        {
             @Override
             public Value evaluate(EvalContext context)
             {
@@ -76,9 +100,10 @@ final public class BuiltInFunctions
             {
                 return ValueType.BOOLEAN;
             }
-        },
+        });
 
-        new IntrinsicFunctionDescriptor("toUpper", Lists.immutable.of("string")) {
+        addFunctionDescriptor(new IntrinsicFunctionDescriptor("toUpper", Lists.immutable.of("string"))
+        {
             @Override
             public Value evaluate(EvalContext context)
             {
@@ -90,9 +115,10 @@ final public class BuiltInFunctions
             {
                 return ValueType.STRING;
             }
-        },
+        });
 
-        new IntrinsicFunctionDescriptor("substr") {
+        addFunctionDescriptor(new IntrinsicFunctionDescriptor("substr")
+        {
             @Override
             public Value evaluate(VectorValue parameters)
             {
@@ -107,9 +133,9 @@ final public class BuiltInFunctions
 
                 String substring = (parameterCount == 2)
                         ?
-                    aString.substring(beginIndex)
+                        aString.substring(beginIndex)
                         :
-                    aString.substring(beginIndex, (int) ((LongValue) parameters.get(2)).longValue());
+                        aString.substring(beginIndex, (int) ((LongValue) parameters.get(2)).longValue());
 
                 return new StringValue(substring);
             }
@@ -125,33 +151,26 @@ final public class BuiltInFunctions
             {
                 return "Usage: " + this.getName() + "(string, beginIndex[, endIndex])";
             }
-        },
+        });
 
-        new IntrinsicFunctionDescriptor("abs") {
+        addFunctionDescriptor(new IntrinsicFunctionDescriptor("abs", Lists.immutable.of("number"))
+        {
             @Override
-            public Value evaluate(VectorValue parameters)
+            public Value evaluate(EvalContext context)
             {
-                this.assertParameterCount(1, parameters.size());
+                Value parameter = context.getVariable("number");
 
-                Value value = parameters.get(0);
-                if (value.isDouble())
+                if (!parameter.isNumber())
                 {
-                    return new DoubleValue(Math.abs(((DoubleValue) value).doubleValue()));
+                    this.assertParameterType(parameter.getType(), ValueType.NUMBER);
                 }
-                else if (value.isLong())
-                {
-                    return new LongValue(Math.abs(((LongValue) value).longValue()));
-                }
-                else
-                {
-                    throw new RuntimeException("Invalid parameter type (" + value.getType() + ") in a call to '" + this.getName() + "'. " + this.usageString());
-                }
-            }
 
-            @Override
-            public String usageString()
-            {
-                return "Usage: " + this.getName() + "(number)";
+                if (parameter.isDouble())
+                {
+                    return new DoubleValue(Math.abs(((DoubleValue) parameter).doubleValue()));
+                }
+
+                return new LongValue(Math.abs(((LongValue) parameter).longValue()));
             }
 
             @Override
@@ -160,15 +179,14 @@ final public class BuiltInFunctions
                 // todo - error handling
                 return parameterTypes.get(0);
             }
-        },
+        });
 
-        new IntrinsicFunctionDescriptor("toString") {
+        addFunctionDescriptor(new IntrinsicFunctionDescriptor("toString", Lists.immutable.of("number"))
+        {
             @Override
-            public Value evaluate(VectorValue parameters)
+            public Value evaluate(EvalContext context)
             {
-                this.assertParameterCount(1, parameters.size());
-
-                Value value = parameters.get(0);
+                Value value = context.getVariable("number");
 
                 return new StringValue(value.stringValue());
             }
@@ -178,15 +196,10 @@ final public class BuiltInFunctions
             {
                 return ValueType.STRING;
             }
+        });
 
-            @Override
-            public String usageString()
-            {
-                return "Usage: " + this.getName() + "(number)";
-            }
-        },
-
-        new IntrinsicFunctionDescriptor("toDate") {
+        addFunctionDescriptor(new IntrinsicFunctionDescriptor("toDate")
+        {
             @Override
             public Value evaluate(VectorValue parameters)
             {
@@ -208,9 +221,10 @@ final public class BuiltInFunctions
             {
                 return "Usage: " + this.getName() + "(yyyy-mm-dd)";
             }
-        },
+        });
 
-        new IntrinsicFunctionDescriptor("toLong", Lists.immutable.of("string")) {
+        addFunctionDescriptor(new IntrinsicFunctionDescriptor("toLong", Lists.immutable.of("string"))
+        {
             @Override
             public Value evaluate(EvalContext context)
             {
@@ -226,9 +240,10 @@ final public class BuiltInFunctions
             {
                 return ValueType.LONG;
             }
-        },
+        });
 
-        new IntrinsicFunctionDescriptor("toDouble", Lists.immutable.of("string")) {
+        addFunctionDescriptor(new IntrinsicFunctionDescriptor("toDouble", Lists.immutable.of("string"))
+        {
             @Override
             public Value evaluate(EvalContext context)
             {
@@ -244,9 +259,10 @@ final public class BuiltInFunctions
             {
                 return ValueType.DOUBLE;
             }
-        },
+        });
 
-        new IntrinsicFunctionDescriptor("withinDays", Lists.immutable.of("date1", "date2", "numberOfDays")) {
+        addFunctionDescriptor(new IntrinsicFunctionDescriptor("withinDays", Lists.immutable.of("date1", "date2", "numberOfDays"))
+        {
             @Override
             public Value evaluate(EvalContext context)
             {
@@ -264,15 +280,7 @@ final public class BuiltInFunctions
             {
                 return ValueType.BOOLEAN;
             }
-        }
-    );
-
-    private static final MutableMap<String, IntrinsicFunctionDescriptor> FUNCTIONS_BY_NAME =
-            FUNCTIONS.toMap(fd -> fd.getNormalizedName(), fd -> fd);
-
-    private BuiltInFunctions()
-    {
-        // Utility class
+        });
     }
 
     public static void addFunctionDescriptor(IntrinsicFunctionDescriptor fd)
@@ -283,5 +291,10 @@ final public class BuiltInFunctions
     public static IntrinsicFunctionDescriptor getFunctionDescriptor(String name)
     {
         return FUNCTIONS_BY_NAME.get(name);
+    }
+
+    public static MapIterable<String, IntrinsicFunctionDescriptor> getFunctionsByName()
+    {
+        return FUNCTIONS_BY_NAME.toImmutable();
     }
 }
