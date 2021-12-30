@@ -226,6 +226,22 @@ public class BasicDataFrameTest
                         .addRow("Alice", 5, "1", "abc", "A abc", 5)
                         .addRow("Deb",   1, "2", "xyz", "D xyz", 2)
                 , df);
+
     }
 
+    @Test(expected = RuntimeException.class)
+    public void sealingMisshapenDataFrame()
+    {
+        DataFrame df = new DataFrame("df1")
+                .addStringColumn("Foo").addStringColumn("Bar");
+
+        DfStringColumn fooColumn = df.getStringColumn("Foo");
+        fooColumn.addObject("A");
+        fooColumn.addObject("B");
+
+        DfStringColumn barColumn = df.getStringColumn("Bar");
+        barColumn.addObject("X");
+
+        df.seal();
+    }
 }

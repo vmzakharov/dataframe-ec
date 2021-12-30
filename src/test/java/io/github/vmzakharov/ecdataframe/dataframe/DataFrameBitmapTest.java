@@ -28,7 +28,7 @@ public class DataFrameBitmapTest
     @Test
     public void selectionOfFlaggedRows()
     {
-        this.dataFrame.enableBitmap();
+        this.dataFrame.resetBitmap();
 
         this.dataFrame.setFlag(0);
         this.dataFrame.setFlag(2);
@@ -44,7 +44,7 @@ public class DataFrameBitmapTest
                 ;
         DataFrameUtil.assertEquals(expected, filtered);
 
-        filtered.enableBitmap();
+        filtered.resetBitmap();
 
         DataFrame moreFiltered = filtered.selectFlagged();
 
@@ -60,7 +60,7 @@ public class DataFrameBitmapTest
     {
         this.dataFrame.sortBy(Lists.immutable.of("Foo"));
 
-        this.dataFrame.enableBitmap();
+        this.dataFrame.resetBitmap();
 
         this.dataFrame.setFlag(0);
         this.dataFrame.setFlag(2);
@@ -80,7 +80,7 @@ public class DataFrameBitmapTest
     @Test
     public void selectionOfNotFlaggedRows()
     {
-        this.dataFrame.enableBitmap();
+        this.dataFrame.resetBitmap();
 
         this.dataFrame.setFlag(1);
         this.dataFrame.setFlag(4);
@@ -95,7 +95,7 @@ public class DataFrameBitmapTest
                 ;
         DataFrameUtil.assertEquals(expected, filtered);
 
-        filtered.enableBitmap();
+        filtered.resetBitmap();
         filtered.setFlag(0);
         filtered.setFlag(1);
         filtered.setFlag(2);
@@ -114,7 +114,7 @@ public class DataFrameBitmapTest
     {
         this.dataFrame.sortBy(Lists.immutable.of("Foo"));
 
-        this.dataFrame.enableBitmap();
+        this.dataFrame.resetBitmap();
         this.dataFrame.setFlag(1);
         this.dataFrame.setFlag(4);
 

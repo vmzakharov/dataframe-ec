@@ -53,7 +53,10 @@ public class DataFrame
     public DataFrame(String newName)
     {
         this.name = newName;
+
         this.evalContext = new DataFrameEvalContext(this);
+
+        this.resetBitmap();
     }
 
     public DataFrame addStringColumn(String newColumnName)
@@ -430,7 +433,7 @@ public class DataFrame
         else
         {
             this.rowCount = storedColumnsSizes.get(0);
-            if (storedColumnsSizes.detectIfNone(e -> e != this.rowCount, -1) != -1)
+            if (storedColumnsSizes.anySatisfy(e -> e != this.rowCount))
             {
                 ErrorReporter.reportAndThrow(
                         "Stored column sizes are not the same when attempting to seal data frame '" + this.getName() + "'");
@@ -753,14 +756,9 @@ public class DataFrame
     /**
      * enables flagging the rows as true or false - effectively creating a bitmap of the data frame
      */
-    public void enableBitmap()
+    public void resetBitmap()
     {
         this.bitmap = BooleanArrayList.newWithNValues(this.rowCount, false);
-    }
-
-    public void disableBitmap()
-    {
-        this.bitmap = null;
     }
 
     public void setFlag(int rowIndex)
