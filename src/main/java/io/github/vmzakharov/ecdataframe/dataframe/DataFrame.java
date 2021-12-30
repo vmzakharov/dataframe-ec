@@ -8,6 +8,8 @@ import io.github.vmzakharov.ecdataframe.dsl.value.Value;
 import io.github.vmzakharov.ecdataframe.dsl.value.ValueType;
 import io.github.vmzakharov.ecdataframe.dsl.visitor.InMemoryEvaluationVisitor;
 import io.github.vmzakharov.ecdataframe.util.ExpressionParserHelper;
+import org.eclipse.collections.api.DoubleIterable;
+import org.eclipse.collections.api.LongIterable;
 import org.eclipse.collections.api.block.function.primitive.IntIntToIntFunction;
 import org.eclipse.collections.api.block.predicate.primitive.BooleanPredicate;
 import org.eclipse.collections.api.list.ImmutableList;
@@ -64,6 +66,11 @@ public class DataFrame
         return this.addColumn(new DfStringColumnComputed(this, newColumnName, expressionAsString));
     }
 
+    public DataFrame addStringColumn(String newColumnName, ListIterable<String> values)
+    {
+        return this.addColumn(new DfStringColumnStored(this, newColumnName, values));
+    }
+
     public DataFrame addLongColumn(String newColumnName)
     {
         return this.addColumn(new DfLongColumnStored(this, newColumnName));
@@ -72,6 +79,11 @@ public class DataFrame
     public DataFrame addLongColumn(String newColumnName, String expressionAsString)
     {
         return this.addColumn(new DfLongColumnComputed(this, newColumnName, expressionAsString));
+    }
+
+    public DataFrame addLongColumn(String newColumnName, LongIterable values)
+    {
+        return this.addColumn(new DfLongColumnStored(this, newColumnName, values));
     }
 
     public DataFrame addDoubleColumn(String newColumnName)
@@ -84,9 +96,19 @@ public class DataFrame
         return this.addColumn(new DfDoubleColumnComputed(this, newColumnName, expressionAsString));
     }
 
+    public DataFrame addDoubleColumn(String newColumnName, DoubleIterable values)
+    {
+        return this.addColumn(new DfDoubleColumnStored(this, newColumnName, values));
+    }
+
     public DataFrame addDateColumn(String newColumnName)
     {
         return this.addColumn(new DfDateColumnStored(this, newColumnName));
+    }
+
+    public DataFrame addDateColumn(String newColumnName, ListIterable<LocalDate> values)
+    {
+        return this.addColumn(new DfDateColumnStored(this, newColumnName, values));
     }
 
     public DataFrame addDateColumn(String newColumnName, String expressionAsString)

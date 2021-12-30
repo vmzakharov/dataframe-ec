@@ -2,6 +2,7 @@ package io.github.vmzakharov.ecdataframe.dataframe;
 
 import io.github.vmzakharov.ecdataframe.dsl.value.LongValue;
 import io.github.vmzakharov.ecdataframe.dsl.value.Value;
+import org.eclipse.collections.api.LongIterable;
 import org.eclipse.collections.api.list.primitive.ImmutableLongList;
 import org.eclipse.collections.api.list.primitive.MutableBooleanList;
 import org.eclipse.collections.api.list.primitive.MutableLongList;
@@ -13,13 +14,26 @@ extends DfLongColumn
 implements DfColumnStored
 {
     static private final long NULL_FILLER = Long.MIN_VALUE; // not the actual null marker, but makes debugging easier
-    private MutableBooleanList nullMap = BooleanLists.mutable.of();
 
+    private MutableBooleanList nullMap = BooleanLists.mutable.of();
     private MutableLongList values = LongLists.mutable.of();
 
     public DfLongColumnStored(DataFrame newDataFrame, String newName)
     {
         super(newDataFrame, newName);
+    }
+
+    public DfLongColumnStored(DataFrame newDataFrame, String newName, LongIterable newValues)
+    {
+        this(newDataFrame, newName);
+
+        this.values.addAll(newValues);
+
+        this.nullMap = BooleanLists.mutable.withInitialCapacity(this.values.size());
+        for (int i = 0; i < this.values.size(); i++)
+        {
+            this.nullMap.add(false);
+        }
     }
 
     @Override

@@ -24,6 +24,13 @@ implements DfColumnStored
         super(owner, newName);
     }
 
+    public DfDateColumnStored(DataFrame owner, String newName, ListIterable<LocalDate> newValues)
+    {
+        this(owner, newName);
+
+        this.values.addAllIterable(newValues);
+    }
+
     public void addDate(LocalDate d)
     {
         if (this.pool == null)

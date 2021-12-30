@@ -19,6 +19,12 @@ implements DfColumnStored
         super(owner, newName);
     }
 
+    public DfDoubleColumnStored(DataFrame owner, String newName, DoubleIterable newValues)
+    {
+        this(owner, newName);
+        this.values.addAll(newValues);
+    }
+
     @Override
     public void addValue(Value value)
     {
