@@ -91,6 +91,25 @@ public class DataFrameAggregationTest
     }
 
     @Test
+    public void maxOfNegativeNumbersWithGrouping()
+    {
+        DataFrame df = new DataFrame("Frame-o-data")
+                .addStringColumn("Key").addLongColumn("long").addDoubleColumn("double")
+                .addRow("A",  -1,  -20.2)
+                .addRow("A", -10,  -15.5)
+                .addRow("B", -15, -25.25)
+                .addRow("B", -17, -45.45)
+                ;
+
+        DataFrameUtil.assertEquals(
+                new DataFrame("expected maxes")
+                        .addStringColumn("Key").addLongColumn("long").addDoubleColumn("double")
+                        .addRow("A", -1, -15.5)
+                        .addRow("B", -15, -25.25),
+                df.aggregateBy(Lists.immutable.of(max("long"), max("double")), Lists.immutable.of("Key")));
+    }
+
+    @Test
     public void sameColumnDifferentAggregationsAll()
     {
         DataFrameUtil.assertEquals(

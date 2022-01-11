@@ -235,7 +235,7 @@ public abstract class AggregateFunction
         @Override
         double doubleInitialValue()
         {
-            return Double.MIN_VALUE;
+            return -Double.MAX_VALUE;
         }
 
         @Override
