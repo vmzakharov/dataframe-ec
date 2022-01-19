@@ -11,6 +11,8 @@ import org.eclipse.collections.impl.factory.primitive.IntLists;
 
 public class DfIndex
 {
+    static private final MutableIntList EMPTY_LIST = IntLists.mutable.empty().asUnmodifiable();
+
     private final MutableMap<ListIterable<Object>, MutableIntList> rowIndexByKey = Maps.mutable.of();
 
     public DfIndex(DataFrame newIndexedDataFrame, ListIterable<String> indexByColumnNames)
@@ -34,7 +36,7 @@ public class DfIndex
 
     public IntList getRowIndicesAtKey(ListIterable<Object> key)
     {
-        return this.rowIndexByKey.getIfAbsent(key, IntLists.mutable::of);
+        return this.rowIndexByKey.getIfAbsent(key, () -> EMPTY_LIST);
     }
 
     private ListIterable<Object> computeKeyFrom(ListIterable<DfColumn> indexByColumns, int rowIndex)

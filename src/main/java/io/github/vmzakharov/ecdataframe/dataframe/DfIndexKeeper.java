@@ -6,16 +6,21 @@ import org.eclipse.collections.api.map.primitive.MutableObjectIntMap;
 import org.eclipse.collections.impl.factory.Lists;
 import org.eclipse.collections.impl.factory.primitive.ObjectIntMaps;
 
-public class DfUniqueIndex
+/**
+ * Maintains an index on a data frame based on one or more column values. If a row with a specified index value does
+ * not exist, will add the row with the respective values to the data frame. This can be useful for example for
+ * aggregation to maintain a dataframe with accumulator rows.
+ */
+public class DfIndexKeeper
 {
     private final MutableObjectIntMap<ListIterable<Object>> rowIndexByKey = ObjectIntMaps.mutable.of();
-    private final ListIterable<DfColumn> indexByColumns;
+    private final ListIterable<DfColumn> columnsToIndexBy;
     private final DataFrame indexedDataFrame;
 
-    public DfUniqueIndex(DataFrame newIndexedDataFrame, ListIterable<String> indexByColumnNames)
+    public DfIndexKeeper(DataFrame newIndexedDataFrame, ListIterable<String> indexByColumnNames)
     {
         this.indexedDataFrame = newIndexedDataFrame;
-        this.indexByColumns = indexByColumnNames.collect(this.indexedDataFrame::getColumnNamed);
+        this.columnsToIndexBy = indexByColumnNames.collect(this.indexedDataFrame::getColumnNamed);
     }
 
     private int getRowIndexAtKey(ListIterable<Object> key)
@@ -39,7 +44,7 @@ public class DfUniqueIndex
             // need to be effectively final so introducing another variable rather than reusing rowIndex
             int lastRowIndex = this.indexedDataFrame.rowCount() - 1;
             this.addIndex(key, lastRowIndex);
-            this.indexByColumns.forEachWithIndex((col, i) -> col.setObject(lastRowIndex, key.get(i)));
+            this.columnsToIndexBy.forEachWithIndex((col, i) -> col.setObject(lastRowIndex, key.get(i)));
 
             rowIndex = lastRowIndex;
         }
@@ -48,9 +53,9 @@ public class DfUniqueIndex
 
     public ListIterable<Object> computeKeyFrom(DataFrame aDataFrame, int rowIndex)
     {
-        MutableList<Object> key = Lists.fixedSize.of(new Object[this.indexByColumns.size()]);
+        MutableList<Object> key = Lists.fixedSize.of(new Object[this.columnsToIndexBy.size()]);
 
-        this.indexByColumns.forEachWithIndex(
+        this.columnsToIndexBy.forEachWithIndex(
                 (col, index) -> key.set(index, aDataFrame.getColumnNamed(col.getName()).getObject(rowIndex)));
         return key;
     }

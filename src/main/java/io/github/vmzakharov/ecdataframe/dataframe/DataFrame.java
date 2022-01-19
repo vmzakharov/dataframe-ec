@@ -521,7 +521,7 @@ public class DataFrame
                 .collect(AggregateFunction::getTargetColumnName)
                 .collect(aggregatedDataFrame::getColumnNamed);
 
-        DfUniqueIndex index = new DfUniqueIndex(aggregatedDataFrame, columnsToGroupByNames);
+        DfIndexKeeper index = new DfIndexKeeper(aggregatedDataFrame, columnsToGroupByNames);
 
         for (int rowIndex = 0; rowIndex < this.rowCount; rowIndex++)
         {
@@ -1314,6 +1314,61 @@ public class DataFrame
         final DfColumn otherColumn = other.getColumnNamed(otherColumnName);
 
         return thisColumn.columnComparator(otherColumn);
+    }
+
+    /**
+     * Appends one or more columns to this dataframe based on value lookup in another data frame. If more than one value
+     * matches a lookup key, the first matching value is used.
+     * @param joinDescriptor - a descriptor, which specifies join keys, values to select, default values, and other join
+     *                      parameters
+     * @return this dataframe
+     */
+    public DataFrame lookup(DfJoin joinDescriptor)
+    {
+        DataFrame target = joinDescriptor.joinTo();
+        DfIndex index = new DfIndex(target, joinDescriptor.joinToColumnNames());
+
+        ListIterable<DfColumn> columnsToSelectFrom = joinDescriptor
+                .selectFromJoined()
+                .collect(target::getColumnNamed);
+
+        ListIterable<DfColumn> columnsToLookup = joinDescriptor.columnsToLookup().collect(this::getColumnNamed);
+
+        columnsToSelectFrom.forEachInBoth(joinDescriptor.columnNameAliases(),
+                (col, alias) -> this.addColumn(alias, col.getType()));
+
+        ListIterable<DfColumn> addedColumns = joinDescriptor.columnNameAliases().collect(this::getColumnNamed);
+
+        for (int rowIndex = 0; rowIndex < this.rowCount(); rowIndex++)
+        {
+            int finalRowIndex = rowIndex; // to pass as a lambda parameter
+
+            ListIterable<Object> lookupKey = columnsToLookup.collect(col -> col.getObject(finalRowIndex));
+
+            IntList found = index.getRowIndicesAtKey(lookupKey);
+
+            if (found.isEmpty())
+            {
+                // default if specified, otherwise null
+                if (joinDescriptor.valuesIfAbsent().notEmpty())
+                {
+                    addedColumns.forEachInBoth(joinDescriptor.valuesIfAbsent(), DfColumn::addObject);
+                }
+                else
+                {
+                    addedColumns.forEach(DfColumn::addEmptyValue);
+                }
+            }
+            else
+            {
+                // use the first row
+                int targetRowIndex = found.get(0);
+
+                columnsToSelectFrom.forEachInBoth(addedColumns, (selectFrom, addTo) -> addTo.addObject(selectFrom.getObject(targetRowIndex)));
+            }
+        }
+
+        return this.seal();
     }
 
     private enum JoinType

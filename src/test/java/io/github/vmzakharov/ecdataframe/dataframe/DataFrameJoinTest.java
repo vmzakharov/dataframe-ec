@@ -40,7 +40,7 @@ public class DataFrameJoinTest
     }
 
     @Test
-    public void duplicateKeys()
+    public void duplicateMatchedKeys()
     {
         DataFrame df1 = new DataFrame("df1")
                 .addStringColumn("Foo").addStringColumn("Bar").addLongColumn("Baz")
@@ -64,6 +64,32 @@ public class DataFrameJoinTest
                 .addRow("Inky", "cyan", 9, "Mint", 3)
                 .addRow("Blinky", "pink", 7, "Orange", 4)
                 .addRow("Clyde", "pink", 10, "Apple", 1);
+
+        DataFrameUtil.assertEquals(expected, joined);
+    }
+
+    @Test
+    public void duplicateMismatchedKeys()
+    {
+        DataFrame df1 = new DataFrame("df1")
+                .addStringColumn("Foo").addStringColumn("Bar").addLongColumn("Baz")
+                .addRow("Pinky", "cyan", 8)
+                .addRow("Inky", "cyan", 9)
+                .addRow("Clyde", "pink", 10);
+
+        DataFrame df2 = new DataFrame("df2")
+                .addStringColumn("Name").addStringColumn("Color").addLongColumn("Number")
+                .addRow("Orange", "pink", 4)
+                .addRow("Mint", "cyan", 3)
+                .addRow("Apple", "pink", 1);
+
+        DataFrame joined = df1.join(df2, "Bar", "Color");
+
+        DataFrame expected = new DataFrame("expected")
+                .addStringColumn("Foo").addStringColumn("Bar").addLongColumn("Baz").addStringColumn("Name").addLongColumn("Number")
+                .addRow("Pinky", "cyan", 8, "Mint", 3)
+                .addRow("Clyde", "pink", 10, "Orange", 4)
+                ;
 
         DataFrameUtil.assertEquals(expected, joined);
     }
