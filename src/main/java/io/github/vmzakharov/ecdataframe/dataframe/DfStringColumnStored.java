@@ -1,6 +1,7 @@
 package io.github.vmzakharov.ecdataframe.dataframe;
 
 import io.github.vmzakharov.ecdataframe.dsl.value.Value;
+import io.github.vmzakharov.ecdataframe.dsl.value.ValueType;
 import org.eclipse.collections.api.list.ImmutableList;
 import org.eclipse.collections.api.list.ListIterable;
 import org.eclipse.collections.api.list.MutableList;
@@ -9,13 +10,9 @@ import org.eclipse.collections.impl.factory.Lists;
 import org.eclipse.collections.impl.set.mutable.UnifiedSet;
 
 public class DfStringColumnStored
-extends DfStringColumn
-implements DfColumnStored
+extends DfObjectColumnStored<String>
+implements DfStringColumn
 {
-    private MutableList<String> values = Lists.mutable.of();
-
-    private Pool<String> pool = null;
-
     public DfStringColumnStored(DataFrame owner, String newName)
     {
         super(owner, newName);
@@ -23,8 +20,7 @@ implements DfColumnStored
 
     public DfStringColumnStored(DataFrame owner, String newName, ListIterable<String> newValues)
     {
-        super(owner, newName);
-        this.values.addAllIterable(newValues);
+        super(owner, newName, newValues);
     }
 
     @Override
@@ -36,7 +32,7 @@ implements DfColumnStored
         }
         else if (value.isString())
         {
-            this.addString(value.stringValue());
+            this.addMyType(value.stringValue());
         }
         else
         {
@@ -47,92 +43,44 @@ implements DfColumnStored
         }
     }
 
-    public void addString(String s)
-    {
-        if (this.pool == null)
-        {
-            this.values.add(s);
-        }
-        else
-        {
-            this.values.add(this.pool.put(s));
-        }
-    }
-
     @Override
-    public void enablePooling()
+    public ValueType getType()
     {
-        this.pool = new UnifiedSet<>();
-    }
-
-    @Override
-    public void seal()
-    {
-        this.pool = null;
+        return ValueType.STRING;
     }
 
     @Override
     public void addObject(Object newObject)
     {
-        this.addString((String) newObject);
+        this.addMyType((String) newObject);
     }
 
-    @Override
-    public String getValueAsString(int rowIndex)
+    public void addString(String newObject)
     {
-        return this.getString(rowIndex);
-    }
-
-    public String getString(int rowIndex)
-    {
-        return this.values.get(rowIndex);
-    }
-
-    @Override
-    public int getSize()
-    {
-        return this.values.size();
+        this.addMyType(newObject);
     }
 
     @Override
     public void setObject(int rowIndex, Object anObject)
     {
-        this.values.set(rowIndex, (String) anObject);
+        this.getValues().set(rowIndex, (String) anObject);
     }
 
     @Override
-    public void addEmptyValue()
+    public String getString(int rowIndex)
     {
-        this.values.add(null);
+        return this.getValues().get(rowIndex);
     }
 
     @Override
-    public ImmutableList<String> toList()
+    public String getTypedObject(int rowIndex)
     {
-        return this.values.toImmutable();
+        return this.getString(rowIndex);
     }
 
     @Override
     public void applyAggregator(int targetRowIndex, DfColumn sourceColumn, int sourceRowIndex, AggregateFunction aggregateFunction)
     {
         throw new UnsupportedOperationException("Not implemented");
-    }
-
-    @Override
-    public Number aggregate(AggregateFunction aggregator)
-    {
-        return aggregator.<String>applyIterable(this.values);
-    }
-
-    @Override
-    public void ensureInitialCapacity(int newCapacity)
-    {
-        this.values = Lists.mutable.withInitialCapacity(newCapacity);
-    }
-
-    @Override
-    protected void addAllItems(ListIterable<String> items)
-    {
-        this.values.addAllIterable(items);
     }
 }

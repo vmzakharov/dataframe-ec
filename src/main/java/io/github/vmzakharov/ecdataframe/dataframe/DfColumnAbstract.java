@@ -23,12 +23,6 @@ implements DfColumn
     }
 
     @Override
-    public String getValueAsStringLiteral(int rowIndex)
-    {
-        return this.isNull(rowIndex) ? "" : this.getValueAsString(rowIndex);
-    }
-
-    @Override
     public DataFrame getDataFrame()
     {
         return this.dataFrame;
@@ -90,10 +84,5 @@ implements DfColumn
         newColumn.ensureInitialCapacity(this.getSize() + other.getSize());
 
         return newColumn;
-    }
-
-    protected int dataFrameRowIndex(int virtualRowIndex)
-    {
-        return this.getDataFrame().rowIndexMap(virtualRowIndex);
     }
 }

@@ -10,7 +10,7 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 
 abstract public class DfDateColumn
-extends DfColumnAbstract
+extends DfObjectColumn<LocalDate>
 {
     private DateTimeFormatter formatter = DateTimeFormatter.ISO_DATE;
 
@@ -28,11 +28,11 @@ extends DfColumnAbstract
         return value == null ? "" : this.formatter.format(value);
     }
 
-    @Override
-    public String getValueAsStringLiteral(int rowIndex)
-    {
-        return this.getValueAsString(rowIndex);
-    }
+//    @Override
+//    public String getValueAsStringLiteral(int rowIndex)
+//    {
+//        return this.getValueAsString(rowIndex);
+//    }
 
     @Override
     public Object getObject(int rowIndex)
@@ -46,8 +46,6 @@ extends DfColumnAbstract
         return new DateValue(this.getDate(rowIndex));
     }
 
-    public abstract ImmutableList<LocalDate> toList();
-
     public ValueType getType()
     {
         return ValueType.DATE;
@@ -58,8 +56,6 @@ extends DfColumnAbstract
     {
         ((DfDateColumnStored) target).addDate(this.getDate(rowIndex));
     }
-
-    protected abstract void addAllItems(ListIterable<LocalDate> items);
 
     @Override
     public boolean isNull(int rowIndex)

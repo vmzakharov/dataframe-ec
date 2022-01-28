@@ -9,11 +9,14 @@ public interface DfColumn
 
     String getValueAsString(int rowIndex);
 
+    default String getValueAsStringLiteral(int rowIndex)
+    {
+        return this.isNull(rowIndex) ? "" : this.getValueAsString(rowIndex);
+    }
+
     void addObject(Object newObject);
 
     void addValue(Value value);
-
-    String getValueAsStringLiteral(int rowIndex);
 
     boolean isNull(int rowIndex);
 
@@ -70,5 +73,10 @@ public interface DfColumn
     default DfCellComparator columnComparator(DfColumn otherColumn)
     {
         throw new UnsupportedOperationException("Not implemented");
+    }
+
+    default int dataFrameRowIndex(int virtualRowIndex)
+    {
+        return this.getDataFrame().rowIndexMap(virtualRowIndex);
     }
 }

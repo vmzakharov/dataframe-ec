@@ -6,74 +6,57 @@ import io.github.vmzakharov.ecdataframe.dsl.value.ValueType;
 import org.eclipse.collections.api.list.ImmutableList;
 import org.eclipse.collections.api.list.ListIterable;
 
-abstract public class DfStringColumn
-extends DfColumnAbstract
+public interface DfStringColumn
+extends DfColumn
 {
-    public DfStringColumn(DataFrame newDataFrame, String newName)
-    {
-        super(newDataFrame, newName);
-    }
-
-    abstract public String getString(int rowIndex);
+    String getString(int rowIndex);
 
     @Override
-    public String getValueAsString(int rowIndex)
+    default String getValueAsString(int rowIndex)
     {
         return this.getString(rowIndex);
     }
 
     @Override
-    public String getValueAsStringLiteral(int rowIndex)
+    default String getValueAsStringLiteral(int rowIndex)
     {
         String value = this.getString(rowIndex);
         return value == null ? "" : '"' + this.getValueAsString(rowIndex) + '"';
     }
 
     @Override
-    public Object getObject(int rowIndex)
+    default Object getObject(int rowIndex)
     {
         return this.getString(rowIndex);
     }
 
     @Override
-    public boolean isNull(int rowIndex)
+    default boolean isNull(int rowIndex)
     {
         return this.getObject(rowIndex) == null;
     }
 
     @Override
-    public Value getValue(int rowIndex)
+    default Value getValue(int rowIndex)
     {
         return new StringValue(this.getString(rowIndex));
     }
 
-    public abstract ImmutableList<String> toList();
+    ImmutableList<String> toList();
 
-    public ValueType getType()
+    default ValueType getType()
     {
         return ValueType.STRING;
     }
 
     @Override
-    public void addRowToColumn(int rowIndex, DfColumn target)
+    default void addRowToColumn(int rowIndex, DfColumn target)
     {
         ((DfStringColumnStored) target).addString(this.getString(rowIndex));
     }
 
-    abstract protected void addAllItems(ListIterable<String> items);
-
     @Override
-    public DfColumn mergeWithInto(DfColumn other, DataFrame target)
-    {
-        DfStringColumn mergedCol = (DfStringColumn) this.validateAndCreateTargetColumn(other, target);
-
-        mergedCol.addAllItems(this.toList());
-        mergedCol.addAllItems(((DfStringColumn) other).toList());
-        return mergedCol;
-    }
-
-    @Override
-    public DfCellComparator columnComparator(DfColumn otherColumn)
+    default DfCellComparator columnComparator(DfColumn otherColumn)
     {
         DfStringColumn otherStringColumn = (DfStringColumn) otherColumn;
 

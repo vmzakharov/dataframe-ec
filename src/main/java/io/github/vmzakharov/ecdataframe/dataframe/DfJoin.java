@@ -36,6 +36,7 @@ final public class DfJoin
         return this;
     }
 
+    // TODO: rename to select
     public DfJoin columns(String newSelectFromJoined)
     {
         return this.columns(newSelectFromJoined, newSelectFromJoined);

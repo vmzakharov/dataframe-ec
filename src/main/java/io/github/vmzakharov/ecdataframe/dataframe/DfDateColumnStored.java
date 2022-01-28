@@ -62,6 +62,12 @@ implements DfColumnStored
     }
 
     @Override
+    public LocalDate getTypedObject(int rowIndex)
+    {
+        return this.getDate(rowIndex);
+    }
+
+    @Override
     public ImmutableList<LocalDate> toList()
     {
         return this.values.toImmutable();
