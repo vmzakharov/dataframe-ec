@@ -168,28 +168,35 @@ extends DataSetAbstract
         CsvSchemaColumn schemaColumn = this.getSchema().columnAt(columnIndex);
 
         String valueAsLiteral;
-        switch (dfColumn.getType())
+
+        if (dfColumn.isNull(rowIndex))
         {
-            case LONG:
-                long longValue = ((DfLongColumn) dfColumn).getLong(rowIndex);
-                valueAsLiteral = schemaColumn.getLongFormatter().format(longValue);
-                break;
-            case DOUBLE:
-//                if (dfColumn.isNull(rowIndex)) {}
-                double doubleValue = ((DfDoubleColumn) dfColumn).getDouble(rowIndex);
-                valueAsLiteral = schemaColumn.getDoubleFormatter().format(doubleValue);
-                break;
-            case STRING:
-                String stringValue = dfColumn.getValueAsString(rowIndex);
-                valueAsLiteral = stringValue == null ? "" : this.schema.getQuoteCharacter() + stringValue + this.schema.getQuoteCharacter();
-                break;
-            case DATE:
-                LocalDate dateValue = ((DfDateColumn) dfColumn).getDate(rowIndex);
-                valueAsLiteral = dateValue == null ? "" : this.formatterForColumn(columnIndex).format(dateValue);
-                break;
-            default:
-                ErrorReporter.reportAndThrow("Do not know how to convert value of type " + dfColumn.getType() + " to a string");
-                valueAsLiteral = null;
+            valueAsLiteral = this.schema.hasNullMarker() ? this.schema.getNullMarker() : "";
+        }
+        else
+        {
+            switch (dfColumn.getType())
+            {
+                case LONG:
+                    long longValue = ((DfLongColumn) dfColumn).getLong(rowIndex);
+                    valueAsLiteral = schemaColumn.getLongFormatter().format(longValue);
+                    break;
+                case DOUBLE:
+                    double doubleValue = ((DfDoubleColumn) dfColumn).getDouble(rowIndex);
+                    valueAsLiteral = schemaColumn.getDoubleFormatter().format(doubleValue);
+                    break;
+                case STRING:
+                    String stringValue = dfColumn.getValueAsString(rowIndex);
+                    valueAsLiteral = this.schema.getQuoteCharacter() + stringValue + this.schema.getQuoteCharacter();
+                    break;
+                case DATE:
+                    LocalDate dateValue = ((DfDateColumn) dfColumn).getDate(rowIndex);
+                    valueAsLiteral = this.formatterForColumn(columnIndex).format(dateValue);
+                    break;
+                default:
+                    ErrorReporter.reportAndThrow("Do not know how to convert value of type " + dfColumn.getType() + " to a string");
+                    valueAsLiteral = "";
+            }
         }
 
 //        assert valueAsLiteral != null;

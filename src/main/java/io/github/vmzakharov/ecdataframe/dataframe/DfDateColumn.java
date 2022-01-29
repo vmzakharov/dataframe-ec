@@ -10,7 +10,7 @@ import java.time.format.DateTimeFormatter;
 public interface DfDateColumn
 extends DfColumn
 {
-    static public DateTimeFormatter FORMATTER = DateTimeFormatter.ISO_DATE;
+    DateTimeFormatter FORMATTER = DateTimeFormatter.ISO_DATE;
 
     LocalDate getDate(int rowIndex);
 
