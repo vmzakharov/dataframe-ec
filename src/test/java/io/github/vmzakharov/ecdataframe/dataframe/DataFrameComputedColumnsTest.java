@@ -12,6 +12,8 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.time.LocalDate;
+
 public class DataFrameComputedColumnsTest
 {
     private DataFrame df;
@@ -20,9 +22,7 @@ public class DataFrameComputedColumnsTest
     public void initializeDataFrame()
     {
         this.df = new DataFrame("this.df1")
-                .addStringColumn("Name").addLongColumn("Count").addDoubleColumn("Value");
-
-        this.df
+                .addStringColumn("Name").addLongColumn("Count").addDoubleColumn("Value")
                 .addRow("Alice",  5, 23.45)
                 .addRow("Bob",   10, 12.34)
                 .addRow("Carol", 11, 56.78)
@@ -194,5 +194,29 @@ public class DataFrameComputedColumnsTest
         this.df.getEvalContext().setNestedContext(outerContext);
 
         Assert.assertEquals(DoubleLists.immutable.of(46.9, 24.68, 58.78, 9.89), this.df.getDoubleColumn("Complication").toDoubleList());
+    }
+
+    @Test
+    public void computedDateColumn()
+    {
+        DataFrame dataFrame  = new DataFrame("DataFrame")
+                .addStringColumn("DateAsString").addLongColumn("Year").addLongColumn("Month").addLongColumn("Day")
+                .addRow("2021-10-01", 2021, 11, 22)
+                .addRow("2022-10-02", 2022, 11, 23)
+                .addRow("2023-10-03", 2023, 11, 24)
+                ;
+
+        dataFrame.addDateColumn("fromString", "toDate(DateAsString)");
+        dataFrame.addDateColumn("fromNumbers", "toDate(Year, Month, Day)");
+
+        DataFrameUtil.assertEquals(
+                new DataFrame("DataFrame")
+                        .addStringColumn("DateAsString").addLongColumn("Year").addLongColumn("Month").addLongColumn("Day")
+                        .addDateColumn("fromString").addDateColumn("fromNumbers")
+                        .addRow("2021-10-01", 2021, 11, 22, LocalDate.of(2021, 10, 1), LocalDate.of(2021, 11, 22))
+                        .addRow("2022-10-02", 2022, 11, 23, LocalDate.of(2022, 10, 2), LocalDate.of(2022, 11, 23))
+                        .addRow("2023-10-03", 2023, 11, 24, LocalDate.of(2023, 10, 3), LocalDate.of(2023, 11, 24))
+                , dataFrame
+        );
     }
 }
