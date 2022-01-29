@@ -203,11 +203,27 @@ final public class BuiltInFunctions
             @Override
             public Value evaluate(VectorValue parameters)
             {
-                this.assertParameterCount(1, parameters.size());
+                LocalDate date = null;
+                if (parameters.size() == 3)
+                {
+                    date = LocalDate.of(
+                            (int) ((LongValue) parameters.get(0)).longValue(),
+                            (int) ((LongValue) parameters.get(1)).longValue(),
+                            (int) ((LongValue) parameters.get(2)).longValue()
+                    );
+                }
+                else if (parameters.size() == 1)
+                {
+                    String aString = parameters.get(0).stringValue();
+                    date = LocalDate.parse(aString, DateTimeFormatter.ISO_DATE);
+                }
+                else
+                {
+                    // forces to fail
+                    this.assertParameterCount(1, parameters.size());
+                }
 
-                String aString = parameters.get(0).stringValue();
-
-                return new DateValue(LocalDate.parse(aString, DateTimeFormatter.ISO_DATE));
+                return new DateValue(date);
             }
 
             @Override
@@ -219,7 +235,7 @@ final public class BuiltInFunctions
             @Override
             public String usageString()
             {
-                return "Usage: " + this.getName() + "(yyyy-mm-dd)";
+                return "Usage: " + this.getName() + "(\"yyyy-mm-dd\") or " + this.getName() + "(yyyy, mm, dd)";
             }
         });
 

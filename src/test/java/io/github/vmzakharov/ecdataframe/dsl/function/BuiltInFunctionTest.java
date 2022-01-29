@@ -118,6 +118,14 @@ public class BuiltInFunctionTest
     }
 
     @Test
+    public void toDate()
+    {
+        Assert.assertEquals(LocalDate.of(2021, 11, 21), evaluateToDate("toDate(2021, 11, 21)"));
+        Assert.assertEquals(LocalDate.of(2021, 11, 21), evaluateToDate("toDate(\"2021-11-21\")"));
+        Assert.assertEquals(LocalDate.of(2011, 12, 20), evaluateToDate("toDate('2011-12-20')"));
+    }
+
+    @Test
     public void toLong()
     {
         Assert.assertEquals(123L, evaluateToLong("toLong('123')"));
