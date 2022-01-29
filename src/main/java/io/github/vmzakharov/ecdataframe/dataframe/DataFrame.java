@@ -116,7 +116,7 @@ public class DataFrame
 
     public DataFrame addDateColumn(String newColumnName, String expressionAsString)
     {
-        throw new UnsupportedOperationException("Cannot add calculated date columns... yet");
+        return this.addColumn(new DfDateColumnComputed(this, newColumnName, expressionAsString));
     }
 
     public DataFrame addColumn(DfColumn newColumn)
