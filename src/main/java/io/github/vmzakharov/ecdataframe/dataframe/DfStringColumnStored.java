@@ -50,11 +50,6 @@ implements DfStringColumn
         this.addMyType((String) newObject);
     }
 
-    public void addString(String newObject)
-    {
-        this.addMyType(newObject);
-    }
-
     @Override
     public String getString(int rowIndex)
     {

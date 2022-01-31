@@ -30,12 +30,6 @@ extends DfColumn
     }
 
     @Override
-    default boolean isNull(int rowIndex)
-    {
-        return this.getObject(rowIndex) == null;
-    }
-
-    @Override
     default Value getValue(int rowIndex)
     {
         return new StringValue(this.getString(rowIndex));
@@ -51,7 +45,7 @@ extends DfColumn
     @Override
     default void addRowToColumn(int rowIndex, DfColumn target)
     {
-        ((DfStringColumnStored) target).addString(this.getString(rowIndex));
+        target.addObject(this.getString(rowIndex));
     }
 
     @Override

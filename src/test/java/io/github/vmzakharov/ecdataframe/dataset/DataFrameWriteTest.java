@@ -67,6 +67,7 @@ public class DataFrameWriteTest
 
         Assert.assertEquals(expected, dataSet.getWrittenData());
     }
+
     @Test
     public void writeWithSchemaPipeNullMarkers()
     {

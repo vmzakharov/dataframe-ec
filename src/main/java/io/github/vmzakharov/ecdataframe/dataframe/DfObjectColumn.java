@@ -18,6 +18,12 @@ extends DfColumnAbstract
     abstract protected void addAllItems(ListIterable<T> items);
 
     @Override
+    public boolean isNull(int rowIndex)
+    {
+        return this.getObject(rowIndex) == null;
+    }
+
+    @Override
     public DfColumn mergeWithInto(DfColumn other, DataFrame target)
     {
         DfObjectColumn<T> mergedCol = (DfObjectColumn<T>) this.validateAndCreateTargetColumn(other, target);

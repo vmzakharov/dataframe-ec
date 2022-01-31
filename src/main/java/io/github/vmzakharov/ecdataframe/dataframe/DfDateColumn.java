@@ -41,13 +41,7 @@ extends DfColumn
     @Override
     default void addRowToColumn(int rowIndex, DfColumn target)
     {
-        ((DfDateColumnStored) target).addDate(this.getDate(rowIndex));
-    }
-
-    @Override
-    default boolean isNull(int rowIndex)
-    {
-        return this.getDate(rowIndex) == null;
+        ((DfDateColumnStored) target).addMyType(this.getDate(rowIndex));
     }
 
     @Override

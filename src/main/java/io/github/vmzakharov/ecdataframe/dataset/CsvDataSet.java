@@ -3,10 +3,8 @@ package io.github.vmzakharov.ecdataframe.dataset;
 import io.github.vmzakharov.ecdataframe.dataframe.DataFrame;
 import io.github.vmzakharov.ecdataframe.dataframe.DfColumn;
 import io.github.vmzakharov.ecdataframe.dataframe.DfDateColumn;
-import io.github.vmzakharov.ecdataframe.dataframe.DfDateColumnStored;
 import io.github.vmzakharov.ecdataframe.dataframe.DfDoubleColumn;
 import io.github.vmzakharov.ecdataframe.dataframe.DfLongColumn;
-import io.github.vmzakharov.ecdataframe.dataframe.DfStringColumnStored;
 import io.github.vmzakharov.ecdataframe.dataframe.ErrorReporter;
 import io.github.vmzakharov.ecdataframe.dsl.value.ValueType;
 import org.eclipse.collections.api.block.procedure.Procedure;
@@ -447,10 +445,10 @@ extends DataSetAbstract
                 columnPopulators.add(s -> schemaCol.parseAsDoubleAndAdd(s, lastColumn));
                 break;
             case STRING:
-                columnPopulators.add(s -> ((DfStringColumnStored) lastColumn).addString(schemaCol.parseAsString(s)));
+                columnPopulators.add(s -> lastColumn.addObject(schemaCol.parseAsString(s)));
                 break;
             case DATE:
-                columnPopulators.add(s -> ((DfDateColumnStored) lastColumn).addDate(schemaCol.parseAsLocalDate(s)));
+                columnPopulators.add(s -> lastColumn.addObject(schemaCol.parseAsLocalDate(s)));
                 break;
             default:
                 throw new RuntimeException("Don't know what to do with the column type: " + columnType);

@@ -20,11 +20,6 @@ implements DfDateColumn
         super(owner, newName, newValues);
     }
 
-    public void addDate(LocalDate d)
-    {
-        this.addMyType(d);
-    }
-
     @Override
     public LocalDate getDate(int rowIndex)
     {
@@ -40,7 +35,7 @@ implements DfDateColumn
     @Override
     public void addObject(Object newObject)
     {
-        this.addDate((LocalDate) newObject);
+        this.addMyType((LocalDate) newObject);
     }
 
     @Override
@@ -52,7 +47,7 @@ implements DfDateColumn
         }
         else if (value.isDate())
         {
-            this.addDate(((DateValue) value).dateValue());
+            this.addObject(((DateValue) value).dateValue());
         }
         else
         {
