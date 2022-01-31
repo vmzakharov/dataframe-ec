@@ -11,6 +11,7 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 import static io.github.vmzakharov.ecdataframe.ExpressionTestUtil.*;
 
@@ -127,6 +128,15 @@ public class BuiltInFunctionTest
     }
 
     @Test
+    public void toDateTime()
+    {
+        Assert.assertEquals(LocalDateTime.of(2021, 11,  1, 10, 35), evaluateToDateTime("toDateTime('2021-11-01T10:35')"));
+        Assert.assertEquals(LocalDateTime.of(2021, 11, 21, 10, 35), evaluateToDateTime("toDateTime(2021, 11, 21, 10, 35)"));
+        Assert.assertEquals(LocalDateTime.of(2021, 11, 21, 15, 5, 35), evaluateToDateTime("toDateTime(\"2021-11-21T15:05:35\")"));
+        Assert.assertEquals(LocalDateTime.of(2011, 12, 20, 20, 45, 5), evaluateToDateTime("toDateTime('2011-12-20T20:45:05')"));
+    }
+
+    @Test
     public void toLong()
     {
         Assert.assertEquals(123L, evaluateToLong("toLong('123')"));
@@ -148,8 +158,8 @@ public class BuiltInFunctionTest
         MapIterable<String, IntrinsicFunctionDescriptor> functionsByName = BuiltInFunctions.getFunctionsByName();
 
         MutableList<String> expectedFunctionNames = Lists.mutable.of(
-            "abs", "contains", "print", "println", "startsWith", "substr", "toDate", "toDouble", "toLong", "toString",
-            "toUpper", "withinDays"
+            "abs", "contains", "print", "println", "startsWith", "substr", "toDate", "toDateTime", "toDouble", "toLong",
+            "toString", "toUpper", "withinDays"
         );
 
         Assert.assertEquals(expectedFunctionNames.size(), functionsByName.size());

@@ -5,6 +5,7 @@ import io.github.vmzakharov.ecdataframe.dsl.BinaryExpr;
 import io.github.vmzakharov.ecdataframe.dsl.BinaryOp;
 import io.github.vmzakharov.ecdataframe.dsl.Expression;
 import io.github.vmzakharov.ecdataframe.dsl.value.BooleanValue;
+import io.github.vmzakharov.ecdataframe.dsl.value.DateTimeValue;
 import io.github.vmzakharov.ecdataframe.dsl.value.DateValue;
 import io.github.vmzakharov.ecdataframe.dsl.value.DoubleValue;
 import io.github.vmzakharov.ecdataframe.dsl.value.LongValue;
@@ -14,6 +15,7 @@ import io.github.vmzakharov.ecdataframe.util.ExpressionParserHelper;
 import org.junit.Assert;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 final public class ExpressionTestUtil
 {
@@ -62,6 +64,11 @@ final public class ExpressionTestUtil
     public static LocalDate evaluateToDate(String s)
     {
         return ((DateValue) evaluate(s)).dateValue();
+    }
+
+    public static LocalDateTime evaluateToDateTime(String s)
+    {
+        return ((DateTimeValue) evaluate(s)).dateTimeValue();
     }
 
     public static boolean evaluate(BinaryOp op, Value value1, Value value2)

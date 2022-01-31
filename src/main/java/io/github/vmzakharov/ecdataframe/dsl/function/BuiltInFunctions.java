@@ -2,6 +2,7 @@ package io.github.vmzakharov.ecdataframe.dsl.function;
 
 import io.github.vmzakharov.ecdataframe.dsl.EvalContext;
 import io.github.vmzakharov.ecdataframe.dsl.value.BooleanValue;
+import io.github.vmzakharov.ecdataframe.dsl.value.DateTimeValue;
 import io.github.vmzakharov.ecdataframe.dsl.value.DateValue;
 import io.github.vmzakharov.ecdataframe.dsl.value.DoubleValue;
 import io.github.vmzakharov.ecdataframe.dsl.value.LongValue;
@@ -18,6 +19,7 @@ import org.eclipse.collections.impl.factory.Lists;
 import org.eclipse.collections.impl.factory.Maps;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.Period;
 import java.time.format.DateTimeFormatter;
 
@@ -236,6 +238,62 @@ final public class BuiltInFunctions
             public String usageString()
             {
                 return "Usage: " + this.getName() + "(\"yyyy-mm-dd\") or " + this.getName() + "(yyyy, mm, dd)";
+            }
+        });
+
+        addFunctionDescriptor(new IntrinsicFunctionDescriptor("toDateTime")
+        {
+            @Override
+            public Value evaluate(VectorValue parameters)
+            {
+                LocalDateTime dateTime = null;
+                int paramCount = parameters.size();
+                if (parameters.size() > 4)
+                {
+                    int[] params = new int[paramCount];
+                    for (int i = 0; i < paramCount; i++)
+                    {
+                        params[i] = (int) ((LongValue) parameters.get(i)).longValue();
+                    }
+
+                    switch (paramCount)
+                    {
+                        case 5:
+                            dateTime = LocalDateTime.of(params[0], params[1], params[2], params[3], params[4]);
+                            break;
+                        case 6:
+                            dateTime = LocalDateTime.of(params[0], params[1], params[2], params[3], params[4], params[5]);
+                            break;
+                        case 7:
+                            dateTime = LocalDateTime.of(params[0], params[1], params[2], params[3], params[4], params[5], params[6]);
+                            break;
+                    }
+
+                }
+                else if (parameters.size() == 1)
+                {
+                    String aString = parameters.get(0).stringValue();
+                    dateTime = LocalDateTime.parse(aString, DateTimeFormatter.ISO_DATE_TIME);
+                }
+                else
+                {
+                    // forces to fail
+                    this.assertParameterCount(1, parameters.size());
+                }
+
+                return new DateTimeValue(dateTime);
+            }
+
+            @Override
+            public ValueType returnType(ListIterable<ValueType> parameterTypes)
+            {
+                return ValueType.DATE;
+            }
+
+            @Override
+            public String usageString()
+            {
+                return "Usage: " + this.getName() + "(\"yyyy-mm-ddThh:mm[:ss[.nnnn]]\") or " + this.getName() + "(yyyy, mm, dd, hh, mm[, ss[, nnnn]])";
             }
         });
 

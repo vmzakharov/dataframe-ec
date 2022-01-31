@@ -4,6 +4,7 @@ import io.github.vmzakharov.ecdataframe.dsl.value.BooleanValue;
 import io.github.vmzakharov.ecdataframe.dsl.value.Value;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 public interface PredicateOp
 extends BinaryOp
@@ -25,6 +26,11 @@ extends BinaryOp
     default BooleanValue applyDate(LocalDate operand1, LocalDate operand2)
     {
         throw new UnsupportedOperationException("Cannot apply '" + this.asString() + "' to dates");
+    }
+
+    default BooleanValue applyDateTime(LocalDateTime operand1, LocalDateTime operand2)
+    {
+        throw new UnsupportedOperationException("Cannot apply '" + this.asString() + "' to datetime values");
     }
 
     default BooleanValue applyLong(long operand1, long operand2)

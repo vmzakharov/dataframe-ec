@@ -7,6 +7,7 @@ import io.github.vmzakharov.ecdataframe.dsl.value.Value;
 import org.eclipse.collections.api.list.ListIterable;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 public interface UnaryOp
 {
@@ -119,6 +120,11 @@ public interface UnaryOp
     default BooleanValue applyDate(LocalDate operand)
     {
         throw new UnsupportedOperationException("Operation " + this.asString() + " cannot be applied to a date");
+    }
+
+    default BooleanValue applyDateTime(LocalDateTime operand)
+    {
+        throw new UnsupportedOperationException("Operation " + this.asString() + " cannot be applied to a datetime");
     }
 
     default BooleanValue applyString(String operand)
