@@ -370,7 +370,7 @@ public class DataFrame
 
     public String getString(String columnName, int rowIndex)
     {
-        return this.getStringColumn(columnName).getString(this.rowIndexMap(rowIndex));
+        return this.getStringColumn(columnName).getTypedObject(this.rowIndexMap(rowIndex));
     }
 
     public double getDouble(String columnName, int rowIndex)
@@ -380,7 +380,7 @@ public class DataFrame
 
     public LocalDate getDate(String columnName, int rowIndex)
     {
-        return this.getDateColumn(columnName).getDate(this.rowIndexMap(rowIndex));
+        return this.getDateColumn(columnName).getTypedObject(this.rowIndexMap(rowIndex));
     }
 
     public DfLongColumn getLongColumn(String columnName)

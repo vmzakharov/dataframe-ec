@@ -1,35 +1,17 @@
 package io.github.vmzakharov.ecdataframe.dataframe;
 
 import org.eclipse.collections.api.list.ImmutableList;
-import org.eclipse.collections.api.list.ListIterable;
 
-abstract public class DfObjectColumn<T>
-extends DfColumnAbstract
+public interface DfObjectColumn<T>
+extends DfColumn
 {
-    public DfObjectColumn(DataFrame newDataFrame, String newName)
-    {
-        super(newDataFrame, newName);
-    }
+    ImmutableList<T> toList();
 
-    abstract public ImmutableList<T> toList();
-
-    abstract public T getTypedObject(int rowIndex);
-
-    abstract protected void addAllItems(ListIterable<T> items);
+    T getTypedObject(int rowIndex);
 
     @Override
-    public boolean isNull(int rowIndex)
+    default Object getObject(int rowIndex)
     {
-        return this.getObject(rowIndex) == null;
-    }
-
-    @Override
-    public DfColumn mergeWithInto(DfColumn other, DataFrame target)
-    {
-        DfObjectColumn<T> mergedCol = (DfObjectColumn<T>) this.validateAndCreateTargetColumn(other, target);
-
-        mergedCol.addAllItems(this.toList());
-        mergedCol.addAllItems(((DfObjectColumn<T>) other).toList());
-        return mergedCol;
+        return this.getTypedObject(rowIndex);
     }
 }

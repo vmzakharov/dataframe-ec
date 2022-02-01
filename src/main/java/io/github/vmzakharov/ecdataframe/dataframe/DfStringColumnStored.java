@@ -1,7 +1,6 @@
 package io.github.vmzakharov.ecdataframe.dataframe;
 
 import io.github.vmzakharov.ecdataframe.dsl.value.Value;
-import io.github.vmzakharov.ecdataframe.dsl.value.ValueType;
 import org.eclipse.collections.api.list.ListIterable;
 
 public class DfStringColumnStored
@@ -39,27 +38,9 @@ implements DfStringColumn
     }
 
     @Override
-    public ValueType getType()
-    {
-        return ValueType.STRING;
-    }
-
-    @Override
     public void addObject(Object newObject)
     {
         this.addMyType((String) newObject);
-    }
-
-    @Override
-    public String getString(int rowIndex)
-    {
-        return this.getValues().get(rowIndex);
-    }
-
-    @Override
-    public String getTypedObject(int rowIndex)
-    {
-        return this.getString(rowIndex);
     }
 
     @Override

@@ -188,7 +188,7 @@ extends DataSetAbstract
                     valueAsLiteral = this.schema.getQuoteCharacter() + stringValue + this.schema.getQuoteCharacter();
                     break;
                 case DATE:
-                    LocalDate dateValue = ((DfDateColumn) dfColumn).getDate(rowIndex);
+                    LocalDate dateValue = ((DfDateColumn) dfColumn).getTypedObject(rowIndex);
                     valueAsLiteral = this.formatterForColumn(columnIndex).format(dateValue);
                     break;
                 default:

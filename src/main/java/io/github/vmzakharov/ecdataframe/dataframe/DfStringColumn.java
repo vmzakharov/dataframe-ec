@@ -3,39 +3,28 @@ package io.github.vmzakharov.ecdataframe.dataframe;
 import io.github.vmzakharov.ecdataframe.dsl.value.StringValue;
 import io.github.vmzakharov.ecdataframe.dsl.value.Value;
 import io.github.vmzakharov.ecdataframe.dsl.value.ValueType;
-import org.eclipse.collections.api.list.ImmutableList;
 
 public interface DfStringColumn
-extends DfColumn
+extends DfObjectColumn<String>
 {
-    String getString(int rowIndex);
-
     @Override
     default String getValueAsString(int rowIndex)
     {
-        return this.getString(rowIndex);
+        return this.getTypedObject(rowIndex);
     }
 
     @Override
     default String getValueAsStringLiteral(int rowIndex)
     {
-        String value = this.getString(rowIndex);
+        String value = this.getTypedObject(rowIndex);
         return value == null ? "" : '"' + this.getValueAsString(rowIndex) + '"';
-    }
-
-    @Override
-    default Object getObject(int rowIndex)
-    {
-        return this.getString(rowIndex);
     }
 
     @Override
     default Value getValue(int rowIndex)
     {
-        return new StringValue(this.getString(rowIndex));
+        return new StringValue(this.getTypedObject(rowIndex));
     }
-
-    ImmutableList<String> toList();
 
     default ValueType getType()
     {
@@ -45,7 +34,7 @@ extends DfColumn
     @Override
     default void addRowToColumn(int rowIndex, DfColumn target)
     {
-        target.addObject(this.getString(rowIndex));
+        target.addObject(this.getTypedObject(rowIndex));
     }
 
     @Override
@@ -54,7 +43,7 @@ extends DfColumn
         DfStringColumn otherStringColumn = (DfStringColumn) otherColumn;
 
         return (thisRowIndex, otherRowIndex) -> new ComparisonResult.StringComparisonResult(
-                this.getString(this.dataFrameRowIndex(thisRowIndex)),
-                otherStringColumn.getString(otherStringColumn.dataFrameRowIndex(otherRowIndex)));
+                this.getTypedObject(this.dataFrameRowIndex(thisRowIndex)),
+                otherStringColumn.getTypedObject(otherStringColumn.dataFrameRowIndex(otherRowIndex)));
     }
 }

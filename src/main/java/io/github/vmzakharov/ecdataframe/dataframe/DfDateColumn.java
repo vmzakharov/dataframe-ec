@@ -8,29 +8,21 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 
 public interface DfDateColumn
-extends DfColumn
+extends DfObjectColumn<LocalDate>
 {
     DateTimeFormatter FORMATTER = DateTimeFormatter.ISO_DATE;
-
-    LocalDate getDate(int rowIndex);
 
     @Override
     default String getValueAsString(int rowIndex)
     {
-        LocalDate value = this.getDate(rowIndex);
+        LocalDate value = this.getTypedObject(rowIndex);
         return value == null ? "" : this.FORMATTER.format(value);
-    }
-
-    @Override
-    default Object getObject(int rowIndex)
-    {
-        return this.getDate(rowIndex);
     }
 
     @Override
     default Value getValue(int rowIndex)
     {
-        return new DateValue(this.getDate(rowIndex));
+        return new DateValue(this.getTypedObject(rowIndex));
     }
 
     default ValueType getType()
@@ -41,7 +33,7 @@ extends DfColumn
     @Override
     default void addRowToColumn(int rowIndex, DfColumn target)
     {
-        ((DfDateColumnStored) target).addMyType(this.getDate(rowIndex));
+        ((DfDateColumnStored) target).addMyType(this.getTypedObject(rowIndex));
     }
 
     @Override
@@ -50,7 +42,7 @@ extends DfColumn
         DfDateColumn otherStringColumn = (DfDateColumn) otherColumn;
 
         return (thisRowIndex, otherRowIndex) -> new ComparisonResult.DateComparisonResult(
-                this.getDate(this.dataFrameRowIndex(thisRowIndex)),
-                otherStringColumn.getDate(otherStringColumn.dataFrameRowIndex(otherRowIndex)));
+                this.getTypedObject(this.dataFrameRowIndex(thisRowIndex)),
+                otherStringColumn.getTypedObject(otherStringColumn.dataFrameRowIndex(otherRowIndex)));
     }
 }

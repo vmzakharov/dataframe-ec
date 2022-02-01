@@ -9,7 +9,7 @@ import org.eclipse.collections.impl.factory.Lists;
 import org.eclipse.collections.impl.set.mutable.UnifiedSet;
 
 abstract public class DfObjectColumnStored<T>
-extends DfObjectColumn<T>
+extends DfObjectColumnAbstract<T>
 implements DfColumnStored
 {
     private MutableList<T> values = Lists.mutable.of();
@@ -25,11 +25,6 @@ implements DfColumnStored
     {
         super(owner, newName);
         this.values.addAllIterable(newValues);
-    }
-
-    protected MutableList<T> getValues()
-    {
-        return this.values;
     }
 
     @Override
@@ -96,6 +91,12 @@ implements DfColumnStored
 
     @Override
     public Object getObject(int rowIndex)
+    {
+        return this.values.get(rowIndex);
+    }
+
+    @Override
+    public T getTypedObject(int rowIndex)
     {
         return this.values.get(rowIndex);
     }

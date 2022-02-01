@@ -16,12 +16,6 @@ implements DfStringColumn
     @Override
     public String getTypedObject(int rowIndex)
     {
-        return this.getString(rowIndex);
-    }
-
-    @Override
-    public String getString(int rowIndex)
-    {
         // todo: column in the variable expr or some other optimization?
         DataFrameEvalContext evalContext = this.getDataFrame().getEvalContext();
         evalContext.setRowIndex(rowIndex);

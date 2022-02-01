@@ -18,12 +18,6 @@ implements DfDateColumn
     @Override
     public LocalDate getTypedObject(int rowIndex)
     {
-        return this.getDate(rowIndex);
-    }
-
-    @Override
-    public LocalDate getDate(int rowIndex)
-    {
         // todo: column in the variable expr or some other optimization?
         DataFrameEvalContext evalContext = this.getDataFrame().getEvalContext();
         evalContext.setRowIndex(rowIndex);

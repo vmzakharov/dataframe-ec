@@ -8,7 +8,7 @@ import org.eclipse.collections.impl.factory.Lists;
 import org.eclipse.collections.impl.list.Interval;
 
 abstract public class DfObjectColumnComputed<T>
-extends DfObjectColumn<T>
+extends DfObjectColumnAbstract<T>
 implements DfColumnComputed
 {
     private final String expressionAsString;
