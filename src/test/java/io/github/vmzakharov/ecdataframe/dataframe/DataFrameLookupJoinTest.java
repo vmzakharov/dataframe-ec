@@ -3,7 +3,7 @@ package io.github.vmzakharov.ecdataframe.dataframe;
 import org.eclipse.collections.impl.factory.Lists;
 import org.junit.Test;
 
-public class DataFrameIndexJoinTest
+public class DataFrameLookupJoinTest
 {
     @Test
     public void simpleLookup()
@@ -22,11 +22,11 @@ public class DataFrameIndexJoinTest
                 .addRow("UZ", "Uzbekistan")
                 ;
 
-        DataFrame enriched = clients.lookup(
-                                DfJoin.to(countries)
-                                    .match("Country ISO", "ISO Code")
-                                    .columns("Country Name")
-                            );
+        clients.lookup(
+            DfJoin.to(countries)
+                .match("Country ISO", "ISO Code")
+                .select("Country Name")
+        );
 
         DataFrameUtil.assertEquals(
                 new DataFrame("clients")
@@ -34,7 +34,7 @@ public class DataFrameIndexJoinTest
                         .addRow("1", "Alice", "BM", "Bermuda")
                         .addRow("3",  "Carl", "XX",  null)
                         .addRow("4", "Doris", "NZ", "New Zealand")
-                , enriched
+                , clients
         );
     }
 
@@ -57,12 +57,12 @@ public class DataFrameIndexJoinTest
                 .addRow("UZ", "Uzbekistan")
                 ;
 
-        DataFrame enriched = clients.lookup(
-                                DfJoin.to(countries)
-                                    .match("Country ISO", "ISO Code")
-                                    .columns("Name", "Country Name")
-                                    .ifAbsent("Not found")
-                            );
+        clients.lookup(
+            DfJoin.to(countries)
+                .match("Country ISO", "ISO Code")
+                .select("Name", "Country Name")
+                .ifAbsent("Not found")
+        );
 
         DataFrameUtil.assertEquals(
                 new DataFrame("clients")
@@ -72,7 +72,7 @@ public class DataFrameIndexJoinTest
                         .addRow("3",  "Carl", "XX", "Not found")
                         .addRow("4", "Doris", "NZ", "New Zealand")
                         .addRow("5",  "Evan", "UZ", "Uzbekistan"),
-                enriched
+                clients
         );
     }
 
@@ -99,7 +99,7 @@ public class DataFrameIndexJoinTest
         DataFrame enriched = clients.lookup(
                 DfJoin.to(countries)
                       .match(Lists.immutable.of("Country ISO", "Code"), Lists.immutable.of("ISO Code", "Code"))
-                      .columns(Lists.immutable.of("Name", "Number"), Lists.immutable.of("Country Name", "Numeric Code"))
+                      .select(Lists.immutable.of("Name", "Number"), Lists.immutable.of("Country Name", "Numeric Code"))
                       .ifAbsent(Lists.immutable.of("Not found", -1))
         );
 

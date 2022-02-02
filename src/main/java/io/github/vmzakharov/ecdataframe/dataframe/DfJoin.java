@@ -37,22 +37,22 @@ final public class DfJoin
     }
 
     // TODO: rename to select
-    public DfJoin columns(String newSelectFromJoined)
+    public DfJoin select(String newSelectFromJoined)
     {
-        return this.columns(newSelectFromJoined, newSelectFromJoined);
+        return this.select(newSelectFromJoined, newSelectFromJoined);
     }
 
-    public DfJoin columns(String newSelectFromJoined, String newAlias)
+    public DfJoin select(String newSelectFromJoined, String newAlias)
     {
-        return this.columns(Lists.fixedSize.of(newSelectFromJoined), Lists.fixedSize.of(newAlias));
+        return this.select(Lists.fixedSize.of(newSelectFromJoined), Lists.fixedSize.of(newAlias));
     }
 
-    public DfJoin columns(ListIterable<String> newSelectFromJoined)
+    public DfJoin select(ListIterable<String> newSelectFromJoined)
     {
-        return this.columns(newSelectFromJoined, newSelectFromJoined);
+        return this.select(newSelectFromJoined, newSelectFromJoined);
     }
 
-    public DfJoin columns(ListIterable<String> newSelectFromJoined, ListIterable<String> newColumnNameAliases)
+    public DfJoin select(ListIterable<String> newSelectFromJoined, ListIterable<String> newColumnNameAliases)
     {
         this.selectFromJoined = newSelectFromJoined;
         this.columnNameAliases = newColumnNameAliases;
