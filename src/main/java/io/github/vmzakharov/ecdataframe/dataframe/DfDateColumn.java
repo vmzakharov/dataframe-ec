@@ -1,7 +1,5 @@
 package io.github.vmzakharov.ecdataframe.dataframe;
 
-import io.github.vmzakharov.ecdataframe.dsl.value.DateValue;
-import io.github.vmzakharov.ecdataframe.dsl.value.Value;
 import io.github.vmzakharov.ecdataframe.dsl.value.ValueType;
 
 import java.time.LocalDate;
@@ -17,12 +15,6 @@ extends DfObjectColumn<LocalDate>
     {
         LocalDate value = this.getTypedObject(rowIndex);
         return value == null ? "" : this.FORMATTER.format(value);
-    }
-
-    @Override
-    default Value getValue(int rowIndex)
-    {
-        return new DateValue(this.getTypedObject(rowIndex));
     }
 
     default ValueType getType()

@@ -1,5 +1,6 @@
 package io.github.vmzakharov.ecdataframe.dataframe;
 
+import io.github.vmzakharov.ecdataframe.dsl.value.StringValue;
 import io.github.vmzakharov.ecdataframe.dsl.value.Value;
 import org.eclipse.collections.api.list.ListIterable;
 
@@ -15,6 +16,12 @@ implements DfStringColumn
     public DfStringColumnStored(DataFrame owner, String newName, ListIterable<String> newValues)
     {
         super(owner, newName, newValues);
+    }
+
+    @Override
+    public Value getValue(int rowIndex)
+    {
+        return new StringValue(this.getTypedObject(rowIndex));
     }
 
     @Override

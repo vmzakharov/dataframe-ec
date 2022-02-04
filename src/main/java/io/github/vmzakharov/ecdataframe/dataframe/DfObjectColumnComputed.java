@@ -50,7 +50,8 @@ implements DfColumnComputed
         return this.expressionAsString;
     }
 
-    protected Expression getExpression()
+    @Override
+    public Expression getExpression()
     {
         return this.expression;
     }

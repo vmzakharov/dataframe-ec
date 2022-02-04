@@ -1,7 +1,5 @@
 package io.github.vmzakharov.ecdataframe.dataframe;
 
-import io.github.vmzakharov.ecdataframe.dsl.value.LongValue;
-import io.github.vmzakharov.ecdataframe.dsl.value.Value;
 import io.github.vmzakharov.ecdataframe.dsl.value.ValueType;
 import org.eclipse.collections.api.list.primitive.ImmutableLongList;
 
@@ -19,18 +17,6 @@ extends DfColumnAbstract
     public String getValueAsString(int rowIndex)
     {
         return Long.toString(this.getLong(rowIndex));
-    }
-
-    @Override
-    public Object getObject(int rowIndex)
-    {
-        return this.getLong(rowIndex);
-    }
-
-    @Override
-    public Value getValue(int rowIndex)
-    {
-        return new LongValue(this.getLong(rowIndex));
     }
 
     public abstract ImmutableLongList toLongList();

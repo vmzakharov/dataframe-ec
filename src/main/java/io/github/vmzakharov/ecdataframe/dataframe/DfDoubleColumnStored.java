@@ -60,6 +60,17 @@ implements DfColumnStored
     }
 
     @Override
+    public Value getValue(int rowIndex)
+    {
+        if (this.isNull(rowIndex))
+        {
+            return Value.VOID;
+        }
+
+        return new DoubleValue(this.getDoubleWithoutNullCheck(rowIndex));
+    }
+
+    @Override
     public String getValueAsString(int rowIndex)
     {
         return Double.toString(this.getDouble(rowIndex));
@@ -89,12 +100,6 @@ implements DfColumnStored
     private double getDoubleWithoutNullCheck(int rowIndex)
     {
         return this.values.get(rowIndex);
-    }
-
-    @Override
-    public Value getValue(int rowIndex)
-    {
-        return new DoubleValue(this.getDouble(rowIndex));
     }
 
     @Override

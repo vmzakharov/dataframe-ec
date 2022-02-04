@@ -1,9 +1,8 @@
 package io.github.vmzakharov.ecdataframe.dataframe;
 
-import io.github.vmzakharov.ecdataframe.dsl.DataFrameEvalContext;
 import io.github.vmzakharov.ecdataframe.dsl.Expression;
 import io.github.vmzakharov.ecdataframe.dsl.value.DoubleValue;
-import io.github.vmzakharov.ecdataframe.dsl.visitor.InMemoryEvaluationVisitor;
+import io.github.vmzakharov.ecdataframe.dsl.value.Value;
 import io.github.vmzakharov.ecdataframe.util.ExpressionParserHelper;
 import org.eclipse.collections.api.DoubleIterable;
 import org.eclipse.collections.api.list.primitive.ImmutableDoubleList;
@@ -26,15 +25,24 @@ implements DfColumnComputed
     }
 
     @Override
+    public Object getObject(int rowIndex)
+    {
+        Value result = this.getValue(rowIndex);
+
+        return result.isVoid() ? null : ((DoubleValue) result).doubleValue();
+    }
+
+    @Override
     public double getDouble(int rowIndex)
     {
-        // todo: column in the variable expr or some other optimization?
+        Value result = this.getValue(rowIndex);
 
-        DataFrameEvalContext evalContext = this.getDataFrame().getEvalContext();
-        evalContext.setRowIndex(rowIndex);
+        if (result.isVoid())
+        {
+            throw new NullPointerException("Null value at " + this.getName() + "[" + rowIndex + "]");
+        }
 
-        DoubleValue result = (DoubleValue) this.expression.evaluate(new InMemoryEvaluationVisitor(evalContext));
-        return result.doubleValue();
+        return ((DoubleValue) result).doubleValue();
     }
 
     @Override
@@ -75,6 +83,12 @@ implements DfColumnComputed
     public String getExpressionAsString()
     {
         return this.expressionAsString;
+    }
+
+    @Override
+    public Expression getExpression()
+    {
+        return this.expression;
     }
 
     @Override

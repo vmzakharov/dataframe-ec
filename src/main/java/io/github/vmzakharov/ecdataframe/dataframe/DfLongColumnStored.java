@@ -73,6 +73,17 @@ implements DfColumnStored
     }
 
     @Override
+    public Value getValue(int rowIndex)
+    {
+        if (this.isNull(rowIndex))
+        {
+            return Value.VOID;
+        }
+
+        return new LongValue(this.getLong(rowIndex));
+    }
+
+    @Override
     public ImmutableLongList toLongList()
     {
         return this.values.toImmutable();

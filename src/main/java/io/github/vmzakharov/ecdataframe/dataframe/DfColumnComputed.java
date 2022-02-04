@@ -1,6 +1,9 @@
 package io.github.vmzakharov.ecdataframe.dataframe;
 
+import io.github.vmzakharov.ecdataframe.dsl.DataFrameEvalContext;
+import io.github.vmzakharov.ecdataframe.dsl.Expression;
 import io.github.vmzakharov.ecdataframe.dsl.value.Value;
+import io.github.vmzakharov.ecdataframe.dsl.visitor.InMemoryEvaluationVisitor;
 
 public interface DfColumnComputed
 extends DfColumn
@@ -10,10 +13,22 @@ extends DfColumn
 
     String getExpressionAsString();
 
+    Expression getExpression();
+
     @Override
     default void setObject(int rowIndex, Object anObject)
     {
         throw new RuntimeException("Cannot set a value on computed column '" + this.getName() + "'");
+    }
+
+    @Override
+    default Value getValue(int rowIndex)
+    {
+        // todo: column in the variable expr or some other optimization?
+        DataFrameEvalContext evalContext = this.getDataFrame().getEvalContext();
+        evalContext.setRowIndex(rowIndex);
+
+        return this.getExpression().evaluate(new InMemoryEvaluationVisitor(evalContext));
     }
 
     @Override

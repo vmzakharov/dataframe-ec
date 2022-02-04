@@ -1,8 +1,7 @@
 package io.github.vmzakharov.ecdataframe.dataframe;
 
-import io.github.vmzakharov.ecdataframe.dsl.DataFrameEvalContext;
 import io.github.vmzakharov.ecdataframe.dsl.value.DateValue;
-import io.github.vmzakharov.ecdataframe.dsl.visitor.InMemoryEvaluationVisitor;
+import io.github.vmzakharov.ecdataframe.dsl.value.Value;
 
 import java.time.LocalDate;
 
@@ -18,11 +17,8 @@ implements DfDateColumn
     @Override
     public LocalDate getTypedObject(int rowIndex)
     {
-        // todo: column in the variable expr or some other optimization?
-        DataFrameEvalContext evalContext = this.getDataFrame().getEvalContext();
-        evalContext.setRowIndex(rowIndex);
+        Value result = this.getValue(rowIndex);
 
-        DateValue result = (DateValue) this.getExpression().evaluate(new InMemoryEvaluationVisitor(evalContext));
-        return result.dateValue();
+        return result.isVoid() ? null : ((DateValue) result).dateValue();
     }
 }

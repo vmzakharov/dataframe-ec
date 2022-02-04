@@ -1,7 +1,5 @@
 package io.github.vmzakharov.ecdataframe.dataframe;
 
-import io.github.vmzakharov.ecdataframe.dsl.value.DoubleValue;
-import io.github.vmzakharov.ecdataframe.dsl.value.Value;
 import io.github.vmzakharov.ecdataframe.dsl.value.ValueType;
 import org.eclipse.collections.api.DoubleIterable;
 import org.eclipse.collections.api.list.primitive.ImmutableDoubleList;
@@ -20,18 +18,6 @@ extends DfColumnAbstract
     public String getValueAsString(int rowIndex)
     {
         return Double.toString(this.getDouble(rowIndex));
-    }
-
-    @Override
-    public Object getObject(int rowIndex)
-    {
-        return this.getDouble(rowIndex);
-    }
-
-    @Override
-    public Value getValue(int rowIndex)
-    {
-        return new DoubleValue(this.getDouble(rowIndex));
     }
 
     public abstract ImmutableDoubleList toDoubleList();

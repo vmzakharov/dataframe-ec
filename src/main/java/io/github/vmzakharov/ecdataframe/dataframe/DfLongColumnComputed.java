@@ -1,9 +1,8 @@
 package io.github.vmzakharov.ecdataframe.dataframe;
 
-import io.github.vmzakharov.ecdataframe.dsl.DataFrameEvalContext;
 import io.github.vmzakharov.ecdataframe.dsl.Expression;
 import io.github.vmzakharov.ecdataframe.dsl.value.LongValue;
-import io.github.vmzakharov.ecdataframe.dsl.visitor.InMemoryEvaluationVisitor;
+import io.github.vmzakharov.ecdataframe.dsl.value.Value;
 import io.github.vmzakharov.ecdataframe.util.ExpressionParserHelper;
 import org.eclipse.collections.api.list.primitive.ImmutableLongList;
 import org.eclipse.collections.impl.factory.primitive.LongLists;
@@ -26,12 +25,14 @@ implements DfColumnComputed
     @Override
     public long getLong(int rowIndex)
     {
-        // todo: column in the variable expr or some other optimization?
-        DataFrameEvalContext evalContext = this.getDataFrame().getEvalContext();
-        evalContext.setRowIndex(rowIndex);
+        Value result = this.getValue(rowIndex);
 
-        LongValue result = (LongValue) this.expression.evaluate(new InMemoryEvaluationVisitor(evalContext));
-        return result.longValue();
+        if (result.isVoid())
+        {
+            throw new NullPointerException("Null value at " + this.getName() + "[" + rowIndex + "]");
+        }
+
+        return ((LongValue) result).longValue();
     }
 
     @Override
@@ -48,6 +49,14 @@ implements DfColumnComputed
                 .toList()
                 .toImmutable();
         return result;
+    }
+
+    @Override
+    public Object getObject(int rowIndex)
+    {
+        Value result = this.getValue(rowIndex);
+
+        return result.isVoid() ? null : ((LongValue) result).longValue();
     }
 
     @Override
@@ -85,5 +94,11 @@ implements DfColumnComputed
     public String getExpressionAsString()
     {
         return this.expressionAsString;
+    }
+
+    @Override
+    public Expression getExpression()
+    {
+        return this.expression;
     }
 }
