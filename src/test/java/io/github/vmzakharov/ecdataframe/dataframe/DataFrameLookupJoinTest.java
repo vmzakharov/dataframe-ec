@@ -80,6 +80,40 @@ public class DataFrameLookupJoinTest
     public void multiColumnLookupMultiColumnSelect()
     {
         DataFrame clients = new DataFrame("clients")
+                .addStringColumn("Id").addStringColumn("User").addStringColumn("Country ISO").addLongColumn("Code")
+                .addRow("1", "Alice", "BM", 1)
+                .addRow("4", "Doris", "NZ", 1)
+                .addRow("5",  "Evan", "UZ", 2)
+                ;
+
+        DataFrame countries = new DataFrame("countries")
+                .addStringColumn("ISO Code").addLongColumn("Code").addStringColumn("Name").addLongColumn("Number")
+                .addRow("BM", 1,     "Bermuda",  60)
+                .addRow("NZ", 1, "New Zealand", 554)
+                .addRow("UZ", 2,  "Uzbekistan", 860)
+                ;
+
+        DataFrame enriched = clients.lookup(
+                DfJoin.to(countries)
+                      .match(Lists.immutable.of("Country ISO", "Code"), Lists.immutable.of("ISO Code", "Code"))
+                      .select(Lists.immutable.of("Name", "Number"))
+        );
+
+        DataFrameUtil.assertEquals(
+                new DataFrame("clients")
+                        .addStringColumn("Id").addStringColumn("User").addStringColumn("Country ISO").addLongColumn("Code")
+                        .addStringColumn("Name").addLongColumn("Number")
+                        .addRow("1", "Alice", "BM", 1,     "Bermuda",  60)
+                        .addRow("4", "Doris", "NZ", 1, "New Zealand", 554)
+                        .addRow("5",  "Evan", "UZ", 2,  "Uzbekistan", 860),
+                enriched
+        );
+    }
+
+    @Test
+    public void multiColumnLookupMultiColumnSelectWithAliases()
+    {
+        DataFrame clients = new DataFrame("clients")
                 .addStringColumn("Id").addStringColumn("Name").addStringColumn("Country ISO").addLongColumn("Code")
                 .addRow("1", "Alice", "BM", 1)
                 .addRow("3",  "Carl", "XX", 1)
@@ -114,6 +148,5 @@ public class DataFrameLookupJoinTest
                         .addRow("5",  "Evan", "UZ", 2,  "Uzbekistan", 860),
                 enriched
         );
-
     }
 }
