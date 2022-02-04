@@ -33,7 +33,7 @@ import org.eclipse.collections.impl.factory.Lists;
 import org.eclipse.collections.impl.utility.ListIterate;
 
 public class ModelScriptTreeBuilderVisitor
-        extends ModelScriptBaseVisitor<Expression>
+extends ModelScriptBaseVisitor<Expression>
 {
     private final MutableStack<Script> scriptStack = Stacks.mutable.of();
 
@@ -282,6 +282,18 @@ public class ModelScriptTreeBuilderVisitor
     public Expression visitIsNotEmptyExpr(ModelScriptParser.IsNotEmptyExprContext ctx)
     {
         return new UnaryExpr(UnaryOp.IS_NOT_EMPTY, this.visit(ctx.expr()));
+    }
+
+    @Override
+    public Expression visitIsNullExpr(ModelScriptParser.IsNullExprContext ctx)
+    {
+        return new UnaryExpr(UnaryOp.IS_NULL, this.visit(ctx.expr()));
+    }
+
+    @Override
+    public Expression visitIsNotNullExpr(ModelScriptParser.IsNotNullExprContext ctx)
+    {
+        return new UnaryExpr(UnaryOp.IS_NOT_NULL, this.visit(ctx.expr()));
     }
 
     @Override

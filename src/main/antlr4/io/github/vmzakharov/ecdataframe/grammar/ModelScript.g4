@@ -36,6 +36,8 @@ expr :
     | '-' expr                 #unaryMinusExpr
     | expr IS_NOT_EMPTY        #isNotEmptyExpr
     | expr IS_EMPTY            #isEmptyExpr
+    | expr IS_NOT_NULL         #isNotNullExpr
+    | expr IS_NULL             #isNullExpr
     | NOT expr                 #notExpr
     | expr '[' expr ']'        #indexVectorExpr
     | expr op=(MUL | DIV) expr #mulDivExpr
@@ -74,6 +76,8 @@ NOT_IN  : 'not in' | 'NOT IN' ;
 IN  : 'in' | 'IN' ;
 IS_EMPTY  : 'is empty' | 'IS EMPTY' ;
 IS_NOT_EMPTY  : 'is not empty' | 'IS NOT EMPTY' ;
+IS_NULL  : 'is null' | 'IS NULL' ;
+IS_NOT_NULL  : 'is not null' | 'IS NOT NULL' ;
 
 AND  : 'and' | 'AND';
 OR   : 'or' | 'OR';

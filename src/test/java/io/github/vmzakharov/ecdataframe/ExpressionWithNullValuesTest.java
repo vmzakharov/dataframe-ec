@@ -30,6 +30,27 @@ public class ExpressionWithNullValuesTest
         Assert.assertTrue(result.isVoid());
     }
 
+    @Test
+    public void conditional()
+    {
+        SimpleEvalContext context = new SimpleEvalContext();
+        context.setVariable("a", new LongValue(5));
+        context.setVariable("b", new LongValue(2));
+        context.setVariable("c", Value.VOID);
+
+        AnonymousScript script = ExpressionTestUtil.toScript("c is null ? a + b : a");
+        Value result = script.evaluate(new InMemoryEvaluationVisitor(context));
+        Assert.assertEquals(7L, ((LongValue) result).longValue());
+
+        script = ExpressionTestUtil.toScript("c is not null ? a + b : a");
+        result = script.evaluate(new InMemoryEvaluationVisitor(context));
+        Assert.assertEquals(5L, ((LongValue) result).longValue());
+
+        script = ExpressionTestUtil.toScript("a is not null ? a : a + b");
+        result = script.evaluate(new InMemoryEvaluationVisitor(context));
+        Assert.assertEquals(5L, ((LongValue) result).longValue());
+    }
+
     @Test(expected = NullPointerException.class)
     public void comparison()
     {

@@ -100,6 +100,48 @@ public interface UnaryOp
         }
     };
 
+    UnaryOp IS_NULL = new UnaryOp()
+    {
+        @Override
+        public Value apply(Value operand)
+        {
+            return BooleanValue.valueOf(operand.isVoid());
+        }
+
+        @Override
+        public String asString()
+        {
+            return "is null";
+        }
+
+        @Override
+        public boolean isPrefix()
+        {
+            return false;
+        }
+    };
+
+    UnaryOp IS_NOT_NULL = new UnaryOp()
+    {
+        @Override
+        public Value apply(Value operand)
+        {
+            return BooleanValue.valueOf(!operand.isVoid());
+        }
+
+        @Override
+        public String asString()
+        {
+            return "is not null";
+        }
+
+        @Override
+        public boolean isPrefix()
+        {
+            return false;
+        }
+    };
+
     String asString();
 
     default BooleanValue applyBoolean(boolean operand)
