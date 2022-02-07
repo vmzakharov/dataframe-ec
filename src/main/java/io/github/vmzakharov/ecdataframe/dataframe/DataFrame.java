@@ -26,6 +26,7 @@ import org.eclipse.collections.api.tuple.Triplet;
 import org.eclipse.collections.api.tuple.Twin;
 import org.eclipse.collections.impl.factory.Lists;
 import org.eclipse.collections.impl.factory.Maps;
+import org.eclipse.collections.impl.factory.primitive.BooleanLists;
 import org.eclipse.collections.impl.factory.primitive.IntLists;
 import org.eclipse.collections.impl.list.mutable.primitive.BooleanArrayList;
 import org.eclipse.collections.impl.list.primitive.IntInterval;
@@ -419,7 +420,8 @@ public class DataFrame
     }
 
     /**
-     * indicates that no further updates can be made to this data frame.
+     * Indicates that no further updates can be made to this data frame and ensures that the data frame is in a
+     * consistent internal state.
      *
      * @return the data frame
      */
@@ -439,6 +441,8 @@ public class DataFrame
                         "Stored column sizes are not the same when attempting to seal data frame '" + this.getName() + "'");
             }
         }
+
+        this.resetBitmap();
 
         this.columns.forEach(DfColumn::seal);
         return this;
@@ -609,13 +613,12 @@ public class DataFrame
         return filtered;
     }
 
-    private DataFrame selectByMarkValue(BooleanList marked, BooleanPredicate markAtIndexPredicate)
+    private DataFrame selectByMarkValue(BooleanPredicate markAtIndexPredicate)
     {
-
         DataFrame filtered = this.cloneStructure(this.getName() + "-selected");
         for (int i = 0; i < this.rowCount; i++)
         {
-            if (markAtIndexPredicate.accept(marked.get(i)))
+            if (markAtIndexPredicate.accept(this.isFlagged(i)))
             {
                 filtered.copyRowFrom(this, this.rowIndexMap(i));
             }
@@ -779,7 +782,7 @@ public class DataFrame
      */
     public DataFrame selectFlagged()
     {
-        return this.selectByMarkValue(this.bitmap, mark -> mark);
+        return this.selectByMarkValue(mark -> mark);
     }
 
     /**
@@ -790,7 +793,7 @@ public class DataFrame
      */
     public DataFrame selectNotFlagged()
     {
-        return this.selectByMarkValue(this.bitmap, mark -> !mark);
+        return this.selectByMarkValue(mark -> !mark);
     }
 
     /**

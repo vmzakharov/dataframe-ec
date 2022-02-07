@@ -171,4 +171,35 @@ public class DataFrameBitmapTest
                         .addRow("Carol",   "Xyz",  14L, null, 40.0)
                 , notFlagged);
     }
+
+    @Test
+    public void selectWhenNothingFlagged()
+    {
+        DataFrame df = new DataFrame("FrameOfData")
+                .addStringColumn("Name").addStringColumn("Foo").addLongColumn("Bar").addDoubleColumn("Baz").addDoubleColumn("Qux")
+                .addRow("Alice",   "Pqr",  11L, 10.0, 20.0)
+                .addRow("Bob",     "Def",  13L, 13.0, 25.0)
+                .addRow("Carol",   "Xyz",  14L, 14.0, 40.0)
+                .seal()
+        ;
+
+        DataFrame flagged = df.selectFlagged();
+
+        DataFrameUtil.assertEquals(
+                new DataFrame("FrameOfData")
+                        .addStringColumn("Name").addStringColumn("Foo").addLongColumn("Bar").addDoubleColumn("Baz").addDoubleColumn("Qux")
+                , flagged
+                );
+
+        DataFrame notFlagged = df.selectNotFlagged();
+
+        DataFrameUtil.assertEquals(
+                new DataFrame("FrameOfData")
+                        .addStringColumn("Name").addStringColumn("Foo").addLongColumn("Bar").addDoubleColumn("Baz").addDoubleColumn("Qux")
+                        .addRow("Alice",   "Pqr",  11L, 10.0, 20.0)
+                        .addRow("Bob",     "Def",  13L, 13.0, 25.0)
+                        .addRow("Carol",   "Xyz",  14L, 14.0, 40.0)
+                , notFlagged
+                );
+    }
 }
