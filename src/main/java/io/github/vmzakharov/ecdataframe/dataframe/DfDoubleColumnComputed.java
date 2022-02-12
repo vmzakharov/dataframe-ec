@@ -74,6 +74,12 @@ implements DfColumnComputed
     }
 
     @Override
+    protected void addAllItemsFrom(DfDoubleColumn doubleColumn)
+    {
+        this.throwUnmodifiableColumnException();
+    }
+
+    @Override
     public int getSize()
     {
         return this.getDataFrame().rowCount();

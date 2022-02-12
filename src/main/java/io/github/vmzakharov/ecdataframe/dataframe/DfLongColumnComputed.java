@@ -79,7 +79,7 @@ implements DfColumnComputed
     }
 
     @Override
-    protected void addAllItemsFrom(DfLongColumn items)
+    protected void addAllItemsFrom(DfLongColumn longColumn)
     {
         this.throwUnmodifiableColumnException();
     }

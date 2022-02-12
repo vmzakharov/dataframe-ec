@@ -55,7 +55,7 @@ public class BasicDataFrameTest
                 .addColumn("StringComp", ValueType.STRING, "String + \"-meep\"")
                 .addColumn("LongComp", ValueType.LONG, "Long * 2")
                 .addColumn("DoubleComp", ValueType.DOUBLE, "Double + 10.0")
-//                .addColumn("DateComp", ValueType.DATE, "Date")
+                .addColumn("DateComp", ValueType.DATE, "toDate(2021, 11, 15)")
                 ;
 
         dataFrame.addRow("Beep", 10, 20.0, LocalDate.of(2020, 10, 20));
@@ -67,6 +67,7 @@ public class BasicDataFrameTest
         Assert.assertEquals(20.0, dataFrame.getDouble("Double", 0), 0.000001);
         Assert.assertEquals(30.0, dataFrame.getDouble("DoubleComp", 0), 0.000001);
         Assert.assertEquals(LocalDate.of(2020, 10, 20), dataFrame.getDate("Date", 0));
+        Assert.assertEquals(LocalDate.of(2021, 11, 15), dataFrame.getDate("DateComp", 0));
     }
 
     @Test

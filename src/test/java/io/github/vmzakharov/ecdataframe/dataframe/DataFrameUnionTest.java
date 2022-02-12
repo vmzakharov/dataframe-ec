@@ -76,6 +76,53 @@ public class DataFrameUnionTest
     }
 
     @Test
+    public void unionWithComputedNulls()
+    {
+        DataFrame df1 = new DataFrame("df1")
+                .addStringColumn("Name").addLongColumn("Count").addDoubleColumn("Value").addDateColumn("Date")
+                .addRow(null, 5, 23.45, LocalDate.of(2020, 7, 10))
+                .addRow("Bob", null, 12.34, LocalDate.of(2020, 7, 10))
+                .addRow("Carl", 11, null, LocalDate.of(2020, 7, 10))
+                .addRow("Deb", 0, 7.89, null)
+                ;
+        df1
+                .addStringColumn("NameX", "Name + 'X'")
+                .addLongColumn("CountMore", "Count + 1")
+                .addDoubleColumn("TwoValues", "2 * Value");
+
+        DataFrame df2 = new DataFrame("df1")
+                .addStringColumn("Name").addLongColumn("Count").addDoubleColumn("Value").addDateColumn("Date")
+                .addRow("Grace", 1, 13.45, null)
+                .addRow("Heidi", 2, null, LocalDate.of(2020, 8, 11))
+                .addRow("Ivan", null, 36.78, LocalDate.of(2020, 8, 12))
+                .addRow(null, 4, 47.89, LocalDate.of(2020, 8, 10))
+                ;
+
+        df2
+                .addStringColumn("NameX", "'X' + Name")
+                .addLongColumn("CountMore", "Count + Count")
+                .addDoubleColumn("TwoValues", "Value * 2");
+
+        DataFrame union = df1.union(df2);
+
+        DataFrame expected = new DataFrame("expected")
+                .addStringColumn("Name").addLongColumn("Count").addDoubleColumn("Value").addDateColumn("Date")
+                .addStringColumn("NameX")
+                .addLongColumn("CountMore")
+                .addDoubleColumn("TwoValues")
+                .addRow(null, 5, 23.45, LocalDate.of(2020, 7, 10), null, 6, 46.90)
+                .addRow("Bob", null, 12.34, LocalDate.of(2020, 7, 10), "BobX", null, 24.68)
+                .addRow("Carl", 11, null, LocalDate.of(2020, 7, 10), "CarlX", 12, null)
+                .addRow("Deb", 0, 7.89, null, "DebX", 1, 15.78)
+                .addRow("Grace", 1, 13.45, null, "XGrace", 2, 26.90)
+                .addRow("Heidi", 2, null, LocalDate.of(2020, 8, 11), "XHeidi", 4, null)
+                .addRow("Ivan", null, 36.78, LocalDate.of(2020, 8, 12), "XIvan", null, 73.56)
+                .addRow(null, 4, 47.89, LocalDate.of(2020, 8, 10), null, 8, 95.78);
+
+        DataFrameUtil.assertEquals(expected, union);
+    }
+
+    @Test
     public void unionOfSorted()
     {
         DataFrame df1 = new DataFrame("df1")

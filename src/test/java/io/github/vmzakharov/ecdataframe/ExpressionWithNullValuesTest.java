@@ -3,6 +3,7 @@ package io.github.vmzakharov.ecdataframe;
 import io.github.vmzakharov.ecdataframe.dsl.AnonymousScript;
 import io.github.vmzakharov.ecdataframe.dsl.SimpleEvalContext;
 import io.github.vmzakharov.ecdataframe.dsl.value.LongValue;
+import io.github.vmzakharov.ecdataframe.dsl.value.StringValue;
 import io.github.vmzakharov.ecdataframe.dsl.value.Value;
 import io.github.vmzakharov.ecdataframe.dsl.visitor.InMemoryEvaluationVisitor;
 import org.junit.Assert;
@@ -26,6 +27,27 @@ public class ExpressionWithNullValuesTest
         Assert.assertTrue(result.isVoid());
 
         script = ExpressionTestUtil.toScript("a + (b - b) + 3");
+        result = script.evaluate(new InMemoryEvaluationVisitor(context));
+        Assert.assertTrue(result.isVoid());
+    }
+
+    @Test
+    public void stringOps()
+    {
+        SimpleEvalContext context = new SimpleEvalContext();
+        context.setVariable("a", new StringValue("abc"));
+        context.setVariable("b", Value.VOID);
+        context.setVariable("c", new StringValue(null));
+
+        AnonymousScript script = ExpressionTestUtil.toScript("a + b");
+        Value result = script.evaluate(new InMemoryEvaluationVisitor(context));
+        Assert.assertTrue(result.isVoid());
+
+        script = ExpressionTestUtil.toScript("b + 'X'");
+        result = script.evaluate(new InMemoryEvaluationVisitor(context));
+        Assert.assertTrue(result.isVoid());
+
+        script = ExpressionTestUtil.toScript("a + c");
         result = script.evaluate(new InMemoryEvaluationVisitor(context));
         Assert.assertTrue(result.isVoid());
     }

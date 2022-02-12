@@ -11,13 +11,20 @@ extends BinaryOp
     ArithmeticOp ADD = new ArithmeticOp()
     {
         @Override
-        public StringValue applyString(String operand1, String operand2) { return new StringValue(operand1 + operand2); }
+        public Value applyString(String operand1, String operand2)
+        {
+            if (operand1 == null || operand2 == null)
+            {
+                return Value.VOID;
+            }
+            return new StringValue(operand1 + operand2);
+        }
 
         @Override
-        public LongValue applyLong(long operand1, long operand2) { return new LongValue(operand1 + operand2); }
+        public Value applyLong(long operand1, long operand2) { return new LongValue(operand1 + operand2); }
 
         @Override
-        public DoubleValue applyDouble(double operand1, double operand2) { return new DoubleValue(operand1 + operand2); }
+        public Value applyDouble(double operand1, double operand2) { return new DoubleValue(operand1 + operand2); }
 
         @Override
         public String asString() { return "+"; }
@@ -87,12 +94,12 @@ extends BinaryOp
         return operand1.apply(operand2, this);
     }
 
-    default StringValue applyString(String operand1, String operand2)
+    default Value applyString(String operand1, String operand2)
     {
         throw new UnsupportedOperationException("Cannot apply '" + this.asString() + "' to String");
     }
 
-    LongValue applyLong(long operand1, long operand2);
+    Value applyLong(long operand1, long operand2);
 
-    DoubleValue applyDouble(double operand1, double operand2);
+    Value applyDouble(double operand1, double operand2);
 }

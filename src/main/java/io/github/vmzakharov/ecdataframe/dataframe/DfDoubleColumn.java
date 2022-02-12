@@ -47,11 +47,13 @@ extends DfColumnAbstract
     {
         DfDoubleColumn mergedCol = (DfDoubleColumn) this.validateAndCreateTargetColumn(other, target);
 
-        mergedCol.addAllItems(this.toDoubleList());
-        mergedCol.addAllItems(((DfDoubleColumn) other).toDoubleList());
+        mergedCol.addAllItemsFrom(this);
+        mergedCol.addAllItemsFrom((DfDoubleColumn) other);
 
         return mergedCol;
     }
+
+    protected abstract void addAllItemsFrom(DfDoubleColumn doubleColumn);
 
     @Override
     public DfCellComparator columnComparator(DfColumn otherColumn)

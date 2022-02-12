@@ -155,6 +155,23 @@ implements DfColumnStored
     }
 
     @Override
+    protected void addAllItemsFrom(DfDoubleColumn doubleColumn)
+    {
+        int size = doubleColumn.getSize();
+        for (int rowIndex = 0; rowIndex < size; rowIndex++)
+        {
+            if (doubleColumn.isNull(rowIndex))
+            {
+                this.addEmptyValue();
+            }
+            else
+            {
+                this.addDouble(doubleColumn.getDouble(rowIndex));
+            }
+        }
+    }
+
+    @Override
     public boolean isNull(int rowIndex)
     {
         return Double.isNaN(this.values.get(rowIndex));

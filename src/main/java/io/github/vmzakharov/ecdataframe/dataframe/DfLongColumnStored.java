@@ -194,12 +194,17 @@ implements DfColumnStored
     @Override
     protected void addAllItemsFrom(DfLongColumn longColumn)
     {
-        this.values.addAll(longColumn.toLongList());
-
         int size = longColumn.getSize();
         for (int rowIndex = 0; rowIndex < size; rowIndex++)
         {
-            this.nullMap.add(longColumn.isNull(rowIndex));
+            if (longColumn.isNull(rowIndex))
+            {
+                this.addEmptyValue();
+            }
+            else
+            {
+                this.addLong(longColumn.getLong(rowIndex), false);
+            }
         }
     }
 }
