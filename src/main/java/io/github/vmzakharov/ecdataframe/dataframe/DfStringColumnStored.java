@@ -37,10 +37,10 @@ implements DfStringColumn
         }
         else
         {
-            throw new RuntimeException(
-                    "Attempting to add a value of type " + value.getType()
-                    + " to a string column " + this.getName()
-                    + ": " + value.asStringLiteral());
+            ErrorReporter.reportAndThrow(
+                "Attempting to add a value of type " + value.getType()
+                + " to a string column " + this.getName()
+                + ": " + value.asStringLiteral());
         }
     }
 

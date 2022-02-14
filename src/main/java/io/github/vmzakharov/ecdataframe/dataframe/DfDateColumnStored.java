@@ -45,10 +45,10 @@ implements DfDateColumn
         }
         else
         {
-            throw new RuntimeException(
-                    "Attempting to add a value of type " + value.getType()
-                            + " to a date column " + this.getName()
-                            + ": " + value.asStringLiteral());
+            ErrorReporter.reportAndThrow(
+                "Attempting to add a value of type " + value.getType()
+                + " to a date column " + this.getName()
+                + ": " + value.asStringLiteral());
         }
     }
 }
