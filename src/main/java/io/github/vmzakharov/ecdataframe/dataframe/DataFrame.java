@@ -234,6 +234,12 @@ public class DataFrame
 
     public DataFrame addRow(Object... values)
     {
+        if (values.length > this.columnCount())
+        {
+            ErrorReporter.reportAndThrow(
+                "Adding more row elements (" + values.length + ") than there are columns in the data frame (" + this.columnCount() + ")");
+        }
+
         ArrayIterate.forEachWithIndex(values, (v, i) -> this.columns.get(i).addObject(v));
         this.rowCount++;
         return this;
@@ -528,23 +534,37 @@ public class DataFrame
         for (int rowIndex = 0; rowIndex < this.rowCount; rowIndex++)
         {
             ListIterable<Object> keyValue = index.computeKeyFrom(this, rowIndex);
-            int aggregateRowIndex = index.getRowIndexAtKeyIfAbsentAdd(keyValue);
+
+            int accumulatorRowIndex;
+            if (index.doesNotContain(keyValue))
+            {
+                // new entry in the aggregated data frame - need to initialize accumulators
+                accumulatorRowIndex = index.getRowIndexAtKeyIfAbsentAdd(keyValue);
+
+                aggregators.forEachInBoth(accumulatorColumns,
+                        (aggregateFunction, accumulatorColumn) -> aggregateFunction.initializeValue(accumulatorColumn, accumulatorRowIndex));
+            }
+            else
+            {
+                // an existing entry so just a lookup
+                accumulatorRowIndex = index.getRowIndexAtKeyIfAbsentAdd(keyValue);
+            }
 
             if (createSourceRowIdIndex)
             {
-                while (sumIndex.size() <= aggregateRowIndex)
+                while (sumIndex.size() <= accumulatorRowIndex)
                 {
                     sumIndex.add(IntLists.mutable.of());
                 }
 
-                sumIndex.get(aggregateRowIndex).add(rowIndex);
+                sumIndex.get(accumulatorRowIndex).add(rowIndex);
             }
 
-            counts[aggregateRowIndex]++;
+            counts[accumulatorRowIndex]++;
 
             for (int colIndex = 0; colIndex < columnsToAggregate.size(); colIndex++)
             {
-                accumulatorColumns.get(colIndex).applyAggregator(aggregateRowIndex, columnsToAggregate.get(colIndex), rowIndex, aggregators.get(colIndex));
+                accumulatorColumns.get(colIndex).applyAggregator(accumulatorRowIndex, columnsToAggregate.get(colIndex), rowIndex, aggregators.get(colIndex));
             }
         }
 

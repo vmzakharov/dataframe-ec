@@ -3,7 +3,6 @@ package io.github.vmzakharov.ecdataframe.dataframe;
 import io.github.vmzakharov.ecdataframe.dsl.value.LongValue;
 import io.github.vmzakharov.ecdataframe.dsl.value.Value;
 import org.eclipse.collections.api.LongIterable;
-import org.eclipse.collections.api.list.primitive.ImmutableLongList;
 import org.eclipse.collections.api.list.primitive.MutableBooleanList;
 import org.eclipse.collections.api.list.primitive.MutableLongList;
 import org.eclipse.collections.impl.factory.primitive.BooleanLists;
@@ -84,18 +83,6 @@ implements DfColumnStored
     }
 
     @Override
-    public ImmutableLongList toLongList()
-    {
-        return this.values.toImmutable();
-    }
-
-    @Override
-    public Number aggregate(AggregateFunction aggregateFunction)
-    {
-        return aggregateFunction.applyLongIterable(this.values);
-    }
-
-    @Override
     public void addObject(Object newObject)
     {
         if (newObject == null)
@@ -134,16 +121,17 @@ implements DfColumnStored
     public void setLong(int rowIndex, long value)
     {
         this.values.set(rowIndex, value);
+        this.clearNull(rowIndex);
     }
 
     @Override
-    public void applyAggregator(int targetRowIndex, DfColumn sourceColumn, int sourceRowIndex, AggregateFunction aggregator)
+    public void aggregateValueInto(int rowIndex, DfColumn sourceColumn, int sourceRowIndex, AggregateFunction aggregator)
     {
-        long stored = this.isNull(targetRowIndex) ? aggregator.longInitialValue() : this.values.get(targetRowIndex);
-        this.values.set(targetRowIndex,
-                aggregator.longAccumulator(stored, aggregator.getLongValue(sourceColumn, sourceRowIndex))
-        );
-        this.clearNull(targetRowIndex);
+        long currentAggregatedValue = this.values.get(rowIndex);
+        this.values.set(
+                rowIndex,
+                aggregator.longAccumulator(
+                        currentAggregatedValue, aggregator.getLongValue(sourceColumn, sourceRowIndex)));
     }
 
     private void clearNull(int rowIndex)

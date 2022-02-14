@@ -31,7 +31,7 @@ public class DfIndexKeeper
     /**
      * Returns the value in the index that matches the index key. If no matching key exists in the index, a new entry
      * for this key is added to the indexed data frame and its index is returned.
-     * @param key the row in the <code>aDataFrame</code> to compute the key on
+     * @param key the to look up the matching row in the indexed dataframe by
      * @return row id in the <b>the indexed data frame</b>  corresponding to the computed key
      */
     public int getRowIndexAtKeyIfAbsentAdd(ListIterable<Object> key)
@@ -44,11 +44,32 @@ public class DfIndexKeeper
             // need to be effectively final so introducing another variable rather than reusing rowIndex
             int lastRowIndex = this.indexedDataFrame.rowCount() - 1;
             this.addIndex(key, lastRowIndex);
+            // todo - use addObject/add Empty instead?
             this.columnsToIndexBy.forEachWithIndex((col, i) -> col.setObject(lastRowIndex, key.get(i)));
 
             rowIndex = lastRowIndex;
         }
         return rowIndex;
+    }
+
+    /**
+     * Checks if the given key exists in this index
+     * @param key the key to look up in the index
+     * @return <code>true</code> if the key exists in the index, <code>false</code> otherwise
+     */
+    public boolean contains(ListIterable<Object> key)
+    {
+        return this.getRowIndexAtKey(key) != -1;
+    }
+
+    /**
+     * Checks if the given key <b>does not</b> exist in this index
+     * @param key the key to look up in the index
+     * @return <code>true</code> if the key does not exist in the index, <code>false</code> otherwise
+     */
+    public boolean doesNotContain(ListIterable<Object> key)
+    {
+        return this.getRowIndexAtKey(key) == -1;
     }
 
     public ListIterable<Object> computeKeyFrom(DataFrame aDataFrame, int rowIndex)

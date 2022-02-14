@@ -2,6 +2,8 @@ package io.github.vmzakharov.ecdataframe.dataframe;
 
 import io.github.vmzakharov.ecdataframe.dsl.value.ValueType;
 import org.eclipse.collections.api.list.primitive.ImmutableLongList;
+import org.eclipse.collections.impl.factory.primitive.LongLists;
+import org.eclipse.collections.impl.list.Interval;
 
 abstract public class DfLongColumn
 extends DfColumnAbstract
@@ -19,7 +21,19 @@ extends DfColumnAbstract
         return Long.toString(this.getLong(rowIndex));
     }
 
-    public abstract ImmutableLongList toLongList();
+    public ImmutableLongList toLongList()
+    {
+        if (this.getDataFrame().rowCount() == 0)
+        {
+            return LongLists.immutable.empty();
+        }
+
+        return Interval
+                .zeroTo(this.getDataFrame().rowCount() - 1)
+                .collectLong(this::getLong)
+                .toList()
+                .toImmutable();
+    }
 
     public ValueType getType()
     {
@@ -51,6 +65,24 @@ extends DfColumnAbstract
     }
 
     protected abstract void addAllItemsFrom(DfLongColumn items);
+
+    @Override
+    public Number aggregate(AggregateFunction aggregateFunction)
+    {
+        if (this.getSize() == 0)
+        {
+            return aggregateFunction.defaultLongIfEmpty();
+        }
+
+        try
+        {
+            return aggregateFunction.applyToLongColumn(this);
+        }
+        catch (NullPointerException npe)
+        {
+            return null;
+        }
+    }
 
     @Override
     public DfCellComparator columnComparator(DfColumn otherColumn)

@@ -1,8 +1,9 @@
 package io.github.vmzakharov.ecdataframe.dataframe;
 
 import io.github.vmzakharov.ecdataframe.dsl.value.ValueType;
-import org.eclipse.collections.api.DoubleIterable;
 import org.eclipse.collections.api.list.primitive.ImmutableDoubleList;
+import org.eclipse.collections.impl.factory.primitive.DoubleLists;
+import org.eclipse.collections.impl.list.Interval;
 
 abstract public class DfDoubleColumn
 extends DfColumnAbstract
@@ -20,7 +21,19 @@ extends DfColumnAbstract
         return Double.toString(this.getDouble(rowIndex));
     }
 
-    public abstract ImmutableDoubleList toDoubleList();
+    public ImmutableDoubleList toDoubleList()
+    {
+        if (this.getDataFrame().rowCount() == 0)
+        {
+            return DoubleLists.immutable.empty();
+        }
+
+        return Interval
+            .zeroTo(this.getDataFrame().rowCount() - 1)
+            .collectDouble(this::getDouble)
+            .toList()
+            .toImmutable();
+    }
 
     public ValueType getType()
     {
@@ -40,8 +53,6 @@ extends DfColumnAbstract
         }
     }
 
-    protected abstract void addAllItems(DoubleIterable items);
-
     @Override
     public DfColumn mergeWithInto(DfColumn other, DataFrame target)
     {
@@ -54,6 +65,24 @@ extends DfColumnAbstract
     }
 
     protected abstract void addAllItemsFrom(DfDoubleColumn doubleColumn);
+
+    @Override
+    public Number aggregate(AggregateFunction aggregateFunction)
+    {
+        if (this.getSize() == 0)
+        {
+            return aggregateFunction.defaultDoubleIfEmpty();
+        }
+
+        try
+        {
+            return aggregateFunction.applyToDoubleColumn(this);
+        }
+        catch (NullPointerException npe)
+        {
+            return null;
+        }
+    }
 
     @Override
     public DfCellComparator columnComparator(DfColumn otherColumn)

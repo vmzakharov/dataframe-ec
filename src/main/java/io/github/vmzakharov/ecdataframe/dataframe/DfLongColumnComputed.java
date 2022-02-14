@@ -4,9 +4,6 @@ import io.github.vmzakharov.ecdataframe.dsl.Expression;
 import io.github.vmzakharov.ecdataframe.dsl.value.LongValue;
 import io.github.vmzakharov.ecdataframe.dsl.value.Value;
 import io.github.vmzakharov.ecdataframe.util.ExpressionParserHelper;
-import org.eclipse.collections.api.list.primitive.ImmutableLongList;
-import org.eclipse.collections.impl.factory.primitive.LongLists;
-import org.eclipse.collections.impl.list.Interval;
 
 public class DfLongColumnComputed
 extends DfLongColumn
@@ -36,22 +33,6 @@ implements DfColumnComputed
     }
 
     @Override
-    public ImmutableLongList toLongList()
-    {
-        if (this.getDataFrame().rowCount() == 0)
-        {
-            return LongLists.immutable.empty();
-        }
-
-        ImmutableLongList result = Interval
-                .zeroTo(this.getDataFrame().rowCount() - 1)
-                .collectLong(this::getLong)
-                .toList()
-                .toImmutable();
-        return result;
-    }
-
-    @Override
     public Object getObject(int rowIndex)
     {
         Value result = this.getValue(rowIndex);
@@ -63,19 +44,6 @@ implements DfColumnComputed
     public boolean isNull(int rowIndex)
     {
         return this.getObject(rowIndex) == null;
-    }
-
-    @Override
-    public Number aggregate(AggregateFunction aggregateFunction)
-    {
-        if (this.getSize() == 0)
-        {
-            return aggregateFunction.defaultLongIfEmpty();
-        }
-
-        return aggregateFunction.applyLongIterable(
-                Interval.zeroTo(this.getDataFrame().rowCount() - 1).collectLong(this::getLong)
-        );
     }
 
     @Override

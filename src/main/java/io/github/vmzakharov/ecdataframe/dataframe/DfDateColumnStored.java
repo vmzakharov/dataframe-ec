@@ -51,10 +51,4 @@ implements DfDateColumn
                             + ": " + value.asStringLiteral());
         }
     }
-
-    @Override
-    public void applyAggregator(int targetRowIndex, DfColumn sourceColumn, int sourceRowIndex, AggregateFunction aggregateFunction)
-    {
-        throw new UnsupportedOperationException("Not implemented yet");
-    }
 }

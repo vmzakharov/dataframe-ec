@@ -1,8 +1,6 @@
 package io.github.vmzakharov.ecdataframe.dataframe;
 
 import io.github.vmzakharov.ecdataframe.dsl.value.ValueType;
-import org.eclipse.collections.api.DoubleIterable;
-import org.eclipse.collections.api.LongIterable;
 import org.eclipse.collections.api.list.ListIterable;
 
 public abstract class AggregateFunction
@@ -86,9 +84,9 @@ public abstract class AggregateFunction
         return sourceColumnType;
     }
 
-    abstract double applyDoubleIterable(DoubleIterable items);
+    abstract double applyToDoubleColumn(DfDoubleColumn doubleColumn);
 
-    abstract long applyLongIterable(LongIterable items);
+    abstract long applyToLongColumn(DfLongColumn longColumn);
 
     public Number applyIterable(ListIterable items)
     {
@@ -123,8 +121,25 @@ public abstract class AggregateFunction
         return ((DfLongColumn) sourceColumn).getLong(sourceRowIndex);
     }
 
+    public double getDoubleValue(DfColumn sourceColumn, int sourceRowIndex)
+    {
+        return ((DfDoubleColumn) sourceColumn).getDouble(sourceRowIndex);
+    }
+
     public void finishAggregating(DataFrame aggregatedDataFrame, int[] countsByRow)
     {
+    }
+
+    public void initializeValue(DfColumn accumulatorColumn, int accumulatorRowIndex)
+    {
+        if (accumulatorColumn.getType().isDouble())
+        {
+            ((DfDoubleColumnStored) accumulatorColumn).setDouble(accumulatorRowIndex, this.doubleInitialValue());
+        }
+        else if (accumulatorColumn.getType().isLong())
+        {
+            ((DfLongColumnStored) accumulatorColumn).setLong(accumulatorRowIndex, this.longInitialValue());
+        }
     }
 
     public static class Sum
@@ -147,15 +162,15 @@ public abstract class AggregateFunction
         }
 
         @Override
-        public double applyDoubleIterable(DoubleIterable items)
+        public double applyToDoubleColumn(DfDoubleColumn doubleColumn)
         {
-            return items.sum();
+            return doubleColumn.toDoubleList().sum();
         }
 
         @Override
-        public long applyLongIterable(LongIterable items)
+        public long applyToLongColumn(DfLongColumn longColumn)
         {
-            return items.sum();
+            return longColumn.toLongList().sum();
         }
 
         @Override
@@ -215,15 +230,15 @@ public abstract class AggregateFunction
         }
 
         @Override
-        public double applyDoubleIterable(DoubleIterable items)
+        public double applyToDoubleColumn(DfDoubleColumn doubleColumn)
         {
-            return items.max();
+            return doubleColumn.toDoubleList().max();
         }
 
         @Override
-        public long applyLongIterable(LongIterable items)
+        public long applyToLongColumn(DfLongColumn longColumn)
         {
-            return items.max();
+            return longColumn.toLongList().max();
         }
 
         @Override
@@ -271,15 +286,15 @@ public abstract class AggregateFunction
         }
 
         @Override
-        public double applyDoubleIterable(DoubleIterable items)
+        public double applyToDoubleColumn(DfDoubleColumn doubleColumn)
         {
-            return items.min();
+            return doubleColumn.toDoubleList().min();
         }
 
         @Override
-        public long applyLongIterable(LongIterable items)
+        public long applyToLongColumn(DfLongColumn longColumn)
         {
-            return items.min();
+            return longColumn.toLongList().min();
         }
 
         @Override
@@ -327,15 +342,15 @@ public abstract class AggregateFunction
         }
 
         @Override
-        public double applyDoubleIterable(DoubleIterable items)
+        public double applyToDoubleColumn(DfDoubleColumn doubleColumn)
         {
-            return items.average();
+            return doubleColumn.toDoubleList().average();
         }
 
         @Override
-        public long applyLongIterable(LongIterable items)
+        public long applyToLongColumn(DfLongColumn longColumn)
         {
-            return Math.round(items.average());
+            return Math.round(longColumn.toLongList().average());
         }
 
         @Override
@@ -374,6 +389,7 @@ public abstract class AggregateFunction
                 int columnSize = longColumn.getSize();
                 for (int rowIndex = 0; rowIndex < columnSize; rowIndex++)
                 {
+                    // todo: check for null
                     longColumn.setLong(rowIndex, longColumn.getLong(rowIndex) / countsByRow[rowIndex]);
                 }
             }
@@ -384,6 +400,7 @@ public abstract class AggregateFunction
                 int columnSize = doubleColumn.getSize();
                 for (int rowIndex = 0; rowIndex < columnSize; rowIndex++)
                 {
+                    // todo: check for null
                     doubleColumn.setDouble(rowIndex, doubleColumn.getDouble(rowIndex) / countsByRow[rowIndex]);
                 }
             }
@@ -416,15 +433,15 @@ public abstract class AggregateFunction
         }
 
         @Override
-        public double applyDoubleIterable(DoubleIterable items)
+        public double applyToDoubleColumn(DfDoubleColumn doubleColumn)
         {
-            return items.size();
+            return doubleColumn.getSize();
         }
 
         @Override
-        public long applyLongIterable(LongIterable items)
+        public long applyToLongColumn(DfLongColumn longColumn)
         {
-            return items.size();
+            return longColumn.getSize();
         }
 
         @Override

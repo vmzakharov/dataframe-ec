@@ -35,6 +35,31 @@ public class DataFrameAggregationWithIndexTest
     }
 
     @Test
+    public void sumWithNullValues()
+    {
+        DataFrame dataFrame = new DataFrame("FrameOfData")
+                .addStringColumn("Name").addStringColumn("Foo").addLongColumn("Bar").addDoubleColumn("Baz").addDoubleColumn("Qux")
+                .addRow("Alice", "Abc",  123L, 10.0, 20.0)
+                .addRow("Bob",   "Def",  null, 12.0, 25.0)
+                .addRow("Alice", "Xyz",  789L, null, 40.0)
+                .addRow("Bob",   "Xyz",  789L, 15.0, 40.0)
+                ;
+
+        DataFrame summed = dataFrame.sumByWithIndex(Lists.immutable.of("Bar", "Baz", "Qux"), Lists.immutable.of("Name"));
+
+        DataFrame expected = new DataFrame("Summed")
+                .addStringColumn("Name").addLongColumn("Bar").addDoubleColumn("Baz").addDoubleColumn("Qux")
+                .addRow("Alice",  912L, null, 60.0)
+                .addRow("Bob",    null, 27.0, 65.0)
+                ;
+
+        DataFrameUtil.assertEquals(expected, summed);
+
+        Assert.assertEquals(IntLists.immutable.of(0, 2), summed.getAggregateIndex(0));
+        Assert.assertEquals(IntLists.immutable.of(1, 3), summed.getAggregateIndex(1));
+    }
+
+    @Test
     public void sumWithIndexOfComputedByComputed()
     {
         DataFrame dataFrame = new DataFrame("FrameOfData")

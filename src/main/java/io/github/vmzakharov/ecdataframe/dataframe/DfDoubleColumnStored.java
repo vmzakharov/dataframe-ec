@@ -4,7 +4,6 @@ import io.github.vmzakharov.ecdataframe.dsl.value.DoubleValue;
 import io.github.vmzakharov.ecdataframe.dsl.value.NumberValue;
 import io.github.vmzakharov.ecdataframe.dsl.value.Value;
 import org.eclipse.collections.api.DoubleIterable;
-import org.eclipse.collections.api.list.primitive.ImmutableDoubleList;
 import org.eclipse.collections.api.list.primitive.MutableDoubleList;
 import org.eclipse.collections.impl.factory.primitive.DoubleLists;
 
@@ -103,12 +102,6 @@ implements DfColumnStored
     }
 
     @Override
-    public Number aggregate(AggregateFunction aggregateFunction)
-    {
-        return aggregateFunction.applyDoubleIterable(this.values);
-    }
-
-    @Override
     public int getSize()
     {
         return this.values.size();
@@ -138,14 +131,12 @@ implements DfColumnStored
         this.values.add(Double.NaN);
     }
 
-    @Override
-    public void applyAggregator(int targetRowIndex, DfColumn sourceColumn, int sourceRowIndex, AggregateFunction aggregator)
+    public void aggregateValueInto(int rowIndex, DfColumn sourceColumn, int sourceRowIndex, AggregateFunction aggregator)
     {
-        double stored = this.isNull(targetRowIndex) ? aggregator.doubleInitialValue() : this.values.get(targetRowIndex);
-
-        this.values.set(targetRowIndex, aggregator.doubleAccumulator(
-                stored,
-                ((DfDoubleColumn) sourceColumn).getDouble(sourceRowIndex)));
+        double currentAggregatedValue = this.values.get(rowIndex);
+        this.values.set(
+                rowIndex,
+                aggregator.doubleAccumulator(currentAggregatedValue, aggregator.getDoubleValue(sourceColumn, sourceRowIndex)));
     }
 
     @Override
@@ -178,20 +169,8 @@ implements DfColumnStored
     }
 
     @Override
-    protected void addAllItems(DoubleIterable items)
-    {
-        this.values.addAll(items);
-    }
-
-    @Override
     public boolean isStored()
     {
         return true;
-    }
-
-    @Override
-    public ImmutableDoubleList toDoubleList()
-    {
-        return this.values.toImmutable();
     }
 }

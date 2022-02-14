@@ -114,12 +114,6 @@ implements DfColumnStored
     }
 
     @Override
-    public void applyAggregator(int targetRowIndex, DfColumn sourceColumn, int sourceRowIndex, AggregateFunction aggregateFunction)
-    {
-        throw new UnsupportedOperationException("Not implemented");
-    }
-
-    @Override
     public Number aggregate(AggregateFunction aggregator)
     {
         return aggregator.<T>applyIterable(this.values);
