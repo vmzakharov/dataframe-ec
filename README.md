@@ -85,6 +85,15 @@ Customer | Count | Price | Date
 "Carl" | 11 | 44.7800 | 2020-12-25
 "Doris" | 1 | 5.0000 | 2020-09-01
 
+#### Change delimiter/separator in CSV files
+The default separator in CSV files is a comma `,`, but it is possible to set other separators/delimiters. Here is an example stting the separator to a semicolon `;` instead:
+
+```
+CsvSchema schema = new CsvSchema();
+schema.separator(';');
+DataFrame ordersFromFile  = new CsvDataSet("donut_orders.csv", "Donut Orders", schema).loadAsDataFrame();
+```
+
 #### Sum of Columns
 ```
 DataFrame totalOrdered = orders.sum(Lists.immutable.of("Count", "Price"));
