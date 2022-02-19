@@ -1,5 +1,7 @@
 package io.github.vmzakharov.ecdataframe.dataframe;
 
+import io.github.vmzakharov.ecdataframe.dsl.value.StringValue;
+import io.github.vmzakharov.ecdataframe.dsl.value.Value;
 import io.github.vmzakharov.ecdataframe.dsl.value.ValueType;
 
 public interface DfStringColumn
@@ -21,6 +23,12 @@ extends DfObjectColumn<String>
     default ValueType getType()
     {
         return ValueType.STRING;
+    }
+
+    @Override
+    default Value objectToValue(String anObject)
+    {
+        return new StringValue(anObject);
     }
 
     @Override

@@ -13,7 +13,7 @@ extends BinaryOp
     {
         if (operand1.isVoid() || operand2.isVoid())
         {
-            throw new NullPointerException("Cannot apply a comparison operation to null values");
+            throw new NullPointerException("Cannot apply " + this.asString() + " operation to null values");
         }
         return operand1.applyPredicate(operand2, this);
     }

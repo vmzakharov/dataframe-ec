@@ -28,6 +28,17 @@ implements DfColumnStored
     }
 
     @Override
+    public Value getValue(int rowIndex)
+    {
+        if (this.isNull(rowIndex))
+        {
+            return Value.VOID;
+        }
+
+        return this.objectToValue(this.getTypedObject(rowIndex));
+    }
+
+    @Override
     public void addValue(Value value)
     {
         if (value.isVoid())

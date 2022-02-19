@@ -152,7 +152,7 @@ public class DataFrameBitmapTest
                 .addRow("Abigail", "Def",  15L, 15.0, null)
         ;
 
-        this.dataFrame.flagRowsBy("Foo in ('Def', 'Pqr')");
+        this.dataFrame.flagRowsBy("Foo is not null and Foo in ('Def', 'Pqr')");
 
         DataFrame flagged = this.dataFrame.selectFlagged();
 

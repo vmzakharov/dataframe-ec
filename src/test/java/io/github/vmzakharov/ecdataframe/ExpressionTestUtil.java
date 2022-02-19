@@ -3,6 +3,7 @@ package io.github.vmzakharov.ecdataframe;
 import io.github.vmzakharov.ecdataframe.dsl.AnonymousScript;
 import io.github.vmzakharov.ecdataframe.dsl.BinaryExpr;
 import io.github.vmzakharov.ecdataframe.dsl.BinaryOp;
+import io.github.vmzakharov.ecdataframe.dsl.EvalContext;
 import io.github.vmzakharov.ecdataframe.dsl.Expression;
 import io.github.vmzakharov.ecdataframe.dsl.value.BooleanValue;
 import io.github.vmzakharov.ecdataframe.dsl.value.DateTimeValue;
@@ -76,5 +77,23 @@ final public class ExpressionTestUtil
         InMemoryEvaluationVisitor evaluationVisitor = new InMemoryEvaluationVisitor();
         Expression expression = new BinaryExpr(value1, value2, op);
         return ((BooleanValue) expression.evaluate(evaluationVisitor)).isTrue();
+    }
+
+    public static Value evaluateScriptWithContext(String scriptAsString, EvalContext context)
+    {
+        AnonymousScript script = ExpressionTestUtil.toScript(scriptAsString);
+        return script.evaluate(new InMemoryEvaluationVisitor(context));
+    }
+
+    public static void assertTrueValue(Value aValue)
+    {
+        Assert.assertTrue(aValue.isBoolean());
+        Assert.assertTrue(((BooleanValue) aValue).isTrue());
+    }
+
+    public static void assertFalseValue(Value aValue)
+    {
+        Assert.assertTrue(aValue.isBoolean());
+        Assert.assertTrue(((BooleanValue) aValue).isFalse());
     }
 }

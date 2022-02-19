@@ -55,8 +55,8 @@ implements ExpressionEvaluationVisitor
     public Value visitBinaryExpr(BinaryExpr expr)
     {
         return expr.getOperation().apply(
-                expr.getOperand1().evaluate(this),
-                expr.getOperand2().evaluate(this));
+                () -> expr.getOperand1().evaluate(this),
+                () -> expr.getOperand2().evaluate(this));
     }
 
     @Override

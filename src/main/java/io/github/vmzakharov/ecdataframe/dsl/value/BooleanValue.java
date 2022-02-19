@@ -16,6 +16,12 @@ implements Value
         }
 
         @Override
+        public boolean isFalse()
+        {
+            return false;
+        }
+
+        @Override
         public String asStringLiteral()
         {
             return "TRUE";
@@ -28,6 +34,12 @@ implements Value
         public boolean isTrue()
         {
             return false;
+        }
+
+        @Override
+        public boolean isFalse()
+        {
+            return true;
         }
 
         @Override
@@ -54,7 +66,9 @@ implements Value
         return operation.applyBoolean(this.isTrue());
     }
 
-    abstract public boolean isTrue();
+    public abstract boolean isTrue();
+
+    public abstract boolean isFalse();
 
     @Override
     public ValueType getType()

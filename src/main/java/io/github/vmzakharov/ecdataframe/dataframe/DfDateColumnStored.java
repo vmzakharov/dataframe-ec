@@ -21,12 +21,6 @@ implements DfDateColumn
     }
 
     @Override
-    public Value getValue(int rowIndex)
-    {
-        return new DateValue(this.getTypedObject(rowIndex));
-    }
-
-    @Override
     public void addObject(Object newObject)
     {
         this.addMyType((LocalDate) newObject);

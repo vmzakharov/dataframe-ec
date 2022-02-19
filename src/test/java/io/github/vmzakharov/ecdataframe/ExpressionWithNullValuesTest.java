@@ -2,6 +2,7 @@ package io.github.vmzakharov.ecdataframe;
 
 import io.github.vmzakharov.ecdataframe.dsl.AnonymousScript;
 import io.github.vmzakharov.ecdataframe.dsl.SimpleEvalContext;
+import io.github.vmzakharov.ecdataframe.dsl.value.BooleanValue;
 import io.github.vmzakharov.ecdataframe.dsl.value.LongValue;
 import io.github.vmzakharov.ecdataframe.dsl.value.StringValue;
 import io.github.vmzakharov.ecdataframe.dsl.value.Value;
@@ -53,6 +54,40 @@ public class ExpressionWithNullValuesTest
     }
 
     @Test
+    public void stringFunctions()
+    {
+        SimpleEvalContext context = new SimpleEvalContext();
+        context.setVariable("a", Value.VOID);
+
+        AnonymousScript script = ExpressionTestUtil.toScript("substr(a, 1, 10)");
+        Value result = script.evaluate(new InMemoryEvaluationVisitor(context));
+        Assert.assertTrue(result.isVoid());
+    }
+
+    @Test
+    public void stringOperatorsOrderSensitive()
+    {
+        SimpleEvalContext context = new SimpleEvalContext();
+        context.setVariable("a", Value.VOID);
+        context.setVariable("voidValue", Value.VOID);
+
+        AnonymousScript script = ExpressionTestUtil.toScript("a is not null and a in ('1', '2', '3')");
+        Value result = script.evaluate(new InMemoryEvaluationVisitor(context));
+        Assert.assertTrue(result.isBoolean());
+        Assert.assertTrue(((BooleanValue) result).isFalse());
+
+        script = ExpressionTestUtil.toScript("a is null or a in ('1', '2', '3')");
+        result = script.evaluate(new InMemoryEvaluationVisitor(context));
+        Assert.assertTrue(result.isBoolean());
+        Assert.assertTrue(((BooleanValue) result).isTrue());
+
+        script = ExpressionTestUtil.toScript("a in ('1', '2', voidValue, '3')");
+        result = script.evaluate(new InMemoryEvaluationVisitor(context));
+        Assert.assertTrue(result.isBoolean());
+        Assert.assertTrue(((BooleanValue) result).isTrue());
+    }
+
+    @Test
     public void conditional()
     {
         SimpleEvalContext context = new SimpleEvalContext();
@@ -84,23 +119,33 @@ public class ExpressionWithNullValuesTest
         script.evaluate(new InMemoryEvaluationVisitor(context));
     }
 
-    @Test(expected = NullPointerException.class)
+    @Test
     public void lookingForNullValueInList()
     {
         SimpleEvalContext context = new SimpleEvalContext();
+        context.setVariable("a", Value.VOID);
         context.setVariable("b", Value.VOID);
 
-        AnonymousScript script = ExpressionTestUtil.toScript("b in ('a', 'b', 'c')");
-        script.evaluate(new InMemoryEvaluationVisitor(context));
+        ExpressionTestUtil.assertFalseValue(
+                ExpressionTestUtil.evaluateScriptWithContext("b in ('a', 'b', 'c')", context));
+
+        ExpressionTestUtil.assertTrueValue(
+                ExpressionTestUtil.evaluateScriptWithContext("a in ('a', b, 'c')", context));
+
+        ExpressionTestUtil.assertFalseValue(
+                ExpressionTestUtil.evaluateScriptWithContext("a not in ('a', b, 'c')", context));
     }
 
-    @Test(expected = NullPointerException.class)
+    @Test
     public void lookingForValueInListWithNulls()
     {
         SimpleEvalContext context = new SimpleEvalContext();
         context.setVariable("b", Value.VOID);
 
-        AnonymousScript script = ExpressionTestUtil.toScript("'foo' in ('a', b, 'c')");
-        script.evaluate(new InMemoryEvaluationVisitor(context));
+        ExpressionTestUtil.assertFalseValue(
+                ExpressionTestUtil.evaluateScriptWithContext("'foo' in ('a', b, 'c')", context));
+
+        ExpressionTestUtil.assertTrueValue(
+                ExpressionTestUtil.evaluateScriptWithContext("'foo' not in ('a', b, 'c')", context));
     }
 }

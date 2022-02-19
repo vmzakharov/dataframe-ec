@@ -1,5 +1,6 @@
 package io.github.vmzakharov.ecdataframe.dsl.function;
 
+import io.github.vmzakharov.ecdataframe.dataframe.ErrorReporter;
 import io.github.vmzakharov.ecdataframe.dsl.EvalContext;
 import io.github.vmzakharov.ecdataframe.dsl.value.BooleanValue;
 import io.github.vmzakharov.ecdataframe.dsl.value.DateTimeValue;
@@ -127,10 +128,17 @@ final public class BuiltInFunctions
                 int parameterCount = parameters.size();
                 if (parameterCount != 2 && parameterCount != 3)
                 {
-                    throw new RuntimeException("Invalid number of parameters in a call to '" + this.getName() + "'. " + this.usageString());
+                    ErrorReporter.reportAndThrow("Invalid number of parameters in a call to '" + this.getName() + "'. " + this.usageString());
                 }
 
-                String aString = parameters.get(0).stringValue();
+                Value stringParam = parameters.get(0);
+                if (stringParam.isVoid())
+                {
+                    return Value.VOID;
+                }
+
+                String aString = stringParam.stringValue();
+
                 int beginIndex = (int) ((LongValue) parameters.get(1)).longValue();
 
                 String substring = (parameterCount == 2)
@@ -161,6 +169,11 @@ final public class BuiltInFunctions
             public Value evaluate(EvalContext context)
             {
                 Value parameter = context.getVariable("number");
+
+                if (parameter.isVoid())
+                {
+                    return Value.VOID;
+                }
 
                 if (!parameter.isNumber())
                 {

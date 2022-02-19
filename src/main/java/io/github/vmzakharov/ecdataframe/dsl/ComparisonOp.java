@@ -1,6 +1,7 @@
 package io.github.vmzakharov.ecdataframe.dsl;
 
 import io.github.vmzakharov.ecdataframe.dsl.value.BooleanValue;
+import io.github.vmzakharov.ecdataframe.dsl.value.Value;
 
 import java.time.LocalDate;
 
@@ -9,6 +10,22 @@ extends PredicateOp
 {
     ComparisonOp EQ = new ComparisonOp()
     {
+        @Override
+        public BooleanValue apply(Value operand1, Value operand2)
+        {
+            if (operand1.isVoid())
+            {
+                return BooleanValue.valueOf(operand2.isVoid());
+            }
+
+            if (operand2.isVoid())
+            {
+                return BooleanValue.valueOf(operand1.isVoid());
+            }
+
+            return ComparisonOp.super.apply(operand1, operand2);
+        }
+
         @Override
         public BooleanValue applyString(String operand1, String operand2)
         {
@@ -49,6 +66,21 @@ extends PredicateOp
 
     ComparisonOp NE = new ComparisonOp()
     {
+        public BooleanValue apply(Value operand1, Value operand2)
+        {
+            if (operand1.isVoid())
+            {
+                return BooleanValue.valueOf(!operand2.isVoid());
+            }
+
+            if (operand2.isVoid())
+            {
+                return BooleanValue.valueOf(!operand1.isVoid());
+            }
+
+            return ComparisonOp.super.apply(operand1, operand2);
+        }
+
         @Override
         public BooleanValue applyString(String operand1, String operand2)
         {
