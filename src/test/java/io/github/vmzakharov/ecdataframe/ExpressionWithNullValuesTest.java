@@ -38,17 +38,12 @@ public class ExpressionWithNullValuesTest
         SimpleEvalContext context = new SimpleEvalContext();
         context.setVariable("a", new StringValue("abc"));
         context.setVariable("b", Value.VOID);
-        context.setVariable("c", new StringValue(null));
 
         AnonymousScript script = ExpressionTestUtil.toScript("a + b");
         Value result = script.evaluate(new InMemoryEvaluationVisitor(context));
         Assert.assertTrue(result.isVoid());
 
         script = ExpressionTestUtil.toScript("b + 'X'");
-        result = script.evaluate(new InMemoryEvaluationVisitor(context));
-        Assert.assertTrue(result.isVoid());
-
-        script = ExpressionTestUtil.toScript("a + c");
         result = script.evaluate(new InMemoryEvaluationVisitor(context));
         Assert.assertTrue(result.isVoid());
     }
@@ -108,7 +103,6 @@ public class ExpressionWithNullValuesTest
         Assert.assertEquals(5L, ((LongValue) result).longValue());
     }
 
-    @Test(expected = NullPointerException.class)
     public void comparison()
     {
         SimpleEvalContext context = new SimpleEvalContext();
@@ -117,6 +111,7 @@ public class ExpressionWithNullValuesTest
 
         AnonymousScript script = ExpressionTestUtil.toScript("a > b");
         script.evaluate(new InMemoryEvaluationVisitor(context));
+        ExpressionTestUtil.scriptEvaluatesToTrue("a > b", context);
     }
 
     @Test
@@ -126,14 +121,9 @@ public class ExpressionWithNullValuesTest
         context.setVariable("a", Value.VOID);
         context.setVariable("b", Value.VOID);
 
-        ExpressionTestUtil.assertFalseValue(
-                ExpressionTestUtil.evaluateScriptWithContext("b in ('a', 'b', 'c')", context));
-
-        ExpressionTestUtil.assertTrueValue(
-                ExpressionTestUtil.evaluateScriptWithContext("a in ('a', b, 'c')", context));
-
-        ExpressionTestUtil.assertFalseValue(
-                ExpressionTestUtil.evaluateScriptWithContext("a not in ('a', b, 'c')", context));
+        ExpressionTestUtil.scriptEvaluatesToFalse("b in ('a', 'b', 'c')", context);
+        ExpressionTestUtil.scriptEvaluatesToTrue("a in ('a', b, 'c')", context);
+        ExpressionTestUtil.scriptEvaluatesToFalse("a not in ('a', b, 'c')", context);
     }
 
     @Test
@@ -142,10 +132,7 @@ public class ExpressionWithNullValuesTest
         SimpleEvalContext context = new SimpleEvalContext();
         context.setVariable("b", Value.VOID);
 
-        ExpressionTestUtil.assertFalseValue(
-                ExpressionTestUtil.evaluateScriptWithContext("'foo' in ('a', b, 'c')", context));
-
-        ExpressionTestUtil.assertTrueValue(
-                ExpressionTestUtil.evaluateScriptWithContext("'foo' not in ('a', b, 'c')", context));
+        ExpressionTestUtil.scriptEvaluatesToFalse("'foo' in ('a', b, 'c')", context);
+        ExpressionTestUtil.scriptEvaluatesToTrue("'foo' not in ('a', b, 'c')", context);
     }
 }

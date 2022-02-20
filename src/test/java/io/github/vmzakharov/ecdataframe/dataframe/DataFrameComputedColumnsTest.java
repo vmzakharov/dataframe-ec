@@ -189,7 +189,7 @@ public class DataFrameComputedColumnsTest
 
         SimpleEvalContext outerContext = new SimpleEvalContext();
         outerContext.setDeclaredFunctions(outerScript.getFunctions());
-        outerContext.setVariable("numbers", ExpressionTestUtil.evaluate("(5, 10)"));
+        outerContext.setVariable("numbers", ExpressionTestUtil.evaluateExpression("(5, 10)"));
 
         this.df.getEvalContext().setNestedContext(outerContext);
 

@@ -1,11 +1,7 @@
 package io.github.vmzakharov.ecdataframe;
 
-import io.github.vmzakharov.ecdataframe.dsl.AnonymousScript;
-import io.github.vmzakharov.ecdataframe.dsl.value.BooleanValue;
-import io.github.vmzakharov.ecdataframe.dsl.value.DateValue;
-import io.github.vmzakharov.ecdataframe.dsl.value.StringValue;
+import io.github.vmzakharov.ecdataframe.dsl.SimpleEvalContext;
 import io.github.vmzakharov.ecdataframe.dsl.value.Value;
-import io.github.vmzakharov.ecdataframe.dsl.visitor.InMemoryEvaluationVisitor;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -48,35 +44,31 @@ public class IsEmptyOperationTest
     }
 
     @Test
-    public void dateNullIsEmpty()
+    public void voidValueIsNull()
     {
-        InMemoryEvaluationVisitor evaluationVisitor = new InMemoryEvaluationVisitor();
-        evaluationVisitor.getContext().setVariable("x", new DateValue(null));
+        SimpleEvalContext context = new SimpleEvalContext();
+        context.setVariable("x", Value.VOID);
 
-        AnonymousScript script = ExpressionTestUtil.toScript("x is empty");
-        Value result = script.evaluate(evaluationVisitor);
-
-        Assert.assertTrue(((BooleanValue) result).isTrue());
-
-        script = ExpressionTestUtil.toScript("x is not empty");
-        result = script.evaluate(evaluationVisitor);
-        Assert.assertFalse(((BooleanValue) result).isTrue());
+        ExpressionTestUtil.scriptEvaluatesToTrue("x is null", context);
+        ExpressionTestUtil.scriptEvaluatesToFalse("x is not null", context);
     }
 
-    @Test
-    public void stringNullIsEmpty()
+    @Test(expected = UnsupportedOperationException.class)
+    public void voidValueNotIsNotEmpty()
     {
-        InMemoryEvaluationVisitor evaluationVisitor = new InMemoryEvaluationVisitor();
-        evaluationVisitor.getContext().setVariable("x", new StringValue(null));
+        SimpleEvalContext context = new SimpleEvalContext();
+        context.setVariable("x", Value.VOID);
 
-        AnonymousScript script = ExpressionTestUtil.toScript("x is empty");
-        Value result = script.evaluate(evaluationVisitor);
+        ExpressionTestUtil.scriptEvaluatesToFalse("x is not empty", context);
+    }
 
-        Assert.assertTrue(((BooleanValue) result).isTrue());
+    @Test(expected = UnsupportedOperationException.class)
+    public void voidValueNotIsEmpty()
+    {
+        SimpleEvalContext context = new SimpleEvalContext();
+        context.setVariable("x", Value.VOID);
 
-        script = ExpressionTestUtil.toScript("x is not empty");
-        result = script.evaluate(evaluationVisitor);
-        Assert.assertFalse(((BooleanValue) result).isTrue());
+        ExpressionTestUtil.scriptEvaluatesToFalse("x is empty", context);
     }
 
     public void evaluatesToTrue(String expression)

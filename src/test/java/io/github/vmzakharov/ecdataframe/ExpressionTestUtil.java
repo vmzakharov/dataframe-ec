@@ -27,7 +27,7 @@ final public class ExpressionTestUtil
 
     static public long evaluateToLong(String s)
     {
-        return ((LongValue) evaluate(s)).longValue();
+        return ((LongValue) evaluateExpression(s)).longValue();
     }
 
     public static AnonymousScript toScript(String s)
@@ -40,36 +40,36 @@ final public class ExpressionTestUtil
         return ExpressionParserHelper.DEFAULT.toExpression(s);
     }
 
-    public static Value evaluate(String s)
+    public static Value evaluateExpression(String s)
     {
         return ExpressionParserHelper.DEFAULT.toExpression(s).evaluate(new InMemoryEvaluationVisitor());
     }
 
     static public double evaluateToDouble(String s)
     {
-        return ((DoubleValue) evaluate(s)).doubleValue();
+        return ((DoubleValue) evaluateExpression(s)).doubleValue();
     }
 
     static public boolean evaluateToBoolean(String s)
     {
-        return ((BooleanValue) evaluate(s)).isTrue();
+        return ((BooleanValue) evaluateExpression(s)).isTrue();
     }
 
     public static String evaluateToString(String s)
     {
-        Value result = evaluate(s);
+        Value result = evaluateExpression(s);
         Assert.assertTrue(result.isString());
         return result.stringValue();
     }
 
     public static LocalDate evaluateToDate(String s)
     {
-        return ((DateValue) evaluate(s)).dateValue();
+        return ((DateValue) evaluateExpression(s)).dateValue();
     }
 
     public static LocalDateTime evaluateToDateTime(String s)
     {
-        return ((DateTimeValue) evaluate(s)).dateTimeValue();
+        return ((DateTimeValue) evaluateExpression(s)).dateTimeValue();
     }
 
     public static boolean evaluate(BinaryOp op, Value value1, Value value2)
@@ -79,19 +79,31 @@ final public class ExpressionTestUtil
         return ((BooleanValue) expression.evaluate(evaluationVisitor)).isTrue();
     }
 
-    public static Value evaluateScriptWithContext(String scriptAsString, EvalContext context)
+    public static void scriptEvaluatesToTrue(String scriptAsString, EvalContext context)
+    {
+        Value result = evaluateScriptWithContext(scriptAsString, context);
+        assertTrueValue(result);
+    }
+
+    public static void scriptEvaluatesToFalse(String scriptAsString, EvalContext context)
+    {
+        Value result = evaluateScriptWithContext(scriptAsString, context);
+        assertFalseValue(result);
+    }
+
+    private static Value evaluateScriptWithContext(String scriptAsString, EvalContext context)
     {
         AnonymousScript script = ExpressionTestUtil.toScript(scriptAsString);
         return script.evaluate(new InMemoryEvaluationVisitor(context));
     }
 
-    public static void assertTrueValue(Value aValue)
+    private static void assertTrueValue(Value aValue)
     {
         Assert.assertTrue(aValue.isBoolean());
         Assert.assertTrue(((BooleanValue) aValue).isTrue());
     }
 
-    public static void assertFalseValue(Value aValue)
+    private static void assertFalseValue(Value aValue)
     {
         Assert.assertTrue(aValue.isBoolean());
         Assert.assertTrue(((BooleanValue) aValue).isFalse());

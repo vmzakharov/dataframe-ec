@@ -1,5 +1,6 @@
 package io.github.vmzakharov.ecdataframe.dsl.value;
 
+import io.github.vmzakharov.ecdataframe.dataframe.ErrorReporter;
 import io.github.vmzakharov.ecdataframe.dsl.PredicateOp;
 import io.github.vmzakharov.ecdataframe.dsl.UnaryOp;
 
@@ -15,6 +16,7 @@ extends AbstractValue
 
     public DateTimeValue(LocalDateTime newValue)
     {
+        ErrorReporter.reportAndThrow(newValue == null, "DateTime value cannot contain null, a void value should be used instead");
         this.value = newValue;
     }
 

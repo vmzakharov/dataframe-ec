@@ -3,6 +3,7 @@ package io.github.vmzakharov.ecdataframe.dsl;
 import io.github.vmzakharov.ecdataframe.ExpressionTestUtil;
 import io.github.vmzakharov.ecdataframe.dsl.value.DateValue;
 import io.github.vmzakharov.ecdataframe.dsl.value.StringValue;
+import io.github.vmzakharov.ecdataframe.dsl.value.Value;
 import io.github.vmzakharov.ecdataframe.dsl.value.VectorValue;
 import org.eclipse.collections.impl.utility.ArrayIterate;
 import org.junit.Assert;
@@ -17,8 +18,8 @@ public class ObjectValueContainsOpTest
     {
         Assert.assertTrue(ExpressionTestUtil.evaluate(ContainsOp.IN, new StringValue("Foo"), this.vectorOfStrings("Foo", "Bar", null, "Baz")));
         Assert.assertFalse(ExpressionTestUtil.evaluate(ContainsOp.IN, new StringValue("Foo"), this.vectorOfStrings("Bar", null, "Baz")));
-        Assert.assertTrue(ExpressionTestUtil.evaluate(ContainsOp.IN, new StringValue(null), this.vectorOfStrings("Foo", "Bar", null, "Baz")));
-        Assert.assertFalse(ExpressionTestUtil.evaluate(ContainsOp.IN, new StringValue(null), this.vectorOfStrings("Foo", "Bar", "Baz")));
+        Assert.assertTrue(ExpressionTestUtil.evaluate(ContainsOp.IN, Value.VOID, this.vectorOfStrings("Foo", "Bar", null, "Baz")));
+        Assert.assertFalse(ExpressionTestUtil.evaluate(ContainsOp.IN, Value.VOID, this.vectorOfStrings("Foo", "Bar", "Baz")));
     }
 
     @Test
@@ -26,8 +27,8 @@ public class ObjectValueContainsOpTest
     {
         Assert.assertFalse(ExpressionTestUtil.evaluate(ContainsOp.NOT_IN, new StringValue("Foo"), this.vectorOfStrings("Foo", "Bar", null, "Baz")));
         Assert.assertTrue(ExpressionTestUtil.evaluate(ContainsOp.NOT_IN, new StringValue("Foo"), this.vectorOfStrings("Bar", null, "Baz")));
-        Assert.assertFalse(ExpressionTestUtil.evaluate(ContainsOp.NOT_IN, new StringValue(null), this.vectorOfStrings("Foo", "Bar", null, "Baz")));
-        Assert.assertTrue(ExpressionTestUtil.evaluate(ContainsOp.NOT_IN, new StringValue(null), this.vectorOfStrings("Foo", "Bar", "Baz")));
+        Assert.assertFalse(ExpressionTestUtil.evaluate(ContainsOp.NOT_IN, Value.VOID, this.vectorOfStrings("Foo", "Bar", null, "Baz")));
+        Assert.assertTrue(ExpressionTestUtil.evaluate(ContainsOp.NOT_IN, Value.VOID, this.vectorOfStrings("Foo", "Bar", "Baz")));
     }
 
     @Test
@@ -35,8 +36,8 @@ public class ObjectValueContainsOpTest
     {
         Assert.assertTrue(ExpressionTestUtil.evaluate(ContainsOp.IN, this.dateValue(2020, 8, 15), this.vectorOfDates(LocalDate.of(2020, 8, 15), LocalDate.of(2020, 7, 15), null, LocalDate.of(2020, 8, 2))));
         Assert.assertFalse(ExpressionTestUtil.evaluate(ContainsOp.IN, this.dateValue(2020, 8, 15), this.vectorOfDates(LocalDate.of(2020, 7, 15), null, LocalDate.of(2020, 8, 2))));
-        Assert.assertTrue(ExpressionTestUtil.evaluate(ContainsOp.IN, new DateValue(null), this.vectorOfDates(LocalDate.of(2020, 8, 15), LocalDate.of(2020, 7, 15), null, LocalDate.of(2020, 8, 2))));
-        Assert.assertFalse(ExpressionTestUtil.evaluate(ContainsOp.IN, new DateValue(null), this.vectorOfDates(LocalDate.of(2020, 8, 15), LocalDate.of(2020, 7, 15), LocalDate.of(2020, 8, 2))));
+        Assert.assertTrue(ExpressionTestUtil.evaluate(ContainsOp.IN, Value.VOID, this.vectorOfDates(LocalDate.of(2020, 8, 15), LocalDate.of(2020, 7, 15), null, LocalDate.of(2020, 8, 2))));
+        Assert.assertFalse(ExpressionTestUtil.evaluate(ContainsOp.IN, Value.VOID, this.vectorOfDates(LocalDate.of(2020, 8, 15), LocalDate.of(2020, 7, 15), LocalDate.of(2020, 8, 2))));
     }
 
     @Test
@@ -44,8 +45,8 @@ public class ObjectValueContainsOpTest
     {
         Assert.assertFalse(ExpressionTestUtil.evaluate(ContainsOp.NOT_IN, this.dateValue(2020, 8, 15), this.vectorOfDates(LocalDate.of(2020, 8, 15), LocalDate.of(2020, 7, 15), null, LocalDate.of(2020, 8, 2))));
         Assert.assertTrue(ExpressionTestUtil.evaluate(ContainsOp.NOT_IN, this.dateValue(2020, 8, 15), this.vectorOfDates(LocalDate.of(2020, 7, 15), null, LocalDate.of(2020, 8, 2))));
-        Assert.assertFalse(ExpressionTestUtil.evaluate(ContainsOp.NOT_IN, new DateValue(null), this.vectorOfDates(LocalDate.of(2020, 8, 15), LocalDate.of(2020, 7, 15), null, LocalDate.of(2020, 8, 2))));
-        Assert.assertTrue(ExpressionTestUtil.evaluate(ContainsOp.NOT_IN, new DateValue(null), this.vectorOfDates(LocalDate.of(2020, 8, 15), LocalDate.of(2020, 7, 15), LocalDate.of(2020, 8, 2))));
+        Assert.assertFalse(ExpressionTestUtil.evaluate(ContainsOp.NOT_IN, Value.VOID, this.vectorOfDates(LocalDate.of(2020, 8, 15), LocalDate.of(2020, 7, 15), null, LocalDate.of(2020, 8, 2))));
+        Assert.assertTrue(ExpressionTestUtil.evaluate(ContainsOp.NOT_IN, Value.VOID, this.vectorOfDates(LocalDate.of(2020, 8, 15), LocalDate.of(2020, 7, 15), LocalDate.of(2020, 8, 2))));
     }
 
     @Test
@@ -68,12 +69,12 @@ public class ObjectValueContainsOpTest
 
     public VectorValue vectorOfStrings(String... items)
     {
-        return new VectorValue(ArrayIterate.collect(items, StringValue::new));
+        return new VectorValue(ArrayIterate.collect(items, item -> item == null ? Value.VOID : new StringValue(item)));
     }
 
     public VectorValue vectorOfDates(LocalDate... items)
     {
-        return new VectorValue(ArrayIterate.collect(items, DateValue::new));
+        return new VectorValue(ArrayIterate.collect(items, item -> item == null ? Value.VOID : new DateValue(item)));
     }
 
     private DateValue dateValue(int year, int month, int dayOfMonth)

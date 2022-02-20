@@ -23,28 +23,18 @@ extends PredicateOp
                 return BooleanValue.valueOf(operand1.isVoid());
             }
 
-            return ComparisonOp.super.apply(operand1, operand2);
+            return operand1.applyPredicate(operand2, this);
         }
 
         @Override
         public BooleanValue applyString(String operand1, String operand2)
         {
-            if (operand1 == null)
-            {
-                return BooleanValue.valueOf(operand2 == null);
-            }
-
             return BooleanValue.valueOf(operand1.equals(operand2));
         }
 
         @Override
         public BooleanValue applyDate(LocalDate operand1, LocalDate operand2)
         {
-            if (operand1 == null)
-            {
-                return BooleanValue.valueOf(operand2 == null);
-            }
-
             return BooleanValue.valueOf(operand1.equals(operand2));
         }
 
@@ -78,28 +68,18 @@ extends PredicateOp
                 return BooleanValue.valueOf(!operand1.isVoid());
             }
 
-            return ComparisonOp.super.apply(operand1, operand2);
+            return operand1.applyPredicate(operand2, this);
         }
 
         @Override
         public BooleanValue applyString(String operand1, String operand2)
         {
-            if (operand1 == null)
-            {
-                return BooleanValue.valueOf(operand2 != null);
-            }
-
             return BooleanValue.valueOf(!operand1.equals(operand2));
         }
 
         @Override
         public BooleanValue applyDate(LocalDate operand1, LocalDate operand2)
         {
-            if (operand1 == null)
-            {
-                return BooleanValue.valueOf(operand2 != null);
-            }
-
             return BooleanValue.valueOf(!operand1.equals(operand2));
         }
 
@@ -122,18 +102,24 @@ extends PredicateOp
     ComparisonOp LT = new ComparisonOp()
     {
         @Override
-        public BooleanValue applyString(String operand1, String operand2)
+        public BooleanValue apply(Value operand1, Value operand2)
         {
-            if (operand2 == null)
+            if (operand2.isVoid())
             {
                 return BooleanValue.FALSE;
             }
 
-            if (operand1 == null)
+            if (operand1.isVoid())
             {
                 return BooleanValue.TRUE;
             }
 
+            return operand1.applyPredicate(operand2, this);
+        }
+
+        @Override
+        public BooleanValue applyString(String operand1, String operand2)
+        {
             return BooleanValue.valueOf(operand1.compareTo(operand2) < 0);
         }
 
@@ -172,34 +158,30 @@ extends PredicateOp
     ComparisonOp LTE = new ComparisonOp()
     {
         @Override
-        public BooleanValue applyString(String operand1, String operand2)
+        public BooleanValue apply(Value operand1, Value operand2)
         {
-            if (operand1 == null)
+            if (operand1.isVoid())
             {
                 return BooleanValue.TRUE;
             }
 
-            if (operand2 == null)
+            if (operand2.isVoid())
             {
                 return BooleanValue.FALSE;
             }
 
+            return ComparisonOp.super.apply(operand1, operand2);
+        }
+
+        @Override
+        public BooleanValue applyString(String operand1, String operand2)
+        {
             return BooleanValue.valueOf(operand1.compareTo(operand2) <= 0);
         }
 
         @Override
         public BooleanValue applyDate(LocalDate operand1, LocalDate operand2)
         {
-            if (operand1 == null)
-            {
-                return BooleanValue.TRUE;
-            }
-
-            if (operand2 == null)
-            {
-                return BooleanValue.FALSE;
-            }
-
             return BooleanValue.valueOf(operand1.compareTo(operand2) <= 0);
         }
 
@@ -222,34 +204,30 @@ extends PredicateOp
     ComparisonOp GT = new ComparisonOp()
     {
         @Override
-        public BooleanValue applyString(String operand1, String operand2)
+        public BooleanValue apply(Value operand1, Value operand2)
         {
-            if (operand1 == null)
+            if (operand1.isVoid())
             {
                 return BooleanValue.FALSE;
             }
 
-            if (operand2 == null)
+            if (operand2.isVoid())
             {
                 return BooleanValue.TRUE;
             }
 
+            return ComparisonOp.super.apply(operand1, operand2);
+        }
+
+        @Override
+        public BooleanValue applyString(String operand1, String operand2)
+        {
             return BooleanValue.valueOf(operand1.compareTo(operand2) > 0);
         }
 
         @Override
         public BooleanValue applyDate(LocalDate operand1, LocalDate operand2)
         {
-            if (operand1 == null)
-            {
-                return BooleanValue.FALSE;
-            }
-
-            if (operand2 == null)
-            {
-                return BooleanValue.TRUE;
-            }
-
             return BooleanValue.valueOf(operand1.compareTo(operand2) > 0);
         }
 
@@ -272,34 +250,30 @@ extends PredicateOp
     ComparisonOp GTE = new ComparisonOp()
     {
         @Override
-        public BooleanValue applyString(String operand1, String operand2)
+        public BooleanValue apply(Value operand1, Value operand2)
         {
-            if (operand2 == null)
+            if (operand2.isVoid())
             {
                 return BooleanValue.TRUE;
             }
 
-            if (operand1 == null)
+            if (operand1.isVoid())
             {
                 return BooleanValue.FALSE;
             }
 
+            return ComparisonOp.super.apply(operand1, operand2);
+        }
+
+        @Override
+        public BooleanValue applyString(String operand1, String operand2)
+        {
             return BooleanValue.valueOf(operand1.compareTo(operand2) >= 0);
         }
 
         @Override
         public BooleanValue applyDate(LocalDate operand1, LocalDate operand2)
         {
-            if (operand2 == null)
-            {
-                return BooleanValue.TRUE;
-            }
-
-            if (operand1 == null)
-            {
-                return BooleanValue.FALSE;
-            }
-
             return BooleanValue.valueOf(operand1.compareTo(operand2) >= 0);
         }
 
