@@ -1,6 +1,8 @@
 package io.github.vmzakharov.ecdataframe.dsl.function;
 
 import io.github.vmzakharov.ecdataframe.dsl.Script;
+import io.github.vmzakharov.ecdataframe.dsl.SimpleEvalContext;
+import io.github.vmzakharov.ecdataframe.dsl.value.Value;
 import io.github.vmzakharov.ecdataframe.dsl.visitor.InMemoryEvaluationVisitor;
 import io.github.vmzakharov.ecdataframe.util.CollectingPrinter;
 import io.github.vmzakharov.ecdataframe.util.PrinterFactory;
@@ -59,6 +61,10 @@ public class BuiltInFunctionTest
         Assert.assertEquals("there", evaluateToString("substr(\"Hello, there!\", 7, 12)"));
         Assert.assertEquals("there!", evaluateToString("substr(\"Hello, there!\", 7)"));
         Assert.assertEquals("Hello, there", evaluateToString("substr(\"Hello, there!\", 0, 12)"));
+
+        SimpleEvalContext context = new SimpleEvalContext();
+        context.setVariable("x", Value.VOID);
+        Assert.assertEquals(Value.VOID, evaluateScriptWithContext("substr(x, 10, 20)", context));
     }
 
     @Test
@@ -101,6 +107,10 @@ public class BuiltInFunctionTest
         Assert.assertEquals(10, evaluateToLong("abs(10)"));
         Assert.assertEquals(10.0, evaluateToDouble("abs(-10.0)"), 0.0);
         Assert.assertEquals(10.0, evaluateToDouble("abs(10.0)"), 0.0);
+
+        SimpleEvalContext context = new SimpleEvalContext();
+        context.setVariable("x", Value.VOID);
+        Assert.assertEquals(Value.VOID, evaluateScriptWithContext("abs(x)", context));
     }
 
     @Test

@@ -91,7 +91,7 @@ final public class ExpressionTestUtil
         assertFalseValue(result);
     }
 
-    private static Value evaluateScriptWithContext(String scriptAsString, EvalContext context)
+    public static Value evaluateScriptWithContext(String scriptAsString, EvalContext context)
     {
         AnonymousScript script = ExpressionTestUtil.toScript(scriptAsString);
         return script.evaluate(new InMemoryEvaluationVisitor(context));
