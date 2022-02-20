@@ -9,7 +9,7 @@ For more on Eclipse Collections see: https://www.eclipse.org/collections/.
 <dependency>
   <groupId>io.github.vmzakharov</groupId>
   <artifactId>dataframe-ec</artifactId>
-  <version>0.14.1</version>
+  <version>0.17.0</version>
 </dependency>
 ```
 
@@ -25,6 +25,7 @@ For more on Eclipse Collections see: https://www.eclipse.org/collections/.
 - union - concatenating data frames with the same schemas
 - join with another data frame, based on the specified column values, inner and outer joins are supported
 - join with complements, a single operation that returns three data frames - a complement of this data frame in another one, an inner join of the data frames, and a complement of the other data frame in this one
+- lookup join - enrich a data frame by adding one or more columns based on value lookup in another data frame
 - find relative complements (set differences) of two data frames based on the specified column values
 - aggregation - aggregating the entire data frame or grouping by the specified column values and aggregating within a group
 - flag rows - individually or matching a criteria.
@@ -40,6 +41,7 @@ Customer,  Count,  Price,  Date
 "Bridget", 10.0, 40.34, 2020-11-10
 "Clyde", 4.0, 19.5, 2020-10-19
 ```
+
 Then a data frame can be loaded from this file as shown below. The file schema can be inferred, like in this example, or specified explicitly.
 ```
 DataFrame ordersFromFile  = new CsvDataSet("donut_orders.csv", "Donut Orders").loadAsDataFrame();
@@ -57,7 +59,6 @@ The `loadAsDataFrame()` method can take a numeric parameter, which specifies how
 ```
 DataFrame firstTwoOrders = new CsvDataSet("donut_orders.csv", "Donut Orders").loadAsDataFrame(2);
 ```
-
 `firstTwoOrders`
 
 Customer |   Count |   Price |   Date
@@ -65,7 +66,39 @@ Customer |   Count |   Price |   Date
 "Archibald" | 5.0000 | 23.4500 | 2020-10-15
 "Bridget" | 10.0000 | 40.3400 | 2020-11-10
 
-A data frame can be created **programmatically**:
+`CsvDataSet` can also accept a **schema** object, which explicitly defines column types and also supports a number of options such as the value separator and the null marker in a source file. For example, let's consider a file "donut_orders_complicated.csv" that looks like
+
+```
+Customer|Count|Price|Date
+"Archibald"|5|23.45|2020-10-15
+"Bridget"|10|*null*|2020-11-10
+"Clyde"|4|19.5|*null*
+```
+
+A data frame can be loaded from this file by providing a schema
+
+```
+CsvSchema donutSchema = new CsvSchema()
+        .separator('|')
+        .nullMarker("*null*");
+donutSchema.addColumn("Customer", STRING);
+donutSchema.addColumn("Count", LONG);
+donutSchema.addColumn("Price", DOUBLE);
+donutSchema.addColumn("Date", DATE);
+
+CsvDataSet dataSet = new CsvDataSet("donut_orders_complicated.csv", "Donut Orders", donutSchema);
+DataFrame schemingDonuts = dataSet.loadAsDataFrame();
+```
+
+`schemingDonuts`
+
+Customer | Count | Price | Date
+---|---:|---:|---
+"Archibald" | 5 | 23.4500 | 2020-10-15
+"Bridget" | 10 | null | 2020-11-10
+"Clyde" | 4 | 19.5000 | null
+
+A data frame can be created **programmatically** by providing values for individual rows or columns. Here is a sample constructing a data frame row by row:
 ```
 DataFrame orders = new DataFrame("Donut Orders")
     .addStringColumn("Customer").addLongColumn("Count").addDoubleColumn("Price").addDateColumn("Date")
@@ -85,14 +118,27 @@ Customer | Count | Price | Date
 "Carl" | 11 | 44.7800 | 2020-12-25
 "Doris" | 1 | 5.0000 | 2020-09-01
 
-#### Change delimiter/separator in CSV files
-The default separator in CSV files is a comma `,`, but it is possible to set other separators/delimiters. Here is an example stting the separator to a semicolon `;` instead:
+This way of creating a data frame is more useful for contexts like unit tests, where readability matters. In your applications you probably want to load a data frame from a file or populate individual columns with strongly typed values as in the following example, which produces a data frame with the same exact contents as the one in the example above:
 
 ```
-CsvSchema schema = new CsvSchema();
-schema.separator(';');
-DataFrame ordersFromFile  = new CsvDataSet("donut_orders.csv", "Donut Orders", schema).loadAsDataFrame();
+DataFrame ordersByCol = new DataFrame("Donut Orders")
+        .addStringColumn("Customer", Lists.immutable.of("Alice", "Bob", "Alice", "Carl", "Doris"))
+        .addLongColumn("Count", LongLists.immutable.of(5, 10, 4, 11, 1))
+        .addDoubleColumn("Price", DoubleLists.immutable.of(23.45, 40.34, 19.50, 44.78, 5.00))
+        .addDateColumn("Date", Lists.immutable.of(LocalDate.of(2020, 10, 15), LocalDate.of(2020, 11, 10),
+                LocalDate.of(2020, 10, 19), LocalDate.of(2020, 12, 25), LocalDate.of(2020, 9, 1)));
+ordersByCol.seal(); // finished constructing a data frame
 ```
+
+`ordersByCol`
+
+Customer | Count | Price | Date
+---|---:|---:|---
+"Alice" | 5 | 23.4500 | 2020-10-15
+"Bob" | 10 | 40.3400 | 2020-11-10
+"Alice" | 4 | 19.5000 | 2020-10-19
+"Carl" | 11 | 44.7800 | 2020-12-25
+"Doris" | 1 | 5.0000 | 2020-09-01
 
 #### Sum of Columns
 ```
@@ -315,6 +361,40 @@ Id | Count
 ---|---:
 "C" | 20
 
+#### Lookup
+
+```
+DataFrame pets = new DataFrame("Pets")
+        .addStringColumn("Name").addLongColumn("Pet Kind Code")
+        .addRow("Sweet Pea", 1)
+        .addRow("Mittens",   2)
+        .addRow("Spot",      1)
+        .addRow("Eagly",     5)
+        .addRow("Grzgxxch", 99);
+
+DataFrame codes = new DataFrame("Pet Kinds")
+        .addLongColumn("Code").addStringColumn("Description")
+        .addRow(1, "Dog")
+        .addRow(2, "Cat")
+        .addRow(5, "Eagle")
+        .addRow(7, "Snake");
+
+pets.lookup(DfJoin.to(codes)
+        .match("Pet Kind Code", "Code")
+        .select("Description")
+        .ifAbsent("Unclear"));
+```
+
+`pets`
+
+Name | Pet Kind Code | Description
+---|---:|---
+"Sweet Pea" | 1 | "Dog"
+"Mittens" | 2 | "Cat"
+"Spot" | 1 | "Dog"
+"Eagly" | 5 | "Eagle"
+"Grzgxxch" | 99 | "Unclear"
+
 ## Domain Specific Language
 
 The framework supports a simple Domain Specific Language (DSL) for computed column expression and operations on data frames such as filtering.
@@ -365,14 +445,15 @@ substr(a + b, 3)
 
 ### Expressions
 
-Category | Type | Example
------------- | ------------ | -------------
-Unary | `-`<br>`not` | `-123`<br>`not (a > b)`
-Binary Arithmetic | `+` `-` `*` `/` | `1 + 2`<br>`unit_price * quantity`<br>string concatenation:<br> `"Hello, " + "world!"`
-Comparison |`>` `>=` `<` `<=` `==` `!=`|
-Boolean | `and`<br>`or`<br>`xor` |
-Containment | `in`<br>`not in` | vectors: <br>`"a" in ("a", "b", "c")`<br>`x not in (1, 2, 3)`<br>strings:<br>`'ello' in 'Hello!'`<br>`"bye" not in "Hello!"`
+Category | Type                         | Example
+------------ |------------------------------| -------------
+Unary | `-`<br>`not`                 | `-123`<br>`not (a > b)`
+Binary Arithmetic | `+` `-` `*` `/`              | `1 + 2`<br>`unit_price * quantity`<br>string concatenation:<br> `"Hello, " + "world!"`
+Comparison | `>` `>=` `<` `<=` `==` `!=`  |
+Boolean | `and`<br>`or`<br>`xor`       |
+Containment | `in`<br>`not in`             | vectors: <br>`"a" in ("a", "b", "c")`<br>`x not in (1, 2, 3)`<br>strings:<br>`'ello' in 'Hello!'`<br>`"bye" not in "Hello!"`
 Empty | `is empty`<br>`is not empty` | `"" is empty`<br>`'Hello' is not empty`<br>vectors:<br>`(1, 2, 3) is not empty`<br>`() is empty`
+Null check | `is null`<br>`is not null`   | `"" is null`<br>`'Hello' is not null`<br>`x is null ? 0.0 : abs(x)`
 
 ### Statements
 
