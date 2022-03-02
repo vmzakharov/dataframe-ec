@@ -57,6 +57,25 @@ public class TypeInferenceTest
     }
 
     @Test
+    public void isNullInference()
+    {
+        assertScriptType("(1, 2, 3) is null", ValueType.BOOLEAN);
+        assertScriptType("'' is not null", ValueType.BOOLEAN);
+        assertScriptType("123 is null", ValueType.BOOLEAN);
+        assertScriptType("123 is not null", ValueType.BOOLEAN);
+        assertScriptType("1.234 is null", ValueType.BOOLEAN);
+        assertScriptType("toDate(2020, 12, 20) is null", ValueType.BOOLEAN);
+        assertScriptType("toDate(2020, 12, 20) is not null", ValueType.BOOLEAN);
+        assertScriptType(
+                  "a = 1\n"
+                + "if a is null then\n"
+                + "  'null'\n"
+                + "else\n"
+                + "  'not null'\n"
+                + "endif", ValueType.STRING);
+    }
+
+    @Test
     public void scriptTypeInference()
     {
         assertScriptType(

@@ -212,6 +212,10 @@ public class TypeInferenceVisitor
         {
             this.store(ValueType.BOOLEAN);
         }
+        else if (operation == UnaryOp.IS_NULL || operation == UnaryOp.IS_NOT_NULL)
+        {
+            this.store(ValueType.BOOLEAN);
+        }
         else if ((operation == UnaryOp.IS_EMPTY || operation == UnaryOp.IS_NOT_EMPTY)
                 && (operandType.isString() || operandType.isVector()))
         {
