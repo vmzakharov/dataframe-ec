@@ -687,7 +687,7 @@ public class DataFrame
         return cloned;
     }
 
-    public void sortBy(ListIterable<String> columnsToSortByNames)
+    public DataFrame sortBy(ListIterable<String> columnsToSortByNames)
     {
         this.unsort();
 
@@ -697,7 +697,7 @@ public class DataFrame
         if (this.rowCount == 0)
         {
             this.virtualRowMap = IntLists.immutable.empty();
-            return;
+            return this;
         }
 
         DfTuple[] tuples = new DfTuple[this.rowCount];
@@ -710,21 +710,25 @@ public class DataFrame
         indexes.sortThisBy(i -> tuples[i]);
 
         this.virtualRowMap = indexes;
+
+        return this;
     }
 
-    public void sortByExpression(String expressionString)
+    public DataFrame sortByExpression(String expressionString)
     {
         this.unsort();
         if (this.rowCount == 0)
         {
             this.virtualRowMap = IntLists.immutable.empty();
-            return;
+            return this;
         }
 
         Expression expression = ExpressionParserHelper.DEFAULT.toExpression(expressionString);
         MutableIntList indexes = IntInterval.zeroTo(this.rowCount - 1).toList();
         indexes.sortThisBy(i -> this.evaluateExpression(expression, i));
         this.virtualRowMap = indexes;
+
+        return this;
     }
 
     public Value evaluateExpression(Expression expression, int rowIndex)

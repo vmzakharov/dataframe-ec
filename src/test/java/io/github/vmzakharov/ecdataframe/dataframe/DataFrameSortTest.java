@@ -20,8 +20,6 @@ public class DataFrameSortTest
                 .addRow("Bob",     "Def",  13L, 13.0, 25.0)
                 .addRow("Abigail", "Def",  15L, 15.0, 11.0);
 
-        dataFrame.sortBy(Lists.immutable.of("Name"));
-
         DataFrame expected = new DataFrame("Expected FrameOfData")
                 .addStringColumn("Name").addStringColumn("Foo").addLongColumn("Bar").addDoubleColumn("Baz").addDoubleColumn("Qux")
                 .addRow("Abigail", "Def",  15L, 15.0, 11.0)
@@ -31,9 +29,7 @@ public class DataFrameSortTest
                 .addRow("Carol",   "Xyz",  14L, 14.0, 40.0)
                 ;
 
-        DataFrameUtil.assertEquals(expected, dataFrame);
-
-        dataFrame.sortBy(Lists.immutable.of("Foo"));
+        DataFrameUtil.assertEquals(expected, dataFrame.sortBy(Lists.immutable.of("Name")));
 
         expected = new DataFrame("Expected FrameOfData")
                 .addStringColumn("Name").addStringColumn("Foo").addLongColumn("Bar").addDoubleColumn("Baz").addDoubleColumn("Qux")
@@ -44,7 +40,7 @@ public class DataFrameSortTest
                 .addRow("Carol",   "Xyz",  14L, 14.0, 40.0)
                 ;
 
-        DataFrameUtil.assertEquals(expected, dataFrame);
+        DataFrameUtil.assertEquals(expected, dataFrame.sortBy(Lists.immutable.of("Foo")));
 
         dataFrame.unsort();
 
@@ -286,10 +282,6 @@ public class DataFrameSortTest
                 .addRow("Carol",   4, "Zzz",  14L, 14.0, 40.0)
                 .addRow("Abigail", 5, "789",  12L, 12.0, 11.0);
 
-//        dataFrame.addDoubleColumn("Xxx", "Bar * 2 + Baz");
-
-        dataFrame.sortByExpression("Bar * 2 + Baz");
-
         DataFrame expected = new DataFrame("Expected FrameOfData")
                 .addStringColumn("Name").addLongColumn("Record").addStringColumn("Foo").addLongColumn("Bar")
                 .addDoubleColumn("Baz").addDoubleColumn("Qux")
@@ -301,9 +293,7 @@ public class DataFrameSortTest
                 .addRow("Carol",   1, "Xyz",  15L, 28.0, 40.0)
                 ;
 
-//        expected.addDoubleColumn("Xxx", "Bar * 2 + Baz");
-
-        DataFrameUtil.assertEquals(expected, dataFrame);
+        DataFrameUtil.assertEquals(expected, dataFrame.sortByExpression("Bar * 2 + Baz"));
     }
 
     @Test
