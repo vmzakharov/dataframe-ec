@@ -162,6 +162,23 @@ public class TypeInferenceTest
     }
 
     @Test
+    public void builtInFunctions()
+    {
+        assertScriptType("abs(123)", ValueType.LONG);
+        assertScriptType("abs(12.34)", ValueType.DOUBLE);
+        assertScriptType("startsWith('Hello, there', 'Hello')", ValueType.BOOLEAN);
+        assertScriptType("substr(' Hello ', 1, 2)", ValueType.STRING);
+        assertScriptType("toDate(2020, 11, 22)", ValueType.DATE);
+        assertScriptType("toDateTime(2020, 11, 22, 15, 11)", ValueType.DATE_TIME);
+        assertScriptType("toDouble('12.34')", ValueType.DOUBLE);
+        assertScriptType("toLong('1234')", ValueType.LONG);
+        assertScriptType("toString(123)", ValueType.STRING);
+        assertScriptType("toUpper('abc')", ValueType.STRING);
+        assertScriptType("trim(' Hello ')", ValueType.STRING);
+        assertScriptType("withinDays(toDate(2020, 11, 22), toDate(2020, 11, 20), 4)", ValueType.BOOLEAN);
+    }
+
+    @Test
     public void containsIncompatibleTypes()
     {
         this.assertError("1 in 'abc'", this.prettyPrint("1 in 'abc'"), ERR_TYPES_IN_EXPRESSION);

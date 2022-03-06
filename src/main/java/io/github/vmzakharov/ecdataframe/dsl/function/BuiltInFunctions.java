@@ -120,6 +120,21 @@ final public class BuiltInFunctions
             }
         });
 
+        addFunctionDescriptor(new IntrinsicFunctionDescriptor("trim", Lists.immutable.of("string"))
+        {
+            @Override
+            public Value evaluate(EvalContext context)
+            {
+                return new StringValue(context.getVariable("string").stringValue().trim());
+            }
+
+            @Override
+            public ValueType returnType(ListIterable<ValueType> parameterTypes)
+            {
+                return ValueType.STRING;
+            }
+        });
+
         addFunctionDescriptor(new IntrinsicFunctionDescriptor("substr")
         {
             @Override
@@ -283,7 +298,6 @@ final public class BuiltInFunctions
                         default:
                             this.assertParameterCount(1, parameters.size()); // forced fail
                     }
-
                 }
                 else if (parameters.size() == 1)
                 {
@@ -302,7 +316,7 @@ final public class BuiltInFunctions
             @Override
             public ValueType returnType(ListIterable<ValueType> parameterTypes)
             {
-                return ValueType.DATE;
+                return ValueType.DATE_TIME;
             }
 
             @Override
@@ -361,7 +375,7 @@ final public class BuiltInFunctions
 
                 Period period = Period.between(date1, date2);
 
-                return BooleanValue.valueOf(period.getDays() <= numberOfDays);
+                return BooleanValue.valueOf(Math.abs(period.getDays()) <= numberOfDays);
             }
 
             @Override

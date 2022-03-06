@@ -15,7 +15,14 @@ import org.junit.Test;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
-import static io.github.vmzakharov.ecdataframe.ExpressionTestUtil.*;
+import static io.github.vmzakharov.ecdataframe.ExpressionTestUtil.evaluateScriptWithContext;
+import static io.github.vmzakharov.ecdataframe.ExpressionTestUtil.evaluateToBoolean;
+import static io.github.vmzakharov.ecdataframe.ExpressionTestUtil.evaluateToDate;
+import static io.github.vmzakharov.ecdataframe.ExpressionTestUtil.evaluateToDateTime;
+import static io.github.vmzakharov.ecdataframe.ExpressionTestUtil.evaluateToDouble;
+import static io.github.vmzakharov.ecdataframe.ExpressionTestUtil.evaluateToLong;
+import static io.github.vmzakharov.ecdataframe.ExpressionTestUtil.evaluateToString;
+import static io.github.vmzakharov.ecdataframe.ExpressionTestUtil.toScript;
 
 public class BuiltInFunctionTest
 {
@@ -72,6 +79,24 @@ public class BuiltInFunctionTest
     {
         Assert.assertEquals("HELLO", evaluateToString("toUpper('Hello')"));
         Assert.assertEquals("THERE! 123", evaluateToString("toUpper(\"THERE! 123\")"));
+    }
+
+    @Test
+    public void trim()
+    {
+        Assert.assertEquals("Hello", evaluateToString("trim('Hello    ')"));
+        Assert.assertEquals("Hello", evaluateToString("trim('   Hello')"));
+        Assert.assertEquals("Hello", evaluateToString("trim('    Hello    ')"));
+        Assert.assertEquals("Hello  there", evaluateToString("trim('    Hello  there    ')"));
+    }
+
+    @Test
+    public void withinDays()
+    {
+        Assert.assertTrue(evaluateToBoolean("withinDays(toDate(2020, 11, 22), toDate(2020, 11, 20), 4)"));
+        Assert.assertTrue(evaluateToBoolean("withinDays(toDate(2020, 11, 20), toDate(2020, 11, 22), 4)"));
+        Assert.assertFalse(evaluateToBoolean("withinDays(toDate(2020, 11, 22), toDate(2020, 11, 20), 1)"));
+        Assert.assertFalse(evaluateToBoolean("withinDays(toDate(2020, 11, 20), toDate(2020, 11, 24), 2)"));
     }
 
     @Test
@@ -169,7 +194,7 @@ public class BuiltInFunctionTest
 
         MutableList<String> expectedFunctionNames = Lists.mutable.of(
             "abs", "contains", "print", "println", "startsWith", "substr", "toDate", "toDateTime", "toDouble", "toLong",
-            "toString", "toUpper", "withinDays"
+            "toString", "toUpper", "trim", "withinDays"
         );
 
         Assert.assertEquals(expectedFunctionNames.size(), functionsByName.size());
