@@ -182,6 +182,7 @@ public class DataFrame
 
     /**
      * Convert the data frame into a multi-line CSV string. The output will include column headers.
+     *
      * @return a string representation of the data frame.
      */
     public String asCsvString()
@@ -191,6 +192,7 @@ public class DataFrame
 
     /**
      * Convert the data frame into a multi-line CSV string. The output will include column headers.
+     *
      * @param limit number of rows to convert, all rows if the value is negative. If the value is zero the result will
      *              only contain column names.
      * @return a string representation of the data frame.
@@ -237,7 +239,7 @@ public class DataFrame
         if (values.length > this.columnCount())
         {
             ErrorReporter.reportAndThrow(
-                "Adding more row elements (" + values.length + ") than there are columns in the data frame (" + this.columnCount() + ")");
+                    "Adding more row elements (" + values.length + ") than there are columns in the data frame (" + this.columnCount() + ")");
         }
 
         ArrayIterate.forEachWithIndex(values, (v, i) -> this.columns.get(i).addObject(v));
@@ -424,7 +426,7 @@ public class DataFrame
     }
 
     /**
-     * Indicates that no further updates can be made to this data frame and ensures that the data frame is in a
+     * Indicates that no further updates will be made to this data frame and ensures that the data frame is in a
      * consistent internal state.
      *
      * @return the data frame
@@ -452,11 +454,23 @@ public class DataFrame
         return this;
     }
 
+    /**
+     * Sums up the values in the specified columns
+     *
+     * @param columnsToAggregateNames - the columns to aggregate
+     * @return a single row data frame containing the aggregated values in the respective columns
+     */
     public DataFrame sum(ListIterable<String> columnsToAggregateNames)
     {
         return this.aggregate(columnsToAggregateNames.collect(AggregateFunction::sum));
     }
 
+    /**
+     * Aggregate the values in the specified columns
+     *
+     * @param aggregators - the aggregate functions to be applied to columns to aggregate
+     * @return a single row data frame containing the aggregated values in the respective columns
+     */
     public DataFrame aggregate(ListIterable<AggregateFunction> aggregators)
     {
         ListIterable<DfColumn> columnsToAggregate = this.getColumnsToAggregate(aggregators.collect(AggregateFunction::getColumnName));
@@ -480,6 +494,15 @@ public class DataFrame
         return this.columnsNamed(columnNames);
     }
 
+
+    /**
+     * Aggregate the values in the specified columns grouped by values in the specified group by columns
+     *
+     * @param aggregators - the aggregate functions to be applied to columns to aggregate
+     * @param columnsToGroupByNames - the columns to group by
+     * @return a data frame with a summary row for each unique combination of the values in the columns to group by,
+     * containing aggregated values in the columns to aggregate
+     */
     public DataFrame aggregateBy(
             ListIterable<AggregateFunction> aggregators,
             ListIterable<String> columnsToGroupByNames)
@@ -487,6 +510,14 @@ public class DataFrame
         return this.aggregateByWithIndex(aggregators, columnsToGroupByNames, false);
     }
 
+    /**
+     * Add up values in columns into summary rows group by values in the specified group by columns
+     *
+     * @param columnsToSumNames     - the columns to aggregate
+     * @param columnsToGroupByNames - the columns to group by
+     * @return a data frame with a row for each unique combination of the values in the columns to group by, containing
+     * summed up values in the columns to aggregate
+     */
     public DataFrame sumBy(ListIterable<String> columnsToSumNames, ListIterable<String> columnsToGroupByNames)
     {
         return this.aggregateBy(columnsToSumNames.collect(AggregateFunction::sum), columnsToGroupByNames);
@@ -675,6 +706,7 @@ public class DataFrame
     /**
      * creates an empty data frame with the same schema as this one except computed columns are converted to stored
      * columns of the same type
+     *
      * @param newName the name for the new data frame
      * @return an empty data frame with the provided name and new schema
      */
@@ -759,8 +791,8 @@ public class DataFrame
     }
 
     /**
-     * Creates a new data frame which is a union of this data frame and the data frame passed as the parameter.
-     * The data frame schemas must match.
+     * Creates a new data frame which is a union of this data frame and the data frame passed as the parameter. The data
+     * frame schemas must match.
      *
      * @param other the data frame to union with
      * @return a data frame with the rows being the union of the rows this data frame and the parameter
@@ -797,8 +829,8 @@ public class DataFrame
     }
 
     /**
-     * creates a new data frame, which contain a subset of rows of this data frame for the rows with the bitmap flags set
-     * (i.e. equals to true). This is the behavior the opposite of {@code selectNotMarked}
+     * creates a new data frame, which contain a subset of rows of this data frame for the rows with the bitmap flags
+     * set (i.e. equals to true). This is the behavior the opposite of {@code selectNotMarked}
      *
      * @return a data frame containing the filtered subset of rows
      */
@@ -860,10 +892,10 @@ public class DataFrame
     }
 
     /**
-     * A very basic join - creates a data frame that is a join of this data frame and another one, based on
-     * the key column values. Rows with the same values of the key column will be combined in the resulting data frame
-     * into one wide row. This is an inner join so rows for which there is no match in the other data frame will not be
-     * present in the join.
+     * A very basic join - creates a data frame that is a join of this data frame and another one, based on the key
+     * column values. Rows with the same values of the key column will be combined in the resulting data frame into one
+     * wide row. This is an inner join so rows for which there is no match in the other data frame will not be present
+     * in the join.
      *
      * @param other               the data frame to join to
      * @param thisJoinColumnName  the name of the column in this data frame to use as the join key
@@ -876,10 +908,10 @@ public class DataFrame
     }
 
     /**
-     * A basic inner join - creates a data frame that is a join of this data frame and another one, based on
-     * the key column values. Rows with the same values of the key column will be combined in the resulting data frame
-     * into one wide row. This is an inner join so rows for which there is no match in the other data frame will not be
-     * present in the join.
+     * A basic inner join - creates a data frame that is a join of this data frame and another one, based on the key
+     * column values. Rows with the same values of the key column will be combined in the resulting data frame into one
+     * wide row. This is an inner join so rows for which there is no match in the other data frame will not be present
+     * in the join.
      *
      * @param other                the data frame to join to
      * @param thisJoinColumnNames  the name of the columns in this data frame to use as the join keys
@@ -894,21 +926,21 @@ public class DataFrame
                 thisJoinColumnNames, Lists.immutable.empty(),
                 otherJoinColumnNames, Lists.immutable.empty(),
                 Maps.mutable.of()
-            ).getTwo();
+        ).getTwo();
     }
 
     /**
-     * A basic inner join - creates a data frame that is a join of this data frame and another one, based on
-     * the key column values. Rows with the same values of the key column will be combined in the resulting data frame
-     * into one wide row. This is an inner join so rows for which there is no match in the other data frame will not be
-     * present in the join.
+     * A basic inner join - creates a data frame that is a join of this data frame and another one, based on the key
+     * column values. Rows with the same values of the key column will be combined in the resulting data frame into one
+     * wide row. This is an inner join so rows for which there is no match in the other data frame will not be present
+     * in the join.
      *
      * @param other                the data frame to join to
      * @param thisJoinColumnNames  the name of the columns in this data frame to use as the join keys
      * @param otherJoinColumnNames the name of the columns in the other data frame to use as the join keys, they will be
      *                             compared to the columns in this data frame in the order they are specified
-     * @param renamedOtherColumns  the map, which will be populated with the column names on the other data frame renamed
-     *                             in the join to avoid column name collisions
+     * @param renamedOtherColumns  the map, which will be populated with the column names on the other data frame
+     *                             renamed in the join to avoid column name collisions
      * @return a data frame that is a join of this data frame and the data frame passed as a parameter
      */
     public DataFrame join(
@@ -922,14 +954,14 @@ public class DataFrame
                 thisJoinColumnNames, Lists.immutable.empty(),
                 otherJoinColumnNames, Lists.immutable.empty(),
                 renamedOtherColumns
-            ).getTwo();
+        ).getTwo();
     }
 
     /**
-     * A basic outer join - creates a data frame that is a join of this data frame and another one, based on
-     * the key column values. Rows with the same values of the key column will be combined in the resulting data frame
-     * into one wide row. The rows for which there is no match in the other data frame will have the missing values
-     * filled with nulls for object column types or zeros for numeric column types.
+     * A basic outer join - creates a data frame that is a join of this data frame and another one, based on the key
+     * column values. Rows with the same values of the key column will be combined in the resulting data frame into one
+     * wide row. The rows for which there is no match in the other data frame will have the missing values filled with
+     * nulls for object column types or zeros for numeric column types.
      *
      * @param other               the data frame to join to
      * @param thisJoinColumnName  the name of the column in this data frame to use as the join key
@@ -942,10 +974,10 @@ public class DataFrame
     }
 
     /**
-     * A basic outer join - creates a data frame that is a join of this data frame and another one, based on
-     * the key column values. Rows with the same values of the key columns will be combined in the resulting data frame
-     * into one wide row. The rows for which there is no match in the other data frame will have the missing values
-     * filled with nulls for object column types or zeros for numeric column types.
+     * A basic outer join - creates a data frame that is a join of this data frame and another one, based on the key
+     * column values. Rows with the same values of the key columns will be combined in the resulting data frame into one
+     * wide row. The rows for which there is no match in the other data frame will have the missing values filled with
+     * nulls for object column types or zeros for numeric column types.
      *
      * @param other                the data frame to join to
      * @param thisJoinColumnNames  the name of the columns in this data frame to use as the join keys
@@ -959,20 +991,20 @@ public class DataFrame
                 thisJoinColumnNames, Lists.immutable.empty(),
                 otherJoinColumnNames, Lists.immutable.empty(),
                 Maps.mutable.of()
-            ).getTwo();
+        ).getTwo();
     }
 
     /**
-     * A basic outer join - creates a data frame that is a join of this data frame and another one, based on
-     * the key column values. Rows with the same values of the key columns will be combined in the resulting data frame
-     * into one wide row. The rows for which there is no match in the other data frame will have the missing values
-     * filled with nulls for object column types or zeros for numeric column types.
+     * A basic outer join - creates a data frame that is a join of this data frame and another one, based on the key
+     * column values. Rows with the same values of the key columns will be combined in the resulting data frame into one
+     * wide row. The rows for which there is no match in the other data frame will have the missing values filled with
+     * nulls for object column types or zeros for numeric column types.
      *
      * @param other                the data frame to join to
      * @param thisJoinColumnNames  the name of the columns in this data frame to use as the join keys
      * @param otherJoinColumnNames the name of the columns in the other data frame to use as the join keys
-     * @param renamedOtherColumns  the map, which will be populated with the column names on the other data frame renamed
-     *                             in the join to avoid column name collisions
+     * @param renamedOtherColumns  the map, which will be populated with the column names on the other data frame
+     *                             renamed in the join to avoid column name collisions
      * @return a data frame that is a join of this data frame and the data frame passed as a parameter
      */
     public DataFrame outerJoin(
@@ -991,10 +1023,11 @@ public class DataFrame
 
     /**
      * Performs intersection and complement set operations between two data frames based on the provided keys and
-     * returns their results as a triplet of data frames.
-     * The result of the intersection is equivalent to inner join of two data frames, and the result of each complement
-     * is the subset of the rows of each data frame that does not have corresponding keys in the other data frame
-     * @param other                 the data frame to join to
+     * returns their results as a triplet of data frames. The result of the intersection is equivalent to inner join of
+     * two data frames, and the result of each complement is the subset of the rows of each data frame that does not
+     * have corresponding keys in the other data frame
+     *
+     * @param other                the data frame to join to
      * @param thisJoinColumnNames  the name of the columns in this data frame to use as the join keys
      * @param otherJoinColumnNames the name of the columns in the other data frame to use as the join keys
      * @return a triplet containing the complement of the other dataframe in this one, the joined dataframe, and the
@@ -1014,14 +1047,15 @@ public class DataFrame
 
     /**
      * Performs intersection and complement set operations between two data frames based on the provided keys and
-     * returns their results as a triplet of data frames.
-     * The result of the intersection is equivalent to inner join of two data frames, and the result of each complement
-     * is the subset of the rows of each data frame that does not have corresponding keys in the other data frame
-     * @param other                 the data frame to join to
+     * returns their results as a triplet of data frames. The result of the intersection is equivalent to inner join of
+     * two data frames, and the result of each complement is the subset of the rows of each data frame that does not
+     * have corresponding keys in the other data frame
+     *
+     * @param other                the data frame to join to
      * @param thisJoinColumnNames  the name of the columns in this data frame to use as the join keys
      * @param otherJoinColumnNames the name of the columns in the other data frame to use as the join keys
-     * @param renamedOtherColumns the map which will be populated with the column names on the other data frame renamed
-     *                            in the join to avoid column name collisions
+     * @param renamedOtherColumns  the map which will be populated with the column names on the other data frame renamed
+     *                             in the join to avoid column name collisions
      * @return a triplet containing the complement of the other dataframe in this one, the joined dataframe, and the
      * complement of this data frame in the other one
      */
@@ -1040,14 +1074,15 @@ public class DataFrame
 
     /**
      * Performs intersection and complement set operations between two data frames based on the provided keys and
-     * returns their results as a triplet of data frames.
-     * The result of the intersection is equivalent to inner join of two data frames, and the result of each complement
-     * is the subset of the rows of each data frame that does not have corresponding keys in the other data frame
-     * @param other                 the data frame to join to
-     * @param thisJoinColumnNames  the name of the columns in this data frame to use as the join keys
-     * @param thisAdditionalSortColumnNames specifies columns for sort order on this data frame's side in addition to
-     *                                      the order of the values of its key columns
-     * @param otherJoinColumnNames the name of the columns in the other data frame to use as the join keys
+     * returns their results as a triplet of data frames. The result of the intersection is equivalent to inner join of
+     * two data frames, and the result of each complement is the subset of the rows of each data frame that does not
+     * have corresponding keys in the other data frame
+     *
+     * @param other                          the data frame to join to
+     * @param thisJoinColumnNames            the name of the columns in this data frame to use as the join keys
+     * @param thisAdditionalSortColumnNames  specifies columns for sort order on this data frame's side in addition to
+     *                                       the order of the values of its key columns
+     * @param otherJoinColumnNames           the name of the columns in the other data frame to use as the join keys
      * @param otherAdditionalSortColumnNames specifies columns for sort order on the other data frame's side in addition
      *                                       to the order of the values of its key columns
      * @return a triplet containing the complement of the other dataframe in this one, the joined dataframe, and the
@@ -1069,18 +1104,19 @@ public class DataFrame
 
     /**
      * Performs intersection and complement set operations between two data frames based on the provided keys and
-     * returns their results as a triplet of data frames.
-     * The result of the intersection is equivalent to inner join of two data frames, and the result of each complement
-     * is the subset of the rows of each data frame that does not have corresponding keys in the other data frame
-     * @param other                the data frame to join to
-     * @param thisJoinColumnNames  the name of the columns in this data frame to use as the join keys
-     * @param thisAdditionalSortColumnNames specifies columns for sort order on this data frame's side in addition to
-     *                                      the order of the values of its key columns
-     * @param otherJoinColumnNames the name of the columns in the other data frame to use as the join keys
+     * returns their results as a triplet of data frames. The result of the intersection is equivalent to inner join of
+     * two data frames, and the result of each complement is the subset of the rows of each data frame that does not
+     * have corresponding keys in the other data frame
+     *
+     * @param other                          the data frame to join to
+     * @param thisJoinColumnNames            the name of the columns in this data frame to use as the join keys
+     * @param thisAdditionalSortColumnNames  specifies columns for sort order on this data frame's side in addition to
+     *                                       the order of the values of its key columns
+     * @param otherJoinColumnNames           the name of the columns in the other data frame to use as the join keys
      * @param otherAdditionalSortColumnNames specifies columns for sort order on the other data frame's side in addition
      *                                       to the order of the values of its key columns
-     * @param renamedOtherColumns the map which will be populated with the column names on the other data frame renamed
-     *                            in the join to avoid column name collisions
+     * @param renamedOtherColumns            the map which will be populated with the column names on the other data
+     *                                       frame renamed in the join to avoid column name collisions
      * @return a triplet containing the complement of the other dataframe in this one, the joined dataframe, and the
      * complement of this data frame in the other one
      */
@@ -1113,7 +1149,7 @@ public class DataFrame
         if (thisJoinColumnNames.size() != otherJoinColumnNames.size())
         {
             ErrorReporter.reportAndThrow("Attempting to join dataframes by different number of keys on each side: "
-             + thisJoinColumnNames.makeString() + " to " + otherJoinColumnNames.makeString());
+                    + thisJoinColumnNames.makeString() + " to " + otherJoinColumnNames.makeString());
         }
 
         DataFrame joined = this.cloneStructureAsStored(this.getName() + "_" + other.getName());
@@ -1210,8 +1246,8 @@ public class DataFrame
                         Arrays.fill(rowData, null);
 
                         joinColumnIndices.forEachWithIndex(
-                            (joinColumnIndex, sourceKeyIndex)
-                                    -> rowData[joinColumnIndex] = other.getObject(otherJoinColumnNames.get(sourceKeyIndex), otherMakeFinal)
+                                (joinColumnIndex, sourceKeyIndex)
+                                        -> rowData[joinColumnIndex] = other.getObject(otherJoinColumnNames.get(sourceKeyIndex), otherMakeFinal)
                         );
 
                         otherColumnNames.forEachWithIndex((colName, i) -> rowData[theseColumnCount + i] = other.getObject(colName, otherMakeFinal));
@@ -1306,6 +1342,7 @@ public class DataFrame
 
     /**
      * Drops the data frame columns with the names specified as the method parameter
+     *
      * @param columnNamesToDrop the names of the columns to remove from this data frame
      * @return the data frame
      */
@@ -1321,6 +1358,7 @@ public class DataFrame
 
     /**
      * Drops all the data frame columns except those with the names specified as the method parameter
+     *
      * @param columnNamesToKeep the list of column names to retain
      * @return the data frame
      */
@@ -1344,8 +1382,9 @@ public class DataFrame
     /**
      * Appends one or more columns to this dataframe based on value lookup in another data frame. If more than one value
      * matches a lookup key, the first matching value is used.
+     *
      * @param joinDescriptor - a descriptor, which specifies join keys, values to select, default values, and other join
-     *                      parameters
+     *                       parameters
      * @return this dataframe
      */
     public DataFrame lookup(DfJoin joinDescriptor)
