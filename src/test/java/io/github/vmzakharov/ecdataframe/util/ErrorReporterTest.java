@@ -42,11 +42,27 @@ public class ErrorReporterTest
     }
 
     @Test
+    public void defaultUnsupported()
+    {
+        try
+        {
+            ErrorReporter.initialize();
+            ErrorReporter.unsupported("Do it!");
+            Assert.fail("didn't throw");
+        }
+        catch (UnsupportedOperationException e)
+        {
+            Assert.assertEquals(UnsupportedOperationException.class, e.getClass());
+            Assert.assertEquals("Do it!", e.getMessage());
+        }
+    }
+
+    @Test
     public void overrideExceptionType()
     {
         try
         {
-            ErrorReporter.exceptionFactories(VerySpecialException::new, VerySpecialException::new);
+            ErrorReporter.exceptionFactories(VerySpecialException::new, VerySpecialException::new, DontWanna::new);
             ErrorReporter.reportAndThrow("Hello");
             Assert.fail("didn't throw");
         }
@@ -58,13 +74,29 @@ public class ErrorReporterTest
     }
 
     @Test
+    public void overrideUnsupported()
+    {
+        try
+        {
+            ErrorReporter.exceptionFactories(VerySpecialException::new, VerySpecialException::new, DontWanna::new);
+            ErrorReporter.unsupported("Do it!");
+            Assert.fail("didn't throw");
+        }
+        catch (UnsupportedOperationException e)
+        {
+            Assert.assertEquals(DontWanna.class, e.getClass());
+            Assert.assertEquals("Do it!", e.getMessage());
+        }
+    }
+
+    @Test
     public void overrideExceptionTypeWithCauseArg()
     {
         Throwable cause = new RuntimeException("Boom!");
 
         try
         {
-            ErrorReporter.exceptionFactories(VerySpecialException::new, VerySpecialException::new);
+            ErrorReporter.exceptionFactories(VerySpecialException::new, VerySpecialException::new, DontWanna::new);
             ErrorReporter.reportAndThrow("Hello", cause);
             Assert.fail("didn't throw");
         }
@@ -87,6 +119,15 @@ public class ErrorReporterTest
         public VerySpecialException(String message, Throwable cause)
         {
             super(message, cause);
+        }
+    }
+
+    private static class DontWanna
+    extends UnsupportedOperationException
+    {
+        public DontWanna(String message)
+        {
+            super(message);
         }
     }
 }
