@@ -41,7 +41,7 @@ public interface DfColumn
 
     void addEmptyValue();
 
-    default Number aggregate(AggregateFunction aggregator)
+    default Object aggregate(AggregateFunction aggregator)
     {
         ErrorReporter.reportAndThrow(
                 "Aggregation " + aggregator.getDescription() + " cannot be performed on column "

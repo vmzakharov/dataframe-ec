@@ -67,7 +67,7 @@ extends DfColumnAbstract
     protected abstract void addAllItemsFrom(DfLongColumn items);
 
     @Override
-    public Number aggregate(AggregateFunction aggregateFunction)
+    public Object aggregate(AggregateFunction aggregateFunction)
     {
         if (this.getSize() == 0)
         {

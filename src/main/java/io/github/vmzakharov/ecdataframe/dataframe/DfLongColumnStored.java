@@ -127,11 +127,7 @@ implements DfColumnStored
     @Override
     public void aggregateValueInto(int rowIndex, DfColumn sourceColumn, int sourceRowIndex, AggregateFunction aggregator)
     {
-        long currentAggregatedValue = this.values.get(rowIndex);
-        this.values.set(
-                rowIndex,
-                aggregator.longAccumulator(
-                        currentAggregatedValue, aggregator.getLongValue(sourceColumn, sourceRowIndex)));
+        aggregator.aggregateValueIntoLong(this, rowIndex, sourceColumn,  sourceRowIndex);
     }
 
     private void clearNull(int rowIndex)

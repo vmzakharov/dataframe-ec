@@ -125,9 +125,23 @@ implements DfColumnStored
     }
 
     @Override
-    public Number aggregate(AggregateFunction aggregator)
+    public Object aggregate(AggregateFunction aggregator)
     {
-        return aggregator.<T>applyIterable(this.values);
+        if (aggregator.handlesObjectIterables())
+        {
+            return aggregator.<T>applyIterable(this.values);
+        }
+
+        return super.aggregate(aggregator);
+    }
+
+    @Override
+    public void aggregateValueInto(int rowIndex, DfColumn sourceColumn, int sourceRowIndex, AggregateFunction aggregator)
+    {
+        T currentAggregatedValue = this.values.get(rowIndex);
+        this.values.set(rowIndex,
+                (T) aggregator.objectAccumulator(
+                        currentAggregatedValue, aggregator.getObjectValue(sourceColumn, sourceRowIndex)));
     }
 
     @Override

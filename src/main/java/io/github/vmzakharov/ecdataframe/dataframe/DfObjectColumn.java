@@ -17,4 +17,22 @@ extends DfColumn
     {
         return this.getTypedObject(rowIndex);
     }
+
+    @Override
+    default Object aggregate(AggregateFunction aggregateFunction)
+    {
+        if (this.getSize() == 0)
+        {
+            return aggregateFunction.defaultObjectIfEmpty();
+        }
+
+        try
+        {
+            return aggregateFunction.applyToObjectColumn(this);
+        }
+        catch (NullPointerException npe)
+        {
+            return null;
+        }
+    }
 }

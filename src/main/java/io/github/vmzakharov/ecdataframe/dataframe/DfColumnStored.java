@@ -36,8 +36,5 @@ extends DfColumn
      * @param sourceRowIndex
      * @param aggregator
      */
-    default void aggregateValueInto(int rowIndex, DfColumn sourceColumn, int sourceRowIndex, AggregateFunction aggregator)
-    {
-        throw new UnsupportedOperationException("Not implemented");
-    }
+    void aggregateValueInto(int rowIndex, DfColumn sourceColumn, int sourceRowIndex, AggregateFunction aggregator);
 }

@@ -481,7 +481,7 @@ public class DataFrame
                 (col, agg) -> summedDataFrame.addColumn(agg.getTargetColumnName(), agg.targetColumnType(col.getType()))
         );
 
-        ListIterable<Number> aggregatedValues = columnsToAggregate.collectWithIndex(
+        ListIterable<Object> aggregatedValues = columnsToAggregate.collectWithIndex(
                 (each, index) -> each.aggregate(aggregators.get(index))
         );
 
@@ -493,7 +493,6 @@ public class DataFrame
     {
         return this.columnsNamed(columnNames);
     }
-
 
     /**
      * Aggregate the values in the specified columns grouped by values in the specified group by columns

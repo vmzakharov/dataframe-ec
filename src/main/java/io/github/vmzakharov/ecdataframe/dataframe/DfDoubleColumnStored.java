@@ -133,10 +133,7 @@ implements DfColumnStored
 
     public void aggregateValueInto(int rowIndex, DfColumn sourceColumn, int sourceRowIndex, AggregateFunction aggregator)
     {
-        double currentAggregatedValue = this.values.get(rowIndex);
-        this.values.set(
-                rowIndex,
-                aggregator.doubleAccumulator(currentAggregatedValue, aggregator.getDoubleValue(sourceColumn, sourceRowIndex)));
+        aggregator.aggregateValueIntoDouble(this, rowIndex, sourceColumn, sourceRowIndex);
     }
 
     @Override

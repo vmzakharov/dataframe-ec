@@ -84,36 +84,91 @@ public abstract class AggregateFunction
         return sourceColumnType;
     }
 
-    abstract double applyToDoubleColumn(DfDoubleColumn doubleColumn);
-
-    abstract long applyToLongColumn(DfLongColumn longColumn);
-
-    public Number applyIterable(ListIterable items)
+    public Object applyToDoubleColumn(DfDoubleColumn doubleColumn)
     {
-        ErrorReporter.reportAndThrow(
-                "Aggregation " + this.getDescription() + " cannot be performed on a column of a non-numeric type");
+        ErrorReporter.unsupported("Operation " + this.getDescription() + " cannot be applied to a double column");
+        return 0.0;
+    }
 
+    public Object applyToLongColumn(DfLongColumn longColumn)
+    {
+        ErrorReporter.unsupported("Operation " + this.getDescription() + " cannot be applied to a long column");
+        return 0;
+    }
+
+    public Object applyToObjectColumn(DfObjectColumn<?> objectColumn)
+    {
+        if (this.handlesObjectIterables())
+        {
+            this.applyIterable(objectColumn.toList());
+        }
+        else
+        {
+            ErrorReporter.reportAndThrow("Aggregation " + this.getDescription() + " cannot be performed on a column of a non-numeric type");
+        }
         return null;
     }
 
-    abstract long longInitialValue();
+    public Object applyIterable(ListIterable<?> items)
+    {
+        ErrorReporter.reportAndThrow("Aggregation " + this.getDescription() + " cannot be performed on a column of a non-numeric type");
+        return null;
+    }
 
-    abstract double doubleInitialValue();
+    long longInitialValue()
+    {
+        ErrorReporter.unsupported("Operation " + this.getDescription() + " does not have a long initial value");
+        return 0;
+    }
 
-    abstract long longAccumulator(long currentAggregate, long newValue);
+    double doubleInitialValue()
+    {
+        ErrorReporter.unsupported("Operation " + this.getDescription() + " does not have a double initial value");
+        return 0.0;
+    }
 
-    abstract double doubleAccumulator(double currentAggregate, double newValue);
+    Object objectInitialValue()
+    {
+        ErrorReporter.unsupported("Operation " + this.getDescription() + " does not have a non-numeric initial value");
+        return null;
+    }
+
+    protected long longAccumulator(long currentAggregate, long newValue)
+    {
+        ErrorReporter.unsupported("Operation " + this.getDescription() + " does not support a long accumulator");
+        return 0;
+    }
+
+    protected double doubleAccumulator(double currentAggregate, double newValue)
+    {
+        ErrorReporter.unsupported("Operation " + this.getDescription() + " does not support a double accumulator");
+        return 0.0;
+    }
+
+    protected Object objectAccumulator(Object currentAggregate, Object newValue)
+    {
+        ErrorReporter.unsupported("Operation " + this.getDescription() + " does not support an non-numeric accumulator");
+        return null;
+    }
 
     abstract public String getDescription();
 
+    public Object defaultObjectIfEmpty()
+    {
+        ErrorReporter.unsupported("Operation " + this.getDescription() + " is not defined on empty lists");
+        return null;
+    }
+
     public long defaultLongIfEmpty()
     {
-        throw new UnsupportedOperationException("Operation " + this.getDescription() + " is not defined on empty lists");
+        ErrorReporter.unsupported("Operation " + this.getDescription() + " is not defined on empty lists");
+        return 0;
     }
 
     public double defaultDoubleIfEmpty()
     {
-        throw new UnsupportedOperationException("Operation " + this.getDescription() + " is not defined on empty lists");
+        ErrorReporter.unsupported("Operation " + this.getDescription() + " is not defined on empty lists");
+        return 0.0;
     }
 
     public long getLongValue(DfColumn sourceColumn, int sourceRowIndex)
@@ -124,6 +179,11 @@ public abstract class AggregateFunction
     public double getDoubleValue(DfColumn sourceColumn, int sourceRowIndex)
     {
         return ((DfDoubleColumn) sourceColumn).getDouble(sourceRowIndex);
+    }
+
+    public Object getObjectValue(DfColumn sourceColumn, int sourceRowIndex)
+    {
+        return sourceColumn.getObject(sourceRowIndex);
     }
 
     public void finishAggregating(DataFrame aggregatedDataFrame, int[] countsByRow)
@@ -140,6 +200,35 @@ public abstract class AggregateFunction
         {
             ((DfLongColumnStored) accumulatorColumn).setLong(accumulatorRowIndex, this.longInitialValue());
         }
+        else
+        {
+            accumulatorColumn.setObject(accumulatorRowIndex, this.objectInitialValue());
+        }
+    }
+
+    public void aggregateValueIntoLong(
+            DfLongColumnStored targetColumn, int targetRowIndex,
+            DfColumn sourceColumn, int sourceRowIndex)
+    {
+        long currentAggregatedValue = targetColumn.getLong(targetRowIndex);
+        targetColumn.setLong(
+                targetRowIndex,
+                this.longAccumulator(currentAggregatedValue, this.getLongValue(sourceColumn, sourceRowIndex)));
+    }
+
+    public void aggregateValueIntoDouble(
+            DfDoubleColumnStored targetColumn, int targetRowIndex,
+            DfColumn sourceColumn, int sourceRowIndex)
+    {
+        double currentAggregatedValue = targetColumn.getDouble(targetRowIndex);
+        targetColumn.setDouble(
+                targetRowIndex,
+                this.doubleAccumulator(currentAggregatedValue, this.getDoubleValue(sourceColumn, sourceRowIndex)));
+    }
+
+    public boolean handlesObjectIterables()
+    {
+        return false;
     }
 
     public static class Sum
@@ -162,13 +251,13 @@ public abstract class AggregateFunction
         }
 
         @Override
-        public double applyToDoubleColumn(DfDoubleColumn doubleColumn)
+        public Object applyToDoubleColumn(DfDoubleColumn doubleColumn)
         {
             return doubleColumn.toDoubleList().sum();
         }
 
         @Override
-        public long applyToLongColumn(DfLongColumn longColumn)
+        public Object applyToLongColumn(DfLongColumn longColumn)
         {
             return longColumn.toLongList().sum();
         }
@@ -186,13 +275,13 @@ public abstract class AggregateFunction
         }
 
         @Override
-        long longAccumulator(long currentAggregate, long newValue)
+        protected long longAccumulator(long currentAggregate, long newValue)
         {
             return currentAggregate + newValue;
         }
 
         @Override
-        double doubleAccumulator(double currentAggregate, double newValue)
+        protected double doubleAccumulator(double currentAggregate, double newValue)
         {
             return currentAggregate + newValue;
         }
@@ -230,13 +319,13 @@ public abstract class AggregateFunction
         }
 
         @Override
-        public double applyToDoubleColumn(DfDoubleColumn doubleColumn)
+        public Object applyToDoubleColumn(DfDoubleColumn doubleColumn)
         {
             return doubleColumn.toDoubleList().max();
         }
 
         @Override
-        public long applyToLongColumn(DfLongColumn longColumn)
+        public Object applyToLongColumn(DfLongColumn longColumn)
         {
             return longColumn.toLongList().max();
         }
@@ -254,13 +343,13 @@ public abstract class AggregateFunction
         }
 
         @Override
-        long longAccumulator(long currentAggregate, long newValue)
+        protected long longAccumulator(long currentAggregate, long newValue)
         {
             return Math.max(currentAggregate, newValue);
         }
 
         @Override
-        double doubleAccumulator(double currentAggregate, double newValue)
+        protected double doubleAccumulator(double currentAggregate, double newValue)
         {
             return Math.max(currentAggregate, newValue);
         }
@@ -286,13 +375,13 @@ public abstract class AggregateFunction
         }
 
         @Override
-        public double applyToDoubleColumn(DfDoubleColumn doubleColumn)
+        public Object applyToDoubleColumn(DfDoubleColumn doubleColumn)
         {
             return doubleColumn.toDoubleList().min();
         }
 
         @Override
-        public long applyToLongColumn(DfLongColumn longColumn)
+        public Object applyToLongColumn(DfLongColumn longColumn)
         {
             return longColumn.toLongList().min();
         }
@@ -310,13 +399,13 @@ public abstract class AggregateFunction
         }
 
         @Override
-        long longAccumulator(long currentAggregate, long newValue)
+        protected long longAccumulator(long currentAggregate, long newValue)
         {
             return Math.min(currentAggregate, newValue);
         }
 
         @Override
-        double doubleAccumulator(double currentAggregate, double newValue)
+        protected double doubleAccumulator(double currentAggregate, double newValue)
         {
             return Math.min(currentAggregate, newValue);
         }
@@ -342,25 +431,25 @@ public abstract class AggregateFunction
         }
 
         @Override
-        public double applyToDoubleColumn(DfDoubleColumn doubleColumn)
+        public Object applyToDoubleColumn(DfDoubleColumn doubleColumn)
         {
             return doubleColumn.toDoubleList().average();
         }
 
         @Override
-        public long applyToLongColumn(DfLongColumn longColumn)
+        public Object applyToLongColumn(DfLongColumn longColumn)
         {
             return Math.round(longColumn.toLongList().average());
         }
 
         @Override
-        long longAccumulator(long currentAggregate, long newValue)
+        protected long longAccumulator(long currentAggregate, long newValue)
         {
             return currentAggregate + newValue;
         }
 
         @Override
-        double doubleAccumulator(double currentAggregate, double newValue)
+        protected double doubleAccumulator(double currentAggregate, double newValue)
         {
             return currentAggregate + newValue;
         }
@@ -433,21 +522,21 @@ public abstract class AggregateFunction
         }
 
         @Override
-        public double applyToDoubleColumn(DfDoubleColumn doubleColumn)
+        public Object applyToDoubleColumn(DfDoubleColumn doubleColumn)
         {
             return doubleColumn.getSize();
         }
 
         @Override
-        public long applyToLongColumn(DfLongColumn longColumn)
+        public Object applyToLongColumn(DfLongColumn longColumn)
         {
             return longColumn.getSize();
         }
 
         @Override
-        public Number applyIterable(ListIterable items)
+        public Object applyToObjectColumn(DfObjectColumn<?> objectColumn)
         {
-            return items.size();
+            return objectColumn.getSize();
         }
 
         @Override
@@ -457,13 +546,19 @@ public abstract class AggregateFunction
         }
 
         @Override
-        long longAccumulator(long currentAggregate, long newValue)
+        public double getDoubleValue(DfColumn sourceColumn, int sourceRowIndex)
+        {
+            return 0.0;
+        }
+
+        @Override
+        protected long longAccumulator(long currentAggregate, long newValue)
         {
             return currentAggregate + 1;
         }
 
         @Override
-        double doubleAccumulator(double currentAggregate, double newValue)
+        protected double doubleAccumulator(double currentAggregate, double newValue)
         {
             return currentAggregate + 1;
         }
