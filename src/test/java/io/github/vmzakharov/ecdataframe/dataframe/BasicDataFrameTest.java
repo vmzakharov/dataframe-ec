@@ -130,6 +130,40 @@ public class BasicDataFrameTest
         this.assertNullValuesInColumn(df, "Foo", false, false, false, true);
     }
 
+    @Test
+    public void isEmpty()
+    {
+        DataFrame df = new DataFrame("df1");
+
+        Assert.assertTrue(df.isEmpty());
+
+        df.addStringColumn("Name").addLongColumn("Count").addDoubleColumn("Value").addDateColumn("Foo")
+                .addRow("Deb",   0,  7.89, null)
+                .addRow("Bob", null, 23.45, LocalDate.of(2020, 10, 20))
+                .addRow(null, 5, 23.45, LocalDate.of(2020, 10, 20))
+                .addRow("Carl", 5, null, LocalDate.of(2020, 10, 20))
+        ;
+
+        Assert.assertFalse(df.isEmpty());
+    }
+
+    @Test
+    public void isNotEmpty()
+    {
+        DataFrame df = new DataFrame("df1");
+
+        Assert.assertFalse(df.isNotEmpty());
+
+        df.addStringColumn("Name").addLongColumn("Count").addDoubleColumn("Value").addDateColumn("Foo")
+                .addRow("Deb",   0,  7.89, null)
+                .addRow("Bob", null, 23.45, LocalDate.of(2020, 10, 20))
+                .addRow(null, 5, 23.45, LocalDate.of(2020, 10, 20))
+                .addRow("Carl", 5, null, LocalDate.of(2020, 10, 20))
+        ;
+
+        Assert.assertTrue(df.isNotEmpty());
+    }
+
     private void assertNullValuesInColumn(DataFrame df, String columnName, boolean... expectedValues)
     {
         Assert.assertEquals(columnName,
