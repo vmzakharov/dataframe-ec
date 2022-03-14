@@ -1434,6 +1434,16 @@ public class DataFrame
         return this.seal();
     }
 
+    public boolean isEmpty()
+    {
+        return this.rowCount() == 0;
+    }
+
+    public boolean isNotEmpty()
+    {
+        return !this.isEmpty();
+    }
+
     private enum JoinType
     {
         INNER_JOIN, OUTER_JOIN, JOIN_WITH_COMPLEMENTS;
