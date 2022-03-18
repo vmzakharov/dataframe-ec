@@ -69,6 +69,16 @@ public abstract class AggregateFunction
         return new Count(newColumnName, newTargetColumnName);
     }
 
+    public static AggregateFunction same(String newColumnName)
+    {
+        return new Same(newColumnName);
+    }
+
+    public static AggregateFunction same(String newColumnName, String newTargetColumnName)
+    {
+        return new Same(newColumnName, newTargetColumnName);
+    }
+
     public String getColumnName()
     {
         return this.columnName;
@@ -588,19 +598,19 @@ public abstract class AggregateFunction
         }
     }
 
-    public static class Const
+    public static class Same
     extends AggregateFunction
     {
         private static final long INITIAL_VALUE_LONG = System.nanoTime();
         private static final double INITIAL_VALUE_DOUBLE = INITIAL_VALUE_LONG;
         private static final Object INITIAL_VALUE_OBJECT = new Object();
 
-        public Const(String newColumnName)
+        public Same(String newColumnName)
         {
             super(newColumnName);
         }
 
-        public Const(String newColumnName, String newTargetColumnName)
+        public Same(String newColumnName, String newTargetColumnName)
         {
             super(newColumnName, newTargetColumnName);
         }

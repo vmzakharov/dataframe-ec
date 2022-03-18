@@ -6,9 +6,9 @@ import org.junit.Test;
 
 import java.time.LocalDate;
 
-import static io.github.vmzakharov.ecdataframe.dataframe.AggregateFunction.Const;
+import static io.github.vmzakharov.ecdataframe.dataframe.AggregateFunction.same;
 
-public class DataFrameAggregationConstTest
+public class DataFrameAggregationSameTest
 {
     private DataFrame dataFrame;
 
@@ -35,7 +35,7 @@ public class DataFrameAggregationConstTest
                         .addRow("Bob",   "Orange",  null, -25.0)
                         .addRow("Carol", null,     -789L,  null),
                 this.dataFrame.aggregateBy(
-                        Lists.immutable.of(new Const("Color"), new Const("Bar"), new Const("Qux")),
+                        Lists.immutable.of(same("Color"), same("Bar"), same("Qux")),
                         Lists.immutable.of("Name")));
     }
 
@@ -49,7 +49,7 @@ public class DataFrameAggregationConstTest
                         .addRow("Bob",   "Orange", null)
                         .addRow("Carol", null,     LocalDate.of(2021, 12, 22)),
                 this.dataFrame.aggregateBy(
-                        Lists.immutable.of(new Const("Color", "Same Color"), new Const("Date")),
+                        Lists.immutable.of(same("Color", "Same Color"), same("Date")),
                         Lists.immutable.of("Name")));
     }
 
@@ -69,8 +69,8 @@ public class DataFrameAggregationConstTest
                         .addDoubleColumn("Qux").addDoubleColumn("Waldo").addDateColumn("DateOne").addDateColumn("DateTwo")
                         .addRow(null, "Orange", 123L, null, null, 100.0, LocalDate.of(2021, 12, 22), null),
                 df.aggregate(Lists.immutable.of(
-                        new Const("Name"), new Const("Color"), new Const("Bar"), new Const("Baz"),
-                        new Const("Qux"), new Const("Waldo"), new Const("DateOne"), new Const("DateTwo"))
+                        same("Name"), same("Color"), same("Bar"), same("Baz"),
+                        same("Qux"), same("Waldo"), same("DateOne"), same("DateTwo"))
                 )
         );
     }
