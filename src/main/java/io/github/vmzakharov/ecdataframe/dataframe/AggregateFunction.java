@@ -726,7 +726,7 @@ public abstract class AggregateFunction
         @Override
         public String getDescription()
         {
-            return "Const";
+            return "SAME";
         }
 
         @Override
