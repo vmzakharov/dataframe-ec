@@ -1434,6 +1434,11 @@ public class DataFrame
         return this.seal();
     }
 
+    public DfJoin lookupIn(DataFrame lookupTarget)
+    {
+        return DfJoin.from(this).joinTo(lookupTarget);
+    }
+
     public boolean isEmpty()
     {
         return this.rowCount() == 0;

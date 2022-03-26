@@ -5,6 +5,7 @@ import org.eclipse.collections.impl.factory.Lists;
 
 final public class DfJoin
 {
+    private DataFrame joinFrom;
     private DataFrame joinTo;
     private ListIterable<String> selectFromJoined;
     private ListIterable<String> columnNameAliases;
@@ -22,6 +23,19 @@ final public class DfJoin
         DfJoin join = new DfJoin();
         join.joinTo = newJoinTo;
         return join;
+    }
+
+    static public DfJoin from(DataFrame newJoinFrom)
+    {
+        DfJoin join = new DfJoin();
+        join.joinFrom = newJoinFrom;
+        return join;
+    }
+
+    public DfJoin joinTo(DataFrame newJoinTo)
+    {
+        this.joinTo = newJoinTo;
+        return this;
     }
 
     public DfJoin match(String columnToLookup, String joinToColumnName)
@@ -101,5 +115,10 @@ final public class DfJoin
     public ListIterable<String> columnsToLookup()
     {
         return this.columnsToLookup;
+    }
+
+    public DataFrame resolveLookup()
+    {
+        return this.joinFrom.lookup(this);
     }
 }
