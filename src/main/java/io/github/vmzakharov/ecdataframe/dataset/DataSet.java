@@ -6,6 +6,10 @@ public interface DataSet
 
     String getName();
 
+    /**
+     * Returns the next element in the data set.
+     * @return the next element in the data set
+     */
     Object next();
 
     boolean hasNext();

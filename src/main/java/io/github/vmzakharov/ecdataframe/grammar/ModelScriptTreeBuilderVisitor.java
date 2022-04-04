@@ -91,7 +91,7 @@ extends ModelScriptBaseVisitor<Expression>
     @Override
     public Expression visitAliasExpr(ModelScriptParser.AliasExprContext ctx)
     {
-        return new AliasExpr(ctx.ID().toString(), this.visit(ctx.expr()));
+        return new AliasExpr(this.unEscape(ctx.ID().toString()), this.visit(ctx.expr()));
     }
 
     @Override

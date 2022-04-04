@@ -23,6 +23,7 @@ import io.github.vmzakharov.ecdataframe.dsl.function.BuiltInFunctions;
 import io.github.vmzakharov.ecdataframe.dsl.function.IntrinsicFunctionDescriptor;
 import io.github.vmzakharov.ecdataframe.dsl.value.BooleanValue;
 import io.github.vmzakharov.ecdataframe.dsl.value.DataFrameValue;
+import io.github.vmzakharov.ecdataframe.dsl.value.DoubleValue;
 import io.github.vmzakharov.ecdataframe.dsl.value.LongValue;
 import io.github.vmzakharov.ecdataframe.dsl.value.StringValue;
 import io.github.vmzakharov.ecdataframe.dsl.value.Value;
@@ -129,7 +130,6 @@ implements ExpressionEvaluationVisitor
         }
 
         if (rawValue instanceof String)
-//        if (rawValue instanceof String || rawValue instanceof org.apache.avro.util.Utf8)
         {
             return new StringValue(rawValue.toString());
         }
@@ -139,7 +139,22 @@ implements ExpressionEvaluationVisitor
             return new LongValue((Integer) rawValue);
         }
 
-        throw new RuntimeException("Don't know how to handle " + rawValue.toString() + ", " + rawValue.getClass().getName());
+        if (rawValue instanceof Long)
+        {
+            return new LongValue((Long) rawValue);
+        }
+
+        if (rawValue instanceof Float)
+        {
+            return new DoubleValue((Float) rawValue);
+        }
+
+        if (rawValue instanceof Double)
+        {
+            return new DoubleValue((Double) rawValue);
+        }
+
+        throw new RuntimeException("Don't know how to handle " + rawValue.toString() + ", type: " + rawValue.getClass().getName());
     }
 
     @Override

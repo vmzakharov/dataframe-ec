@@ -12,6 +12,11 @@ implements Value
         this.dataFrame = newDataFrame;
     }
 
+    public DataFrame dataFrameValue()
+    {
+        return this.dataFrame;
+    }
+
     @Override
     public String asStringLiteral()
     {
