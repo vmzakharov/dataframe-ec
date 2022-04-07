@@ -363,7 +363,6 @@ public class DataFrameSortTest
                 .addRow("Carol",                        null)
                 .addRow("Abigail",                      null);
 
-
         DataFrame expected = new DataFrame("Expected FrameOfData")
                 .addStringColumn("Name").addDateTimeColumn("DateTime")
                 .addRow("Abigail",                      null)

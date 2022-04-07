@@ -152,7 +152,7 @@ extends HierarchicalDataSet
 
             if (elementMethod == null)
             {
-                ErrorReporter.reportAndThrow("Unable to find " + element + " on " + currentClass.getName() );
+                ErrorReporter.reportAndThrow("Unable to find " + element + " on " + currentClass.getName());
             }
 
             currentClass = elementMethod.getReturnType();

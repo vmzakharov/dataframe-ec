@@ -349,8 +349,6 @@ extends DataSetAbstract
                 return df;
             }
 
-
-
             MutableList<String> lineBuffer = Lists.mutable.withInitialCapacity(LINE_COUNT_FOR_TYPE_INFERENCE);
             lineBuffer.add(dataRow);
 

@@ -1,11 +1,9 @@
 package io.github.vmzakharov.ecdataframe.dataframe;
 
 import io.github.vmzakharov.ecdataframe.dsl.value.DateTimeValue;
-import io.github.vmzakharov.ecdataframe.dsl.value.DateValue;
 import io.github.vmzakharov.ecdataframe.dsl.value.Value;
 import org.eclipse.collections.api.list.ListIterable;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 public class DfDateTimeColumnStored
