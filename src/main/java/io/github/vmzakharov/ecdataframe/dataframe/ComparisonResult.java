@@ -1,6 +1,7 @@
 package io.github.vmzakharov.ecdataframe.dataframe;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.function.DoubleSupplier;
 import java.util.function.LongSupplier;
 
@@ -241,6 +242,15 @@ abstract public class ComparisonResult
     extends ObjectComparisonResult<LocalDate>
     {
         public DateComparisonResult(LocalDate thisObject, LocalDate thatObject)
+        {
+            super(thisObject, thatObject);
+        }
+    }
+
+    static public class DateTimeComparisonResult
+    extends ObjectComparisonResult<LocalDateTime>
+    {
+        public DateTimeComparisonResult(LocalDateTime thisObject, LocalDateTime thatObject)
         {
             super(thisObject, thatObject);
         }

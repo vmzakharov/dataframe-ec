@@ -32,6 +32,7 @@ import org.eclipse.collections.impl.tuple.Tuples;
 import org.eclipse.collections.impl.utility.ArrayIterate;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Arrays;
 
 public class DataFrame
@@ -116,6 +117,21 @@ public class DataFrame
     public DataFrame addDateColumn(String newColumnName, String expressionAsString)
     {
         return this.addColumn(new DfDateColumnComputed(this, newColumnName, expressionAsString));
+    }
+
+    public DataFrame addDateTimeColumn(String newColumnName)
+    {
+        return this.addColumn(new DfDateTimeColumnStored(this, newColumnName));
+    }
+
+    public DataFrame addDateTimeColumn(String newColumnName, ListIterable<LocalDateTime> values)
+    {
+        return this.addColumn(new DfDateTimeColumnStored(this, newColumnName, values));
+    }
+
+    public DataFrame addDateTimeColumn(String newColumnName, String expressionAsString)
+    {
+        return this.addColumn(new DfDateTimeColumnComputed(this, newColumnName, expressionAsString));
     }
 
     public DataFrame addColumn(DfColumn newColumn)
@@ -273,6 +289,9 @@ public class DataFrame
             case DATE:
                 this.addDateColumn(columnName);
                 break;
+            case DATE_TIME:
+                this.addDateTimeColumn(columnName);
+                break;
             default:
                 ErrorReporter.reportAndThrow("Cannot add a column " + columnName + " for values of type " + type);
         }
@@ -294,6 +313,9 @@ public class DataFrame
                 break;
             case DATE:
                 this.addDateColumn(columnName, expressionAsString);
+                break;
+            case DATE_TIME:
+                this.addDateTimeColumn(columnName, expressionAsString);
                 break;
             default:
                 ErrorReporter.reportAndThrow("Cannot add a column " + columnName + " for values of type " + type);
@@ -390,6 +412,11 @@ public class DataFrame
         return this.getDateColumn(columnName).getTypedObject(this.rowIndexMap(rowIndex));
     }
 
+    public LocalDateTime getDateTime(String columnName, int rowIndex)
+    {
+        return this.getDateTimeColumn(columnName).getTypedObject(this.rowIndexMap(rowIndex));
+    }
+
     public DfLongColumn getLongColumn(String columnName)
     {
         return (DfLongColumn) this.getColumnNamed(columnName);
@@ -403,6 +430,11 @@ public class DataFrame
     public DfDateColumn getDateColumn(String columnName)
     {
         return (DfDateColumn) this.getColumnNamed(columnName);
+    }
+
+    public DfDateTimeColumn getDateTimeColumn(String columnName)
+    {
+        return (DfDateTimeColumn) this.getColumnNamed(columnName);
     }
 
     public DfStringColumn getStringColumn(String columnName)

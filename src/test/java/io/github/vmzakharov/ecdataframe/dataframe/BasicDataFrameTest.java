@@ -8,6 +8,7 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 public class BasicDataFrameTest
 {
@@ -52,22 +53,30 @@ public class BasicDataFrameTest
                 .addColumn("Long", ValueType.LONG)
                 .addColumn("Double", ValueType.DOUBLE)
                 .addColumn("Date", ValueType.DATE)
+                .addColumn("DateTime", ValueType.DATE_TIME)
                 .addColumn("StringComp", ValueType.STRING, "String + \"-meep\"")
                 .addColumn("LongComp", ValueType.LONG, "Long * 2")
                 .addColumn("DoubleComp", ValueType.DOUBLE, "Double + 10.0")
                 .addColumn("DateComp", ValueType.DATE, "toDate(2021, 11, 15)")
+                .addColumn("DateTimeComp", ValueType.DATE_TIME, "toDateTime(2022, 12, 25, 13, 12, 10)")
                 ;
 
-        dataFrame.addRow("Beep", 10, 20.0, LocalDate.of(2020, 10, 20));
+        dataFrame.addRow("Beep", 10, 20.0, LocalDate.of(2020, 10, 20), LocalDateTime.of(2022, 8, 22, 10, 10, 10));
 
         Assert.assertEquals("Beep", dataFrame.getString("String", 0));
         Assert.assertEquals("Beep-meep", dataFrame.getString("StringComp", 0));
+
         Assert.assertEquals(10, dataFrame.getLong("Long", 0));
         Assert.assertEquals(20, dataFrame.getLong("LongComp", 0));
+
         Assert.assertEquals(20.0, dataFrame.getDouble("Double", 0), 0.000001);
         Assert.assertEquals(30.0, dataFrame.getDouble("DoubleComp", 0), 0.000001);
+
         Assert.assertEquals(LocalDate.of(2020, 10, 20), dataFrame.getDate("Date", 0));
+        Assert.assertEquals(LocalDateTime.of(2022, 8, 22, 10, 10, 10), dataFrame.getDateTime("DateTime", 0));
+
         Assert.assertEquals(LocalDate.of(2021, 11, 15), dataFrame.getDate("DateComp", 0));
+        Assert.assertEquals(LocalDateTime.of(2022, 12, 25, 13, 12, 10), dataFrame.getDateTime("DateTimeComp", 0));
     }
 
     @Test
