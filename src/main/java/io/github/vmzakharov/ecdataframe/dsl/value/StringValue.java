@@ -12,7 +12,7 @@ extends AbstractValue
 
     public StringValue(String newValue)
     {
-        ErrorReporter.reportAndThrow(newValue == null, "String value cannot contain null, a void value should be used instead");
+        ErrorReporter.reportAndThrowIf(newValue == null, "String value cannot contain null, a void value should be used instead");
         this.value = newValue;
     }
 

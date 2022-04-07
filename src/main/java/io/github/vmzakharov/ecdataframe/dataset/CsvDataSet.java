@@ -236,7 +236,8 @@ extends DataSetAbstract
             ZipEntry entry = zis.getNextEntry();
             return new InputStreamReader(zis);
         }
-        else if (fileName.endsWith(".gz"))
+
+        if (fileName.endsWith(".gz"))
         {
             GZIPInputStream gzis = new GZIPInputStream(fis);
             return new InputStreamReader(gzis);
@@ -313,6 +314,90 @@ extends DataSetAbstract
         }
 
         return this.schema;
+    }
+
+    private DataFrame loadFlexi()
+    {
+        DataFrame df = new DataFrame(this.getName());
+        df.enablePooling();
+
+        if (this.schemaIsNotDefined())
+        {
+            this.schema = new CsvSchema(); // provides default separators, quote characters, etc.
+        }
+
+        try (BufferedReader reader = new BufferedReader(this.createReader(), BUFFER_SIZE))
+        {
+            MutableList<String> headers = this.splitMindingQs(reader.readLine()).collect(this::removeSurroundingQuotes);
+
+            if (headers.anySatisfy(String::isEmpty))
+            {
+                ErrorReporter.reportAndThrow("Error parsing a CSV file: a column header cannot be empty");
+            }
+
+            String dataRow = reader.readLine();
+
+            if (dataRow == null) // no data, just headers
+            {
+                if (this.getSchema().columnCount() == 0)
+                {
+                    headers.forEach(header -> this.schema.addColumn(header, STRING));
+                }
+
+                this.getSchema().getColumns().forEach(col -> df.addColumn(col.getName(), col.getType()));
+
+                return df;
+            }
+
+
+
+            MutableList<String> lineBuffer = Lists.mutable.withInitialCapacity(LINE_COUNT_FOR_TYPE_INFERENCE);
+            lineBuffer.add(dataRow);
+
+            // the schema is empty, need to infer columns properties from the first lineCountForTypeInference columns
+            if (this.getSchema().columnCount() == 0)
+            {
+                int loadedLineCount = 1; // already have one in the buffer
+                while (loadedLineCount++ < LINE_COUNT_FOR_TYPE_INFERENCE
+                        && (dataRow = reader.readLine()) != null)
+                {
+                    lineBuffer.add(dataRow);
+                }
+                this.inferSchema(headers, lineBuffer);
+            }
+            else if (headers.size() != this.schema.columnCount())
+            {
+                ErrorReporter.reportAndThrow(String.format(
+                        "The number of elements in the header does not match the number of columns in the schema %d vs %d",
+                        headers.size(), this.schema.columnCount()));
+            }
+
+            MutableList<Procedure<String>> columnPopulators = Lists.mutable.of();
+
+            this.getSchema().getColumns().forEach(col -> this.addDataFrameColumn(df, col, columnPopulators));
+
+            int columnCount = this.getSchema().columnCount();
+            MutableList<String> lineElements = Lists.mutable.withInitialCapacity(columnCount);
+
+            int lineNumber = 0;
+
+//            while (
+//                    (dataRow = this.getNextLine(lineBuffer, reader, lineNumber)) != null
+//                            && (loadAllLines || (lineNumber < headLineCount))
+//            )
+//            {
+//                this.parseAndAddLineToDataFrame(dataRow, lineElements, columnCount, columnPopulators);
+//                lineNumber++;
+//            }
+
+            df.seal();
+        }
+        catch (IOException e)
+        {
+            ErrorReporter.reportAndThrow("Failed to load as a data frame '" + this.getDataFileName() + "'", e);
+        }
+
+        return df;
     }
 
     private DataFrame loadAsDataFrame(int headLineCount, boolean loadAllLines)
@@ -563,8 +648,9 @@ extends DataSetAbstract
         if (this.getSchema().columnCount() != elements.size())
         {
             ErrorReporter.reportAndThrow(
-                    "The number of columns in the schema does not match the number of elements in the data row " + 0
-                    + " (" + this.getSchema().columnCount() + ", " + elements.size() + ")");
+                    "The number of columns in the schema (" + this.getSchema().columnCount()
+                    + ") does not match the number of elements in the data row  (" + elements.size() + "): "
+                    + line);
         }
 
         for (int i = 0; i < columnCount; i++)

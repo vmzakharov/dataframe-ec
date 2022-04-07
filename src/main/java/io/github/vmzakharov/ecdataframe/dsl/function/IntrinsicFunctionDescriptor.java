@@ -77,14 +77,14 @@ implements FunctionDescriptor
 
     protected void assertParameterCount(int expectedCount, int actualCount)
     {
-        ErrorReporter.reportAndThrow(
+        ErrorReporter.reportAndThrowIf(
                 expectedCount != actualCount,
                 () -> "Invalid number of parameters in a call to '" + this.getName() + "'. " + this.usageString());
     }
 
     protected void assertParameterType(ValueType expected, ValueType actual)
     {
-        ErrorReporter.reportAndThrow(
+        ErrorReporter.reportAndThrowIf(
                 expected != actual,
                 () -> "Invalid parameter type in a call to '" + this.getName() + "'. " + this.usageString());
     }

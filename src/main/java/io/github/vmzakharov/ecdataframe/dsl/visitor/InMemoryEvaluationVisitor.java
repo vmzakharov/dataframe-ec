@@ -23,6 +23,8 @@ import io.github.vmzakharov.ecdataframe.dsl.function.BuiltInFunctions;
 import io.github.vmzakharov.ecdataframe.dsl.function.IntrinsicFunctionDescriptor;
 import io.github.vmzakharov.ecdataframe.dsl.value.BooleanValue;
 import io.github.vmzakharov.ecdataframe.dsl.value.DataFrameValue;
+import io.github.vmzakharov.ecdataframe.dsl.value.DateTimeValue;
+import io.github.vmzakharov.ecdataframe.dsl.value.DateValue;
 import io.github.vmzakharov.ecdataframe.dsl.value.DoubleValue;
 import io.github.vmzakharov.ecdataframe.dsl.value.LongValue;
 import io.github.vmzakharov.ecdataframe.dsl.value.StringValue;
@@ -30,6 +32,9 @@ import io.github.vmzakharov.ecdataframe.dsl.value.Value;
 import io.github.vmzakharov.ecdataframe.dsl.value.ValueType;
 import io.github.vmzakharov.ecdataframe.dsl.value.VectorValue;
 import org.eclipse.collections.api.list.ListIterable;
+
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 public class InMemoryEvaluationVisitor
 implements ExpressionEvaluationVisitor
@@ -152,6 +157,16 @@ implements ExpressionEvaluationVisitor
         if (rawValue instanceof Double)
         {
             return new DoubleValue((Double) rawValue);
+        }
+
+        if (rawValue instanceof LocalDate)
+        {
+            return new DateValue((LocalDate) rawValue);
+        }
+
+        if (rawValue instanceof LocalDateTime)
+        {
+            return new DateTimeValue((LocalDateTime) rawValue);
         }
 
         throw new RuntimeException("Don't know how to handle " + rawValue.toString() + ", type: " + rawValue.getClass().getName());

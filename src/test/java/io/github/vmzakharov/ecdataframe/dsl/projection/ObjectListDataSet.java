@@ -1,5 +1,6 @@
 package io.github.vmzakharov.ecdataframe.dsl.projection;
 
+import io.github.vmzakharov.ecdataframe.dataframe.ErrorReporter;
 import io.github.vmzakharov.ecdataframe.dataset.HierarchicalDataSet;
 import io.github.vmzakharov.ecdataframe.dsl.value.ValueType;
 import org.eclipse.collections.api.factory.Maps;
@@ -14,13 +15,17 @@ import org.eclipse.collections.impl.utility.ArrayIterate;
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Method;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.chrono.ChronoLocalDate;
+import java.time.chrono.ChronoLocalDateTime;
 import java.util.NoSuchElementException;
 
 public class ObjectListDataSet
 extends HierarchicalDataSet
 {
     private final ListIterable<Object> items;
-    private int index = 0;
+    private int index = -1;
 
     private final MutableListMultimap<String, MethodHandle> valueGetters = Multimaps.mutable.list.of();
     private final MutableMap<String, ValueType> valueTypes = Maps.mutable.of();
@@ -46,7 +51,8 @@ extends HierarchicalDataSet
             return this.items.get(this.index);
         }
 
-        throw new NoSuchElementException();
+        ErrorReporter.reportAndThrow("No more elements in data set " + this.getName());
+        throw new NoSuchElementException(); // won't get here
     }
 
     @Override
@@ -81,7 +87,7 @@ extends HierarchicalDataSet
             }
             catch (Throwable e)
             {
-                throw new RuntimeException(e);
+                ErrorReporter.reportAndThrow("Failed to invoke " + methodHandle, e);
             }
         }
         return currentValue;
@@ -102,6 +108,11 @@ extends HierarchicalDataSet
 
             Method elementMethod = ArrayIterate.detect(currentClass.getDeclaredMethods(), method -> method.getName().equals(element));
 
+            if (elementMethod == null)
+            {
+                ErrorReporter.reportAndThrow("Unable to find " + element + " on " + currentClass.getName());
+            }
+
             MethodHandle elementHandle;
             try
             {
@@ -111,7 +122,8 @@ extends HierarchicalDataSet
             }
             catch (IllegalAccessException e)
             {
-                throw new RuntimeException(e);
+                ErrorReporter.reportAndThrow("Failed to lookup method for " + element + " on " + currentClass.getName(), e);
+                throw new RuntimeException(); // won't get here
             }
 
             getters.add(elementHandle);
@@ -137,6 +149,12 @@ extends HierarchicalDataSet
             String element = elements[i];
 
             Method elementMethod = ArrayIterate.detect(currentClass.getDeclaredMethods(), method -> method.getName().equals(element));
+
+            if (elementMethod == null)
+            {
+                ErrorReporter.reportAndThrow("Unable to find " + element + " on " + currentClass.getName() );
+            }
+
             currentClass = elementMethod.getReturnType();
         }
 
@@ -145,14 +163,26 @@ extends HierarchicalDataSet
             return ValueType.STRING;
         }
 
-        if (currentClass.equals(Number.class) || currentClass.equals(long.class))
+        if (currentClass.equals(long.class) || currentClass.equals(int.class)
+            || currentClass.equals(Long.class) || currentClass.equals(Integer.class))
         {
             return ValueType.LONG;
         }
 
-        if (currentClass.equals(Double.class) || currentClass.equals(double.class))
+        if (currentClass.equals(double.class) || currentClass.equals(float.class)
+            || currentClass.equals(Double.class) || currentClass.equals(Float.class))
         {
             return ValueType.DOUBLE;
+        }
+
+        if (currentClass.equals(LocalDate.class) || ChronoLocalDate.class.isAssignableFrom(currentClass))
+        {
+            return ValueType.DATE;
+        }
+
+        if (currentClass.equals(LocalDateTime.class) || ChronoLocalDateTime.class.isAssignableFrom(currentClass))
+        {
+            return ValueType.DATE_TIME;
         }
 
         return ValueType.VOID;
@@ -162,7 +192,8 @@ extends HierarchicalDataSet
     {
         if (this.items.size() == 0)
         {
-            throw new NoSuchElementException("The data set contains no data");
+            ErrorReporter.reportAndThrow("The data set " + this.getName() + " contains no data");
+            // throw new NoSuchElementException(...)
         }
 
         return this.items.get(0);

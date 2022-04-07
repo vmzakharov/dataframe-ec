@@ -19,6 +19,9 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+
 import static io.github.vmzakharov.ecdataframe.dsl.value.ValueType.DOUBLE;
 import static io.github.vmzakharov.ecdataframe.dsl.value.ValueType.LONG;
 import static io.github.vmzakharov.ecdataframe.dsl.value.ValueType.STRING;
@@ -31,8 +34,8 @@ public class HierarchicalDataSetProjectionTest
     public void initializeDataSet()
     {
         this.dataSet = new ObjectListDataSet("Person", Lists.immutable.of(
-                new Person("Alice", 123, 95.7, "Lutefisk"),
-                new Person("Bob", 456, 36.6, "Chocolate")
+                new Person("Alice", 123, 95.7, LocalDate.of(2022, 4, 3), "Lutefisk", LocalDateTime.of(1911, 11, 11, 11, 11, 11)),
+                new Person("Bob", 456, 36.6, LocalDate.of(2022, 4, 2), "Chocolate", LocalDateTime.of(2022, 4, 6, 15, 24, 35))
         ));
     }
 
@@ -40,6 +43,8 @@ public class HierarchicalDataSetProjectionTest
     public void simpleDataSetOperations()
     {
         Assert.assertTrue(this.dataSet.hasNext());
+
+        this.dataSet.next();
 
         Assert.assertEquals("Alice", this.dataSet.getValue("name"));
         Assert.assertEquals(123L, this.dataSet.getValue("luckyNumber"));
@@ -59,17 +64,24 @@ public class HierarchicalDataSetProjectionTest
     @Test
     public void dataSetOperationsWithPropertyChain()
     {
+        this.dataSet.next();
+
         Assert.assertEquals("Alice", this.dataSet.getValue("name"));
         Assert.assertEquals(123L, this.dataSet.getValue("luckyNumber"));
+        Assert.assertEquals(123L, this.dataSet.getValue("bigLuckyNumber"));
         Assert.assertEquals(95.7, this.dataSet.getValue("temperature"));
+        Assert.assertEquals(95.7, this.dataSet.getValue("bigTemperature"));
         Assert.assertEquals("Lutefisk", this.dataSet.getValue("favoriteFood.description"));
 
         this.dataSet.next();
 
         Assert.assertEquals("Bob", this.dataSet.getValue("name"));
         Assert.assertEquals(456L, this.dataSet.getValue("luckyNumber"));
-        Assert.assertEquals(36.6, this.dataSet.getValue("temperature"));
+        Assert.assertEquals(456L, this.dataSet.getValue("bigLuckyNumber"));
+        Assert.assertEquals(36.6, this.dataSet.getValue("bigTemperature"));
+        Assert.assertEquals(LocalDate.of(2022, 4, 2), this.dataSet.getValue("specialDate"));
         Assert.assertEquals("Chocolate", this.dataSet.getValue("favoriteFood.description"));
+        Assert.assertEquals(LocalDateTime.of(2022, 4, 6, 15, 24, 35), this.dataSet.getValue("favoriteFood.lastEaten"));
     }
 
     @Test
@@ -125,7 +137,36 @@ public class HierarchicalDataSetProjectionTest
     }
 
     @Test
-    public void notSoSimpleProjection()
+    public void projectionWithBigNumbers()
+    {
+        String scriptString =
+                "project {\n"
+                + "    Person.name,\n"
+                + "    ${Big Lucky Number} : Person.bigLuckyNumber,\n"
+                + "    BigTemp : Person.bigTemperature\n"
+                + "}";
+
+        Script script = ExpressionParserHelper.DEFAULT.toScript(scriptString);
+
+        InMemoryEvaluationVisitor visitor = new InMemoryEvaluationVisitor();
+        visitor.getContext().addDataSet(this.dataSet);
+        this.dataSet.openFileForReading();
+
+        Value result = script.evaluate(visitor);
+
+        Assert.assertEquals(DataFrameValue.class, result.getClass());
+
+        DataFrameUtil.assertEquals(
+                new DataFrame("expected")
+                        .addStringColumn("Person.name").addLongColumn("Big Lucky Number").addDoubleColumn("BigTemp")
+                        .addRow("Alice", 123, 95.7)
+                        .addRow("Bob",   456, 36.6),
+                ((DataFrameValue) result).dataFrameValue()
+        );
+    }
+
+    @Test
+    public void nestedObjectProjection()
     {
         String scriptString =
                 "project {\n"
@@ -149,6 +190,39 @@ public class HierarchicalDataSetProjectionTest
                 new DataFrame("expected")
                         .addStringColumn("Person.name").addLongColumn("Lucky Number").addDoubleColumn("Temp").addStringColumn("Food")
                         .addRow("Alice", 123, 95.7, "Lutefisk"),
+                ((DataFrameValue) result).dataFrameValue()
+        );
+    }
+
+    @Test
+    public void nestedObjectProjectionWithDates()
+    {
+        String scriptString =
+                "project {\n"
+                + "    Person.name,\n"
+                + "    ${Lucky Number} : Person.luckyNumber,\n"
+                + "    Date : Person.specialDate,\n"
+                + "    FavoriteFood : Person.favoriteFood.description,\n"
+//                + "    LastEaten : Person.favoriteFood.lastEaten,\n"
+                + "    LastEatenDateOnly : Person.favoriteFood.lastEaten.toLocalDate\n"
+                + "}";
+
+        Script script = ExpressionParserHelper.DEFAULT.toScript(scriptString);
+
+        InMemoryEvaluationVisitor visitor = new InMemoryEvaluationVisitor();
+        visitor.getContext().addDataSet(this.dataSet);
+        this.dataSet.openFileForReading();
+
+        Value result = script.evaluate(visitor);
+
+        Assert.assertEquals(DataFrameValue.class, result.getClass());
+
+        DataFrameUtil.assertEquals(
+                new DataFrame("expected")
+                        .addStringColumn("Person.name").addLongColumn("Lucky Number").addDateColumn("Date")
+                        .addStringColumn("FavoriteFood").addDateColumn("LastEatenDateOnly")
+                        .addRow("Alice", 123, LocalDate.of(2022, 4, 3), "Lutefisk", LocalDate.of(1911, 11, 11))
+                        .addRow("Bob",   456, LocalDate.of(2022, 4, 2), "Chocolate", LocalDate.of(2022, 4, 6)),
                 ((DataFrameValue) result).dataFrameValue()
         );
     }

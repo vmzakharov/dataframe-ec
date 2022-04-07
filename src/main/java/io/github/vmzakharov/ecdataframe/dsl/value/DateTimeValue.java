@@ -16,7 +16,7 @@ extends AbstractValue
 
     public DateTimeValue(LocalDateTime newValue)
     {
-        ErrorReporter.reportAndThrow(newValue == null, "DateTime value cannot contain null, a void value should be used instead");
+        ErrorReporter.reportAndThrowIf(newValue == null, "DateTime value cannot contain null, a void value should be used instead");
         this.value = newValue;
     }
 

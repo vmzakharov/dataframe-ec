@@ -128,7 +128,7 @@ public class DataFrame
                     + newColumn.getName() + "' already bound to '" + newColumn.getDataFrame().getName() + "'");
         }
 
-        ErrorReporter.reportAndThrow(this.hasColumn(newColumn.getName()),
+        ErrorReporter.reportAndThrowIf(this.hasColumn(newColumn.getName()),
                 "Column named '" + newColumn.getName() + "' is already in data frame '" + this.getName() + "'");
 
         this.columnsByName.put(newColumn.getName(), newColumn);
@@ -274,7 +274,7 @@ public class DataFrame
                 this.addDateColumn(columnName);
                 break;
             default:
-                throw new RuntimeException("Cannot add a column for values of type " + type);
+                ErrorReporter.reportAndThrow("Cannot add a column " + columnName + " for values of type " + type);
         }
         return this;
     }
@@ -296,7 +296,7 @@ public class DataFrame
                 this.addDateColumn(columnName, expressionAsString);
                 break;
             default:
-                throw new RuntimeException("Cannot add a column for values of type " + type);
+                ErrorReporter.reportAndThrow("Cannot add a column " + columnName + " for values of type " + type);
         }
         return this;
     }
@@ -798,7 +798,7 @@ public class DataFrame
      */
     public DataFrame union(DataFrame other)
     {
-        ErrorReporter.reportAndThrow(this.columnCount() != other.columnCount(), "Attempting to union data frames with different numbers of columns");
+        ErrorReporter.reportAndThrowIf(this.columnCount() != other.columnCount(), "Attempting to union data frames with different numbers of columns");
         DataFrame dfUnion = new DataFrame("union");
 
         this.columns.forEach(

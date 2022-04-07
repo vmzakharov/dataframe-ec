@@ -51,7 +51,7 @@ final public class ErrorReporter
         exceptionFactories(RuntimeException::new, RuntimeException::new, UnsupportedOperationException::new);
     }
 
-    public static void reportAndThrow(boolean badThingHappened, String errorText)
+    public static void reportAndThrowIf(boolean badThingHappened, String errorText)
     {
         if (badThingHappened)
         {
@@ -59,7 +59,7 @@ final public class ErrorReporter
         }
     }
 
-    public static void reportAndThrow(boolean badThingHappened, Supplier<String> errorTextSupplier)
+    public static void reportAndThrowIf(boolean badThingHappened, Supplier<String> errorTextSupplier)
     {
         if (badThingHappened)
         {
