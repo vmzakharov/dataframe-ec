@@ -33,7 +33,7 @@ implements DfDateTimeColumn
         {
             this.addObject(null);
         }
-        else if (value.isDate())
+        else if (value.isDateTime())
         {
             this.addMyType(((DateTimeValue) value).dateTimeValue());
         }

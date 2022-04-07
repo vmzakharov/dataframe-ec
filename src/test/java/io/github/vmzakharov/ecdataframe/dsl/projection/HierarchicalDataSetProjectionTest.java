@@ -203,7 +203,7 @@ public class HierarchicalDataSetProjectionTest
                 + "    ${Lucky Number} : Person.luckyNumber,\n"
                 + "    Date : Person.specialDate,\n"
                 + "    FavoriteFood : Person.favoriteFood.description,\n"
-//                + "    LastEaten : Person.favoriteFood.lastEaten,\n"
+                + "    LastEaten : Person.favoriteFood.lastEaten,\n"
                 + "    LastEatenDateOnly : Person.favoriteFood.lastEaten.toLocalDate\n"
                 + "}";
 
@@ -220,9 +220,9 @@ public class HierarchicalDataSetProjectionTest
         DataFrameUtil.assertEquals(
                 new DataFrame("expected")
                         .addStringColumn("Person.name").addLongColumn("Lucky Number").addDateColumn("Date")
-                        .addStringColumn("FavoriteFood").addDateColumn("LastEatenDateOnly")
-                        .addRow("Alice", 123, LocalDate.of(2022, 4, 3), "Lutefisk", LocalDate.of(1911, 11, 11))
-                        .addRow("Bob",   456, LocalDate.of(2022, 4, 2), "Chocolate", LocalDate.of(2022, 4, 6)),
+                        .addStringColumn("FavoriteFood").addDateTimeColumn("LastEaten").addDateColumn("LastEatenDateOnly")
+                        .addRow("Alice", 123, LocalDate.of(2022, 4, 3), "Lutefisk",  LocalDateTime.of(1911, 11, 11, 11, 11, 11), LocalDate.of(1911, 11, 11))
+                        .addRow("Bob",   456, LocalDate.of(2022, 4, 2), "Chocolate", LocalDateTime.of(2022, 4, 6, 15, 24, 35),   LocalDate.of(2022, 4, 6)),
                 ((DataFrameValue) result).dataFrameValue()
         );
     }

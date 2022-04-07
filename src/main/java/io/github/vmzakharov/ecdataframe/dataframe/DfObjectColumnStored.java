@@ -38,26 +38,6 @@ implements DfColumnStored
         return this.objectToValue(this.getTypedObject(rowIndex));
     }
 
-    @Override
-    public void addValue(Value value)
-    {
-        if (value.isVoid())
-        {
-            this.addObject(null);
-        }
-        else if (value.isString())
-        {
-            this.addObject(value.stringValue());
-        }
-        else
-        {
-            throw new RuntimeException(
-                    "Attempting to add a value of type " + value.getType()
-                    + " to a string column " + this.getName()
-                    + ": " + value.asStringLiteral());
-        }
-    }
-
     protected void addMyType(T anObject)
     {
         if (this.pool == null)
