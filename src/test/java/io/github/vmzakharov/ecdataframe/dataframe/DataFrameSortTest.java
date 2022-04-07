@@ -6,6 +6,7 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 public class DataFrameSortTest
 {
@@ -348,5 +349,31 @@ public class DataFrameSortTest
                 ;
 
         DataFrameUtil.assertEquals(expected, dataFrame);
+    }
+
+    @Test
+    public void sortByDateTime()
+    {
+        DataFrame dataFrame = new DataFrame("FrameOfData")
+                .addStringColumn("Name").addDateTimeColumn("DateTime")
+                .addRow("Abigail", LocalDateTime.of(2020, 9, 11, 11, 12, 13))
+                .addRow("Carol",   LocalDateTime.of(2020, 9, 14, 11, 12, 13))
+                .addRow("Abigail", LocalDateTime.of(2020, 9, 10, 11, 12, 13))
+                .addRow("Bob",     LocalDateTime.of(2020, 9, 13, 11, 12, 13))
+                .addRow("Carol",                        null)
+                .addRow("Abigail",                      null);
+
+
+        DataFrame expected = new DataFrame("Expected FrameOfData")
+                .addStringColumn("Name").addDateTimeColumn("DateTime")
+                .addRow("Abigail",                      null)
+                .addRow("Abigail", LocalDateTime.of(2020, 9, 10, 11, 12, 13))
+                .addRow("Abigail", LocalDateTime.of(2020, 9, 11, 11, 12, 13))
+                .addRow("Bob",     LocalDateTime.of(2020, 9, 13, 11, 12, 13))
+                .addRow("Carol",                        null)
+                .addRow("Carol",   LocalDateTime.of(2020, 9, 14, 11, 12, 13))
+                ;
+
+        DataFrameUtil.assertEquals(expected, dataFrame.sortBy(Lists.immutable.of("Name", "DateTime")));
     }
 }
