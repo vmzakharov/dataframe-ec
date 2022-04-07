@@ -3,6 +3,7 @@ package io.github.vmzakharov.ecdataframe.dsl.projection;
 import io.github.vmzakharov.ecdataframe.dataframe.DataFrame;
 import io.github.vmzakharov.ecdataframe.dataframe.DataFrameUtil;
 import io.github.vmzakharov.ecdataframe.dataset.HierarchicalDataSet;
+import io.github.vmzakharov.ecdataframe.dataset.ObjectListDataSet;
 import io.github.vmzakharov.ecdataframe.dsl.EvalContext;
 import io.github.vmzakharov.ecdataframe.dsl.ProjectionExpr;
 import io.github.vmzakharov.ecdataframe.dsl.Script;
