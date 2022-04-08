@@ -21,7 +21,7 @@ extends DfObjectColumn<LocalDateTime>
 
     default ValueType getType()
     {
-        return ValueType.DATE;
+        return ValueType.DATE_TIME;
     }
 
     @Override

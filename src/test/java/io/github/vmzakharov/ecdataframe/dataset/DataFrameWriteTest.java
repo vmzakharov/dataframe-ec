@@ -6,6 +6,7 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 public class DataFrameWriteTest
 {
@@ -25,10 +26,10 @@ public class DataFrameWriteTest
         dataSet.write(dataFrame);
 
         String expected = "Name,EmployeeId,HireDate,Dept,Salary\n"
-                        + "\"Alice\",1234,2020-01-01,\"Accounting\",110000.0\n"
-                        + "\"Bob\",1233,2010-01-01,\"Bee-bee-boo-boo\",100000.0\n"
+                        + "\"Alice\",1234,2020-1-1,\"Accounting\",110000.0\n"
+                        + "\"Bob\",1233,2010-1-1,\"Bee-bee-boo-boo\",100000.0\n"
                         + "\"Carl\",10000,2005-11-21,\"Controllers\",130000.0\n"
-                        + "\"Diane\",10001,2012-09-20,\"\",\n"
+                        + "\"Diane\",10001,2012-9-20,\"\",\n"
                         + "\"Ed\",10002,,,0.0\n";
 
         Assert.assertEquals(expected, dataSet.getWrittenData());
@@ -99,6 +100,59 @@ public class DataFrameWriteTest
                 + "'Carl'|10000|2005-11-21|'Controllers'|-null-\n"
                 + "'Diane'|10001|2012-09-20|''|130000.0\n"
                 + "'Ed'|10002|-null-|-null-|0.0\n";
+
+        Assert.assertEquals(expected, dataSet.getWrittenData());
+    }
+
+    @Test
+    public void writeDateTime()
+    {
+        DataFrame dataFrame = new DataFrame("PeopleAndDateTimes")
+                .addStringColumn("Name").addDateTimeColumn("DateTime")
+                .addRow("Alice", LocalDateTime.of(2020,  9, 22, 13, 14, 15))
+                .addRow("Bob",   LocalDateTime.of(2021, 10, 23, 13, 14, 16))
+                .addRow("Carl", null)
+                .addRow("Diane", LocalDateTime.of(2023, 12, 24, 13, 14, 15)
+                );
+
+        StringBasedCsvDataSet dataSet = new StringBasedCsvDataSet("Foo", "People",  "");
+        dataSet.write(dataFrame);
+
+        String expected = "Name,DateTime\n"
+                        + "\"Alice\",2020-9-22T13:14:15\n"
+                        + "\"Bob\",2021-10-23T13:14:16\n"
+                        + "\"Carl\",\n"
+                        + "\"Diane\",2023-12-24T13:14:15\n";
+
+        Assert.assertEquals(expected, dataSet.getWrittenData());
+    }
+
+    @Test
+    public void writeDateTimeWithSchema()
+    {
+        DataFrame dataFrame = new DataFrame("PeopleAndDateTimes")
+                .addStringColumn("Name").addDateTimeColumn("DateTime")
+                .addRow("Alice", LocalDateTime.of(2020,  9, 22, 13, 14, 15))
+                .addRow("Bob",   LocalDateTime.of(2021, 10, 23, 13, 14, 16))
+                .addRow("Carl", null)
+                .addRow("Diane", LocalDateTime.of(2023, 12, 24, 13, 14, 15)
+                );
+
+        dataFrame.addDateTimeColumn("LooksDifferent", "DateTime");
+
+        CsvSchema schema = new CsvSchema();
+        schema.addColumn("Name",           ValueType.STRING);
+        schema.addColumn("DateTime",       ValueType.DATE_TIME, "uuuu-MM-dd'/'HH:mm:ss");
+        schema.addColumn("LooksDifferent", ValueType.DATE_TIME, "uuuu*M*d-HH*mm*ss");
+
+        StringBasedCsvDataSet dataSet = new StringBasedCsvDataSet("Foo", "People", schema, "");
+        dataSet.write(dataFrame);
+
+        String expected = "Name,DateTime,LooksDifferent\n"
+                        + "\"Alice\",2020-09-22/13:14:15,2020*9*22-13*14*15\n"
+                        + "\"Bob\",2021-10-23/13:14:16,2021*10*23-13*14*16\n"
+                        + "\"Carl\",,\n"
+                        + "\"Diane\",2023-12-24/13:14:15,2023*12*24-13*14*15\n";
 
         Assert.assertEquals(expected, dataSet.getWrittenData());
     }

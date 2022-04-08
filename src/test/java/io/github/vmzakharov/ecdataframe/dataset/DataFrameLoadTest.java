@@ -8,8 +8,10 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 import static io.github.vmzakharov.ecdataframe.dsl.value.ValueType.DATE;
+import static io.github.vmzakharov.ecdataframe.dsl.value.ValueType.DATE_TIME;
 import static io.github.vmzakharov.ecdataframe.dsl.value.ValueType.DOUBLE;
 import static io.github.vmzakharov.ecdataframe.dsl.value.ValueType.LONG;
 import static io.github.vmzakharov.ecdataframe.dsl.value.ValueType.STRING;
@@ -112,6 +114,58 @@ public class DataFrameLoadTest
                 .addRow("Carl", LocalDate.of(2005, 11, 21))
                 .addRow("Diane", LocalDate.of(2012, 9, 2))
                 .addRow("Ed", null);
+
+        DataFrameUtil.assertEquals(expected, loaded);
+    }
+
+    @Test
+    public void dateTimeDefaultParsing()
+    {
+        CsvDataSet dataSet = new StringBasedCsvDataSet("Foo", "Dates And Also Times",
+                "Name,DateTime\n"
+                + "\"Alice\",2020-9-22T13:14:15\n"
+                + "\"Bob\",2021-10-23T13:14:16\n"
+                + "\"Carl\",\n"
+                + "\"Diane\",2023-12-24T13:14:15\n"
+        );
+
+        DataFrame loaded = dataSet.loadAsDataFrame();
+
+        DataFrame expected = new DataFrame("Expected")
+                .addStringColumn("Name").addDateTimeColumn("DateTime")
+                .addRow("Alice", LocalDateTime.of(2020,  9, 22, 13, 14, 15))
+                .addRow("Bob",   LocalDateTime.of(2021, 10, 23, 13, 14, 16))
+                .addRow("Carl", null)
+                .addRow("Diane", LocalDateTime.of(2023, 12, 24, 13, 14, 15)
+            );
+
+        DataFrameUtil.assertEquals(expected, loaded);
+    }
+
+    @Test
+    public void dateTimeWithSchema()
+    {
+        CsvSchema schema = new CsvSchema();
+        schema.addColumn("Name", STRING);
+        schema.addColumn("Dates And Also Times", DATE_TIME, "uuuu*M*d-HH*mm*ss");
+
+        CsvDataSet dataSet = new StringBasedCsvDataSet("Foo", "Dates And Also Times", schema,
+                "Name,DateTime\n"
+                + "\"Alice\",2020*9*22-13*14*15\n"
+                + "\"Bob\",  2021*10*23-13*14*16\n"
+                + "\"Carl\", \n"
+                + "\"Diane\",2023*12*24-13*15*15\n"
+        );
+
+        DataFrame loaded = dataSet.loadAsDataFrame();
+
+        DataFrame expected = new DataFrame("Expected")
+                .addStringColumn("Name").addDateTimeColumn("Dates And Also Times")
+                .addRow("Alice", LocalDateTime.of(2020,  9, 22, 13, 14, 15))
+                .addRow("Bob",   LocalDateTime.of(2021, 10, 23, 13, 14, 16))
+                .addRow("Carl", null)
+                .addRow("Diane", LocalDateTime.of(2023, 12, 24, 13, 15, 15)
+            );
 
         DataFrameUtil.assertEquals(expected, loaded);
     }

@@ -19,8 +19,11 @@ final public class DataFrameUtil
         }
 
         Assert.assertEquals("Column names",
-                expected.getColumns().collect(DfColumn::getName),
-                actual.getColumns().collect(DfColumn::getName)
+                expected.getColumns().collect(DfColumn::getName), actual.getColumns().collect(DfColumn::getName)
+        );
+
+        Assert.assertEquals("Column types",
+                expected.getColumns().collect(DfColumn::getType), actual.getColumns().collect(DfColumn::getType)
         );
 
         int colCount = expected.columnCount();

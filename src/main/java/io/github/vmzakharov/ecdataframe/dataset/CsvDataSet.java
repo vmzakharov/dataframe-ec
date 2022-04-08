@@ -3,6 +3,7 @@ package io.github.vmzakharov.ecdataframe.dataset;
 import io.github.vmzakharov.ecdataframe.dataframe.DataFrame;
 import io.github.vmzakharov.ecdataframe.dataframe.DfColumn;
 import io.github.vmzakharov.ecdataframe.dataframe.DfDateColumn;
+import io.github.vmzakharov.ecdataframe.dataframe.DfDateTimeColumn;
 import io.github.vmzakharov.ecdataframe.dataframe.DfDoubleColumn;
 import io.github.vmzakharov.ecdataframe.dataframe.DfLongColumn;
 import io.github.vmzakharov.ecdataframe.dataframe.ErrorReporter;
@@ -24,6 +25,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.time.format.ResolverStyle;
@@ -32,6 +34,7 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
 import static io.github.vmzakharov.ecdataframe.dsl.value.ValueType.DATE;
+import static io.github.vmzakharov.ecdataframe.dsl.value.ValueType.DATE_TIME;
 import static io.github.vmzakharov.ecdataframe.dsl.value.ValueType.DOUBLE;
 import static io.github.vmzakharov.ecdataframe.dsl.value.ValueType.LONG;
 import static io.github.vmzakharov.ecdataframe.dsl.value.ValueType.STRING;
@@ -191,13 +194,16 @@ extends DataSetAbstract
                     LocalDate dateValue = ((DfDateColumn) dfColumn).getTypedObject(rowIndex);
                     valueAsLiteral = this.formatterForColumn(columnIndex).format(dateValue);
                     break;
+                case DATE_TIME:
+                    LocalDateTime dateTimeValue = ((DfDateTimeColumn) dfColumn).getTypedObject(rowIndex);
+                    valueAsLiteral = this.formatterForColumn(columnIndex).format(dateTimeValue);
+                    break;
                 default:
                     ErrorReporter.reportAndThrow("Do not know how to convert value of type " + dfColumn.getType() + " to a string");
                     valueAsLiteral = "";
             }
         }
 
-//        assert valueAsLiteral != null;
         writer.write(valueAsLiteral);
     }
 
@@ -533,6 +539,9 @@ extends DataSetAbstract
             case DATE:
                 columnPopulators.add(s -> lastColumn.addObject(schemaCol.parseAsLocalDate(s)));
                 break;
+            case DATE_TIME:
+                columnPopulators.add(s -> lastColumn.addObject(schemaCol.parseAsLocalDateTime(s)));
+                break;
             default:
                 throw new RuntimeException("Don't know what to do with the column type: " + columnType);
         }
@@ -566,7 +575,7 @@ extends DataSetAbstract
 
                 ValueType guessedType;
 
-                // element can be null if it is a null marker or if it and empty element (0-length)
+                // element can be null if it is a null marker or if it is an empty element (0-length)
                 if (element == null || element.isEmpty())
                 {
                     continue;
@@ -583,17 +592,25 @@ extends DataSetAbstract
                     {
                         guessedType = DATE;
                     }
-                    else if (this.canParseAsLong(element))
-                    {
-                        guessedType = LONG;
-                    }
-                    else if (this.canParseAsDouble(element))
-                    {
-                        guessedType = DOUBLE;
-                    }
                     else
                     {
-                        guessedType = STRING;
+                        matchingFormat = this.findMatchingDateTimeFormat(element);
+                        if (matchingFormat != null)
+                        {
+                            guessedType = DATE_TIME;
+                        }
+                        else if (this.canParseAsLong(element))
+                        {
+                            guessedType = LONG;
+                        }
+                        else if (this.canParseAsDouble(element))
+                        {
+                            guessedType = DOUBLE;
+                        }
+                        else
+                        {
+                            guessedType = STRING;
+                        }
                     }
                 }
 
@@ -610,10 +627,10 @@ extends DataSetAbstract
                 {
                     types[columnIndex] = DOUBLE;
                 }
-                else if (guessedType == DATE && types[columnIndex] == DATE
+                else if (((guessedType == DATE || guessedType == DATE_TIME) && types[columnIndex] == guessedType)
                         && !matchingFormat.equals(formats[columnIndex]))
                 {
-                    // still a date but mismatched formats
+                    // still a date or dateTime but mismatched formats
                     types[columnIndex] = STRING;
                     formats[columnIndex] = null;
                 }
@@ -704,6 +721,30 @@ extends DataSetAbstract
             {
                 DateTimeFormatter candidateFormatter = DateTimeFormatter.ofPattern(pattern).withResolverStyle(ResolverStyle.STRICT);
                 LocalDate.parse(trimmed, candidateFormatter);
+                return pattern;
+            }
+            catch (DateTimeParseException e)
+            {
+                // ignore
+            }
+        }
+
+        return null;
+    }
+
+    private String findMatchingDateTimeFormat(String aString)
+    {
+        ListIterable<String> dateFormats = Lists.immutable.of("uuuu-M-d'T'H:m:s");
+
+        String trimmed = aString.trim();
+        for (int i = 0; i < dateFormats.size(); i++)
+        {
+            String pattern = dateFormats.get(i);
+
+            try
+            {
+                DateTimeFormatter candidateFormatter = DateTimeFormatter.ofPattern(pattern).withResolverStyle(ResolverStyle.STRICT);
+                LocalDateTime.parse(trimmed, candidateFormatter);
                 return pattern;
             }
             catch (DateTimeParseException e)

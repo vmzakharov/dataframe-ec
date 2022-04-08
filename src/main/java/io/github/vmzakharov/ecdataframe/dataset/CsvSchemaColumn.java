@@ -6,6 +6,7 @@ import io.github.vmzakharov.ecdataframe.dataframe.DfLongColumnStored;
 import io.github.vmzakharov.ecdataframe.dsl.value.ValueType;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.ResolverStyle;
 
@@ -25,7 +26,22 @@ public class CsvSchemaColumn
         this.csvSchema = newCsvSchema;
         this.name = newName;
         this.type = newType;
-        this.pattern = (this.type.isDate() && newPattern == null) ? "uuuu-MM-dd" : newPattern;
+
+        if (newPattern == null && (this.type.isDate() || this.type.isDateTime()))
+        {
+            if (this.type.isDate())
+            {
+                this.pattern = "uuuu-M-d";
+            }
+            else
+            {
+                this.pattern = "uuuu-M-d'T'H:m:s";
+            }
+        }
+        else
+        {
+            this.pattern = newPattern;
+        }
 
         if (this.type.isDate() || this.type.isDateTime())
         {
@@ -66,6 +82,18 @@ public class CsvSchemaColumn
         String trimmed = aString.trim();
 
         return trimmed.isEmpty() ? null : LocalDate.parse(trimmed, this.dateTimeFormatter);
+    }
+
+    public LocalDateTime parseAsLocalDateTime(String aString)
+    {
+        if (aString == null)
+        {
+            return null;
+        }
+
+        String trimmed = aString.trim();
+
+        return trimmed.isEmpty() ? null : LocalDateTime.parse(trimmed, this.dateTimeFormatter);
     }
 
     public void parseAsDoubleAndAdd(String aString, DfColumn dfColumn)
