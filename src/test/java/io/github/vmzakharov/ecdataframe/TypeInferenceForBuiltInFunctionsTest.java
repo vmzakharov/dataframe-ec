@@ -73,6 +73,12 @@ public class TypeInferenceForBuiltInFunctionsTest
     }
 
     @Test
+    public void toDateTime()
+    {
+        assertScriptType("toDateTime(2001, 11, 22, 10, 10, 10)", ValueType.DATE_TIME);
+    }
+
+    @Test
     public void functionAddedAtRuntime()
     {
         BuiltInFunctions.addFunctionDescriptor(new IntrinsicFunctionDescriptor("two")

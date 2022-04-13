@@ -76,6 +76,17 @@ public class TypeInferenceTest
     }
 
     @Test
+    public void projectionInference()
+    {
+        assertScriptType(
+                "project {\n" +
+                "  p.x,\n" +
+                "  p.y,\n" +
+                "  abc: 'abc'\n" +
+                "}", ValueType.DATA_FRAME);
+    }
+
+    @Test
     public void scriptTypeInference()
     {
         assertScriptType(
