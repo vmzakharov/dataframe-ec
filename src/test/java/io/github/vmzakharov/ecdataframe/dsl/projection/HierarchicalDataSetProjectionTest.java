@@ -90,11 +90,11 @@ public class HierarchicalDataSetProjectionTest
     {
         String scriptString =
                 "project {\n"
-                        + "    Person.name,\n"
-                        + "    ${Lucky Number} : Person.luckyNumber,\n"
-                        + "    Temp : Person.temperature,\n"
-                        + "    Abc : \"ABC\"\n"
-                        + "}";
+                + "    Person.name,\n"
+                + "    ${Lucky Number} : Person.luckyNumber,\n"
+                + "    Temp : Person.temperature,\n"
+                + "    Abc : \"ABC\"\n"
+                + "}";
 
         EvalContext context = new SimpleEvalContext();
         context.addDataSet(this.dataSet);

@@ -79,11 +79,11 @@ public class TypeInferenceTest
     public void projectionInference()
     {
         assertScriptType(
-                "project {\n" +
-                "  p.x,\n" +
-                "  p.y,\n" +
-                "  abc: 'abc'\n" +
-                "}", ValueType.DATA_FRAME);
+                  "project {\n"
+                + "  p.x,\n"
+                + "  p.y,\n"
+                + "  abc: 'abc'\n"
+                + "}", ValueType.DATA_FRAME);
     }
 
     @Test
