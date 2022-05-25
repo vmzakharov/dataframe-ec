@@ -88,10 +88,26 @@ extends DataSetAbstract
         // Not needed for CSV files
     }
 
-    // todo: if set, interferes with type inference
-    public void convertEmptyElementsToNulls()
+    /**
+     * Empty values in the source file (two adjacent separators) will be loaded as null values as this data set is
+     * loaded into a data frame
+     * @return this data set
+     */
+    public CsvDataSet convertEmptyElementsToNulls()
     {
         this.emptyElementsConvertedToNulls = true;
+        return this;
+    }
+
+    /**
+     * Empty values in the source file (two adjacent separators) will be converted to the respective zero or empty
+     * values depending on the column type as this data set is loaded into a data frame
+     * @return this data set
+     */
+    public CsvDataSet convertEmptyElementsToValues()
+    {
+        this.emptyElementsConvertedToNulls = false;
+        return this;
     }
 
     @Override
