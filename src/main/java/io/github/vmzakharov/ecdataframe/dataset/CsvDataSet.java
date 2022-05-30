@@ -139,16 +139,19 @@ extends DataSetAbstract
         {
             int columnCount = dataFrame.columnCount();
 
-            for (int columnIndex = 0; columnIndex < columnCount; columnIndex++)
+            if (this.schema.hasHeaderLine())
             {
-                writer.write(this.schema.columnAt(columnIndex).getName());
-
-                if (columnIndex < columnCount - 1)
+                for (int columnIndex = 0; columnIndex < columnCount; columnIndex++)
                 {
-                    writer.write(this.getSchema().getSeparator());
+                    writer.write(this.schema.columnAt(columnIndex).getName());
+
+                    if (columnIndex < columnCount - 1)
+                    {
+                        writer.write(this.getSchema().getSeparator());
+                    }
                 }
+                writer.write('\n');
             }
-            writer.write('\n');
 
             int rowCount = dataFrame.rowCount();
             for (int rowIndex = 0; rowIndex < rowCount; rowIndex++)
@@ -437,18 +440,26 @@ extends DataSetAbstract
 
         try (BufferedReader reader = new BufferedReader(this.createReader(), BUFFER_SIZE))
         {
-            MutableList<String> headers = this.splitMindingQs(reader.readLine()).collect(this::removeSurroundingQuotes);
-
-            if (headers.anySatisfy(String::isEmpty))
+            MutableList<String> headers;
+            if (this.schema.hasHeaderLine())
             {
-                ErrorReporter.reportAndThrow("Error parsing a CSV file: a column header cannot be empty");
+                headers = this.splitMindingQs(reader.readLine()).collect(this::removeSurroundingQuotes);
+
+                if (headers.anySatisfy(String::isEmpty))
+                {
+                    ErrorReporter.reportAndThrow("Error parsing a CSV file: a column header cannot be empty");
+                }
+            }
+            else
+            {
+                headers = this.schema.getColumns().collect(CsvSchemaColumn::getName);
             }
 
             String dataRow = reader.readLine();
 
             if (dataRow == null) // no data, just headers
             {
-                if (this.getSchema().columnCount() == 0)
+                if (this.getSchema().columnCount() == 0) // schema does not have columns predefined and there is no data
                 {
                     headers.forEach(header -> this.schema.addColumn(header, STRING));
                 }

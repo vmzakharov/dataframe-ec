@@ -9,6 +9,7 @@ public class CsvSchema
     private String nullMarker;
     private char separator = ',';
     private char quoteCharacter = '"';
+    private boolean hasHeaderLine = true;
 
     private final MutableList<CsvSchemaColumn> columns = Lists.mutable.of();
 
@@ -26,6 +27,17 @@ public class CsvSchema
     public boolean hasNullMarker()
     {
         return this.nullMarker != null;
+    }
+
+    public boolean hasHeaderLine()
+    {
+        return this.hasHeaderLine;
+    }
+
+    public CsvSchema hasHeaderLine(boolean newHasHeaderLine)
+    {
+        this.hasHeaderLine = newHasHeaderLine;
+        return this;
     }
 
     public char getSeparator()
@@ -50,15 +62,16 @@ public class CsvSchema
         return this;
     }
 
-    public void addColumn(String name, ValueType type)
+    public CsvSchema addColumn(String name, ValueType type)
     {
-        this.addColumn(name, type, null);
+        return this.addColumn(name, type, null);
     }
 
-    public void addColumn(String name, ValueType type, String format)
+    public CsvSchema addColumn(String name, ValueType type, String format)
     {
         CsvSchemaColumn newColumn = new CsvSchemaColumn(this, name, type, format);
         this.columns.add(newColumn);
+        return this;
     }
 
     public MutableList<CsvSchemaColumn> getColumns()

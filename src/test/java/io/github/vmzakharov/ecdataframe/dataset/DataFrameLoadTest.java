@@ -778,7 +778,7 @@ public class DataFrameLoadTest
     }
 
     @Test(expected = RuntimeException.class)
-    public void emptyHeader()
+    public void emptyHeaderThrowsException()
     {
         CsvDataSet dataSet = new StringBasedCsvDataSet("Foo", "Employees",
                 "Name,EmployeeId,,HireDate,Salary,MaybeNumber\n"
@@ -787,6 +787,33 @@ public class DataFrameLoadTest
         );
 
         DataFrame df = dataSet.loadAsDataFrame();
+    }
+
+    @Test
+    public void noHeaderLineWithSchema()
+    {
+        CsvSchema schema = new CsvSchema()
+            .addColumn("Name", STRING)
+            .addColumn("EmployeeId", LONG)
+            .addColumn("HireDate", DATE, "uuuu-M-d")
+            .addColumn("Salary", DOUBLE)
+            .addColumn("DeptCode", LONG)
+            .hasHeaderLine(false);
+
+        CsvDataSet dataSet = new StringBasedCsvDataSet("Foo", "Employees", schema,
+                  "\"Bob\",1235,2010-01-01,100000.50,12\n"
+                + "\"Doris\",1237,2010-01-01,100000.70,15\n"
+        );
+
+        DataFrame df = dataSet.loadAsDataFrame();
+
+        DataFrameUtil.assertEquals(
+                new DataFrame("Employees")
+                        .addStringColumn("Name").addLongColumn("EmployeeId").addDateColumn("HireDate").addDoubleColumn("Salary").addLongColumn("DeptCode")
+                        .addRow("Bob", 1235, LocalDate.of(2010, 1, 1), 100_000.50, 12)
+                        .addRow("Doris", 1237, LocalDate.of(2010, 1, 1), 100_000.70, 15),
+                df
+        );
     }
 
     @Test(expected = RuntimeException.class)

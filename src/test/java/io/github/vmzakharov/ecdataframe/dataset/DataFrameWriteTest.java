@@ -8,6 +8,11 @@ import org.junit.Test;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
+import static io.github.vmzakharov.ecdataframe.dsl.value.ValueType.DATE;
+import static io.github.vmzakharov.ecdataframe.dsl.value.ValueType.DOUBLE;
+import static io.github.vmzakharov.ecdataframe.dsl.value.ValueType.LONG;
+import static io.github.vmzakharov.ecdataframe.dsl.value.ValueType.STRING;
+
 public class DataFrameWriteTest
 {
     @Test
@@ -153,6 +158,33 @@ public class DataFrameWriteTest
                         + "\"Bob\",2021-10-23/13:14:16,2021*10*23-13*14*16\n"
                         + "\"Carl\",,\n"
                         + "\"Diane\",2023-12-24/13:14:15,2023*12*24-13*14*15\n";
+
+        Assert.assertEquals(expected, dataSet.getWrittenData());
+    }
+
+    @Test
+    public void writeWithoutHeaderLine()
+    {
+        DataFrame dataFrame = new DataFrame("Employees")
+                .addStringColumn("Name").addLongColumn("EmployeeId").addDateColumn("HireDate").addDoubleColumn("Salary").addLongColumn("DeptCode")
+                .addRow("Bob", 1235, LocalDate.of(2010, 1, 1), 100_000.50, 12)
+                .addRow("Doris", 1237, LocalDate.of(2010, 1, 1), 100_000.70, 15)
+                ;
+
+        CsvSchema schema = new CsvSchema()
+                .addColumn("Name", STRING)
+                .addColumn("EmployeeId", LONG)
+                .addColumn("HireDate", DATE, "uuuu-MM-dd")
+                .addColumn("Salary", DOUBLE)
+                .addColumn("DeptCode", LONG)
+                .hasHeaderLine(false);
+
+        StringBasedCsvDataSet dataSet = new StringBasedCsvDataSet("Foo", "Employees", schema, "");
+        dataSet.write(dataFrame);
+
+        String expected =
+                  "\"Bob\",1235,2010-01-01,100000.5,12\n"
+                + "\"Doris\",1237,2010-01-01,100000.7,15\n";
 
         Assert.assertEquals(expected, dataSet.getWrittenData());
     }
