@@ -736,6 +736,7 @@ public class DataFrameLoadTest
 
         DataFrameUtil.assertEquals(expected, loaded);
     }
+
     @Test
     public void inferSchemaThenLoadWithNulls()
     {

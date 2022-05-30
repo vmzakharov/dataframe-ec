@@ -96,13 +96,13 @@ public abstract class AggregateFunction
 
     public Object applyToDoubleColumn(DfDoubleColumn doubleColumn)
     {
-        ErrorReporter.unsupported("Operation " + this.getDescription() + " cannot be applied to a double column");
+        this.throwNotApplicable("double values");
         return 0.0;
     }
 
     public Object applyToLongColumn(DfLongColumn longColumn)
     {
-        ErrorReporter.unsupported("Operation " + this.getDescription() + " cannot be applied to a long column");
+        this.throwNotApplicable("long values");
         return 0;
     }
 
@@ -114,15 +114,21 @@ public abstract class AggregateFunction
         }
         else
         {
-            ErrorReporter.reportAndThrow("Aggregation " + this.getDescription() + " cannot be performed on a column of a non-numeric type");
+            this.throwNotApplicable("non-numeric values");
         }
         return null;
     }
 
     public Object applyIterable(ListIterable<?> items)
     {
-        ErrorReporter.reportAndThrow("Aggregation " + this.getDescription() + " cannot be performed on a column of a non-numeric type");
+        this.throwNotApplicable("non-numeric values");
         return null;
+    }
+
+    private void throwNotApplicable(String scope)
+    {
+        ErrorReporter.unsupported(
+                "Aggregation '" + this.getName() + "' (" + this.getDescription() + ") cannot be performed on " + scope);
     }
 
     long longInitialValue()
@@ -161,23 +167,40 @@ public abstract class AggregateFunction
         return null;
     }
 
-    abstract public String getDescription();
+    /**
+     * A short name used to identify this aggregation function (such as 'Sum', 'Min', 'Avg', etc.). It is primarily
+     * meant for internal used (as opposed to the value returned by the <code>getDescription()</code> method).
+     * @return the name of this aggregation function
+     */
+    public String getName()
+    {
+        return this.getClass().getSimpleName();
+    }
+
+    /**
+     * A brief description of the aggregation operation supported by this function (primarily for display purposes)
+     * @return the description of this aggregation function
+     */
+    public String getDescription()
+    {
+        return this.getName();
+    }
 
     public Object defaultObjectIfEmpty()
     {
-        ErrorReporter.unsupported("Operation " + this.getDescription() + " is not defined on empty lists");
+        this.throwNotApplicable("empty lists");
         return null;
     }
 
     public long defaultLongIfEmpty()
     {
-        ErrorReporter.unsupported("Operation " + this.getDescription() + " is not defined on empty lists");
+        this.throwNotApplicable("empty lists");
         return 0;
     }
 
     public double defaultDoubleIfEmpty()
     {
-        ErrorReporter.unsupported("Operation " + this.getDescription() + " is not defined on empty lists");
+        this.throwNotApplicable("empty lists");
         return 0.0;
     }
 
@@ -241,6 +264,20 @@ public abstract class AggregateFunction
         return false;
     }
 
+    /**
+     * by default aggregators treat null values as "poisonous" - that is any null value passed in the aggregator will
+     * cause the result of the entire aggregation to be null, which is a sensible behavior for most aggregation
+     * functions.
+     *
+     * Override this method to return <code>false</code> if this aggregation function can handle null value.
+     *
+     * @return <code>true</code> if nulls are poisonous, <code>false</code> if nulls can be handled
+     */
+    public boolean nullsArePoisonous()
+    {
+        return true;
+    }
+
     public static class Sum
     extends AggregateFunction
     {
@@ -257,7 +294,7 @@ public abstract class AggregateFunction
         @Override
         public String getDescription()
         {
-            return "SUM";
+            return "Sum";
         }
 
         @Override
@@ -325,7 +362,7 @@ public abstract class AggregateFunction
         @Override
         public String getDescription()
         {
-            return "MAX";
+            return "Maximum numeric value";
         }
 
         @Override
@@ -381,7 +418,7 @@ public abstract class AggregateFunction
         @Override
         public String getDescription()
         {
-            return "MIN";
+            return "Minimum numeric value";
         }
 
         @Override
@@ -437,7 +474,7 @@ public abstract class AggregateFunction
         @Override
         public String getDescription()
         {
-            return "AVG";
+            return "Average, or mean of numeric values";
         }
 
         @Override
@@ -528,7 +565,7 @@ public abstract class AggregateFunction
         @Override
         public String getDescription()
         {
-            return "COUNT";
+            return "Count the number of rows in a set or a group within a set";
         }
 
         @Override
@@ -726,7 +763,7 @@ public abstract class AggregateFunction
         @Override
         public String getDescription()
         {
-            return "SAME";
+            return "All values in the set are the same";
         }
 
         @Override

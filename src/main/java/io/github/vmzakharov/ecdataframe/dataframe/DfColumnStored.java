@@ -14,20 +14,21 @@ extends DfColumn
     @Override
     default void applyAggregator(int targetRowIndex, DfColumn sourceColumn, int sourceRowIndex, AggregateFunction aggregator)
     {
-        // nulls are "poisonous"
-        if (this.isNull(targetRowIndex))
+        if (aggregator.nullsArePoisonous())
         {
-            return;
+            if (this.isNull(targetRowIndex))
+            {
+                return;
+            }
+
+            if (sourceColumn.isNull(sourceRowIndex))
+            {
+                this.setObject(targetRowIndex, null);
+                return;
+            }
         }
 
-        if (sourceColumn.isNull(sourceRowIndex))
-        {
-            this.setObject(targetRowIndex, null);
-        }
-        else
-        {
-            this.aggregateValueInto(targetRowIndex, sourceColumn, sourceRowIndex, aggregator);
-        }
+        this.aggregateValueInto(targetRowIndex, sourceColumn, sourceRowIndex, aggregator);
     }
 
     /**
