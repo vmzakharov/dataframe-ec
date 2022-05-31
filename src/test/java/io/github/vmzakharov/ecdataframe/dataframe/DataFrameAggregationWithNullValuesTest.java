@@ -133,7 +133,7 @@ public class DataFrameAggregationWithNullValuesTest
         }
 
         @Override
-        long longInitialValue()
+        public long longInitialValue()
         {
             return 0;
         }

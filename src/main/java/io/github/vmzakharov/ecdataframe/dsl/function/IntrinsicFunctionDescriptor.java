@@ -88,4 +88,11 @@ implements FunctionDescriptor
                 expected != actual,
                 () -> "Invalid parameter type in a call to '" + this.getName() + "'. " + this.usageString());
     }
+
+    protected void assertParameterType(ListIterable<ValueType> expected, ValueType actual)
+    {
+        ErrorReporter.reportAndThrowIf(
+                !expected.contains(actual),
+                () -> "Invalid parameter type in a call to '" + this.getName() + "'. " + this.usageString());
+    }
 }

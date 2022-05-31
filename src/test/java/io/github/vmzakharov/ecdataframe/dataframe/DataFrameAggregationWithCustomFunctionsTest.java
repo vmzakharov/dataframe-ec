@@ -87,7 +87,7 @@ public class DataFrameAggregationWithCustomFunctionsTest
         }
 
         @Override
-        long longInitialValue()
+        public long longInitialValue()
         {
             return 0;
         }
@@ -136,7 +136,7 @@ public class DataFrameAggregationWithCustomFunctionsTest
         }
 
         @Override
-        Object objectInitialValue()
+        public Object objectInitialValue()
         {
             return "";
         }
