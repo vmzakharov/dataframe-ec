@@ -23,13 +23,13 @@ import java.util.NoSuchElementException;
 public class ObjectListDataSet
 extends HierarchicalDataSet
 {
-    private final ListIterable<Object> items;
+    private final ListIterable<?> items;
     private int index = -1;
 
     private final MutableListMultimap<String, MethodHandle> valueGetters = Multimaps.mutable.list.of();
     private final MutableMap<String, ValueType> valueTypes = Maps.mutable.of();
 
-    public ObjectListDataSet(String newName, ListIterable<Object> newItems)
+    public ObjectListDataSet(String newName, ListIterable<?> newItems)
     {
         super(newName);
         this.items = newItems;
