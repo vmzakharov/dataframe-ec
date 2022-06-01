@@ -9,7 +9,7 @@ import org.eclipse.collections.api.list.ListIterable;
 import org.junit.Assert;
 import org.junit.Test;
 
-public class RuntimeAddedFuntionTest
+public class RuntimeAddedFunctionTest
 {
     @Test
     public void simple()
