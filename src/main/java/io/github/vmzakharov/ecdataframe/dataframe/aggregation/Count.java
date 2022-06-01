@@ -6,10 +6,20 @@ import io.github.vmzakharov.ecdataframe.dataframe.DfDoubleColumn;
 import io.github.vmzakharov.ecdataframe.dataframe.DfLongColumn;
 import io.github.vmzakharov.ecdataframe.dataframe.DfObjectColumn;
 import io.github.vmzakharov.ecdataframe.dsl.value.ValueType;
+import org.eclipse.collections.api.list.ListIterable;
+import org.eclipse.collections.impl.factory.Lists;
+
+import static io.github.vmzakharov.ecdataframe.dsl.value.ValueType.DATE;
+import static io.github.vmzakharov.ecdataframe.dsl.value.ValueType.DATE_TIME;
+import static io.github.vmzakharov.ecdataframe.dsl.value.ValueType.DOUBLE;
+import static io.github.vmzakharov.ecdataframe.dsl.value.ValueType.LONG;
+import static io.github.vmzakharov.ecdataframe.dsl.value.ValueType.STRING;
 
 public class Count
-        extends AggregateFunction
+extends AggregateFunction
 {
+    private static final ListIterable<ValueType> SUPPORTED_TYPES = Lists.immutable.of(LONG, DOUBLE, STRING, DATE, DATE_TIME);
+
     public Count(String newColumnName)
     {
         super(newColumnName);
@@ -24,6 +34,12 @@ public class Count
     public ValueType targetColumnType(ValueType sourceColumnType)
     {
         return ValueType.LONG;
+    }
+
+    @Override
+    public ListIterable<ValueType> supportedSourceTypes()
+    {
+        return SUPPORTED_TYPES;
     }
 
     @Override

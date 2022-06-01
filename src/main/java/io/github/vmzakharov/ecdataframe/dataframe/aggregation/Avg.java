@@ -7,10 +7,18 @@ import io.github.vmzakharov.ecdataframe.dataframe.DfDoubleColumn;
 import io.github.vmzakharov.ecdataframe.dataframe.DfDoubleColumnStored;
 import io.github.vmzakharov.ecdataframe.dataframe.DfLongColumn;
 import io.github.vmzakharov.ecdataframe.dataframe.DfLongColumnStored;
+import io.github.vmzakharov.ecdataframe.dsl.value.ValueType;
+import org.eclipse.collections.api.list.ListIterable;
+import org.eclipse.collections.impl.factory.Lists;
+
+import static io.github.vmzakharov.ecdataframe.dsl.value.ValueType.DOUBLE;
+import static io.github.vmzakharov.ecdataframe.dsl.value.ValueType.LONG;
 
 public class Avg
-        extends AggregateFunction
+extends AggregateFunction
 {
+    private static final ListIterable<ValueType> SUPPORTED_TYPES = Lists.immutable.of(LONG, DOUBLE);
+
     public Avg(String newColumnName)
     {
         super(newColumnName);
@@ -19,6 +27,12 @@ public class Avg
     public Avg(String newColumnName, String newTargetColumnName)
     {
         super(newColumnName, newTargetColumnName);
+    }
+
+    @Override
+    public ListIterable<ValueType> supportedSourceTypes()
+    {
+        return SUPPORTED_TYPES;
     }
 
     @Override

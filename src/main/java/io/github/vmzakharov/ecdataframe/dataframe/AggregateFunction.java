@@ -100,6 +100,8 @@ public abstract class AggregateFunction
         return sourceColumnType;
     }
 
+    abstract public ListIterable<ValueType> supportedSourceTypes();
+
     public Object applyToDoubleColumn(DfDoubleColumn doubleColumn)
     {
         this.throwNotApplicable("double values");

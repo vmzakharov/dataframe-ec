@@ -1,10 +1,13 @@
 package io.github.vmzakharov.ecdataframe.dataframe;
 
 import io.github.vmzakharov.ecdataframe.dsl.value.ValueType;
+import org.eclipse.collections.api.list.ListIterable;
 import org.eclipse.collections.impl.factory.Lists;
 import org.junit.Test;
 
 import java.time.LocalDate;
+
+import static io.github.vmzakharov.ecdataframe.dsl.value.ValueType.*;
 
 public class DataFrameAggregationWithNullValuesTest
 {
@@ -133,6 +136,12 @@ public class DataFrameAggregationWithNullValuesTest
         }
 
         @Override
+        public ListIterable<ValueType> supportedSourceTypes()
+        {
+            return Lists.immutable.of(LONG, DOUBLE, STRING, DATE, DATE_TIME);
+        }
+
+        @Override
         public long longInitialValue()
         {
             return 0;
@@ -200,7 +209,7 @@ public class DataFrameAggregationWithNullValuesTest
         @Override
         public ValueType targetColumnType(ValueType sourceColumnType)
         {
-            return ValueType.LONG;
+            return LONG;
         }
 
         @Override
@@ -227,6 +236,12 @@ public class DataFrameAggregationWithNullValuesTest
         public String getDescription()
         {
             return "Sum ignoring null values";
+        }
+
+        @Override
+        public ListIterable<ValueType> supportedSourceTypes()
+        {
+            return Lists.immutable.of(LONG, DOUBLE);
         }
 
         @Override

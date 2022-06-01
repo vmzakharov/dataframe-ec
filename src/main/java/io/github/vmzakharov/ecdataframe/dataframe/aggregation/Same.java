@@ -8,10 +8,14 @@ import io.github.vmzakharov.ecdataframe.dataframe.DfLongColumn;
 import io.github.vmzakharov.ecdataframe.dataframe.DfLongColumnStored;
 import io.github.vmzakharov.ecdataframe.dsl.value.ValueType;
 import org.eclipse.collections.api.list.ListIterable;
+import org.eclipse.collections.impl.factory.Lists;
+
+import static io.github.vmzakharov.ecdataframe.dsl.value.ValueType.*;
 
 public class Same
-        extends AggregateFunction
+extends AggregateFunction
 {
+    private static final ListIterable<ValueType> SUPPORTED_TYPES = Lists.immutable.of(LONG, DOUBLE, STRING, DATE, DATE_TIME);
     private static final long INITIAL_VALUE_LONG = System.nanoTime();
     private static final double INITIAL_VALUE_DOUBLE = INITIAL_VALUE_LONG;
     private static final Object INITIAL_VALUE_OBJECT = new Object();
@@ -144,5 +148,11 @@ public class Same
     public ValueType targetColumnType(ValueType sourceColumnType)
     {
         return sourceColumnType;
+    }
+
+    @Override
+    public ListIterable<ValueType> supportedSourceTypes()
+    {
+        return SUPPORTED_TYPES;
     }
 }

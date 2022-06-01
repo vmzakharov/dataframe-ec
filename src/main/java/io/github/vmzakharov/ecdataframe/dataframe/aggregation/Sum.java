@@ -3,10 +3,15 @@ package io.github.vmzakharov.ecdataframe.dataframe.aggregation;
 import io.github.vmzakharov.ecdataframe.dataframe.AggregateFunction;
 import io.github.vmzakharov.ecdataframe.dataframe.DfDoubleColumn;
 import io.github.vmzakharov.ecdataframe.dataframe.DfLongColumn;
+import io.github.vmzakharov.ecdataframe.dsl.value.ValueType;
+import org.eclipse.collections.api.list.ListIterable;
+import org.eclipse.collections.impl.factory.Lists;
 
 public class Sum
-        extends AggregateFunction
+extends AggregateFunction
 {
+    private static final ListIterable<ValueType> SUPPORTED_TYPES = Lists.immutable.of(ValueType.LONG, ValueType.DOUBLE);
+
     public Sum(String newColumnName)
     {
         super(newColumnName);
@@ -15,6 +20,12 @@ public class Sum
     public Sum(String newColumnName, String newTargetColumnName)
     {
         super(newColumnName, newTargetColumnName);
+    }
+
+    @Override
+    public ListIterable<ValueType> supportedSourceTypes()
+    {
+        return SUPPORTED_TYPES;
     }
 
     @Override

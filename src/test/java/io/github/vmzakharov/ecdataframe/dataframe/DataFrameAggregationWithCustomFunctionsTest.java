@@ -1,11 +1,14 @@
 package io.github.vmzakharov.ecdataframe.dataframe;
 
 import io.github.vmzakharov.ecdataframe.dsl.value.ValueType;
+import org.eclipse.collections.api.list.ListIterable;
 import org.eclipse.collections.impl.factory.Lists;
 import org.junit.Before;
 import org.junit.Test;
 
 import java.time.LocalDate;
+
+import static io.github.vmzakharov.ecdataframe.dsl.value.ValueType.STRING;
 
 public class DataFrameAggregationWithCustomFunctionsTest
 {
@@ -86,6 +89,11 @@ public class DataFrameAggregationWithCustomFunctionsTest
             super(newColumnName, newTargetColumnName);
         }
 
+        public ListIterable<ValueType> supportedSourceTypes()
+        {
+            return Lists.immutable.of(STRING);
+        }
+
         @Override
         public long longInitialValue()
         {
@@ -135,6 +143,11 @@ public class DataFrameAggregationWithCustomFunctionsTest
             super(newColumnName, newTargetColumnName);
         }
 
+        public ListIterable<ValueType> supportedSourceTypes()
+        {
+            return Lists.immutable.of(STRING);
+        }
+
         @Override
         public Object objectInitialValue()
         {
@@ -162,7 +175,7 @@ public class DataFrameAggregationWithCustomFunctionsTest
         @Override
         public ValueType targetColumnType(ValueType sourceColumnType)
         {
-            return ValueType.STRING;
+            return STRING;
         }
     }
 }

@@ -24,6 +24,8 @@ import java.time.LocalDateTime;
 import java.time.Period;
 import java.time.format.DateTimeFormatter;
 
+import static io.github.vmzakharov.ecdataframe.dsl.value.ValueType.*;
+
 final public class BuiltInFunctions
 {
     private static final MutableMap<String, IntrinsicFunctionDescriptor> FUNCTIONS_BY_NAME = Maps.mutable.of();
@@ -83,7 +85,7 @@ final public class BuiltInFunctions
             @Override
             public ValueType returnType(ListIterable<ValueType> paraValueTypes)
             {
-                return ValueType.BOOLEAN;
+                return BOOLEAN;
             }
         });
 
@@ -101,7 +103,7 @@ final public class BuiltInFunctions
             @Override
             public ValueType returnType(ListIterable<ValueType> paraValueTypes)
             {
-                return ValueType.BOOLEAN;
+                return BOOLEAN;
             }
         });
 
@@ -116,7 +118,7 @@ final public class BuiltInFunctions
             @Override
             public ValueType returnType(ListIterable<ValueType> parameterTypes)
             {
-                return ValueType.STRING;
+                return STRING;
             }
         });
 
@@ -131,7 +133,7 @@ final public class BuiltInFunctions
             @Override
             public ValueType returnType(ListIterable<ValueType> parameterTypes)
             {
-                return ValueType.STRING;
+                return STRING;
             }
         });
 
@@ -168,7 +170,7 @@ final public class BuiltInFunctions
             @Override
             public ValueType returnType(ListIterable<ValueType> paraValueTypes)
             {
-                return ValueType.STRING;
+                return STRING;
             }
 
             @Override
@@ -192,7 +194,7 @@ final public class BuiltInFunctions
 
                 if (!parameter.isNumber())
                 {
-                    this.assertParameterType(parameter.getType(), ValueType.NUMBER);
+                    this.assertParameterType(Lists.immutable.of(DOUBLE, LONG), parameter.getType());
                 }
 
                 if (parameter.isDouble())
@@ -224,7 +226,7 @@ final public class BuiltInFunctions
             @Override
             public ValueType returnType(ListIterable<ValueType> paraValueTypes)
             {
-                return ValueType.STRING;
+                return STRING;
             }
         });
 
@@ -259,7 +261,7 @@ final public class BuiltInFunctions
             @Override
             public ValueType returnType(ListIterable<ValueType> parameterTypes)
             {
-                return ValueType.DATE;
+                return DATE;
             }
 
             @Override
@@ -316,7 +318,7 @@ final public class BuiltInFunctions
             @Override
             public ValueType returnType(ListIterable<ValueType> parameterTypes)
             {
-                return ValueType.DATE_TIME;
+                return DATE_TIME;
             }
 
             @Override
@@ -332,7 +334,7 @@ final public class BuiltInFunctions
             public Value evaluate(EvalContext context)
             {
                 Value parameter = context.getVariable("string");
-                this.assertParameterType(ValueType.STRING, parameter.getType());
+                this.assertParameterType(STRING, parameter.getType());
                 String aString = parameter.stringValue();
 
                 return new LongValue(Long.parseLong(aString));
@@ -341,7 +343,7 @@ final public class BuiltInFunctions
             @Override
             public ValueType returnType(ListIterable<ValueType> parameterTypes)
             {
-                return ValueType.LONG;
+                return LONG;
             }
         });
 
@@ -351,7 +353,7 @@ final public class BuiltInFunctions
             public Value evaluate(EvalContext context)
             {
                 Value parameter = context.getVariable("string");
-                this.assertParameterType(ValueType.STRING, parameter.getType());
+                this.assertParameterType(STRING, parameter.getType());
                 String aString = parameter.stringValue();
 
                 return new DoubleValue(Double.parseDouble(aString));
@@ -360,7 +362,7 @@ final public class BuiltInFunctions
             @Override
             public ValueType returnType(ListIterable<ValueType> paraValueTypes)
             {
-                return ValueType.DOUBLE;
+                return DOUBLE;
             }
         });
 
@@ -381,7 +383,7 @@ final public class BuiltInFunctions
             @Override
             public ValueType returnType(ListIterable<ValueType> paraValueTypes)
             {
-                return ValueType.BOOLEAN;
+                return BOOLEAN;
             }
         });
     }

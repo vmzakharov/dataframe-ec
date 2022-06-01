@@ -11,6 +11,11 @@ import static io.github.vmzakharov.ecdataframe.dataframe.AggregateFunction.max;
 import static io.github.vmzakharov.ecdataframe.dataframe.AggregateFunction.min;
 import static io.github.vmzakharov.ecdataframe.dataframe.AggregateFunction.same;
 import static io.github.vmzakharov.ecdataframe.dataframe.AggregateFunction.sum;
+import static io.github.vmzakharov.ecdataframe.dsl.value.ValueType.DATE;
+import static io.github.vmzakharov.ecdataframe.dsl.value.ValueType.DATE_TIME;
+import static io.github.vmzakharov.ecdataframe.dsl.value.ValueType.DOUBLE;
+import static io.github.vmzakharov.ecdataframe.dsl.value.ValueType.LONG;
+import static io.github.vmzakharov.ecdataframe.dsl.value.ValueType.STRING;
 
 public class DataFrameAggregationTest
 {
@@ -280,5 +285,16 @@ public class DataFrameAggregationTest
             Lists.immutable.of(avg("NA"), count("NA"), max("NA"), min("NA"), same("NA"), sum("NA"))
                     .collect(AggregateFunction::getName)
         );
+    }
+
+    @Test
+    public void builtInAggregationSupportedTypes()
+    {
+        Assert.assertEquals(Lists.immutable.of(LONG, DOUBLE), avg("NA").supportedSourceTypes());
+        Assert.assertEquals(Lists.immutable.of(LONG, DOUBLE, STRING, DATE, DATE_TIME), count("NA").supportedSourceTypes());
+        Assert.assertEquals(Lists.immutable.of(LONG, DOUBLE), max("NA").supportedSourceTypes());
+        Assert.assertEquals(Lists.immutable.of(LONG, DOUBLE), min("NA").supportedSourceTypes());
+        Assert.assertEquals(Lists.immutable.of(LONG, DOUBLE, STRING, DATE, DATE_TIME), same("NA").supportedSourceTypes());
+        Assert.assertEquals(Lists.immutable.of(LONG, DOUBLE), sum("NA").supportedSourceTypes());
     }
 }
