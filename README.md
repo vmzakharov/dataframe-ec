@@ -1,3 +1,4 @@
+
 # dataframe-ec
 A tabular data structure (aka a data frame) based on the Eclipse Collections framework. The underlying data frame structure is columnar, with focus on memory optimization achieved by using efficient Eclipse Collections data structures and APIs.
 
@@ -9,7 +10,7 @@ For more on Eclipse Collections see: https://www.eclipse.org/collections/.
 <dependency>
   <groupId>io.github.vmzakharov</groupId>
   <artifactId>dataframe-ec</artifactId>
-  <version>0.17.3</version>
+  <version>0.18.0</version>
 </dependency>
 ```
 
@@ -139,6 +140,36 @@ Customer | Count | Price | Date
 "Alice" | 4 | 19.5000 | 2020-10-19
 "Carl" | 11 | 44.7800 | 2020-12-25
 "Doris" | 1 | 5.0000 | 2020-09-01
+
+A data frame can also be created from a hierarchical data set via a **projection operator** supported by the DSL. Let's say we have two record types: `Person` and `Address`. Then we can use the projection operator to turn a list of `Person` objects into a data frame as follows.
+
+```
+var visitor = new InMemoryEvaluationVisitor();
+visitor.getContext().addDataSet(
+        new ObjectListDataSet("Person", Lists.immutable.of(
+            new Person("Alice", 30, new Address("Brooklyn", "North Dakota")),
+            new Person("Bob", 40, new Address("Lexington", "Nebraska")),
+            new Person("Carl", 50, new Address("Northwood", "Idaho"))
+        )));
+
+var script = ExpressionParserHelper.DEFAULT.toScript("""
+        project {
+            Name : Person.name,
+            ${Lucky Number} : Person.luckyNumber,
+            State : Person.address.state
+        }
+        """);
+
+DataFrame projectionValue = ((DataFrameValue) script.evaluate(visitor)).dataFrameValue();
+```
+
+`projectionValue`
+
+Name | Lucky Number | State
+---|---:|---
+"Alice" | 30 | "North Dakota"
+"Bob" | 40 | "Nebraska"
+"Carl" | 50 | "Idaho"
 
 #### Sum of Columns
 ```
@@ -445,7 +476,7 @@ substr(a + b, 3)
 
 ### Expressions
 
-Category | Type                         | Example
+Category | Expression                   | Example
 ------------ |------------------------------| -------------
 Unary | `-`<br>`not`                 | `-123`<br>`not (a > b)`
 Binary Arithmetic | `+` `-` `*` `/`              | `1 + 2`<br>`unit_price * quantity`<br>string concatenation:<br> `"Hello, " + "world!"`
@@ -478,7 +509,8 @@ print | print()
 println | println()
 startsWith | startsWith(string, prefix)
 substr | substr(string, beginIndex[, endIndex])
-toDate | toDate(string in the yyyy-mm-dd format)
+toDate | toDate(string in the yyyy-mm-dd format)<br>toDate(yyyy, mm, dd)
+toDateTime | toDateTime(yyyy, mm, dd, hh, mm, ss)
 toDouble | toDouble(string)
 toLong | toLong(string)
 toString | toString(number)
