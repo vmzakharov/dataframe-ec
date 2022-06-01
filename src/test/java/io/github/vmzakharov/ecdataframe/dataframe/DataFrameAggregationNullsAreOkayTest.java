@@ -9,7 +9,7 @@ import java.time.LocalDate;
 
 import static io.github.vmzakharov.ecdataframe.dsl.value.ValueType.*;
 
-public class DataFrameAggregationWithNullValuesTest
+public class DataFrameAggregationNullsAreOkayTest
 {
     @Test
     public void countNulls()

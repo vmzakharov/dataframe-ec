@@ -9,7 +9,7 @@ import static io.github.vmzakharov.ecdataframe.dataframe.AggregateFunction.max;
 import static io.github.vmzakharov.ecdataframe.dataframe.AggregateFunction.min;
 import static io.github.vmzakharov.ecdataframe.dataframe.AggregateFunction.sum;
 
-public class DataFrameAggregationWithNullsTest
+public class DataFrameAggregationNullsArePoisonousTest
 {
     @Test
     public void aggregationsAllWithCalculatedColumnsWithNulls()
