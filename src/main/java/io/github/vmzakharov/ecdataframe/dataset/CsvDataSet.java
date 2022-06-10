@@ -486,8 +486,19 @@ extends DataSetAbstract
             else if (headers.size() != this.schema.columnCount())
             {
                 ErrorReporter.reportAndThrow(String.format(
-                                "The number of elements in the header does not match the number of columns in the schema %d vs %d",
+                                "The number of elements in the header (%d) does not match the number of columns in the schema (%d)",
                                 headers.size(), this.schema.columnCount()));
+            }
+            else
+            {
+                MutableList<String> schemaColumnNames = this.schema.getColumns().collect(CsvSchemaColumn::getName);
+                if (!headers.equals(schemaColumnNames))
+                {
+                    ErrorReporter.reportAndThrow(
+                        "Mismatch between the column header names in the data set " + headers.makeString("[", ",", "]")
+                        + " and in the schema: " + schemaColumnNames.makeString("[", ",", "]")
+                        );
+                }
             }
 
             MutableList<Procedure<String>> columnPopulators = Lists.mutable.of();

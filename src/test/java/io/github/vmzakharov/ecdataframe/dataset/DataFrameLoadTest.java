@@ -147,7 +147,7 @@ public class DataFrameLoadTest
     {
         CsvSchema schema = new CsvSchema();
         schema.addColumn("Name", STRING);
-        schema.addColumn("Dates And Also Times", DATE_TIME, "uuuu*M*d-HH*mm*ss");
+        schema.addColumn("DateTime", DATE_TIME, "uuuu*M*d-HH*mm*ss");
 
         CsvDataSet dataSet = new StringBasedCsvDataSet("Foo", "Dates And Also Times", schema,
                 "Name,DateTime\n"
@@ -160,7 +160,7 @@ public class DataFrameLoadTest
         DataFrame loaded = dataSet.loadAsDataFrame();
 
         DataFrame expected = new DataFrame("Expected")
-                .addStringColumn("Name").addDateTimeColumn("Dates And Also Times")
+                .addStringColumn("Name").addDateTimeColumn("DateTime")
                 .addRow("Alice", LocalDateTime.of(2020,  9, 22, 13, 14, 15))
                 .addRow("Bob",   LocalDateTime.of(2021, 10, 23, 13, 14, 16))
                 .addRow("Carl", null)
@@ -267,11 +267,11 @@ public class DataFrameLoadTest
     {
         CsvDataSet dataSet = new StringBasedCsvDataSet("Foo", "Dates",
                 "Name,Date\n"
-                        + "\"Alice\",1-Jan-2020,10\n"
-                        + "\"Bob\",01-Jan-2010,11\n"
-                        + "\"Carl\",21-Nov-2005,12\n"
-                        + "\"Diane\",2-Sep-2012,13\n"
-                        + "\"Ed\","
+                + "\"Alice\",1-Jan-2020,10\n"
+                + "\"Bob\",01-Jan-2010,11\n"
+                + "\"Carl\",21-Nov-2005,12\n"
+                + "\"Diane\",2-Sep-2012,13\n"
+                + "\"Ed\","
         );
 
         DataFrame loaded = dataSet.loadAsDataFrame();
@@ -280,7 +280,7 @@ public class DataFrameLoadTest
     }
 
     @Test(expected = RuntimeException.class)
-    public void schemaDataMismatchThrowsException()
+    public void schemaColumnCountMismatchThrowsException()
     {
 
         CsvSchema schema = new CsvSchema();
@@ -290,16 +290,35 @@ public class DataFrameLoadTest
 
         CsvDataSet dataSet = new StringBasedCsvDataSet("Foo", "Dates", schema,
                 "Name,Date\n"
-                        + "\"Alice\",1-Jan-2020\n"
-                        + "\"Bob\",01-Jan-2010\n"
-                        + "\"Carl\",21-Nov-2005\n"
-                        + "\"Diane\",2-Sep-2012\n"
-                        + "\"Ed\","
+                + "\"Alice\",1-Jan-2020\n"
+                + "\"Bob\",01-Jan-2010\n"
+                + "\"Carl\",21-Nov-2005\n"
+                + "\"Diane\",2-Sep-2012\n"
+                + "\"Ed\","
         );
 
-        DataFrame loaded = dataSet.loadAsDataFrame();
+        Assert.assertNotNull(dataSet.loadAsDataFrame());
+    }
 
-        Assert.assertNotNull(loaded);
+    @Test(expected = RuntimeException.class)
+    public void schemaColumnNameMismatchThrowsException()
+    {
+
+        CsvSchema schema = new CsvSchema();
+        schema.addColumn("Name", STRING);
+        schema.addColumn("Date", DATE, "d-MMM-uuuu");
+        schema.addColumn("Number", LONG);
+
+        CsvDataSet dataSet = new StringBasedCsvDataSet("Foo", "Dates", schema,
+                "Name,Something,Number\n"
+                + "\"Alice\",1-Jan-2020,1\n"
+                + "\"Bob\",01-Jan-2010,2\n"
+                + "\"Carl\",21-Nov-2005,3\n"
+                + "\"Diane\",2-Sep-2012,4\n"
+                + "\"Ed\",,5"
+        );
+
+        Assert.assertNotNull(dataSet.loadAsDataFrame());
     }
 
     @Test(expected = RuntimeException.class)
