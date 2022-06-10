@@ -1,5 +1,6 @@
 package io.github.vmzakharov.ecdataframe.dataframe;
 
+import io.github.vmzakharov.ecdataframe.util.Printer;
 import io.github.vmzakharov.ecdataframe.util.PrinterFactory;
 import org.eclipse.collections.api.block.function.Function;
 import org.eclipse.collections.api.block.function.Function2;
@@ -11,6 +12,10 @@ final public class ErrorReporter
     private static Function<String, ? extends RuntimeException> exceptionWithMessage;
     private static Function2<String, Throwable, ? extends RuntimeException> exceptionWithMessageAndCause;
     private static Function<String, ? extends RuntimeException> unsupportedWithMessage;
+
+    private static Printer errorPrinter;
+
+    private static String printedMessagePrefix;
 
     static
     {
@@ -49,6 +54,19 @@ final public class ErrorReporter
     public static void initialize()
     {
         exceptionFactories(RuntimeException::new, RuntimeException::new, UnsupportedOperationException::new);
+
+        setErrorPrinter(PrinterFactory.getErrPrinter());
+        setPrintedMessagePrefix("ERROR: ");
+    }
+
+    public static void setErrorPrinter(Printer newErrorPrinter)
+    {
+        ErrorReporter.errorPrinter = newErrorPrinter;
+    }
+
+    public static void setPrintedMessagePrefix(String newPrintedMessagePrefix)
+    {
+        ErrorReporter.printedMessagePrefix = newPrintedMessagePrefix;
     }
 
     public static void reportAndThrowIf(boolean badThingHappened, String errorText)
@@ -69,19 +87,19 @@ final public class ErrorReporter
 
     public static void unsupported(String errorText)
     {
-        PrinterFactory.getErrPrinter().println("ERROR: " + errorText);
+        errorPrinter.println(printedMessagePrefix + errorText);
         throw unsupportedWithMessage.apply(errorText);
     }
 
     public static void reportAndThrow(String errorText)
     {
-        PrinterFactory.getErrPrinter().println("ERROR: " + errorText);
+        errorPrinter.println(printedMessagePrefix + errorText);
         throw exceptionWithMessage.apply(errorText);
     }
 
     public static void reportAndThrow(String errorText, Throwable cause)
     {
-        PrinterFactory.getErrPrinter().println("ERROR: " + errorText);
+        errorPrinter.println(printedMessagePrefix + errorText);
         throw exceptionWithMessageAndCause.apply(errorText, cause);
     }
 }

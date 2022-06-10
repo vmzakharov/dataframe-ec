@@ -108,6 +108,47 @@ public class ErrorReporterTest
         }
     }
 
+    @Test
+    public void errorPrinter()
+    {
+        CollectingPrinter printer = new CollectingPrinter();
+        ErrorReporter.setPrintedMessagePrefix("Boo-boo: ");
+        ErrorReporter.setErrorPrinter(printer);
+
+        try
+        {
+            ErrorReporter.reportAndThrow("ouch");
+        }
+        catch (RuntimeException e)
+        {
+            Assert.assertEquals("Boo-boo: ouch\n", printer.toString());
+        }
+
+        printer.clear();
+
+        try
+        {
+            ErrorReporter.reportAndThrow("ow-ow", new RuntimeException("Nothing to see here"));
+        }
+        catch (RuntimeException e)
+        {
+            Assert.assertEquals("Boo-boo: ow-ow\n", printer.toString());
+        }
+
+        printer.clear();
+
+        try
+        {
+            ErrorReporter.unsupported("oh, well");
+        }
+        catch (UnsupportedOperationException e)
+        {
+            Assert.assertEquals("Boo-boo: oh, well\n", printer.toString());
+        }
+
+        ErrorReporter.initialize();
+    }
+
     private static class VerySpecialException
     extends RuntimeException
     {

@@ -15,4 +15,9 @@ implements Printer
     {
         return this.buffer.toString();
     }
+
+    public void clear()
+    {
+        this.buffer.setLength(0);
+    }
 }
