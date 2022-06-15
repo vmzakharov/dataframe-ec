@@ -75,6 +75,8 @@ extends Expression, Comparable<Value>
 
     default boolean isDate()      { return this.getType().isDate(); }
 
+    default boolean isTemporal()  { return this.getType().isTemporal(); }
+
     default boolean isDateTime()  { return this.getType().isDateTime(); }
 
     default boolean isVector()    { return this.getType().isVector(); }

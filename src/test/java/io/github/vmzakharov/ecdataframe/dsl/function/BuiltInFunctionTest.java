@@ -194,7 +194,7 @@ public class BuiltInFunctionTest
 
         MutableList<String> expectedFunctionNames = Lists.mutable.of(
             "abs", "contains", "print", "println", "startsWith", "substr", "toDate", "toDateTime", "toDouble", "toLong",
-            "toString", "toUpper", "trim", "withinDays"
+            "toString", "toUpper", "trim", "withinDays", "format"
         );
 
         Assert.assertEquals(expectedFunctionNames.size(), functionsByName.size());

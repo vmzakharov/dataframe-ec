@@ -19,12 +19,18 @@ import org.eclipse.collections.api.map.MutableMap;
 import org.eclipse.collections.impl.factory.Lists;
 import org.eclipse.collections.impl.factory.Maps;
 
+import java.text.DecimalFormat;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.Period;
 import java.time.format.DateTimeFormatter;
 
-import static io.github.vmzakharov.ecdataframe.dsl.value.ValueType.*;
+import static io.github.vmzakharov.ecdataframe.dsl.value.ValueType.BOOLEAN;
+import static io.github.vmzakharov.ecdataframe.dsl.value.ValueType.DATE;
+import static io.github.vmzakharov.ecdataframe.dsl.value.ValueType.DATE_TIME;
+import static io.github.vmzakharov.ecdataframe.dsl.value.ValueType.DOUBLE;
+import static io.github.vmzakharov.ecdataframe.dsl.value.ValueType.LONG;
+import static io.github.vmzakharov.ecdataframe.dsl.value.ValueType.STRING;
 
 final public class BuiltInFunctions
 {
@@ -227,6 +233,55 @@ final public class BuiltInFunctions
             public ValueType returnType(ListIterable<ValueType> paraValueTypes)
             {
                 return STRING;
+            }
+        });
+
+        addFunctionDescriptor(new IntrinsicFunctionDescriptor("format", Lists.immutable.of("object", "pattern"))
+        {
+            private final MutableMap<String, DecimalFormat> decimalFormats = Maps.mutable.of();
+            private final MutableMap<String, DateTimeFormatter> dateTimeFormatters = Maps.mutable.of();
+
+            @Override
+            public Value evaluate(EvalContext context)
+            {
+                Value value = context.getVariable("object");
+                String pattern = context.getVariable("pattern").stringValue();
+
+                String result = "not used";
+                if (value.isNumber())
+                {
+                    result = this.decimalFormats
+                            .computeIfAbsent(pattern, DecimalFormat::new)
+                            .format(
+                                value.isLong() ? ((LongValue) value).longValue() : ((DoubleValue) value).doubleValue()
+                            );
+                }
+                else if (value.isTemporal())
+                {
+                    result = this.dateTimeFormatters
+                            .computeIfAbsent(pattern, DateTimeFormatter::ofPattern)
+                            .format(
+                                value.isDate() ? ((DateValue) value).dateValue() : ((DateTimeValue) value).dateTimeValue()
+                            );
+                }
+                else
+                {
+                    this.assertParameterType(Lists.immutable.of(LONG, DOUBLE, DATE, DATE_TIME), value.getType());
+                }
+
+                return new StringValue(result);
+            }
+
+            @Override
+            public ValueType returnType(ListIterable<ValueType> paraValueTypes)
+            {
+                return STRING;
+            }
+
+            @Override
+            public String usageString()
+            {
+                return "Usage: " + this.getName() + "([number or date value], pattern)";
             }
         });
 

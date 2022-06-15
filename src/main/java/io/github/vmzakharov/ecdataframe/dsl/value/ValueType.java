@@ -18,6 +18,8 @@ public enum ValueType
 
     public boolean isDateTime()  { return this == DATE_TIME; }
 
+    public boolean isTemporal() { return this == DATE || this == DATE_TIME; }
+
     public boolean isString()  { return this == STRING; }
 
     public boolean isVector()  { return this == VECTOR; }
