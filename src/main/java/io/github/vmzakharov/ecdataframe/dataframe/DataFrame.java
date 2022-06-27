@@ -12,6 +12,7 @@ import org.eclipse.collections.api.DoubleIterable;
 import org.eclipse.collections.api.LongIterable;
 import org.eclipse.collections.api.block.function.primitive.IntIntToIntFunction;
 import org.eclipse.collections.api.block.predicate.primitive.BooleanPredicate;
+import org.eclipse.collections.api.block.predicate.primitive.IntPredicate;
 import org.eclipse.collections.api.list.ImmutableList;
 import org.eclipse.collections.api.list.ListIterable;
 import org.eclipse.collections.api.list.MutableList;
@@ -693,17 +694,19 @@ public class DataFrame
         return filtered;
     }
 
-    private DataFrame selectByMarkValue(BooleanPredicate markAtIndexPredicate)
+    private DataFrame selectByMarkValue(IntPredicate flaggedAtIndex, String description)
     {
-        DataFrame filtered = this.cloneStructure(this.getName() + "-selected");
+        DataFrame filtered = this.cloneStructure(this.getName() + "-" + description);
+
         for (int i = 0; i < this.rowCount; i++)
         {
-            if (markAtIndexPredicate.accept(this.isFlagged(i)))
+            if (flaggedAtIndex.accept(i))
             {
                 filtered.copyRowFrom(this, this.rowIndexMap(i));
             }
         }
         filtered.seal();
+
         return filtered;
     }
 
@@ -859,6 +862,11 @@ public class DataFrame
         return this.bitmap.get(rowIndex);
     }
 
+    public boolean notFlagged(int rowIndex)
+    {
+        return !this.bitmap.get(rowIndex);
+    }
+
     /**
      * creates a new data frame, which contain a subset of rows of this data frame for the rows with the bitmap flags
      * set (i.e. equals to true). This is the behavior the opposite of {@code selectNotMarked}
@@ -867,7 +875,7 @@ public class DataFrame
      */
     public DataFrame selectFlagged()
     {
-        return this.selectByMarkValue(mark -> mark);
+        return this.selectByMarkValue(this::isFlagged, "flagged");
     }
 
     /**
@@ -878,7 +886,7 @@ public class DataFrame
      */
     public DataFrame selectNotFlagged()
     {
-        return this.selectByMarkValue(mark -> !mark);
+        return this.selectByMarkValue(this::notFlagged, "not flagged");
     }
 
     /**
