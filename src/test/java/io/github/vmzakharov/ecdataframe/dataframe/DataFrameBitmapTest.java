@@ -137,7 +137,11 @@ public class DataFrameBitmapTest
         BooleanList flags = IntInterval.zeroTo(this.dataFrame.rowCount() - 1)
                 .collectBoolean(this.dataFrame::isFlagged, BooleanLists.mutable.of());
 
+        BooleanList noFlags = IntInterval.zeroTo(this.dataFrame.rowCount() - 1)
+                .collectBoolean(this.dataFrame::notFlagged, BooleanLists.mutable.of());
+
         Assert.assertEquals(BooleanLists.immutable.of(false, true, false, false, true), flags);
+        Assert.assertEquals(BooleanLists.immutable.of(true, false, true, true, false), noFlags);
     }
 
     @Test
