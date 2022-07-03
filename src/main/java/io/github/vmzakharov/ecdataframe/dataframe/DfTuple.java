@@ -8,9 +8,16 @@ public class DfTuple
 implements Comparable<DfTuple>
 {
     private final Object[] items;
+    private final int order;
 
     public DfTuple(Object... newItems)
     {
+        this(0, newItems);
+    }
+
+    public DfTuple(int newOrder, Object... newItems)
+    {
+        this.order = newOrder;
         this.items = newItems;
     }
 
@@ -70,5 +77,10 @@ implements Comparable<DfTuple>
     public String toString()
     {
         return ArrayIterate.makeString(this.items);
+    }
+
+    public int order()
+    {
+        return this.order;
     }
 }

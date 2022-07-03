@@ -11,7 +11,6 @@ import io.github.vmzakharov.ecdataframe.util.ExpressionParserHelper;
 import org.eclipse.collections.api.DoubleIterable;
 import org.eclipse.collections.api.LongIterable;
 import org.eclipse.collections.api.block.function.primitive.IntIntToIntFunction;
-import org.eclipse.collections.api.block.predicate.primitive.BooleanPredicate;
 import org.eclipse.collections.api.block.predicate.primitive.IntPredicate;
 import org.eclipse.collections.api.list.ImmutableList;
 import org.eclipse.collections.api.list.ListIterable;
@@ -28,7 +27,6 @@ import org.eclipse.collections.impl.factory.Lists;
 import org.eclipse.collections.impl.factory.Maps;
 import org.eclipse.collections.impl.factory.primitive.IntLists;
 import org.eclipse.collections.impl.list.mutable.primitive.BooleanArrayList;
-import org.eclipse.collections.impl.list.primitive.IntInterval;
 import org.eclipse.collections.impl.tuple.Tuples;
 import org.eclipse.collections.impl.utility.ArrayIterate;
 
@@ -772,10 +770,9 @@ public class DataFrame
             tuples[i] = this.rowToTuple(i, columnsToSortBy);
         }
 
-        MutableIntList indexes = IntInterval.zeroTo(this.rowCount - 1).toList();
-        indexes.sortThisBy(i -> tuples[i]);
+        Arrays.sort(tuples);
 
-        this.virtualRowMap = indexes;
+        this.virtualRowMap = ArrayIterate.collectInt(tuples, DfTuple::order);
 
         return this;
     }
@@ -790,9 +787,16 @@ public class DataFrame
         }
 
         Expression expression = ExpressionParserHelper.DEFAULT.toExpression(expressionString);
-        MutableIntList indexes = IntInterval.zeroTo(this.rowCount - 1).toList();
-        indexes.sortThisBy(i -> this.evaluateExpression(expression, i));
-        this.virtualRowMap = indexes;
+
+        DfTuple[] tuples = new DfTuple[this.rowCount];
+        for (int i = 0; i < this.rowCount; i++)
+        {
+            tuples[i] = new DfTuple(i, new Object[] {this.evaluateExpression(expression, i)});
+        }
+
+        Arrays.sort(tuples);
+
+        this.virtualRowMap = ArrayIterate.collectInt(tuples, DfTuple::order);
 
         return this;
     }
@@ -811,7 +815,8 @@ public class DataFrame
         {
             values[i] = columnsToCollect.get(i).getObject(rowIndex);
         }
-        return new DfTuple(values);
+
+        return new DfTuple(rowIndex, values);
     }
 
     public void unsort()

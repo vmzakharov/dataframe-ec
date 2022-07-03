@@ -2,6 +2,8 @@ package io.github.vmzakharov.ecdataframe.dataframe;
 
 import io.github.vmzakharov.ecdataframe.dsl.value.DoubleValue;
 import org.eclipse.collections.api.factory.Lists;
+import org.eclipse.collections.api.list.primitive.MutableLongList;
+import org.eclipse.collections.impl.factory.primitive.LongLists;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -374,5 +376,87 @@ public class DataFrameSortTest
                 ;
 
         DataFrameUtil.assertEquals(expected, dataFrame.sortBy(Lists.immutable.of("Name", "DateTime")));
+    }
+
+    @Test
+    public void columnSortIsStable()
+    {
+        DataFrame df = new DataFrame("DF")
+            .addLongColumn("ID").addStringColumn("Foo").addLongColumn("Bar")
+            .addRow(0, "A", 1L)
+            .addRow(1, "B", 2L)
+            .addRow(2, "B", 1L)
+            .addRow(3, "A", 1L)
+            .addRow(4, "A", 2L)
+            .addRow(5, "B", 1L)
+            .addRow(6, "B", 3L)
+            .addRow(7, "B", 2L)
+            .addRow(8, "B", 2L)
+            .addRow(9, "A", 2L)
+            ;
+
+        df.sortBy(Lists.immutable.of("Foo", "Bar"));
+
+        MutableLongList indexes = LongLists.mutable.of();
+        for (int rowIndex = 0; rowIndex < df.rowCount(); rowIndex++)
+        {
+            indexes.add(df.getLong("ID", rowIndex));
+        }
+
+        this.checkSortedAndOrderIsPreserved(df);
+    }
+
+    @Test
+    public void expressionSortIsStable()
+    {
+        DataFrame df = new DataFrame("DF")
+            .addLongColumn("ID").addStringColumn("Foo").addLongColumn("Bar")
+            .addRow(0, "A", 1L)
+            .addRow(1, "B", 2L)
+            .addRow(2, "B", 1L)
+            .addRow(3, "A", 1L)
+            .addRow(4, "A", 2L)
+            .addRow(5, "B", 1L)
+            .addRow(6, "B", 3L)
+            .addRow(7, "B", 2L)
+            .addRow(8, "B", 2L)
+            .addRow(9, "A", 2L)
+            ;
+
+        df.sortByExpression("Foo + toString(Bar)");
+
+        MutableLongList indexes = LongLists.mutable.of();
+        for (int rowIndex = 0; rowIndex < df.rowCount(); rowIndex++)
+        {
+            indexes.add(df.getLong("ID", rowIndex));
+        }
+
+        this.checkSortedAndOrderIsPreserved(df);
+    }
+
+    private void checkSortedAndOrderIsPreserved(DataFrame df)
+    {
+        long prevId = df.getLong("ID", 0);
+        String prevFoo = df.getString("Foo", 0);
+        long prevBar = df.getLong("Bar", 0);
+
+        for (int rowIndex = 1; rowIndex < df.rowCount(); rowIndex++)
+        {
+            long curId = df.getLong("ID", rowIndex);
+            String curFoo = df.getString("Foo", rowIndex);
+            long curBar = df.getLong("Bar", rowIndex);
+
+
+            Assert.assertTrue(curFoo.compareTo(prevFoo) > 0  || (curFoo.equals(prevFoo) && curBar >= prevBar));
+
+            if (curFoo.equals(prevFoo) && (curBar == prevBar))
+            {
+                Assert.assertTrue("row " + curId + " unstable", curId > prevId);
+            }
+
+            prevId = curId;
+            prevFoo = curFoo;
+            prevBar = curBar;
+        }
     }
 }
