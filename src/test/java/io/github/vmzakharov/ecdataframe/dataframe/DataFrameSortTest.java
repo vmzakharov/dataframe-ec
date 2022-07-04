@@ -446,7 +446,6 @@ public class DataFrameSortTest
             String curFoo = df.getString("Foo", rowIndex);
             long curBar = df.getLong("Bar", rowIndex);
 
-
             Assert.assertTrue(curFoo.compareTo(prevFoo) > 0  || (curFoo.equals(prevFoo) && curBar >= prevBar));
 
             if (curFoo.equals(prevFoo) && (curBar == prevBar))
