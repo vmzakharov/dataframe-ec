@@ -1,6 +1,7 @@
 package io.github.vmzakharov.ecdataframe.dsl;
 
 import io.github.vmzakharov.ecdataframe.dataframe.DataFrame;
+import io.github.vmzakharov.ecdataframe.dataframe.DfColumn;
 import io.github.vmzakharov.ecdataframe.dataset.HierarchicalDataSet;
 import io.github.vmzakharov.ecdataframe.dsl.value.Value;
 import org.eclipse.collections.api.RichIterable;
@@ -52,7 +53,8 @@ extends EvalContextAbstract
         {
             if (this.getDataFrame().hasColumn(variableName))
             {
-                valueGetter = () -> this.dataFrame.getValueAtPhysicalRow(variableName, this.getRowIndex());
+                DfColumn column = this.dataFrame.getColumnNamed(variableName);
+                valueGetter = () -> column.getValue(this.getRowIndex());
             }
             else if (this.getContextVariables().containsKey(variableName))
             {
