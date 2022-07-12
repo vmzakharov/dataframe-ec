@@ -376,11 +376,6 @@ public class DataFrame
         return this.columnsByName.get(columnName).getValue(this.rowIndexMap(rowIndex));
     }
 
-    public Value getValueAtPhysicalRow(String columnName, int rowIndex)
-    {
-        return this.columnsByName.get(columnName).getValue(rowIndex);
-    }
-
     public String getValueAsStringLiteral(int rowIndex, int columnIndex)
     {
         return this.columns.get(columnIndex).getValueAsStringLiteral(this.rowIndexMap(rowIndex));
