@@ -5,7 +5,6 @@ import io.github.vmzakharov.ecdataframe.dataframe.DataFrameUtil;
 import io.github.vmzakharov.ecdataframe.dsl.value.ValueType;
 import org.eclipse.collections.api.map.MutableMap;
 import org.junit.Assert;
-import org.junit.ComparisonFailure;
 import org.junit.Test;
 
 import java.time.LocalDate;
