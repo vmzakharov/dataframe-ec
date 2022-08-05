@@ -6,6 +6,7 @@ import io.github.vmzakharov.ecdataframe.dsl.value.LongValue;
 import io.github.vmzakharov.ecdataframe.dsl.value.Value;
 import org.eclipse.collections.api.list.ListIterable;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
@@ -172,6 +173,11 @@ public interface UnaryOp
     default BooleanValue applyString(String operand)
     {
         throw new UnsupportedOperationException("Operation " + this.asString() + " cannot be applied to a string");
+    }
+
+    default BooleanValue applyDecimal(BigDecimal operand)
+    {
+        throw new UnsupportedOperationException("Operation " + this.asString() + " cannot be applied to a decimal");
     }
 
     default BooleanValue applyVector(ListIterable<Value> operand)

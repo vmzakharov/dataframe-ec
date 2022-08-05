@@ -9,6 +9,7 @@ import io.github.vmzakharov.ecdataframe.dsl.BinaryExpr;
 import io.github.vmzakharov.ecdataframe.dsl.BooleanOp;
 import io.github.vmzakharov.ecdataframe.dsl.ComparisonOp;
 import io.github.vmzakharov.ecdataframe.dsl.ContainsOp;
+import io.github.vmzakharov.ecdataframe.dsl.DecimalExpr;
 import io.github.vmzakharov.ecdataframe.dsl.EvalContext;
 import io.github.vmzakharov.ecdataframe.dsl.Expression;
 import io.github.vmzakharov.ecdataframe.dsl.FunctionCallExpr;
@@ -42,6 +43,8 @@ public class TypeInferenceVisitor
 {
     public static final String ERR_IF_ELSE_INCOMPATIBLE = "Incompatible types in branches of if-else";
     public static final String ERR_TYPES_IN_EXPRESSION = "Incompatible operand types in expression";
+
+    public static final String ERR_UNEXPECTED_TYPE = "Required expression type %s, was %s";
     public static final String ERR_UNDEFINED_VARIABLE = "Undefined variable";
     public static final String ERR_UNDEFINED_FUNCTION = "Undefined function";
     public static final String ERR_CONDITION_NOT_BOOLEAN = "Condition type is not boolean";
@@ -363,6 +366,32 @@ public class TypeInferenceVisitor
     }
 
     @Override
+    public void visitDecimalExpr(DecimalExpr expr)
+    {
+        expr.unscaledValueExpr().accept(this);
+        ValueType unscaledValueType = this.expressionTypeStack.pop();
+
+        if (!unscaledValueType.isLong() && !unscaledValueType.isVoid())
+        {
+            this.recordError(
+                    this.unexpectedTypeMessage(ValueType.LONG, unscaledValueType),
+                    PrettyPrintVisitor.exprToString(expr.unscaledValueExpr()));
+        }
+
+        expr.scaleExpr().accept(this);
+        ValueType scaleType = this.expressionTypeStack.pop();
+
+        if (!scaleType.isLong() && !scaleType.isVoid())
+        {
+            this.recordError(
+                    this.unexpectedTypeMessage(ValueType.LONG, scaleType),
+                    PrettyPrintVisitor.exprToString(expr.scaleExpr()));
+        }
+
+        this.store(ValueType.DECIMAL);
+    }
+
+    @Override
     public void visitIfElseExpr(IfElseExpr expr)
     {
         expr.getCondition().accept(this);
@@ -398,5 +427,10 @@ public class TypeInferenceVisitor
     public ValueType getLastExpressionType()
     {
         return this.lastExpressionType;
+    }
+
+    private String unexpectedTypeMessage(ValueType expected, ValueType actual)
+    {
+        return String.format(ERR_UNEXPECTED_TYPE, expected.toString(), actual.toString());
     }
 }

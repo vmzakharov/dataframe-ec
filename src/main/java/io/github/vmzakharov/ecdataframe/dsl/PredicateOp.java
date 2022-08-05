@@ -3,6 +3,7 @@ package io.github.vmzakharov.ecdataframe.dsl;
 import io.github.vmzakharov.ecdataframe.dsl.value.BooleanValue;
 import io.github.vmzakharov.ecdataframe.dsl.value.Value;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
@@ -21,6 +22,11 @@ extends BinaryOp
     default BooleanValue applyString(String operand1, String operand2)
     {
         throw new UnsupportedOperationException("Cannot apply '" + this.asString() + "' to strings");
+    }
+
+    default BooleanValue applyDecimal(BigDecimal operand1, BigDecimal operand2)
+    {
+        throw new UnsupportedOperationException("Cannot apply '" + this.asString() + "' to decimals");
     }
 
     default BooleanValue applyDate(LocalDate operand1, LocalDate operand2)

@@ -8,6 +8,7 @@ import io.github.vmzakharov.ecdataframe.dsl.Expression;
 import io.github.vmzakharov.ecdataframe.dsl.value.BooleanValue;
 import io.github.vmzakharov.ecdataframe.dsl.value.DateTimeValue;
 import io.github.vmzakharov.ecdataframe.dsl.value.DateValue;
+import io.github.vmzakharov.ecdataframe.dsl.value.DecimalValue;
 import io.github.vmzakharov.ecdataframe.dsl.value.DoubleValue;
 import io.github.vmzakharov.ecdataframe.dsl.value.LongValue;
 import io.github.vmzakharov.ecdataframe.dsl.value.Value;
@@ -15,6 +16,7 @@ import io.github.vmzakharov.ecdataframe.dsl.visitor.InMemoryEvaluationVisitor;
 import io.github.vmzakharov.ecdataframe.util.ExpressionParserHelper;
 import org.junit.Assert;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
@@ -60,6 +62,13 @@ final public class ExpressionTestUtil
         Value result = evaluateExpression(s);
         Assert.assertTrue(result.isString());
         return result.stringValue();
+    }
+
+    public static BigDecimal evaluateToDecimal(String s)
+    {
+        Value result = evaluateExpression(s);
+        Assert.assertTrue(result.isDecimal());
+        return ((DecimalValue) result).decimalValue();
     }
 
     public static LocalDate evaluateToDate(String s)

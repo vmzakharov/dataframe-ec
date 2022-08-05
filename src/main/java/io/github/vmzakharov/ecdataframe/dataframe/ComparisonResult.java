@@ -1,5 +1,6 @@
 package io.github.vmzakharov.ecdataframe.dataframe;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.function.DoubleSupplier;
@@ -251,6 +252,15 @@ abstract public class ComparisonResult
     extends ObjectComparisonResult<LocalDateTime>
     {
         public DateTimeComparisonResult(LocalDateTime thisObject, LocalDateTime thatObject)
+        {
+            super(thisObject, thatObject);
+        }
+    }
+
+    static public class DecimalComparisonResult
+    extends ObjectComparisonResult<BigDecimal>
+    {
+        public DecimalComparisonResult(BigDecimal thisObject, BigDecimal thatObject)
         {
             super(thisObject, thatObject);
         }

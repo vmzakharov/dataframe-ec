@@ -4,6 +4,7 @@ import io.github.vmzakharov.ecdataframe.dsl.AliasExpr;
 import io.github.vmzakharov.ecdataframe.dsl.AnonymousScript;
 import io.github.vmzakharov.ecdataframe.dsl.AssingExpr;
 import io.github.vmzakharov.ecdataframe.dsl.BinaryExpr;
+import io.github.vmzakharov.ecdataframe.dsl.DecimalExpr;
 import io.github.vmzakharov.ecdataframe.dsl.FunctionCallExpr;
 import io.github.vmzakharov.ecdataframe.dsl.FunctionScript;
 import io.github.vmzakharov.ecdataframe.dsl.IfElseExpr;
@@ -47,4 +48,6 @@ public interface ExpressionVisitor
     void visitVectorExpr(VectorExpr expr);
 
     void visitIndexExpr(IndexExpr expr);
+
+    void visitDecimalExpr(DecimalExpr expr);
 }

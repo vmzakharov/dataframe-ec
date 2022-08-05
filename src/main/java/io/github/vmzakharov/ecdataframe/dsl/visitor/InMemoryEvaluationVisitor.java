@@ -5,6 +5,7 @@ import io.github.vmzakharov.ecdataframe.dataset.HierarchicalDataSet;
 import io.github.vmzakharov.ecdataframe.dsl.AnonymousScript;
 import io.github.vmzakharov.ecdataframe.dsl.AssingExpr;
 import io.github.vmzakharov.ecdataframe.dsl.BinaryExpr;
+import io.github.vmzakharov.ecdataframe.dsl.DecimalExpr;
 import io.github.vmzakharov.ecdataframe.dsl.EvalContext;
 import io.github.vmzakharov.ecdataframe.dsl.Expression;
 import io.github.vmzakharov.ecdataframe.dsl.FunctionCallExpr;
@@ -25,6 +26,7 @@ import io.github.vmzakharov.ecdataframe.dsl.value.BooleanValue;
 import io.github.vmzakharov.ecdataframe.dsl.value.DataFrameValue;
 import io.github.vmzakharov.ecdataframe.dsl.value.DateTimeValue;
 import io.github.vmzakharov.ecdataframe.dsl.value.DateValue;
+import io.github.vmzakharov.ecdataframe.dsl.value.DecimalValue;
 import io.github.vmzakharov.ecdataframe.dsl.value.DoubleValue;
 import io.github.vmzakharov.ecdataframe.dsl.value.LongValue;
 import io.github.vmzakharov.ecdataframe.dsl.value.StringValue;
@@ -273,6 +275,14 @@ implements ExpressionEvaluationVisitor
         VectorValue vector = (VectorValue) expr.getVectorExpr().evaluate(this);
         LongValue index = (LongValue) expr.getIndexExpr().evaluate(this);
         return vector.get((int) index.longValue());
+    }
+
+    @Override
+    public Value visitDecimalExpr(DecimalExpr expr)
+    {
+        LongValue unscaledValue = (LongValue) expr.unscaledValueExpr().evaluate(this);
+        LongValue scale = (LongValue) expr.scaleExpr().evaluate(this);
+        return new DecimalValue(unscaledValue.longValue(), (int) scale.longValue());
     }
 
     public EvalContext getContext()

@@ -2,7 +2,7 @@ package io.github.vmzakharov.ecdataframe.dsl.value;
 
 public enum ValueType
 {
-    BOOLEAN, DOUBLE, LONG, STRING, DATE, DATE_TIME, VOID, VECTOR, DATA_FRAME;
+    BOOLEAN, DOUBLE, LONG, DECIMAL, STRING, DATE, DATE_TIME, VOID, VECTOR, DATA_FRAME;
 
     public boolean isVoid()    { return this == VOID; }
 
@@ -11,6 +11,8 @@ public enum ValueType
     public boolean isLong()    { return this == LONG; }
 
     public boolean isDouble()  { return this == DOUBLE; }
+
+    public boolean isDecimal()  { return this == DECIMAL; }
 
     public boolean isNumber()  { return this == LONG || this == DOUBLE; }
 

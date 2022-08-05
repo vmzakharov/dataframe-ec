@@ -5,6 +5,7 @@ import io.github.vmzakharov.ecdataframe.dsl.EvalContext;
 import io.github.vmzakharov.ecdataframe.dsl.value.BooleanValue;
 import io.github.vmzakharov.ecdataframe.dsl.value.DateTimeValue;
 import io.github.vmzakharov.ecdataframe.dsl.value.DateValue;
+import io.github.vmzakharov.ecdataframe.dsl.value.DecimalValue;
 import io.github.vmzakharov.ecdataframe.dsl.value.DoubleValue;
 import io.github.vmzakharov.ecdataframe.dsl.value.LongValue;
 import io.github.vmzakharov.ecdataframe.dsl.value.StringValue;
@@ -19,6 +20,7 @@ import org.eclipse.collections.api.map.MutableMap;
 import org.eclipse.collections.impl.factory.Lists;
 import org.eclipse.collections.impl.factory.Maps;
 
+import java.math.BigDecimal;
 import java.text.DecimalFormat;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -140,6 +142,23 @@ final public class BuiltInFunctions
             public ValueType returnType(ListIterable<ValueType> parameterTypes)
             {
                 return STRING;
+            }
+        });
+
+        addFunctionDescriptor(new IntrinsicFunctionDescriptor("toDecimal", Lists.immutable.of("unscaledValue", "scale"))
+        {
+            @Override
+            public Value evaluate(EvalContext context)
+            {
+                long unscaledValue = ((LongValue) context.getVariable("unscaledValue")).longValue();
+                int scale  = (int) ((LongValue) context.getVariable("scale")).longValue();
+                return new DecimalValue(BigDecimal.valueOf(unscaledValue, scale));
+            }
+
+            @Override
+            public ValueType returnType(ListIterable<ValueType> parameterTypes)
+            {
+                return ValueType.DECIMAL;
             }
         });
 

@@ -69,6 +69,8 @@ extends Expression, Comparable<Value>
 
     default boolean isDouble()    { return this.getType().isDouble(); }
 
+    default boolean isDecimal()    { return this.getType().isDecimal(); }
+
     default boolean isNumber()    { return this.getType().isNumber(); }
 
     default boolean isString()    { return this.getType().isString(); }

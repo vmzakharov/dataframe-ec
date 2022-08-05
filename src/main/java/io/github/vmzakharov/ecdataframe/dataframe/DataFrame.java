@@ -30,6 +30,7 @@ import org.eclipse.collections.impl.list.mutable.primitive.BooleanArrayList;
 import org.eclipse.collections.impl.tuple.Tuples;
 import org.eclipse.collections.impl.utility.ArrayIterate;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Arrays;
@@ -131,6 +132,21 @@ public class DataFrame
     public DataFrame addDateTimeColumn(String newColumnName, String expressionAsString)
     {
         return this.addColumn(new DfDateTimeColumnComputed(this, newColumnName, expressionAsString));
+    }
+
+    public DataFrame addDecimalColumn(String newColumnName)
+    {
+        return this.addColumn(new DfDecimalColumnStored(this, newColumnName));
+    }
+
+    public DataFrame addDecimalColumn(String newColumnName, ListIterable<BigDecimal> values)
+    {
+        return this.addColumn(new DfDecimalColumnStored(this, newColumnName, values));
+    }
+
+    public DataFrame addDecimalColumn(String newColumnName, String expressionAsString)
+    {
+        return this.addColumn(new DfDecimalColumnComputed(this, newColumnName, expressionAsString));
     }
 
     public DataFrame addColumn(DfColumn newColumn)
@@ -291,6 +307,9 @@ public class DataFrame
             case DATE_TIME:
                 this.addDateTimeColumn(columnName);
                 break;
+            case DECIMAL:
+                this.addDecimalColumn(columnName);
+                break;
             default:
                 ErrorReporter.reportAndThrow("Cannot add a column " + columnName + " for values of type " + type);
         }
@@ -315,6 +334,9 @@ public class DataFrame
                 break;
             case DATE_TIME:
                 this.addDateTimeColumn(columnName, expressionAsString);
+                break;
+            case DECIMAL:
+                this.addDecimalColumn(columnName, expressionAsString);
                 break;
             default:
                 ErrorReporter.reportAndThrow("Cannot add a column " + columnName + " for values of type " + type);
@@ -411,6 +433,11 @@ public class DataFrame
         return this.getDateTimeColumn(columnName).getTypedObject(this.rowIndexMap(rowIndex));
     }
 
+    public BigDecimal getDecimal(String columnName, int rowIndex)
+    {
+        return this.getDecimalColumn(columnName).getTypedObject(this.rowIndexMap(rowIndex));
+    }
+
     public DfLongColumn getLongColumn(String columnName)
     {
         return (DfLongColumn) this.getColumnNamed(columnName);
@@ -429,6 +456,11 @@ public class DataFrame
     public DfDateTimeColumn getDateTimeColumn(String columnName)
     {
         return (DfDateTimeColumn) this.getColumnNamed(columnName);
+    }
+
+    public DfDecimalColumn getDecimalColumn(String columnName)
+    {
+        return (DfDecimalColumn) this.getColumnNamed(columnName);
     }
 
     public DfStringColumn getStringColumn(String columnName)
@@ -1175,6 +1207,7 @@ public class DataFrame
     }
 
     // todo: do not override sort order (use an external sort)
+    // todo: optimize away column lookup when joining
     private Triplet<DataFrame> join(
             DataFrame other,
             JoinType joinType,

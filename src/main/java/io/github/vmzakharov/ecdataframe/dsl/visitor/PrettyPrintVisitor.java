@@ -4,6 +4,7 @@ import io.github.vmzakharov.ecdataframe.dsl.AliasExpr;
 import io.github.vmzakharov.ecdataframe.dsl.AnonymousScript;
 import io.github.vmzakharov.ecdataframe.dsl.AssingExpr;
 import io.github.vmzakharov.ecdataframe.dsl.BinaryExpr;
+import io.github.vmzakharov.ecdataframe.dsl.DecimalExpr;
 import io.github.vmzakharov.ecdataframe.dsl.Expression;
 import io.github.vmzakharov.ecdataframe.dsl.FunctionCallExpr;
 import io.github.vmzakharov.ecdataframe.dsl.FunctionScript;
@@ -201,6 +202,16 @@ implements ExpressionVisitor
     public void visitIndexExpr(IndexExpr expr)
     {
         this.printExpression(expr.getVectorExpr()).print("[").printExpression(expr.getIndexExpr()).print("]");
+    }
+
+    @Override
+    public void visitDecimalExpr(DecimalExpr expr)
+    {
+        this.print("[")
+            .printExpression(expr.unscaledValueExpr())
+            .print(",")
+            .printExpression(expr.scaleExpr())
+            .print("]");
     }
 
     @Override

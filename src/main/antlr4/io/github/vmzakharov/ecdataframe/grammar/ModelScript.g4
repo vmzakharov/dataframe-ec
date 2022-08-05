@@ -47,6 +47,8 @@ expr :
     | expr op=AND expr         #andExpr
     | expr op=(OR | XOR) expr  #orExpr
     | vectorExpr               #standaloneVectorExpr
+    | '[' INT ',' INT ']'      #decimalLiteralExpr
+    | '[' expr ',' expr ']'    #decimalExpr
     | INT                      #intLiteralExpr
     | DOUBLE                   #doubleLiteralExpr
     | STRING                   #stringLiteralExpr

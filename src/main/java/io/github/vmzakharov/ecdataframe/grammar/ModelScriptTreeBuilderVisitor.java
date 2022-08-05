@@ -8,6 +8,7 @@ import io.github.vmzakharov.ecdataframe.dsl.BinaryExpr;
 import io.github.vmzakharov.ecdataframe.dsl.BooleanOp;
 import io.github.vmzakharov.ecdataframe.dsl.ComparisonOp;
 import io.github.vmzakharov.ecdataframe.dsl.ContainsOp;
+import io.github.vmzakharov.ecdataframe.dsl.DecimalExpr;
 import io.github.vmzakharov.ecdataframe.dsl.Expression;
 import io.github.vmzakharov.ecdataframe.dsl.FunctionCallExpr;
 import io.github.vmzakharov.ecdataframe.dsl.FunctionScript;
@@ -21,6 +22,7 @@ import io.github.vmzakharov.ecdataframe.dsl.UnaryExpr;
 import io.github.vmzakharov.ecdataframe.dsl.UnaryOp;
 import io.github.vmzakharov.ecdataframe.dsl.VarExpr;
 import io.github.vmzakharov.ecdataframe.dsl.VectorExpr;
+import io.github.vmzakharov.ecdataframe.dsl.value.DecimalValue;
 import io.github.vmzakharov.ecdataframe.dsl.value.DoubleValue;
 import io.github.vmzakharov.ecdataframe.dsl.value.LongValue;
 import io.github.vmzakharov.ecdataframe.dsl.value.StringValue;
@@ -111,7 +113,7 @@ extends ModelScriptBaseVisitor<Expression>
     @Override
     public Expression visitIntLiteralExpr(ModelScriptParser.IntLiteralExprContext ctx)
     {
-        return new LongValue(Integer.parseInt(ctx.INT().getText()));
+        return new LongValue(Long.parseLong(ctx.INT().getText()));
     }
 
     @Override
@@ -314,10 +316,19 @@ extends ModelScriptBaseVisitor<Expression>
     @Override
     public Expression visitIndexVectorExpr(ModelScriptParser.IndexVectorExprContext ctx)
     {
-        return new IndexExpr(
-                this.visit(ctx.expr(0)),
-                this.visit(ctx.expr(1))
-        );
+        return new IndexExpr(this.visit(ctx.expr(0)), this.visit(ctx.expr(1)));
+    }
+
+    @Override
+    public Expression visitDecimalExpr(ModelScriptParser.DecimalExprContext ctx)
+    {
+        return new DecimalExpr(this.visit(ctx.expr(0)), this.visit(ctx.expr(1)));
+    }
+
+    @Override
+    public Expression visitDecimalLiteralExpr(ModelScriptParser.DecimalLiteralExprContext ctx)
+    {
+        return new DecimalValue(Long.parseLong(ctx.INT(0).getText()), Integer.parseInt(ctx.INT(1).getText()));
     }
 
     @Override

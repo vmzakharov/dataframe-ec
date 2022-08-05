@@ -7,6 +7,7 @@ import org.eclipse.collections.impl.list.Interval;
 import org.junit.Assert;
 import org.junit.Test;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
@@ -54,14 +55,17 @@ public class BasicDataFrameTest
                 .addColumn("Double", ValueType.DOUBLE)
                 .addColumn("Date", ValueType.DATE)
                 .addColumn("DateTime", ValueType.DATE_TIME)
+                .addColumn("Decimal", ValueType.DECIMAL)
                 .addColumn("StringComp", ValueType.STRING, "String + \"-meep\"")
                 .addColumn("LongComp", ValueType.LONG, "Long * 2")
                 .addColumn("DoubleComp", ValueType.DOUBLE, "Double + 10.0")
                 .addColumn("DateComp", ValueType.DATE, "toDate(2021, 11, 15)")
                 .addColumn("DateTimeComp", ValueType.DATE_TIME, "toDateTime(2022, 12, 25, 13, 12, 10)")
+                .addColumn("DecimalComp", ValueType.DECIMAL, "[456,5]")
                 ;
 
-        dataFrame.addRow("Beep", 10, 20.0, LocalDate.of(2020, 10, 20), LocalDateTime.of(2022, 8, 22, 10, 10, 10));
+        dataFrame.addRow("Beep", 10, 20.0, LocalDate.of(2020, 10, 20), LocalDateTime.of(2022, 8, 22, 10, 10, 10),
+                BigDecimal.valueOf(123.456));
 
         Assert.assertEquals("Beep", dataFrame.getString("String", 0));
         Assert.assertEquals("Beep-meep", dataFrame.getString("StringComp", 0));
@@ -77,6 +81,9 @@ public class BasicDataFrameTest
 
         Assert.assertEquals(LocalDate.of(2021, 11, 15), dataFrame.getDate("DateComp", 0));
         Assert.assertEquals(LocalDateTime.of(2022, 12, 25, 13, 12, 10), dataFrame.getDateTime("DateTimeComp", 0));
+
+        Assert.assertEquals(BigDecimal.valueOf(123.456), dataFrame.getDecimal("Decimal", 0));
+        Assert.assertEquals(BigDecimal.valueOf(456, 5), dataFrame.getDecimal("DecimalComp", 0));
     }
 
     @Test

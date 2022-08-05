@@ -12,6 +12,7 @@ import org.eclipse.collections.impl.factory.Lists;
 import org.junit.Assert;
 import org.junit.Test;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
@@ -19,6 +20,7 @@ import static io.github.vmzakharov.ecdataframe.ExpressionTestUtil.evaluateScript
 import static io.github.vmzakharov.ecdataframe.ExpressionTestUtil.evaluateToBoolean;
 import static io.github.vmzakharov.ecdataframe.ExpressionTestUtil.evaluateToDate;
 import static io.github.vmzakharov.ecdataframe.ExpressionTestUtil.evaluateToDateTime;
+import static io.github.vmzakharov.ecdataframe.ExpressionTestUtil.evaluateToDecimal;
 import static io.github.vmzakharov.ecdataframe.ExpressionTestUtil.evaluateToDouble;
 import static io.github.vmzakharov.ecdataframe.ExpressionTestUtil.evaluateToLong;
 import static io.github.vmzakharov.ecdataframe.ExpressionTestUtil.evaluateToString;
@@ -186,6 +188,13 @@ public class BuiltInFunctionTest
     }
 
     @Test
+    public void toDecimal()
+    {
+        Assert.assertEquals(BigDecimal.valueOf(123, 5), evaluateToDecimal("toDecimal(123, 5)"));
+        Assert.assertEquals(BigDecimal.valueOf(-456, -2), evaluateToDecimal("toDecimal(-456, -2)"));
+    }
+
+    @Test
     public void listAllFunctions()
     {
         BuiltInFunctions.resetFunctionList();
@@ -194,7 +203,7 @@ public class BuiltInFunctionTest
 
         MutableList<String> expectedFunctionNames = Lists.mutable.of(
             "abs", "contains", "print", "println", "startsWith", "substr", "toDate", "toDateTime", "toDouble", "toLong",
-            "toString", "toUpper", "trim", "withinDays", "format"
+            "toString", "toUpper", "trim", "withinDays", "format", "toDecimal"
         );
 
         Assert.assertEquals(expectedFunctionNames.size(), functionsByName.size());
