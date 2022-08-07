@@ -26,7 +26,7 @@ extends AbstractValue
     @Override
     public String asStringLiteral()
     {
-        return "[" + this.value.unscaledValue() + ',' + this.value.scale() +']';
+        return "[" + this.value.unscaledValue() + ',' + this.value.scale() + ']';
     }
 
     @Override

@@ -8,7 +8,6 @@ import io.github.vmzakharov.ecdataframe.dsl.value.Value;
 
 import java.math.BigDecimal;
 import java.math.MathContext;
-import java.math.RoundingMode;
 
 public interface ArithmeticOp
 extends BinaryOp
