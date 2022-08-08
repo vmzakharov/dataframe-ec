@@ -601,7 +601,7 @@ extends DataSetAbstract
             if (headers.size() != elements.size())
             {
                 ErrorReporter.reportAndThrow(
-                        "The number of elements in the header does not match the number of elements in the data row " + (lineIndex+1) + " ("
+                        "The number of elements in the header does not match the number of elements in the data row " + (lineIndex + 1) + " ("
                                 + headers.size() + " vs " + elements.size() + ")");
             }
 
