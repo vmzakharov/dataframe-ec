@@ -24,7 +24,10 @@ extends BinaryOp
         }
 
         @Override
-        public String asString() { return "AND"; }
+        public String asString()
+        {
+            return "AND";
+        }
     };
 
     BooleanOp OR = new BooleanOp()

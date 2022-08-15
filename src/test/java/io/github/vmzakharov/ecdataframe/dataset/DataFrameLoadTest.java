@@ -282,7 +282,8 @@ public class DataFrameLoadTest
     @Test
     public void headerDataMismatchThrowsExceptionWithCorrectLineNumber()
     {
-        try {
+        try
+        {
             CsvDataSet dataSet = new StringBasedCsvDataSet("Foo", "Dates",
                     "Name,Date,Count\n"
                             + "\"Alice\",1-Jan-2020,10\n"
@@ -293,7 +294,9 @@ public class DataFrameLoadTest
             );
 
             DataFrame loaded = dataSet.loadAsDataFrame();
-        } catch (RuntimeException re) {
+        }
+        catch (RuntimeException re)
+        {
             String expectedMessage = "The number of elements in the header does not match the number of elements in the data row 5 (3 vs 2)";
             Assert.assertEquals(expectedMessage, re.getMessage());
         }

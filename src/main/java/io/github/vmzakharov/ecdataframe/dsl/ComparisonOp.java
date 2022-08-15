@@ -51,7 +51,10 @@ extends PredicateOp
         }
 
         @Override
-        public String asString() { return "=="; }
+        public String asString()
+        {
+            return "==";
+        }
     };
 
     ComparisonOp NE = new ComparisonOp()
@@ -96,7 +99,10 @@ extends PredicateOp
         }
 
         @Override
-        public String asString() { return "!="; }
+        public String asString()
+        {
+            return "!=";
+        }
     };
 
     ComparisonOp LT = new ComparisonOp()
@@ -152,7 +158,10 @@ extends PredicateOp
         }
 
         @Override
-        public String asString() { return "<"; }
+        public String asString()
+        {
+            return "<";
+        }
     };
 
     ComparisonOp LTE = new ComparisonOp()
@@ -198,7 +207,10 @@ extends PredicateOp
         }
 
         @Override
-        public String asString() { return "<="; }
+        public String asString()
+        {
+            return "<=";
+        }
     };
 
     ComparisonOp GT = new ComparisonOp()
@@ -244,7 +256,10 @@ extends PredicateOp
         }
 
         @Override
-        public String asString() { return ">"; }
+        public String asString()
+        {
+            return ">";
+        }
     };
 
     ComparisonOp GTE = new ComparisonOp()
@@ -290,6 +305,9 @@ extends PredicateOp
         }
 
         @Override
-        public String asString() { return ">="; }
+        public String asString()
+        {
+            return ">=";
+        }
     };
 }

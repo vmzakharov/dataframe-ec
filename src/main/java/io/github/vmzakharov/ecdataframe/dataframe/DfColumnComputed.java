@@ -9,7 +9,10 @@ public interface DfColumnComputed
 extends DfColumn
 {
     @Override
-    default boolean isStored() { return false; }
+    default boolean isStored()
+    {
+        return false;
+    }
 
     String getExpressionAsString();
 

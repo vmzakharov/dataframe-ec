@@ -13,10 +13,16 @@ extends Expression, Comparable<Value>
     Value VOID = new Value()
     {
         @Override
-        public String asStringLiteral() { return "VOID"; }
+        public String asStringLiteral()
+        {
+            return "VOID";
+        }
 
         @Override
-        public ValueType getType() { return ValueType.VOID; }
+        public ValueType getType()
+        {
+            return ValueType.VOID;
+        }
 
         @Override
         public int compareTo(Value other)
@@ -61,28 +67,64 @@ extends Expression, Comparable<Value>
 
     ValueType getType();
 
-    default boolean isVoid()      { return this == VOID; }
+    default boolean isVoid()
+    {
+        return this == VOID;
+    }
 
-    default boolean isBoolean()   { return this.getType().isBoolean(); }
+    default boolean isBoolean()
+    {
+        return this.getType().isBoolean();
+    }
 
-    default boolean isLong()      { return this.getType().isLong(); }
+    default boolean isLong()
+    {
+        return this.getType().isLong();
+    }
 
-    default boolean isDouble()    { return this.getType().isDouble(); }
+    default boolean isDouble()
+    {
+        return this.getType().isDouble();
+    }
 
-    default boolean isDecimal()    { return this.getType().isDecimal(); }
+    default boolean isDecimal()
+    {
+        return this.getType().isDecimal();
+    }
 
-    default boolean isNumber()    { return this.getType().isNumber(); }
+    default boolean isNumber()
+    {
+        return this.getType().isNumber();
+    }
 
-    default boolean isString()    { return this.getType().isString(); }
+    default boolean isString()
+    {
+        return this.getType().isString();
+    }
 
-    default boolean isDate()      { return this.getType().isDate(); }
+    default boolean isDate()
+    {
+        return this.getType().isDate();
+    }
 
-    default boolean isTemporal()  { return this.getType().isTemporal(); }
+    default boolean isTemporal()
+    {
+        return this.getType().isTemporal();
+    }
 
-    default boolean isDateTime()  { return this.getType().isDateTime(); }
+    default boolean isDateTime()
+    {
+        return this.getType().isDateTime();
+    }
 
-    default boolean isVector()    { return this.getType().isVector(); }
+    default boolean isVector()
+    {
+        return this.getType().isVector();
+    }
 
-    default boolean isDataFrame() { return this.getType().isString(); }
+    default boolean isDataFrame()
+    {
+        return this.getType().isString();
+    }
 }
 

@@ -10,7 +10,7 @@ import java.math.BigDecimal;
 import java.math.MathContext;
 
 public interface ArithmeticOp
-extends BinaryOp
+        extends BinaryOp
 {
     ArithmeticOp ADD = new ArithmeticOp()
     {
@@ -25,10 +25,16 @@ extends BinaryOp
         }
 
         @Override
-        public Value applyLong(long operand1, long operand2) { return new LongValue(operand1 + operand2); }
+        public Value applyLong(long operand1, long operand2)
+        {
+            return new LongValue(operand1 + operand2);
+        }
 
         @Override
-        public Value applyDouble(double operand1, double operand2) { return new DoubleValue(operand1 + operand2); }
+        public Value applyDouble(double operand1, double operand2)
+        {
+            return new DoubleValue(operand1 + operand2);
+        }
 
         @Override
         public Value applyDecimal(BigDecimal operand1, BigDecimal operand2)
@@ -37,7 +43,10 @@ extends BinaryOp
         }
 
         @Override
-        public String asString() { return "+"; }
+        public String asString()
+        {
+            return "+";
+        }
     };
 
     ArithmeticOp MULTIPLY = new ArithmeticOp()
@@ -49,7 +58,10 @@ extends BinaryOp
         }
 
         @Override
-        public DoubleValue applyDouble(double operand1, double operand2) { return new DoubleValue(operand1 * operand2); }
+        public DoubleValue applyDouble(double operand1, double operand2)
+        {
+            return new DoubleValue(operand1 * operand2);
+        }
 
         @Override
         public Value applyDecimal(BigDecimal operand1, BigDecimal operand2)
@@ -73,7 +85,10 @@ extends BinaryOp
         }
 
         @Override
-        public DoubleValue applyDouble(double operand1, double operand2) { return new DoubleValue(operand1 - operand2); }
+        public DoubleValue applyDouble(double operand1, double operand2)
+        {
+            return new DoubleValue(operand1 - operand2);
+        }
 
         @Override
         public Value applyDecimal(BigDecimal operand1, BigDecimal operand2)
@@ -97,11 +112,15 @@ extends BinaryOp
         }
 
         @Override
-        public DoubleValue applyDouble(double operand1, double operand2) { return new DoubleValue(operand1 / operand2); }
+        public DoubleValue applyDouble(double operand1, double operand2)
+        {
+            return new DoubleValue(operand1 / operand2);
+        }
 
         @Override
         public Value applyDecimal(BigDecimal operand1, BigDecimal operand2)
         {
+            // todo: fix ikt
 //            return new DecimalValue(operand1.divide(operand2, RoundingMode.HALF_UP));
             return new DecimalValue(operand1.divide(operand2, MathContext.DECIMAL64));
         }

@@ -1397,8 +1397,7 @@ public class DataFrame
 
         MutableMap<String, String> otherColumnNameMap = Maps.mutable.of();
 
-        otherNames.forEach(e ->
-                {
+        otherNames.forEach(e -> {
                     String newName = e;
                     while (uniqueColumnNames.contains(newName))
                     {

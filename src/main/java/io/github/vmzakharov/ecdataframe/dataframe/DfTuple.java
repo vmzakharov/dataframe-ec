@@ -38,8 +38,16 @@ implements Comparable<DfTuple>
     @Override
     public boolean equals(Object o)
     {
-        if (this == o) { return true; }
-        if (o == null || this.getClass() != o.getClass()) { return false; }
+        if (this == o)
+        {
+            return true;
+        }
+
+        if (o == null || this.getClass() != o.getClass())
+        {
+            return false;
+        }
+
         DfTuple dfTuple = (DfTuple) o;
         return Arrays.equals(this.items, dfTuple.items);
     }

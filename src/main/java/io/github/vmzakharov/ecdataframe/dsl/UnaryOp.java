@@ -15,13 +15,22 @@ public interface UnaryOp
     UnaryOp MINUS = new UnaryOp()
     {
         @Override
-        public LongValue applyLong(long operand) { return new LongValue(-operand); }
+        public LongValue applyLong(long operand)
+        {
+            return new LongValue(-operand);
+        }
 
         @Override
-        public DoubleValue applyDouble(double operand) { return new DoubleValue(-operand); }
+        public DoubleValue applyDouble(double operand)
+        {
+            return new DoubleValue(-operand);
+        }
 
         @Override
-        public String asString() { return "-"; }
+        public String asString()
+        {
+            return "-";
+        }
     };
 
     UnaryOp NOT = new UnaryOp()
@@ -32,7 +41,10 @@ public interface UnaryOp
             return BooleanValue.valueOf(!operand);
         }
 
-        public String asString() { return "!"; }
+        public String asString()
+        {
+            return "!";
+        }
     };
 
     UnaryOp IS_EMPTY = new UnaryOp()
