@@ -1,6 +1,7 @@
 package io.github.vmzakharov.ecdataframe.dsl.visitor;
 
 import io.github.vmzakharov.ecdataframe.dataframe.DataFrame;
+import io.github.vmzakharov.ecdataframe.dataframe.ErrorReporter;
 import io.github.vmzakharov.ecdataframe.dataset.HierarchicalDataSet;
 import io.github.vmzakharov.ecdataframe.dsl.AnonymousScript;
 import io.github.vmzakharov.ecdataframe.dsl.AssingExpr;
@@ -92,7 +93,7 @@ implements ExpressionEvaluationVisitor
         {
             if (expr.getParameters().size() != functionScript.getParameterNames().size())
             {
-                throw new RuntimeException("Parameter count mismatch in an invocation of '" + functionName + "'");
+                ErrorReporter.reportAndThrow("Parameter count mismatch in an invocation of '" + functionName + "'");
             }
 
             functionScript.getParameterNames().forEachWithIndex(
@@ -108,11 +109,16 @@ implements ExpressionEvaluationVisitor
 
             if (functionDescriptor == null)
             {
-                throw new RuntimeException("Unknown function: '" + expr.getFunctionName() + "'");
+                ErrorReporter.reportAndThrow("Unknown function: '" + expr.getFunctionName() + "'");
             }
 
             if (functionDescriptor.hasExplicitParameters())
             {
+                if (expr.getParameters().size() != functionDescriptor.getParameterNames().size())
+                {
+                    ErrorReporter.reportAndThrow("Parameter count mismatch in an invocation of '" + functionName + "'");
+                }
+
                 functionDescriptor.getParameterNames().forEachWithIndex(
                         (p, i) -> localContext.setVariable(p, parameterValues.get(i)));
             }
@@ -171,7 +177,8 @@ implements ExpressionEvaluationVisitor
             return new DateTimeValue((LocalDateTime) rawValue);
         }
 
-        throw new RuntimeException("Don't know how to handle " + rawValue.toString() + ", type: " + rawValue.getClass().getName());
+        ErrorReporter.reportAndThrow("Don't know how to handle " + rawValue.toString() + ", type: " + rawValue.getClass().getName());
+        return Value.VOID; // will not reach this, but otherwise the compiler is not happy
     }
 
     @Override
@@ -197,7 +204,8 @@ implements ExpressionEvaluationVisitor
     @Override
     public Value visitFunctionScriptExpr(FunctionScript expr)
     {
-        throw new RuntimeException("Cannot evaluate function declaration by itself. Function " + expr.getName());
+        ErrorReporter.reportAndThrow("Cannot evaluate function declaration by itself. Function " + expr.getName());
+        return Value.VOID; // will not reach this, but otherwise the compiler is not happy
     }
 
     @Override
