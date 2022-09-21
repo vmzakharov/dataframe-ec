@@ -33,6 +33,7 @@ import static io.github.vmzakharov.ecdataframe.dsl.value.ValueType.DATE_TIME;
 import static io.github.vmzakharov.ecdataframe.dsl.value.ValueType.DOUBLE;
 import static io.github.vmzakharov.ecdataframe.dsl.value.ValueType.LONG;
 import static io.github.vmzakharov.ecdataframe.dsl.value.ValueType.STRING;
+import static io.github.vmzakharov.ecdataframe.dsl.value.ValueType.VECTOR;
 
 final public class BuiltInFunctions
 {
@@ -252,6 +253,21 @@ final public class BuiltInFunctions
             public ValueType returnType(ListIterable<ValueType> paraValueTypes)
             {
                 return STRING;
+            }
+        });
+
+        addFunctionDescriptor(new IntrinsicFunctionDescriptor("v")
+        {
+            @Override
+            public Value evaluate(VectorValue parameters)
+            {
+                return parameters;
+            }
+
+            @Override
+            public ValueType returnType(ListIterable<ValueType> paraValueTypes)
+            {
+                return VECTOR;
             }
         });
 

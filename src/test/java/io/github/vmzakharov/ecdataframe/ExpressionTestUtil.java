@@ -12,8 +12,10 @@ import io.github.vmzakharov.ecdataframe.dsl.value.DecimalValue;
 import io.github.vmzakharov.ecdataframe.dsl.value.DoubleValue;
 import io.github.vmzakharov.ecdataframe.dsl.value.LongValue;
 import io.github.vmzakharov.ecdataframe.dsl.value.Value;
+import io.github.vmzakharov.ecdataframe.dsl.value.VectorValue;
 import io.github.vmzakharov.ecdataframe.dsl.visitor.InMemoryEvaluationVisitor;
 import io.github.vmzakharov.ecdataframe.util.ExpressionParserHelper;
+import org.eclipse.collections.api.list.ListIterable;
 import org.junit.Assert;
 
 import java.math.BigDecimal;
@@ -30,6 +32,11 @@ final public class ExpressionTestUtil
     static public long evaluateToLong(String s)
     {
         return ((LongValue) evaluateExpression(s)).longValue();
+    }
+
+    static public ListIterable<Value> evaluateToVector(String s)
+    {
+        return ((VectorValue) evaluateExpression(s)).getElements();
     }
 
     public static AnonymousScript toScript(String s)

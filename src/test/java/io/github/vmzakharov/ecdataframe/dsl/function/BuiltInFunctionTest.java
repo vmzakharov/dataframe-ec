@@ -2,10 +2,12 @@ package io.github.vmzakharov.ecdataframe.dsl.function;
 
 import io.github.vmzakharov.ecdataframe.dsl.Script;
 import io.github.vmzakharov.ecdataframe.dsl.SimpleEvalContext;
+import io.github.vmzakharov.ecdataframe.dsl.value.LongValue;
 import io.github.vmzakharov.ecdataframe.dsl.value.Value;
 import io.github.vmzakharov.ecdataframe.dsl.visitor.InMemoryEvaluationVisitor;
 import io.github.vmzakharov.ecdataframe.util.CollectingPrinter;
 import io.github.vmzakharov.ecdataframe.util.PrinterFactory;
+import org.eclipse.collections.api.factory.primitive.LongLists;
 import org.eclipse.collections.api.list.MutableList;
 import org.eclipse.collections.api.map.MapIterable;
 import org.eclipse.collections.impl.factory.Lists;
@@ -24,6 +26,7 @@ import static io.github.vmzakharov.ecdataframe.ExpressionTestUtil.evaluateToDeci
 import static io.github.vmzakharov.ecdataframe.ExpressionTestUtil.evaluateToDouble;
 import static io.github.vmzakharov.ecdataframe.ExpressionTestUtil.evaluateToLong;
 import static io.github.vmzakharov.ecdataframe.ExpressionTestUtil.evaluateToString;
+import static io.github.vmzakharov.ecdataframe.ExpressionTestUtil.evaluateToVector;
 import static io.github.vmzakharov.ecdataframe.ExpressionTestUtil.toScript;
 
 public class BuiltInFunctionTest
@@ -128,6 +131,26 @@ public class BuiltInFunctionTest
     }
 
     @Test
+    public void vectorFactory()
+    {
+        Assert.assertEquals(
+                LongLists.immutable.of(1L, 2L, 3L),
+                evaluateToVector("v(1, 2, 3)").collectLong(each -> ((LongValue) each).longValue())
+        );
+
+        Assert.assertEquals(
+                Lists.immutable.of("abc"),
+                evaluateToVector("v('abc')").collect(Value::stringValue)
+        );
+
+        Assert.assertEquals(
+                Lists.immutable.of(1L, "two", 3L),
+                evaluateToVector("v(1, 'two', 3)")
+                        .collect(each -> each.isLong() ? ((LongValue) each).longValue() : each.stringValue())
+        );
+    }
+
+    @Test
     public void abs()
     {
         Assert.assertEquals(10, evaluateToLong("abs(-10)"));
@@ -203,7 +226,7 @@ public class BuiltInFunctionTest
 
         MutableList<String> expectedFunctionNames = Lists.mutable.of(
             "abs", "contains", "print", "println", "startsWith", "substr", "toDate", "toDateTime", "toDouble", "toLong",
-            "toString", "toUpper", "trim", "withinDays", "format", "toDecimal"
+            "toString", "toUpper", "trim", "withinDays", "format", "toDecimal", "v"
         );
 
         Assert.assertEquals(expectedFunctionNames.size(), functionsByName.size());
