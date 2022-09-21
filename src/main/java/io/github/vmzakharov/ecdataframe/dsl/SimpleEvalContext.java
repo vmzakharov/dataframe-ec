@@ -1,5 +1,6 @@
 package io.github.vmzakharov.ecdataframe.dsl;
 
+import io.github.vmzakharov.ecdataframe.dataframe.ErrorReporter;
 import io.github.vmzakharov.ecdataframe.dataset.HierarchicalDataSet;
 import io.github.vmzakharov.ecdataframe.dsl.value.Value;
 import org.eclipse.collections.api.RichIterable;
@@ -18,7 +19,7 @@ extends EvalContextAbstract
 
         if (value == null)
         {
-            throw new RuntimeException("Uninitialized variable: " + newVariableName);
+            ErrorReporter.reportAndThrow("Uninitialized variable: " + newVariableName);
         }
 
         return value;
