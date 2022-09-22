@@ -5,6 +5,7 @@ import io.github.vmzakharov.ecdataframe.dataframe.DfDoubleColumnStored;
 import io.github.vmzakharov.ecdataframe.dataframe.DfLongColumnStored;
 import io.github.vmzakharov.ecdataframe.dsl.value.ValueType;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -94,6 +95,18 @@ public class CsvSchemaColumn
         String trimmed = aString.trim();
 
         return trimmed.isEmpty() ? null : LocalDateTime.parse(trimmed, this.dateTimeFormatter);
+    }
+
+    public BigDecimal parseAsDecimal(String aString)
+    {
+        if (aString == null)
+        {
+            return null;
+        }
+
+        String trimmed = aString.trim();
+
+        return trimmed.isEmpty() ? null : new BigDecimal(trimmed);
     }
 
     public void parseAsDoubleAndAdd(String aString, DfColumn dfColumn)

@@ -7,11 +7,13 @@ import org.eclipse.collections.api.map.MutableMap;
 import org.junit.Assert;
 import org.junit.Test;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 import static io.github.vmzakharov.ecdataframe.dsl.value.ValueType.DATE;
 import static io.github.vmzakharov.ecdataframe.dsl.value.ValueType.DATE_TIME;
+import static io.github.vmzakharov.ecdataframe.dsl.value.ValueType.DECIMAL;
 import static io.github.vmzakharov.ecdataframe.dsl.value.ValueType.DOUBLE;
 import static io.github.vmzakharov.ecdataframe.dsl.value.ValueType.LONG;
 import static io.github.vmzakharov.ecdataframe.dsl.value.ValueType.STRING;
@@ -868,5 +870,34 @@ public class DataFrameLoadTest
         );
 
         DataFrame df = dataSet.loadAsDataFrame();
+    }
+
+    @Test
+    public void loadBigDecimalLiteral()
+    {
+        CsvSchema schema = new CsvSchema()
+                .addColumn("Name", STRING)
+                .addColumn("EmployeeId", LONG)
+                .addColumn("Salary", DECIMAL)
+                .addColumn("Bonus", DOUBLE)
+                ;
+
+        CsvDataSet dataSet = new StringBasedCsvDataSet("Foo", "Employees", schema,
+                "Name,EmployeeId,Salary,Bonus\n"
+                + "\"Alice\",1234,12000010.1,100.1\n"
+                + "\"Bob\",1235,1000005.12,100.2\n"
+                + "\"Doris\",1237,100000.701,100.3\n"
+        );
+
+        DataFrame df = dataSet.loadAsDataFrame();
+
+        DataFrameUtil.assertEquals(
+                new DataFrame("Employees")
+                        .addStringColumn("Name").addLongColumn("EmployeeId").addDecimalColumn("Salary").addDoubleColumn("Bonus")
+                        .addRow("Alice", 1234, BigDecimal.valueOf(120000101, 1), 100.1)
+                        .addRow("Bob",   1235, BigDecimal.valueOf(100000512, 2), 100.2)
+                        .addRow("Doris", 1237, BigDecimal.valueOf(100000701, 3), 100.3)
+                , df
+        );
     }
 }

@@ -580,6 +580,9 @@ extends DataSetAbstract
             case DATE_TIME:
                 columnPopulators.add(s -> lastColumn.addObject(schemaCol.parseAsLocalDateTime(s)));
                 break;
+            case DECIMAL:
+                columnPopulators.add(s -> lastColumn.addObject(schemaCol.parseAsDecimal(s)));
+                break;
             default:
                 throw new RuntimeException("Don't know what to do with the column type: " + columnType);
         }
