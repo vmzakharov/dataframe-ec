@@ -9,6 +9,7 @@ import java.math.BigDecimal;
 
 public class DecimalValue
 extends AbstractValue
+implements NumberValue
 {
     private final BigDecimal value;
 
@@ -32,7 +33,7 @@ extends AbstractValue
     @Override
     public Value apply(Value another, ArithmeticOp operation)
     {
-        return operation.applyDecimal(this.decimalValue(), ((DecimalValue) another).decimalValue());
+        return operation.applyDecimal(this.decimalValue(), ((NumberValue) another).decimalValue());
     }
 
     @Override
@@ -56,6 +57,13 @@ extends AbstractValue
     public BigDecimal decimalValue()
     {
         return this.value;
+    }
+
+    @Override
+    public double doubleValue()
+    {
+        ErrorReporter.reportAndThrow("Cannot convert decimal value to floating point");
+        return 0.0;
     }
 
     @Override

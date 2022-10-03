@@ -61,7 +61,7 @@ public class BasicDataFrameTest
                 .addColumn("DoubleComp", ValueType.DOUBLE, "Double + 10.0")
                 .addColumn("DateComp", ValueType.DATE, "toDate(2021, 11, 15)")
                 .addColumn("DateTimeComp", ValueType.DATE_TIME, "toDateTime(2022, 12, 25, 13, 12, 10)")
-                .addColumn("DecimalComp", ValueType.DECIMAL, "[456,5]")
+                .addColumn("DecimalComp", ValueType.DECIMAL, "toDecimal(456,5)")
                 ;
 
         dataFrame.addRow("Beep", 10, 20.0, LocalDate.of(2020, 10, 20), LocalDateTime.of(2022, 8, 22, 10, 10, 10),

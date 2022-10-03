@@ -25,19 +25,19 @@ public interface ArithmeticOp
         }
 
         @Override
-        public Value applyLong(long operand1, long operand2)
+        public LongValue applyLong(long operand1, long operand2)
         {
             return new LongValue(operand1 + operand2);
         }
 
         @Override
-        public Value applyDouble(double operand1, double operand2)
+        public DoubleValue applyDouble(double operand1, double operand2)
         {
             return new DoubleValue(operand1 + operand2);
         }
 
         @Override
-        public Value applyDecimal(BigDecimal operand1, BigDecimal operand2)
+        public DecimalValue applyDecimal(BigDecimal operand1, BigDecimal operand2)
         {
             return new DecimalValue(operand1.add(operand2));
         }
@@ -64,7 +64,7 @@ public interface ArithmeticOp
         }
 
         @Override
-        public Value applyDecimal(BigDecimal operand1, BigDecimal operand2)
+        public DecimalValue applyDecimal(BigDecimal operand1, BigDecimal operand2)
         {
             return new DecimalValue(operand1.multiply(operand2));
         }
@@ -91,7 +91,7 @@ public interface ArithmeticOp
         }
 
         @Override
-        public Value applyDecimal(BigDecimal operand1, BigDecimal operand2)
+        public DecimalValue applyDecimal(BigDecimal operand1, BigDecimal operand2)
         {
             return new DecimalValue(operand1.subtract(operand2));
         }
@@ -118,11 +118,9 @@ public interface ArithmeticOp
         }
 
         @Override
-        public Value applyDecimal(BigDecimal operand1, BigDecimal operand2)
+        public DecimalValue applyDecimal(BigDecimal operand1, BigDecimal operand2)
         {
-            // todo: fix ikt
-//            return new DecimalValue(operand1.divide(operand2, RoundingMode.HALF_UP));
-            return new DecimalValue(operand1.divide(operand2, MathContext.DECIMAL64));
+            return new DecimalValue(operand1.divide(operand2, MathContext.DECIMAL128));
         }
 
         @Override

@@ -1,19 +1,24 @@
 package io.github.vmzakharov.ecdataframe.dataframe.aggregation;
 
 import io.github.vmzakharov.ecdataframe.dataframe.AggregateFunction;
+import io.github.vmzakharov.ecdataframe.dataframe.DfDecimalColumn;
 import io.github.vmzakharov.ecdataframe.dataframe.DfDoubleColumn;
 import io.github.vmzakharov.ecdataframe.dataframe.DfLongColumn;
+import io.github.vmzakharov.ecdataframe.dataframe.DfObjectColumn;
 import io.github.vmzakharov.ecdataframe.dsl.value.ValueType;
 import org.eclipse.collections.api.list.ListIterable;
 import org.eclipse.collections.impl.factory.Lists;
 
+import java.math.BigDecimal;
+
+import static io.github.vmzakharov.ecdataframe.dsl.value.ValueType.DECIMAL;
 import static io.github.vmzakharov.ecdataframe.dsl.value.ValueType.DOUBLE;
 import static io.github.vmzakharov.ecdataframe.dsl.value.ValueType.LONG;
 
 public class Min
 extends AggregateFunction
 {
-    private static final ListIterable<ValueType> SUPPORTED_TYPES = Lists.immutable.of(LONG, DOUBLE);
+    private static final ListIterable<ValueType> SUPPORTED_TYPES = Lists.immutable.of(LONG, DOUBLE, DECIMAL);
 
     public Min(String newColumnName)
     {
@@ -50,6 +55,15 @@ extends AggregateFunction
     }
 
     @Override
+    public Object applyToObjectColumn(DfObjectColumn<?> objectColumn)
+    {
+        return ((DfDecimalColumn) objectColumn).injectIntoBreakOnNulls(
+                this.objectInitialValue(),
+                (result, current) -> result.compareTo(current) < 0 ? result : current
+        );
+    }
+
+    @Override
     public long longInitialValue()
     {
         return Long.MAX_VALUE;
@@ -62,6 +76,12 @@ extends AggregateFunction
     }
 
     @Override
+    public BigDecimal objectInitialValue()
+    {
+        return BigDecimal.valueOf(Double.MAX_VALUE);
+    }
+
+    @Override
     protected long longAccumulator(long currentAggregate, long newValue)
     {
         return Math.min(currentAggregate, newValue);
@@ -71,5 +91,11 @@ extends AggregateFunction
     protected double doubleAccumulator(double currentAggregate, double newValue)
     {
         return Math.min(currentAggregate, newValue);
+    }
+
+    @Override
+    protected Object objectAccumulator(Object currentAggregate, Object newValue)
+    {
+        return ((BigDecimal) currentAggregate).compareTo((BigDecimal) newValue) > 0 ? newValue : currentAggregate;
     }
 }

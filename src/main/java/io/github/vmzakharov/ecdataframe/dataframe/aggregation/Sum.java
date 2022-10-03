@@ -1,16 +1,24 @@
 package io.github.vmzakharov.ecdataframe.dataframe.aggregation;
 
 import io.github.vmzakharov.ecdataframe.dataframe.AggregateFunction;
+import io.github.vmzakharov.ecdataframe.dataframe.DfDecimalColumn;
 import io.github.vmzakharov.ecdataframe.dataframe.DfDoubleColumn;
 import io.github.vmzakharov.ecdataframe.dataframe.DfLongColumn;
+import io.github.vmzakharov.ecdataframe.dataframe.DfObjectColumn;
 import io.github.vmzakharov.ecdataframe.dsl.value.ValueType;
 import org.eclipse.collections.api.list.ListIterable;
 import org.eclipse.collections.impl.factory.Lists;
 
+import java.math.BigDecimal;
+
+import static io.github.vmzakharov.ecdataframe.dsl.value.ValueType.DECIMAL;
+import static io.github.vmzakharov.ecdataframe.dsl.value.ValueType.DOUBLE;
+import static io.github.vmzakharov.ecdataframe.dsl.value.ValueType.LONG;
+
 public class Sum
 extends AggregateFunction
 {
-    private static final ListIterable<ValueType> SUPPORTED_TYPES = Lists.immutable.of(ValueType.LONG, ValueType.DOUBLE);
+    private static final ListIterable<ValueType> SUPPORTED_TYPES = Lists.immutable.of(LONG, DOUBLE, DECIMAL);
 
     public Sum(String newColumnName)
     {
@@ -47,6 +55,14 @@ extends AggregateFunction
     }
 
     @Override
+    public Object applyToObjectColumn(DfObjectColumn<?> objectColumn)
+    {
+        return ((DfDecimalColumn) objectColumn).injectIntoBreakOnNulls(
+                this.objectInitialValue(),
+                BigDecimal::add);
+    }
+
+    @Override
     public long longInitialValue()
     {
         return 0L;
@@ -59,6 +75,12 @@ extends AggregateFunction
     }
 
     @Override
+    public BigDecimal objectInitialValue()
+    {
+        return BigDecimal.ZERO;
+    }
+
+    @Override
     protected long longAccumulator(long currentAggregate, long newValue)
     {
         return currentAggregate + newValue;
@@ -68,6 +90,12 @@ extends AggregateFunction
     protected double doubleAccumulator(double currentAggregate, double newValue)
     {
         return currentAggregate + newValue;
+    }
+
+    @Override
+    protected Object objectAccumulator(Object currentAggregate, Object newValue)
+    {
+        return ((BigDecimal) currentAggregate).add((BigDecimal) newValue);
     }
 
     @Override

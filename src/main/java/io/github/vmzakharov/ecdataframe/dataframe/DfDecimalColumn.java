@@ -18,7 +18,7 @@ extends DfObjectColumn<BigDecimal>
 
     default ValueType getType()
     {
-        return ValueType.STRING;
+        return ValueType.DECIMAL;
     }
 
     @Override

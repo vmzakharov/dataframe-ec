@@ -30,6 +30,7 @@ import java.time.format.DateTimeFormatter;
 import static io.github.vmzakharov.ecdataframe.dsl.value.ValueType.BOOLEAN;
 import static io.github.vmzakharov.ecdataframe.dsl.value.ValueType.DATE;
 import static io.github.vmzakharov.ecdataframe.dsl.value.ValueType.DATE_TIME;
+import static io.github.vmzakharov.ecdataframe.dsl.value.ValueType.DECIMAL;
 import static io.github.vmzakharov.ecdataframe.dsl.value.ValueType.DOUBLE;
 import static io.github.vmzakharov.ecdataframe.dsl.value.ValueType.LONG;
 import static io.github.vmzakharov.ecdataframe.dsl.value.ValueType.STRING;
@@ -453,6 +454,29 @@ final public class BuiltInFunctions
             public ValueType returnType(ListIterable<ValueType> paraValueTypes)
             {
                 return DOUBLE;
+            }
+        });
+
+        addFunctionDescriptor(new IntrinsicFunctionDescriptor("toDecimal", Lists.immutable.of("unscaledValue", "scale"))
+        {
+            @Override
+            public Value evaluate(EvalContext context)
+            {
+                Value unscaled = context.getVariable("unscaledValue");
+                this.assertParameterType(LONG, unscaled.getType());
+                Value scale = context.getVariable("scale");
+                this.assertParameterType(LONG, scale.getType());
+
+                return new DecimalValue(BigDecimal.valueOf(
+                        ((LongValue) unscaled).longValue(),
+                        (int) ((LongValue) scale).longValue()
+                ));
+            }
+
+            @Override
+            public ValueType returnType(ListIterable<ValueType> paraValueTypes)
+            {
+                return DECIMAL;
             }
         });
 

@@ -16,6 +16,7 @@ import io.github.vmzakharov.ecdataframe.dsl.value.Value;
 import io.github.vmzakharov.ecdataframe.dsl.visitor.InMemoryEvaluationVisitor;
 import org.eclipse.collections.impl.factory.Lists;
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
 
 public class SimpleExpressionParsingTest
@@ -125,6 +126,26 @@ public class SimpleExpressionParsingTest
 
         Assert.assertEquals(
                 Lists.immutable.of("\"a\"", "\"b\"", "\"c\""),
+                vectorExpr.getElements().collect(e -> ((Value) e).asStringLiteral()));
+    }
+
+    @Test
+    @Ignore
+    public void singleElementVectorExpression()
+    {
+        // TODO: remove ambiguous syntax for single element arrays
+        Script script = ExpressionTestUtil.toScript("('a')");
+
+        Expression expression = script.getExpressions().get(0);
+
+        Assert.assertEquals(VectorExpr.class, expression.getClass());
+
+        VectorExpr vectorExpr = (VectorExpr) expression;
+
+        Assert.assertEquals(3, vectorExpr.getElements().size());
+
+        Assert.assertEquals(
+                Lists.immutable.of("\"a\""),
                 vectorExpr.getElements().collect(e -> ((Value) e).asStringLiteral()));
     }
 }

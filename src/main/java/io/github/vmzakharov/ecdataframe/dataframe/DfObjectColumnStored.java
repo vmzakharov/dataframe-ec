@@ -105,17 +105,6 @@ implements DfColumnStored
     }
 
     @Override
-    public Object aggregate(AggregateFunction aggregator)
-    {
-        if (aggregator.handlesObjectIterables())
-        {
-            return aggregator.<T>applyIterable(this.values);
-        }
-
-        return super.aggregate(aggregator);
-    }
-
-    @Override
     public void aggregateValueInto(int rowIndex, DfColumn sourceColumn, int sourceRowIndex, AggregateFunction aggregator)
     {
         T currentAggregatedValue = this.values.get(rowIndex);

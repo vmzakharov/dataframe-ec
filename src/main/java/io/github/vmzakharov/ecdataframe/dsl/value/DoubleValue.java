@@ -4,6 +4,8 @@ import io.github.vmzakharov.ecdataframe.dsl.ArithmeticOp;
 import io.github.vmzakharov.ecdataframe.dsl.PredicateOp;
 import io.github.vmzakharov.ecdataframe.dsl.UnaryOp;
 
+import java.math.BigDecimal;
+
 public class DoubleValue
 extends AbstractValue
 implements NumberValue
@@ -18,6 +20,12 @@ implements NumberValue
     public double doubleValue()
     {
         return this.value;
+    }
+
+    @Override
+    public BigDecimal decimalValue()
+    {
+        return BigDecimal.valueOf(this.value);
     }
 
     @Override

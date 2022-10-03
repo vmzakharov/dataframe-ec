@@ -102,6 +102,11 @@ public abstract class AggregateFunction
 
     abstract public ListIterable<ValueType> supportedSourceTypes();
 
+    public boolean supportsSourceType(ValueType type)
+    {
+        return this.supportedSourceTypes().contains(type);
+    }
+
     public Object applyToDoubleColumn(DfDoubleColumn doubleColumn)
     {
         this.throwNotApplicable("double values");
@@ -116,24 +121,11 @@ public abstract class AggregateFunction
 
     public Object applyToObjectColumn(DfObjectColumn<?> objectColumn)
     {
-        if (this.handlesObjectIterables())
-        {
-            this.applyIterable(objectColumn.toList());
-        }
-        else
-        {
-            this.throwNotApplicable("non-numeric values");
-        }
-        return null;
-    }
-
-    public Object applyIterable(ListIterable<?> items)
-    {
         this.throwNotApplicable("non-numeric values");
         return null;
     }
 
-    private void throwNotApplicable(String scope)
+    protected void throwNotApplicable(String scope)
     {
         ErrorReporter.unsupported(
                 "Aggregation '" + this.getName() + "' (" + this.getDescription() + ") cannot be performed on " + scope);
@@ -141,37 +133,37 @@ public abstract class AggregateFunction
 
     public long longInitialValue()
     {
-        ErrorReporter.unsupported("Operation " + this.getDescription() + " does not have a long initial value");
+        ErrorReporter.unsupported("Operation " + this.getName() + " does not have a long initial value");
         return 0;
     }
 
     public double doubleInitialValue()
     {
-        ErrorReporter.unsupported("Operation " + this.getDescription() + " does not have a double initial value");
+        ErrorReporter.unsupported("Operation " + this.getName() + " does not have a double initial value");
         return 0.0;
     }
 
     public Object objectInitialValue()
     {
-        ErrorReporter.unsupported("Operation " + this.getDescription() + " does not have a non-numeric initial value");
+        ErrorReporter.unsupported("Operation " + this.getName() + " does not have a non-numeric initial value");
         return null;
     }
 
     protected long longAccumulator(long currentAggregate, long newValue)
     {
-        ErrorReporter.unsupported("Operation " + this.getDescription() + " does not support a long accumulator");
+        ErrorReporter.unsupported("Operation " + this.getName() + " does not support a long accumulator");
         return 0;
     }
 
     protected double doubleAccumulator(double currentAggregate, double newValue)
     {
-        ErrorReporter.unsupported("Operation " + this.getDescription() + " does not support a double accumulator");
+        ErrorReporter.unsupported("Operation " + this.getName() + " does not support a double accumulator");
         return 0.0;
     }
 
     protected Object objectAccumulator(Object currentAggregate, Object newValue)
     {
-        ErrorReporter.unsupported("Operation " + this.getDescription() + " does not support an non-numeric accumulator");
+        ErrorReporter.unsupported("Operation " + this.getName() + " does not support an non-numeric accumulator");
         return null;
     }
 
@@ -265,11 +257,6 @@ public abstract class AggregateFunction
         targetColumn.setDouble(
                 targetRowIndex,
                 this.doubleAccumulator(currentAggregatedValue, this.getDoubleValue(sourceColumn, sourceRowIndex)));
-    }
-
-    public boolean handlesObjectIterables()
-    {
-        return false;
     }
 
     /**

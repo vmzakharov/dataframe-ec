@@ -6,6 +6,7 @@ import io.github.vmzakharov.ecdataframe.dataframe.DfDoubleColumn;
 import io.github.vmzakharov.ecdataframe.dataframe.DfDoubleColumnStored;
 import io.github.vmzakharov.ecdataframe.dataframe.DfLongColumn;
 import io.github.vmzakharov.ecdataframe.dataframe.DfLongColumnStored;
+import io.github.vmzakharov.ecdataframe.dataframe.DfObjectColumn;
 import io.github.vmzakharov.ecdataframe.dsl.value.ValueType;
 import org.eclipse.collections.api.list.ListIterable;
 import org.eclipse.collections.impl.factory.Lists;
@@ -15,7 +16,7 @@ import static io.github.vmzakharov.ecdataframe.dsl.value.ValueType.*;
 public class Same
 extends AggregateFunction
 {
-    private static final ListIterable<ValueType> SUPPORTED_TYPES = Lists.immutable.of(LONG, DOUBLE, STRING, DATE, DATE_TIME);
+    private static final ListIterable<ValueType> SUPPORTED_TYPES = Lists.immutable.of(LONG, DOUBLE, STRING, DATE, DATE_TIME, DECIMAL);
     private static final long INITIAL_VALUE_LONG = System.nanoTime();
     private static final double INITIAL_VALUE_DOUBLE = INITIAL_VALUE_LONG;
     private static final Object INITIAL_VALUE_OBJECT = new Object();
@@ -46,12 +47,6 @@ extends AggregateFunction
     public Object objectInitialValue()
     {
         return INITIAL_VALUE_OBJECT;
-    }
-
-    @Override
-    public boolean handlesObjectIterables()
-    {
-        return true;
     }
 
     @Override
@@ -127,15 +122,12 @@ extends AggregateFunction
     }
 
     @Override
-    public Object applyIterable(ListIterable<?> items)
+    public Object applyToObjectColumn(DfObjectColumn<?> objectColumn)
     {
-        Object first = items.getFirst();
-        if (items.allSatisfy(each -> each.equals(first)))
-        {
-            return first;
-        }
-
-        return null;
+        return objectColumn.injectIntoBreakOnNulls(
+                objectColumn.getObject(0),
+                (result, current) -> current == null ? null : (result.equals(current) ? result : null)
+        );
     }
 
     @Override

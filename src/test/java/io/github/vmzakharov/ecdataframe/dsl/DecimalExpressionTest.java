@@ -13,14 +13,15 @@ public class DecimalExpressionTest
     @Test
     public void literals()
     {
-        Assert.assertEquals(BigDecimal.valueOf(579, 4), ExpressionTestUtil.evaluateToDecimal("[123,4] + [456,4]"));
+        Assert.assertEquals(BigDecimal.valueOf(579, 4), ExpressionTestUtil.evaluateToDecimal("toDecimal(123,4) + toDecimal(456,4)"));
 
-        Assert.assertEquals(BigDecimal.valueOf(-333, 4), ExpressionTestUtil.evaluateToDecimal("[123,4] - [456,4]"));
+        Assert.assertEquals(BigDecimal.valueOf(-333, 4), ExpressionTestUtil.evaluateToDecimal("toDecimal(123,4) - toDecimal(456,4)"));
 
-        Assert.assertEquals(BigDecimal.valueOf(56088, 8), ExpressionTestUtil.evaluateToDecimal("[123,4] * [456,4]"));
+        Assert.assertEquals(BigDecimal.valueOf(56088, 8), ExpressionTestUtil.evaluateToDecimal("toDecimal(123,4) * toDecimal(456,4)"));
 
-        Assert.assertEquals(BigDecimal.valueOf(2697368421052632L, 16), ExpressionTestUtil.evaluateToDecimal("[123, 4] / [456, 4]"));
-//        Assert.assertEquals(BigDecimal.valueOf((double) 123/(double) 456), ExpressionTestUtil.evaluateToDecimal("[123, 4] / [456, 4]"));
+        Assert.assertEquals(
+                BigDecimal.valueOf(123.0).divide(BigDecimal.valueOf(456.0), MathContext.DECIMAL128),
+                ExpressionTestUtil.evaluateToDecimal("toDecimal(123, 4) / toDecimal(456, 4)"));
     }
 
     @Test
@@ -31,19 +32,21 @@ public class DecimalExpressionTest
         context.setVariable("b", new DecimalValue(111, 2));
 
          Assert.assertEquals(
-                 BigDecimal.valueOf(123567, 2),
-                 ((DecimalValue) ExpressionTestUtil.evaluateScriptWithContext("a + b", context)).decimalValue());
+                 BigDecimal.valueOf(123567, 2), this.evaluateToDecimalWithContext("a + b", context));
 
          Assert.assertEquals(
-                 BigDecimal.valueOf(123345, 2),
-                 ((DecimalValue) ExpressionTestUtil.evaluateScriptWithContext("a - b", context)).decimalValue());
+                 BigDecimal.valueOf(123345, 2), this.evaluateToDecimalWithContext("a - b", context));
 
          Assert.assertEquals(
-                 BigDecimal.valueOf(13703616, 4),
-                 ((DecimalValue) ExpressionTestUtil.evaluateScriptWithContext("a * b", context)).decimalValue());
+                 BigDecimal.valueOf(13703616, 4), this.evaluateToDecimalWithContext("a * b", context));
 
          Assert.assertEquals(
-                 new BigDecimal(123456.0 / 111.0, MathContext.DECIMAL64),
-                 ((DecimalValue) ExpressionTestUtil.evaluateScriptWithContext("a / b", context)).decimalValue());
+                 BigDecimal.valueOf(123456).divide(BigDecimal.valueOf(111), MathContext.DECIMAL128),
+                 this.evaluateToDecimalWithContext("a / b", context));
+    }
+
+    private BigDecimal evaluateToDecimalWithContext(String expression, EvalContext context)
+    {
+        return ((DecimalValue) ExpressionTestUtil.evaluateScriptWithContext(expression, context)).decimalValue();
     }
 }
