@@ -21,7 +21,7 @@ extends DfColumn
     @Override
     default void setObject(int rowIndex, Object anObject)
     {
-        throw new RuntimeException("Cannot set a value on computed column '" + this.getName() + "'");
+        ErrorReporter.reportAndThrow("Cannot set a value on computed column '" + this.getName() + "'");
     }
 
     @Override
@@ -63,11 +63,11 @@ extends DfColumn
     @Override
     default void applyAggregator(int targetRowIndex, DfColumn sourceColumn, int sourceRowIndex, AggregateFunction aggregateFunction)
     {
-        throw new RuntimeException("Cannot store aggregated value into a computed column '" + this.getName() + "'");
+        ErrorReporter.reportAndThrow("Cannot store aggregated value into a computed column '" + this.getName() + "'");
     }
 
     default void throwUnmodifiableColumnException()
     {
-        throw new UnsupportedOperationException("Cannot directly modify computed column '" + this.getName() + "'");
+        throw ErrorReporter.unsupported("Cannot directly modify computed column '" + this.getName() + "'");
     }
 }

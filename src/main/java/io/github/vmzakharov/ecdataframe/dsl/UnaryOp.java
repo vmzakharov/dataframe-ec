@@ -1,5 +1,6 @@
 package io.github.vmzakharov.ecdataframe.dsl;
 
+import io.github.vmzakharov.ecdataframe.dataframe.ErrorReporter;
 import io.github.vmzakharov.ecdataframe.dsl.value.BooleanValue;
 import io.github.vmzakharov.ecdataframe.dsl.value.DoubleValue;
 import io.github.vmzakharov.ecdataframe.dsl.value.LongValue;
@@ -159,42 +160,42 @@ public interface UnaryOp
 
     default BooleanValue applyBoolean(boolean operand)
     {
-        throw new UnsupportedOperationException("Operation " + this.asString() + " cannot be applied to a boolean");
+        throw ErrorReporter.unsupported("Operation " + this.asString() + " cannot be applied to a boolean");
     }
 
     default LongValue applyLong(long operand)
     {
-        throw new UnsupportedOperationException("Operation " + this.asString() + " cannot be applied to a long");
+        throw ErrorReporter.unsupported("Operation " + this.asString() + " cannot be applied to a long");
     }
 
     default DoubleValue applyDouble(double operand)
     {
-        throw new UnsupportedOperationException("Operation " + this.asString() + " cannot be applied to a double");
+        throw ErrorReporter.unsupported("Operation " + this.asString() + " cannot be applied to a double");
     }
 
     default BooleanValue applyDate(LocalDate operand)
     {
-        throw new UnsupportedOperationException("Operation " + this.asString() + " cannot be applied to a date");
+        throw ErrorReporter.unsupported("Operation " + this.asString() + " cannot be applied to a date");
     }
 
     default BooleanValue applyDateTime(LocalDateTime operand)
     {
-        throw new UnsupportedOperationException("Operation " + this.asString() + " cannot be applied to a datetime");
+        throw ErrorReporter.unsupported("Operation " + this.asString() + " cannot be applied to a datetime");
     }
 
     default BooleanValue applyString(String operand)
     {
-        throw new UnsupportedOperationException("Operation " + this.asString() + " cannot be applied to a string");
+        throw ErrorReporter.unsupported("Operation " + this.asString() + " cannot be applied to a string");
     }
 
     default BooleanValue applyDecimal(BigDecimal operand)
     {
-        throw new UnsupportedOperationException("Operation " + this.asString() + " cannot be applied to a decimal");
+        throw ErrorReporter.unsupported("Operation " + this.asString() + " cannot be applied to a decimal");
     }
 
     default BooleanValue applyVector(ListIterable<Value> operand)
     {
-        throw new UnsupportedOperationException("Operation " + this.asString() + " cannot be applied to a vector");
+        throw ErrorReporter.unsupported("Operation " + this.asString() + " cannot be applied to a vector");
     }
 
     default Value apply(Value operand)

@@ -1,5 +1,6 @@
 package io.github.vmzakharov.ecdataframe.dsl.value;
 
+import io.github.vmzakharov.ecdataframe.dataframe.ErrorReporter;
 import io.github.vmzakharov.ecdataframe.dsl.UnaryOp;
 import org.eclipse.collections.api.list.ListIterable;
 import org.eclipse.collections.impl.factory.Lists;
@@ -52,6 +53,6 @@ implements Value
     @Override
     public int compareTo(Value o)
     {
-        throw new UnsupportedOperationException("Not implemented");
+        throw ErrorReporter.unsupported("Cannot compare values of type " + this.getType());
     }
 }

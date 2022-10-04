@@ -109,62 +109,53 @@ public abstract class AggregateFunction
 
     public Object applyToDoubleColumn(DfDoubleColumn doubleColumn)
     {
-        this.throwNotApplicable("double values");
-        return 0.0;
+        throw this.notApplicable("double values");
     }
 
     public Object applyToLongColumn(DfLongColumn longColumn)
     {
-        this.throwNotApplicable("long values");
-        return 0;
+        throw this.notApplicable("long values");
     }
 
     public Object applyToObjectColumn(DfObjectColumn<?> objectColumn)
     {
-        this.throwNotApplicable("non-numeric values");
-        return null;
+        throw this.notApplicable("non-numeric values");
     }
 
-    protected void throwNotApplicable(String scope)
+    protected RuntimeException notApplicable(String scope)
     {
-        ErrorReporter.unsupported(
+        return ErrorReporter.unsupported(
                 "Aggregation '" + this.getName() + "' (" + this.getDescription() + ") cannot be performed on " + scope);
     }
 
     public long longInitialValue()
     {
-        ErrorReporter.unsupported("Operation " + this.getName() + " does not have a long initial value");
-        return 0;
+        throw ErrorReporter.unsupported("Operation " + this.getName() + " does not have a long initial value");
     }
 
     public double doubleInitialValue()
     {
-        ErrorReporter.unsupported("Operation " + this.getName() + " does not have a double initial value");
-        return 0.0;
+        throw ErrorReporter.unsupported("Operation " + this.getName() + " does not have a double initial value");
     }
 
     public Object objectInitialValue()
     {
-        ErrorReporter.unsupported("Operation " + this.getName() + " does not have a non-numeric initial value");
-        return null;
+        throw ErrorReporter.unsupported("Operation " + this.getName() + " does not have a non-numeric initial value");
     }
 
     protected long longAccumulator(long currentAggregate, long newValue)
     {
-        ErrorReporter.unsupported("Operation " + this.getName() + " does not support a long accumulator");
-        return 0;
+        throw ErrorReporter.unsupported("Operation " + this.getName() + " does not support a long accumulator");
     }
 
     protected double doubleAccumulator(double currentAggregate, double newValue)
     {
-        ErrorReporter.unsupported("Operation " + this.getName() + " does not support a double accumulator");
-        return 0.0;
+        throw ErrorReporter.unsupported("Operation " + this.getName() + " does not support a double accumulator");
     }
 
     protected Object objectAccumulator(Object currentAggregate, Object newValue)
     {
-        ErrorReporter.unsupported("Operation " + this.getName() + " does not support an non-numeric accumulator");
-        return null;
+        throw ErrorReporter.unsupported("Operation " + this.getName() + " does not support an non-numeric accumulator");
     }
 
     /**
@@ -188,20 +179,17 @@ public abstract class AggregateFunction
 
     public Object defaultObjectIfEmpty()
     {
-        this.throwNotApplicable("empty lists");
-        return null;
+        throw this.notApplicable("empty lists");
     }
 
     public long defaultLongIfEmpty()
     {
-        this.throwNotApplicable("empty lists");
-        return 0;
+        throw this.notApplicable("empty lists");
     }
 
     public double defaultDoubleIfEmpty()
     {
-        this.throwNotApplicable("empty lists");
-        return 0.0;
+        throw this.notApplicable("empty lists");
     }
 
     public long getLongValue(DfColumn sourceColumn, int sourceRowIndex)
@@ -263,7 +251,6 @@ public abstract class AggregateFunction
      * by default aggregators treat null values as "poisonous" - that is any null value passed in the aggregator will
      * cause the result of the entire aggregation to be null, which is a sensible behavior for most aggregation
      * functions.
-     *
      * Override this method to return <code>false</code> if this aggregation function can handle null value.
      *
      * @return <code>true</code> if nulls are poisonous, <code>false</code> if nulls can be handled

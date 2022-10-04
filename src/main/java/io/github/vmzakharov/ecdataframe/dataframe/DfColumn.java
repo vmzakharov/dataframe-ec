@@ -43,11 +43,8 @@ public interface DfColumn
 
     default Object aggregate(AggregateFunction aggregator)
     {
-        ErrorReporter.reportAndThrow(
-            "Aggregation " + aggregator.getName() + "(" + aggregator.getDescription()
+        throw ErrorReporter.exception("Aggregation " + aggregator.getName() + "(" + aggregator.getDescription()
             + ") cannot be performed on column " + this.getName() + " of type " + this.getType());
-
-        return null; // will not get here
     }
 
     void applyAggregator(int targetRowIndex, DfColumn sourceColumn, int sourceRowIndex, AggregateFunction aggregateFunction);
@@ -72,7 +69,8 @@ public interface DfColumn
 
     default DfCellComparator columnComparator(DfColumn otherColumn)
     {
-        throw new UnsupportedOperationException("Not implemented");
+        throw ErrorReporter.unsupported("Column comparator is not implemented for column "
+                + this.getName() + " of type " + this.getType());
     }
 
     default int dataFrameRowIndex(int virtualRowIndex)

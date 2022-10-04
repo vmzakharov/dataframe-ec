@@ -47,8 +47,7 @@ public class ErrorReporterTest
         try
         {
             ErrorReporter.initialize();
-            ErrorReporter.unsupported("Do it!");
-            Assert.fail("didn't throw");
+            throw ErrorReporter.unsupported("Do it!");
         }
         catch (UnsupportedOperationException e)
         {
@@ -79,8 +78,7 @@ public class ErrorReporterTest
         try
         {
             ErrorReporter.exceptionFactories(VerySpecialException::new, VerySpecialException::new, DontWanna::new);
-            ErrorReporter.unsupported("Do it!");
-            Assert.fail("didn't throw");
+            throw ErrorReporter.unsupported("Do it!");
         }
         catch (UnsupportedOperationException e)
         {

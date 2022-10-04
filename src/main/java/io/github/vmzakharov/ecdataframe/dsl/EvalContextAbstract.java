@@ -1,5 +1,6 @@
 package io.github.vmzakharov.ecdataframe.dsl;
 
+import io.github.vmzakharov.ecdataframe.dataframe.ErrorReporter;
 import io.github.vmzakharov.ecdataframe.dsl.value.Value;
 import org.eclipse.collections.api.map.MapIterable;
 import org.eclipse.collections.api.map.MutableMap;
@@ -39,8 +40,9 @@ implements EvalContext
     {
         if (this.hasVariable(variableName))
         {
-            throw new RuntimeException("Attempting to change immutable variable '" + variableName + "'");
+            ErrorReporter.reportAndThrow("Attempting to change immutable variable '" + variableName + "'");
         }
+
         this.getContextVariables().put(variableName, newValue);
         return newValue;
     }

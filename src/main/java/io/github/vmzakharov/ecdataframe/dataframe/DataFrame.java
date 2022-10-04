@@ -154,13 +154,13 @@ public class DataFrame
         // todo: would like to make it impossible in the first place
         if (newColumn.getDataFrame() != this)
         {
-            throw new RuntimeException("Mixing columns from different data frames: attempting to add"
+            ErrorReporter.reportAndThrow("Mixing columns from different data frames: attempting to add"
                     + " to '" + this.getName() + "' column '"
                     + newColumn.getName() + "' already bound to '" + newColumn.getDataFrame().getName() + "'");
         }
 
         ErrorReporter.reportAndThrowIf(this.hasColumn(newColumn.getName()),
-                "Column named '" + newColumn.getName() + "' is already in data frame '" + this.getName() + "'");
+                () -> "Column named '" + newColumn.getName() + "' is already in data frame '" + this.getName() + "'");
 
         this.columnsByName.put(newColumn.getName(), newColumn);
         this.columns.add(newColumn);

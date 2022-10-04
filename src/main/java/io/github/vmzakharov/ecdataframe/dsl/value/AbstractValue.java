@@ -1,5 +1,7 @@
 package io.github.vmzakharov.ecdataframe.dsl.value;
 
+import io.github.vmzakharov.ecdataframe.dataframe.ErrorReporter;
+
 abstract public class AbstractValue
 implements Value
 {
@@ -14,12 +16,12 @@ implements Value
     {
         if (null == other)
         {
-            throw new UnsupportedOperationException("Cannot compare a " + this.getClass().getName() + " to null");
+            throw ErrorReporter.unsupported("Cannot compare a " + this.getClass().getName() + " to null");
         }
 
         if (!other.isVoid() && (this.getClass() != other.getClass()))
         {
-            throw new UnsupportedOperationException("Cannot compare a " + this.getClass().getName() + " to a " + other.getClass().getName());
+            throw ErrorReporter.unsupported("Cannot compare a " + this.getClass().getName() + " to a " + other.getClass().getName());
         }
     }
 }

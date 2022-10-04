@@ -1,5 +1,6 @@
 package io.github.vmzakharov.ecdataframe.dsl.value;
 
+import io.github.vmzakharov.ecdataframe.dataframe.ErrorReporter;
 import io.github.vmzakharov.ecdataframe.dsl.ArithmeticOp;
 import io.github.vmzakharov.ecdataframe.dsl.Expression;
 import io.github.vmzakharov.ecdataframe.dsl.PredicateOp;
@@ -40,17 +41,18 @@ extends Expression, Comparable<Value>
 
     default Value apply(Value another, ArithmeticOp operation)
     {
-        throw new UnsupportedOperationException("Undefined operation " + operation.asString() + " on " + this.asStringLiteral());
+        ErrorReporter.reportAndThrow("Undefined operation " + operation.asString() + " on " + this.asStringLiteral());
+        return null;
     }
 
     default Value apply(UnaryOp operation)
     {
-        throw new UnsupportedOperationException("Undefined operation " + operation.asString() + " on " + this.asStringLiteral());
+        throw ErrorReporter.unsupported("Undefined operation " + operation.asString() + " on " + this.asStringLiteral());
     }
 
     default BooleanValue applyPredicate(Value another, PredicateOp operation)
     {
-        throw new UnsupportedOperationException("Undefined operation " + operation.asString() + " on " + this.asStringLiteral());
+        throw ErrorReporter.unsupported("Undefined operation " + operation.asString() + " on " + this.asStringLiteral());
     }
 
     @Override

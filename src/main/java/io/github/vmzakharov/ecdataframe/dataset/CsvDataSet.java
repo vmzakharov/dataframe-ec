@@ -170,7 +170,7 @@ extends DataSetAbstract
         }
         catch (IOException e)
         {
-            throw new RuntimeException("Failed write data frame to '" + this.getDataFileName() + "'", e);
+            throw ErrorReporter.exception("Failed write data frame to '" + this.getDataFileName() + "'", e);
         }
     }
 
@@ -584,7 +584,7 @@ extends DataSetAbstract
                 columnPopulators.add(s -> lastColumn.addObject(schemaCol.parseAsDecimal(s)));
                 break;
             default:
-                throw new RuntimeException("Don't know what to do with the column type: " + columnType);
+                throw ErrorReporter.exception("Don't know what to do with the column type: " + columnType);
         }
     }
 
@@ -876,7 +876,7 @@ extends DataSetAbstract
 
     private void throwBadFormat(String message)
     {
-        throw new RuntimeException(message);
+        throw ErrorReporter.exception(message);
     }
 
     private boolean isTokenSeparator(char aChar)

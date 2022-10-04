@@ -85,21 +85,31 @@ final public class ErrorReporter
         }
     }
 
-    public static void unsupported(String errorText)
-    {
-        errorPrinter.println(printedMessagePrefix + errorText);
-        throw unsupportedWithMessage.apply(errorText);
-    }
-
     public static void reportAndThrow(String errorText)
     {
-        errorPrinter.println(printedMessagePrefix + errorText);
-        throw exceptionWithMessage.apply(errorText);
+        throw exception(errorText);
     }
 
     public static void reportAndThrow(String errorText, Throwable cause)
     {
+        throw exception(errorText, cause);
+    }
+
+    public static RuntimeException exception(String errorText)
+    {
         errorPrinter.println(printedMessagePrefix + errorText);
-        throw exceptionWithMessageAndCause.apply(errorText, cause);
+        return exceptionWithMessage.apply(errorText);
+    }
+
+    public static RuntimeException exception(String errorText, Throwable cause)
+    {
+        errorPrinter.println(printedMessagePrefix + errorText);
+        return exceptionWithMessageAndCause.apply(errorText, cause);
+    }
+
+    public static RuntimeException unsupported(String errorText)
+    {
+        errorPrinter.println(printedMessagePrefix + errorText);
+        return unsupportedWithMessage.apply(errorText);
     }
 }

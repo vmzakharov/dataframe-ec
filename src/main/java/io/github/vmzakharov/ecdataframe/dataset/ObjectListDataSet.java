@@ -18,7 +18,6 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.chrono.ChronoLocalDate;
 import java.time.chrono.ChronoLocalDateTime;
-import java.util.NoSuchElementException;
 
 public class ObjectListDataSet
 extends HierarchicalDataSet
@@ -50,8 +49,7 @@ extends HierarchicalDataSet
             return this.items.get(this.index);
         }
 
-        ErrorReporter.reportAndThrow("No more elements in data set " + this.getName());
-        throw new NoSuchElementException(); // won't get here
+        throw ErrorReporter.exception("No more elements in data set " + this.getName());
     }
 
     @Override
@@ -121,8 +119,7 @@ extends HierarchicalDataSet
             }
             catch (IllegalAccessException e)
             {
-                ErrorReporter.reportAndThrow("Failed to lookup method for " + element + " on " + currentClass.getName(), e);
-                throw new RuntimeException(); // won't get here
+                throw ErrorReporter.exception("Failed to lookup method for " + element + " on " + currentClass.getName(), e);
             }
 
             getters.add(elementHandle);
@@ -192,7 +189,6 @@ extends HierarchicalDataSet
         if (this.items.size() == 0)
         {
             ErrorReporter.reportAndThrow("The data set " + this.getName() + " contains no data");
-            // throw new NoSuchElementException(...)
         }
 
         return this.items.get(0);

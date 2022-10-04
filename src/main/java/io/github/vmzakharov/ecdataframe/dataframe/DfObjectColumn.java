@@ -33,10 +33,8 @@ extends DfColumn
         }
         else
         {
-            aggregateFunction.throwNotApplicable("values of type " + this.getType());
+            throw aggregateFunction.notApplicable("values of type " + this.getType());
         }
-
-        return null;
     }
 
     default <IV> IV injectIntoBreakOnNulls(

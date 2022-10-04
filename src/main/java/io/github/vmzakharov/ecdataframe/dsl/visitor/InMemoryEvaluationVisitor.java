@@ -177,8 +177,7 @@ implements ExpressionEvaluationVisitor
             return new DateTimeValue((LocalDateTime) rawValue);
         }
 
-        ErrorReporter.reportAndThrow("Don't know how to handle " + rawValue.toString() + ", type: " + rawValue.getClass().getName());
-        return Value.VOID; // will not reach this, but otherwise the compiler is not happy
+        throw ErrorReporter.exception("Don't know how to handle " + rawValue.toString() + ", type: " + rawValue.getClass().getName());
     }
 
     @Override
@@ -204,8 +203,7 @@ implements ExpressionEvaluationVisitor
     @Override
     public Value visitFunctionScriptExpr(FunctionScript expr)
     {
-        ErrorReporter.reportAndThrow("Cannot evaluate function declaration by itself. Function " + expr.getName());
-        return Value.VOID; // will not reach this, but otherwise the compiler is not happy
+        throw ErrorReporter.exception("Cannot evaluate function declaration by itself. Function " + expr.getName());
     }
 
     @Override

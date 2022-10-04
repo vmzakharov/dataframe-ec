@@ -32,8 +32,9 @@ implements DfColumn
     {
         if (this.dataFrame != null)
         {
-            throw new RuntimeException("Column '" + this.getName() + "' has already been linked to a data frame");
+            ErrorReporter.reportAndThrow("Column '" + this.getName() + "' has already been linked to a data frame");
         }
+
         this.dataFrame = newDataFrame;
     }
 
@@ -63,7 +64,7 @@ implements DfColumn
         }
         catch (NoSuchMethodException | IllegalAccessException | InstantiationException | InvocationTargetException e)
         {
-            throw new RuntimeException("Failed to instantiate a column from " + this.getName(), e);
+            throw ErrorReporter.exception("Failed to instantiate a column from " + this.getName(), e);
         }
 
         attachTo.addColumn(clonedColumn);

@@ -1,5 +1,6 @@
 package io.github.vmzakharov.ecdataframe.dsl.value;
 
+import io.github.vmzakharov.ecdataframe.dataframe.ErrorReporter;
 import io.github.vmzakharov.ecdataframe.dsl.ArithmeticOp;
 import io.github.vmzakharov.ecdataframe.dsl.UnaryOp;
 
@@ -57,7 +58,7 @@ implements Value
     @Override
     public Value apply(Value another, ArithmeticOp operation)
     {
-        throw new UnsupportedOperationException("Cannot apply " + operation.asString() + " to a boolean");
+        throw ErrorReporter.unsupported("Cannot apply " + operation.asString() + " to a boolean");
     }
 
     @Override

@@ -48,10 +48,8 @@ implements DfColumnStored
         }
         else
         {
-            throw new RuntimeException(
-                    "Attempting to add a value of type " + value.getType()
-                    + " to a long integer column " + this.getName()
-                    + ": " + value.asStringLiteral());
+            ErrorReporter.reportAndThrow("Attempting to add a value of type " + value.getType()
+                    + " to a long integer column " + this.getName() + ": " + value.asStringLiteral());
         }
     }
 

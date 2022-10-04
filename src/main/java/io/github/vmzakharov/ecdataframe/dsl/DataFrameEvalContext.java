@@ -2,6 +2,7 @@ package io.github.vmzakharov.ecdataframe.dsl;
 
 import io.github.vmzakharov.ecdataframe.dataframe.DataFrame;
 import io.github.vmzakharov.ecdataframe.dataframe.DfColumn;
+import io.github.vmzakharov.ecdataframe.dataframe.ErrorReporter;
 import io.github.vmzakharov.ecdataframe.dataset.HierarchicalDataSet;
 import io.github.vmzakharov.ecdataframe.dsl.value.Value;
 import org.eclipse.collections.api.RichIterable;
@@ -88,7 +89,7 @@ extends EvalContextAbstract
     @Override
     public void removeVariable(String variableName)
     {
-        throw new UnsupportedOperationException("Cannot remove a variable from a data frame evaluation context");
+        ErrorReporter.reportAndThrow("Cannot remove a variable from a data frame evaluation context");
     }
 
     @Override
@@ -112,7 +113,7 @@ extends EvalContextAbstract
     @Override
     public void addDataSet(HierarchicalDataSet dataSet)
     {
-        throw new UnsupportedOperationException("Cannot add a data set to a data frame evaluation context");
+        ErrorReporter.reportAndThrow("Cannot add a data set to a data frame evaluation context");
     }
 
     @Override
@@ -130,7 +131,7 @@ extends EvalContextAbstract
     @Override
     public void removeAllVariables()
     {
-        throw new UnsupportedOperationException("Cannot remove variables from a data frame evaluation context");
+        throw ErrorReporter.unsupported("Cannot remove variables from a data frame evaluation context");
     }
 
     public DataFrame getDataFrame()

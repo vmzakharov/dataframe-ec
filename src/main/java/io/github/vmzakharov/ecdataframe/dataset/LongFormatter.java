@@ -1,5 +1,6 @@
 package io.github.vmzakharov.ecdataframe.dataset;
 
+import io.github.vmzakharov.ecdataframe.dataframe.ErrorReporter;
 import org.eclipse.collections.api.block.function.primitive.LongFunction;
 import org.eclipse.collections.impl.utility.StringIterate;
 
@@ -34,7 +35,7 @@ public class LongFormatter
                 }
                 catch (ParseException e)
                 {
-                    throw new RuntimeException("Failed to parse input string " + s, e);
+                    throw ErrorReporter.exception("Failed to parse input string " + s, e);
                 }
             };
         }
