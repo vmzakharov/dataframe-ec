@@ -10,7 +10,7 @@ For more on Eclipse Collections see: https://www.eclipse.org/collections/.
 <dependency>
   <groupId>io.github.vmzakharov</groupId>
   <artifactId>dataframe-ec</artifactId>
-  <version>0.18.3</version>
+  <version>0.18.4</version>
 </dependency>
 ```
 
@@ -50,11 +50,11 @@ DataFrame ordersFromFile  = new CsvDataSet("donut_orders.csv", "Donut Orders").l
 
 `ordersFromFile`
 
-Customer |   Count |   Price |   Date
----|---:|---:|---
-"Archibald" | 5.0000 | 23.4500 | 2020-10-15
-"Bridget" | 10.0000 | 40.3400 | 2020-11-10
-"Clyde" | 4.0000 | 19.5000 | 2020-10-19
+|Customer |   Count |   Price |   Date|
+|---|---:|---:|---|
+|"Archibald" | 5.0000 | 23.4500 | 2020-10-15|
+|"Bridget" | 10.0000 | 40.3400 | 2020-11-10|
+|"Clyde" | 4.0000 | 19.5000 | 2020-10-19|
 
 The `loadAsDataFrame()` method can take a numeric parameter, which specifies how many rows of data to load. For example:
 ```
@@ -62,10 +62,10 @@ DataFrame firstTwoOrders = new CsvDataSet("donut_orders.csv", "Donut Orders").lo
 ```
 `firstTwoOrders`
 
-Customer |   Count |   Price |   Date
----|---:|---:|---
-"Archibald" | 5.0000 | 23.4500 | 2020-10-15
-"Bridget" | 10.0000 | 40.3400 | 2020-11-10
+|Customer |   Count |   Price |   Date|
+|---|---:|---:|---|
+|"Archibald" | 5.0000 | 23.4500 | 2020-10-15|
+|"Bridget" | 10.0000 | 40.3400 | 2020-11-10|
 
 `CsvDataSet` can also accept a **schema** object, which explicitly defines column types and also supports a number of options such as the value separator and the null marker in a source file. For example, let's consider a file "donut_orders_complicated.csv" that looks like
 
@@ -93,11 +93,11 @@ DataFrame schemingDonuts = dataSet.loadAsDataFrame();
 
 `schemingDonuts`
 
-Customer | Count | Price | Date
----|---:|---:|---
-"Archibald" | 5 | 23.4500 | 2020-10-15
-"Bridget" | 10 | null | 2020-11-10
-"Clyde" | 4 | 19.5000 | null
+|Customer | Count | Price | Date|
+|---|---:|---:|---|
+|"Archibald" | 5 | 23.4500 | 2020-10-15|
+|"Bridget" | 10 | null | 2020-11-10|
+|"Clyde" | 4 | 19.5000 | null|
 
 A data frame can be created **programmatically** by providing values for individual rows or columns. Here is a sample constructing a data frame row by row:
 ```
@@ -111,13 +111,13 @@ DataFrame orders = new DataFrame("Donut Orders")
 ```
 `orders`
 
-Customer | Count | Price | Date
----|---:|---:|---
-"Alice" | 5 | 23.4500 | 2020-10-15
-"Bob" | 10 | 40.3400 | 2020-11-10
-"Alice" | 4 | 19.5000 | 2020-10-19
-"Carl" | 11 | 44.7800 | 2020-12-25
-"Doris" | 1 | 5.0000 | 2020-09-01
+|Customer | Count | Price | Date|
+|---|---:|---:|---|
+|"Alice" | 5 | 23.4500 | 2020-10-15|
+|"Bob" | 10 | 40.3400 | 2020-11-10|
+|"Alice" | 4 | 19.5000 | 2020-10-19|
+|"Carl" | 11 | 44.7800 | 2020-12-25|
+|"Doris" | 1 | 5.0000 | 2020-09-01|
 
 This way of creating a data frame is more useful for contexts like unit tests, where readability matters. In your applications you probably want to load a data frame from a file or populate individual columns with strongly typed values as in the following example, which produces a data frame with the same exact contents as the one in the example above:
 
@@ -133,13 +133,13 @@ ordersByCol.seal(); // finished constructing a data frame
 
 `ordersByCol`
 
-Customer | Count | Price | Date
----|---:|---:|---
-"Alice" | 5 | 23.4500 | 2020-10-15
-"Bob" | 10 | 40.3400 | 2020-11-10
-"Alice" | 4 | 19.5000 | 2020-10-19
-"Carl" | 11 | 44.7800 | 2020-12-25
-"Doris" | 1 | 5.0000 | 2020-09-01
+|Customer | Count | Price | Date|
+|---|---:|---:|---|
+|"Alice" | 5 | 23.4500 | 2020-10-15|
+|"Bob" | 10 | 40.3400 | 2020-11-10|
+|"Alice" | 4 | 19.5000 | 2020-10-19|
+|"Carl" | 11 | 44.7800 | 2020-12-25|
+|"Doris" | 1 | 5.0000 | 2020-09-01|
 
 A data frame can also be created from a hierarchical data set via a **projection operator** supported by the DSL. Let's say we have two record types: `Person` and `Address`. Then we can use the projection operator to turn a list of `Person` objects into a data frame as follows.
 
@@ -165,11 +165,11 @@ DataFrame projectionValue = ((DataFrameValue) script.evaluate(visitor)).dataFram
 
 `projectionValue`
 
-Name | Lucky Number | State
----|---:|---
-"Alice" | 30 | "North Dakota"
-"Bob" | 40 | "Nebraska"
-"Carl" | 50 | "Idaho"
+|Name | Lucky Number | State|
+|---|---:|---|
+|"Alice" | 30 | "North Dakota"|
+|"Bob" | 40 | "Nebraska"|
+|"Carl" | 50 | "Idaho"|
 
 #### Sum of Columns
 ```
@@ -178,9 +178,9 @@ DataFrame totalOrdered = orders.sum(Lists.immutable.of("Count", "Price"));
 
 `totalOrdered`
 
-Count | Price
----:|---:
-31 | 133.0700
+|Count | Price|
+|---:|---:|
+|31 | 133.0700|
 
 #### Aggregation Functions
 
@@ -190,6 +190,7 @@ The following aggregation functions are supported
 - `max`
 - `avg`
 - `count`
+- `same` - the resul is `null` if the aggregated values are not the equal to each other, otherwise it equals to that value
 
 ```
 DataFrame orderStats = orders.aggregate(Lists.immutable.of(max("Price", "MaxPrice"), min("Price", "MinPrice"), sum("Price", "Total")));
@@ -197,9 +198,9 @@ DataFrame orderStats = orders.aggregate(Lists.immutable.of(max("Price", "MaxPric
 
 `orderStats`
 
-MaxPrice | MinPrice | Total
----:|---:|---:
-44.7800 | 5.0000 | 133.0700
+|MaxPrice | MinPrice | Total|
+|---:|---:|---:|
+|44.7800 | 5.0000 | 133.0700|
 
 #### Sum With Group By
 ```
@@ -208,12 +209,12 @@ DataFrame totalsByCustomer = orders.sumBy(Lists.immutable.of("Count", "Price"), 
 
 `totalsByCustomer`
 
-Customer | Count | Price
----|---:|---:
-"Alice" | 9 | 42.9500
-"Bob" | 10 | 40.3400
-"Carl" | 11 | 44.7800
-"Doris" | 1 | 5.0000
+|Customer | Count | Price|
+|---|---:|---:|
+|"Alice" | 9 | 42.9500|
+|"Bob" | 10 | 40.3400|
+|"Carl" | 11 | 44.7800|
+|"Doris" | 1 | 5.0000|
 
 #### Add a Calculated Column
 ```
@@ -221,13 +222,13 @@ orders.addDoubleColumn("AvgDonutPrice", "Price / Count");
 ```
 `orders`
 
-Customer | Count | Price | Date | AvgDonutPrice
----|---:|---:|---|---:
-"Alice" | 5 | 23.4500 | 2020-10-15 | 4.6900
-"Bob" | 10 | 40.3400 | 2020-11-10 | 4.0340
-"Alice" | 4 | 19.5000 | 2020-10-19 | 4.8750
-"Carl" | 11 | 44.7800 | 2020-12-25 | 4.0709
-"Doris" | 1 | 5.0000 | 2020-09-01 | 5.0000
+|Customer | Count | Price | Date | AvgDonutPrice|
+|---|---:|---:|---|---:|
+|"Alice" | 5 | 23.4500 | 2020-10-15 | 4.6900|
+|"Bob" | 10 | 40.3400 | 2020-11-10 | 4.0340|
+|"Alice" | 4 | 19.5000 | 2020-10-19 | 4.8750|
+|"Carl" | 11 | 44.7800 | 2020-12-25 | 4.0709|
+|"Doris" | 1 | 5.0000 | 2020-09-01 | 5.0000|
 
 #### Filter
 Selection of a sub dataframe with the rows matching the filter condition
@@ -236,10 +237,10 @@ DataFrame bigOrders = orders.selectBy("Count >= 10");
 ```
 `bigOrders`
 
-Customer | Count | Price | Date | AvgDonutPrice
----|---:|---:|---|---:
-"Bob" | 10 | 40.3400 | 2020-11-10 | 4.0340
-"Carl" | 11 | 44.7800 | 2020-12-25 | 4.0709
+|Customer | Count | Price | Date | AvgDonutPrice|
+|---|---:|---:|---|---:|
+|"Bob" | 10 | 40.3400 | 2020-11-10 | 4.0340|
+|"Carl" | 11 | 44.7800 | 2020-12-25 | 4.0709|
 
 Select two subsets both matching and not matching the filter condition respectively
 ```
@@ -249,18 +250,18 @@ Result - a pair of data frames:
 
 `highAndLow.getOne()`
 
-Customer | Count | Price | Date | AvgDonutPrice
----|---:|---:|---|---:
-"Bob" | 10 | 40.3400 | 2020-11-10 | 4.0340
-"Carl" | 11 | 44.7800 | 2020-12-25 | 4.0709
+|Customer | Count | Price | Date | AvgDonutPrice|
+|---|---:|---:|---|---:|
+|"Bob" | 10 | 40.3400 | 2020-11-10 | 4.0340|
+|"Carl" | 11 | 44.7800 | 2020-12-25 | 4.0709|
 
 `highAndLow.getTwo()`
 
-Customer | Count | Price | Date | AvgDonutPrice
----|---:|---:|---|---:
-"Alice" | 5 | 23.4500 | 2020-10-15 | 4.6900
-"Alice" | 4 | 19.5000 | 2020-10-19 | 4.8750
-"Doris" | 1 | 5.0000 | 2020-09-01 | 5.0000
+|Customer | Count | Price | Date | AvgDonutPrice|
+|---|---:|---:|---|---:|
+|"Alice" | 5 | 23.4500 | 2020-10-15 | 4.6900|
+|"Alice" | 4 | 19.5000 | 2020-10-19 | 4.8750|
+|"Doris" | 1 | 5.0000 | 2020-09-01 | 5.0000|
 
 #### Drop Column
 ```
@@ -268,13 +269,13 @@ orders.dropColumn("AvgDonutPrice");
 ```
 `orders`
 
-Customer | Count | Price | Date
----|---:|---:|---
-"Alice" | 5 | 23.4500 | 2020-10-15
-"Bob" | 10 | 40.3400 | 2020-11-10
-"Alice" | 4 | 19.5000 | 2020-10-19
-"Carl" | 11 | 44.7800 | 2020-12-25
-"Doris" | 1 | 5.0000 | 2020-09-01
+|Customer | Count | Price | Date|
+|---|---:|---:|---|
+|"Alice" | 5 | 23.4500 | 2020-10-15|
+|"Bob" | 10 | 40.3400 | 2020-11-10|
+|"Alice" | 4 | 19.5000 | 2020-10-19|
+|"Carl" | 11 | 44.7800 | 2020-12-25|
+|"Doris" | 1 | 5.0000 | 2020-09-01|
 
 #### Sort
 Sort by the order date:
@@ -283,13 +284,13 @@ orders.sortBy(Lists.immutable.of("Date"));
 ```
 `orders`
 
-Customer | Count | Price | Date
----|---:|---:|---
-"Doris" | 1 | 5.0000 | 2020-09-01
-"Alice" | 5 | 23.4500 | 2020-10-15
-"Alice" | 4 | 19.5000 | 2020-10-19
-"Bob" | 10 | 40.3400 | 2020-11-10
-"Carl" | 11 | 44.7800 | 2020-12-25
+|Customer | Count | Price | Date|
+|---|---:|---:|---|
+|"Doris" | 1 | 5.0000 | 2020-09-01|
+|"Alice" | 5 | 23.4500 | 2020-10-15|
+|"Alice" | 4 | 19.5000 | 2020-10-19|
+|"Bob" | 10 | 40.3400 | 2020-11-10|
+|"Carl" | 11 | 44.7800 | 2020-12-25|
 
 Sort by Customer ignoring the first letter of their name
 ```
@@ -297,13 +298,13 @@ orders.sortByExpression("substr(Customer, 1)");
 ```
 `orders`
 
-Customer | Count | Price | Date
----|---:|---:|---
-"Carl" | 11 | 44.7800 | 2020-12-25
-"Alice" | 5 | 23.4500 | 2020-10-15
-"Alice" | 4 | 19.5000 | 2020-10-19
-"Bob" | 10 | 40.3400 | 2020-11-10
-"Doris" | 1 | 5.0000 | 2020-09-01
+|Customer | Count | Price | Date|
+|---|---:|---:|---|
+|"Carl" | 11 | 44.7800 | 2020-12-25|
+|"Alice" | 5 | 23.4500 | 2020-10-15|
+|"Alice" | 4 | 19.5000 | 2020-10-19|
+|"Bob" | 10 | 40.3400 | 2020-11-10|
+|"Doris" | 1 | 5.0000 | 2020-09-01|
 
 #### Union
 ```
@@ -315,14 +316,14 @@ DataFrame combinedOrders = orders.union(otherOrders);
 ```
 `combinedOrders`
 
-Customer | Count | Price | Date
----|---:|---:|---
-"Alice" | 5 | 23.4500 | 2020-10-15
-"Bob" | 10 | 40.3400 | 2020-11-10
-"Alice" | 4 | 19.5000 | 2020-10-19
-"Carl" | 11 | 44.7800 | 2020-12-25
-"Doris" | 1 | 5.0000 | 2020-09-01
-"Eve" | 2 | 9.8000 | 2020-12-05
+|Customer | Count | Price | Date|
+|---|---:|---:|---|
+|"Alice" | 5 | 23.4500 | 2020-10-15|
+|"Bob" | 10 | 40.3400 | 2020-11-10|
+|"Alice" | 4 | 19.5000 | 2020-10-19|
+|"Carl" | 11 | 44.7800 | 2020-12-25|
+|"Doris" | 1 | 5.0000 | 2020-09-01|
+|"Eve" | 2 | 9.8000 | 2020-12-05|
 
 #### Join
 ```
@@ -342,12 +343,12 @@ DataFrame joined = joining1.outerJoin(joining2, Lists.immutable.of("Bar", "Lette
 ```
 `joined`
 
-Foo | Bar | Letter | Baz | Name | Number
----|---|---|---:|---|---:
-"Inky" | "cyan" | "C" | 9 | null | null
-"Clyde" | "orange" | "D" | 10 | "Orange" | 4
-"Pinky" | "pink" | "B" | 8 | "Grapefruit" | 2
-null | "red" | "A" | null | "Apple" | 1
+|Foo | Bar | Letter | Baz | Name | Number|
+|---|---|---|---:|---|---:|
+|"Inky" | "cyan" | "C" | 9 | null | null|
+|"Clyde" | "orange" | "D" | 10 | "Orange" | 4|
+|"Pinky" | "pink" | "B" | 8 | "Grapefruit" | 2|
+|null | "red" | "A" | null | "Apple" | 1|
 
 #### Join With Complements
 ```
@@ -371,26 +372,26 @@ Complement of B in A:
 
 `result.getOne()`
 
-Key | Value
----|---:
-"A" | 1
+|Key | Value|
+|---|---:|
+|"A" | 1|
 
 Intersection (inner join) of A and B based on the key columns:
 
 `result.getTwo()`
 
-Key | Value | Count
----|---:|---:
-"B" | 2 | 10
-"X" | 3 | 30
+|Key | Value | Count|
+|---|---:|---:|
+|"B" | 2 | 10|
+|"X" | 3 | 30|
 
 Complement of A in B:
 
 `result.getThree()`
 
-Id | Count
----|---:
-"C" | 20
+|Id | Count|
+|---|---:|
+|"C" | 20|
 
 #### Lookup
 
@@ -418,13 +419,13 @@ pets.lookup(DfJoin.to(codes)
 
 `pets`
 
-Name | Pet Kind Code | Description
----|---:|---
-"Sweet Pea" | 1 | "Dog"
-"Mittens" | 2 | "Cat"
-"Spot" | 1 | "Dog"
-"Eagly" | 5 | "Eagle"
-"Grzgxxch" | 99 | "Unclear"
+|Name | Pet Kind Code | Description|
+|---|---:|---|
+|"Sweet Pea" | 1 | "Dog"|
+|"Mittens" | 2 | "Cat"|
+|"Spot" | 1 | "Dog"|
+|"Eagly" | 5 | "Eagle"|
+|"Grzgxxch" | 99 | "Unclear"|
 
 ## Domain Specific Language
 
@@ -438,26 +439,29 @@ A DSL script is a one or more statements (see below for the kinds of statements 
 
 The language supports variable and literal values of the following types:
 - string
-- long
-- double
+- long - integer values
+- double - floating point value
+- decimal - arbitrary precision (for all practical reasons) numbers
 - date
+- date-time
 - vector
 - boolean
 
-There is no implicit type conversion of values and variables to avoid inadvertent errors, surprises, and to fail early.
+There is no implicit type conversion of values and variables to avoid inadvertent errors, to minimize surprising results, and to fail early.
 
 ### Literals
 
 The following are examples of literals
 
-Type | Example
---- | ---
-String | `"Hello"` or `'Abracadabra'` (both single and double quotes are supported)
-Long | `123`
-Double | `123.456`
-Date | There is not date literal per se, however there is a built-in function `toDate()` that lets specify date constants `toDate(2021, 11, 25)`
-Vector | `(1, 2, 3)` <br>`('A', 'B', 'C')` <br>`(x, x + 1, x + 2)`
-Boolean | there are no literal of boolean type as there was no scenario where they would be required, however boolean variables and expressions are fully supported
+| Type     | Example|
+|----------| ---|
+| String   | `"Hello"` or `'Abracadabra'` (both single and double quotes are supported)|
+|  Long    | `123`|
+|  Double  | `123.456`|
+|  Decimal | There is no decimal literal per se, however there is a built-in function `toDecimal()` that lets specify decimal constants, e.g. `toDecimal(1234, 3)`|
+|  Date    | There is no date literal per se, however there is a built-in function `toDate()` that lets specify date constants, e.g. `toDate(2021, 11, 25)`|
+|  Vector  | `(1, 2, 3)` <br>`('A', 'B', 'C')` <br>`(x, x + 1, x + 2)`|
+|  Boolean | there are no literal of boolean type as there was no scenario where they would be required, however boolean variables and expressions are fully supported|
 
 ### Variables
 
@@ -476,15 +480,15 @@ substr(a + b, 3)
 
 ### Expressions
 
-Category | Expression                   | Example
------------- |------------------------------| -------------
-Unary | `-`<br>`not`                 | `-123`<br>`not (a > b)`
-Binary Arithmetic | `+` `-` `*` `/`              | `1 + 2`<br>`unit_price * quantity`<br>string concatenation:<br> `"Hello, " + "world!"`
-Comparison | `>` `>=` `<` `<=` `==` `!=`  |
-Boolean | `and`<br>`or`<br>`xor`       |
-Containment | `in`<br>`not in`             | vectors: <br>`"a" in ("a", "b", "c")`<br>`x not in (1, 2, 3)`<br>strings:<br>`'ello' in 'Hello!'`<br>`"bye" not in "Hello!"`
-Empty | `is empty`<br>`is not empty` | `"" is empty`<br>`'Hello' is not empty`<br>vectors:<br>`(1, 2, 3) is not empty`<br>`() is empty`
-Null check | `is null`<br>`is not null`   | `"" is null`<br>`'Hello' is not null`<br>`x is null ? 0.0 : abs(x)`
+| Category          | Expression                   | Example|
+|-------------------|------------------------------| -------------|
+| Unary             | `-`<br>`not`                 | `-123`<br>`not (a > b)`|
+| Binary Arithmetic | `+` `-` `*` `/`              | `1 + 2`<br>`unit_price * quantity`<br>string concatenation:<br> `"Hello, " + "world!"`|
+| Comparison        | `>` `>=` `<` `<=` `==` `!=`  |
+| Boolean           | `and`<br>`or`<br>`xor`       |
+| Containment       | `in`<br>`not in`             | vectors: <br>`"a" in ("a", "b", "c")`<br>`x not in (1, 2, 3)`<br>strings:<br>`'ello' in 'Hello!'`<br>`"bye" not in "Hello!"`|
+| Empty             | `is empty`<br>`is not empty` | `"" is empty`<br>`'Hello' is not empty`<br>vectors:<br>`(1, 2, 3) is not empty`<br>`() is empty`|
+| Null check        | `is null`<br>`is not null`   | `"" is null`<br>`'Hello' is not null`<br>`x is null ? 0.0 : abs(x)`|
 
 ### Statements
 
@@ -501,21 +505,22 @@ Recursion (direct or indirect) is not supported.
 
 #### Built-in functions
 
-Function | Usage
---- | ---
-abs | abs(number)
-contains | contains(string, substring)
-print | print()
-println | println()
-startsWith | startsWith(string, prefix)
-substr | substr(string, beginIndex[, endIndex])
-toDate | toDate(string in the yyyy-mm-dd format)<br>toDate(yyyy, mm, dd)
-toDateTime | toDateTime(yyyy, mm, dd, hh, mm, ss)
-toDouble | toDouble(string)
-toLong | toLong(string)
-toString | toString(number)
-toUpper | toUpper(string)
-withinDays | withinDays(date1, date2, numberOfDays)
+| Function   | Usage|
+|------------| ---|
+| abs        | abs(number)|
+| contains   | contains(string, substring)|
+| print      | print()|
+| println    | println()|
+| startsWith | startsWith(string, prefix)|
+| substr     | substr(string, beginIndex[, endIndex])|
+| toDate     | toDate(string in the yyyy-mm-dd format)<br>toDate(yyyy, mm, dd)|
+| toDateTime | toDateTime(yyyy, mm, dd, hh, mm, ss)|
+| toDouble   | toDouble(string)|
+| toLong     | toLong(string)|
+| toDecimal  | toUpper(unscaledValue, scale)|
+| toString   | toString(number)|
+| toUpper    | toUpper(string)|
+| withinDays | withinDays(date1, date2, numberOfDays)|
 
 
 #### User Declared Function Example 1

@@ -1,6 +1,10 @@
 # Releases
+### 0.18.4
+* adds support for the decimal type (high/arbitrary precision)
+* improves error handling and reporting
+* bug fixes
 ### 0.18.3
-* changes data frame sort implementations by column and by expression to be stable
+* changes data frame sort by column and sort by expression implementations to be stable
 * adds format() built-in function which supports rich formatting of numeric and date values
 ###  0.18.1
 * validates that the header names in a CSV data set match the schema
