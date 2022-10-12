@@ -1,5 +1,6 @@
 package io.github.vmzakharov.ecdataframe.dataframe;
 
+import io.github.vmzakharov.ecdataframe.dataframe.compare.DoubleComparisonResult;
 import io.github.vmzakharov.ecdataframe.dsl.value.ValueType;
 import org.eclipse.collections.api.list.primitive.ImmutableDoubleList;
 import org.eclipse.collections.impl.factory.primitive.DoubleLists;
@@ -93,7 +94,7 @@ extends DfColumnAbstract
             int thisMappedIndex = this.dataFrameRowIndex(thisRowIndex);
             int otherMappedIndex = otherDoubleColumn.dataFrameRowIndex(otherRowIndex);
 
-            return new ComparisonResult.DoubleComparisonResult(
+            return new DoubleComparisonResult(
                     () -> this.getDouble(thisMappedIndex),
                     () -> otherDoubleColumn.getDouble(otherMappedIndex),
                     this.isNull(thisMappedIndex),

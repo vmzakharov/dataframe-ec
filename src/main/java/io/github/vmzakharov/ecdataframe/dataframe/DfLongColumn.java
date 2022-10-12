@@ -1,5 +1,6 @@
 package io.github.vmzakharov.ecdataframe.dataframe;
 
+import io.github.vmzakharov.ecdataframe.dataframe.compare.LongComparisonResult;
 import io.github.vmzakharov.ecdataframe.dsl.value.ValueType;
 import org.eclipse.collections.api.list.primitive.ImmutableLongList;
 import org.eclipse.collections.impl.factory.primitive.LongLists;
@@ -93,7 +94,7 @@ extends DfColumnAbstract
             int thisMappedIndex = this.dataFrameRowIndex(thisRowIndex);
             int otherMappedIndex = otherLongColumn.dataFrameRowIndex(otherRowIndex);
 
-            return new ComparisonResult.LongComparisonResult(
+            return new LongComparisonResult(
                 () -> this.getLong(thisMappedIndex),
                 () -> otherLongColumn.getLong(otherMappedIndex),
                 this.isNull(thisMappedIndex),

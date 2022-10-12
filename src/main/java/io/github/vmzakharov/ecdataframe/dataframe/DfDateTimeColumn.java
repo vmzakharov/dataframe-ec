@@ -1,5 +1,6 @@
 package io.github.vmzakharov.ecdataframe.dataframe;
 
+import io.github.vmzakharov.ecdataframe.dataframe.compare.DateTimeComparisonResult;
 import io.github.vmzakharov.ecdataframe.dsl.value.DateTimeValue;
 import io.github.vmzakharov.ecdataframe.dsl.value.Value;
 import io.github.vmzakharov.ecdataframe.dsl.value.ValueType;
@@ -41,7 +42,7 @@ extends DfObjectColumn<LocalDateTime>
     {
         DfDateTimeColumn otherStringColumn = (DfDateTimeColumn) otherColumn;
 
-        return (thisRowIndex, otherRowIndex) -> new ComparisonResult.DateTimeComparisonResult(
+        return (thisRowIndex, otherRowIndex) -> new DateTimeComparisonResult(
                 this.getTypedObject(this.dataFrameRowIndex(thisRowIndex)),
                 otherStringColumn.getTypedObject(otherStringColumn.dataFrameRowIndex(otherRowIndex)));
     }

@@ -1,9 +1,11 @@
 package io.github.vmzakharov.ecdataframe.dataframe;
 
+import io.github.vmzakharov.ecdataframe.dataframe.compare.DecimalComparisonResult;
 import org.eclipse.collections.impl.factory.Lists;
 import org.junit.Assert;
 import org.junit.Test;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 
 public class DfColumnCompareTest
@@ -14,17 +16,19 @@ public class DfColumnCompareTest
     public void simpleCompare()
     {
         DataFrame df1 = new DataFrame("DF1")
-                .addStringColumn("col1").addStringColumn("col2").addLongColumn("col3").addDateColumn("col4").addDoubleColumn("col5")
-                .addRow("A", "B", 3, LocalDate.of(2020, 10, 23), 103.03)
-                .addRow("B", "B", 1, LocalDate.of(2020, 10, 21), 100.01)
-                .addRow("C", "B", 2, LocalDate.of(2020, 10, 22), 101.01)
+                .addStringColumn("col1").addStringColumn("col2").addLongColumn("col3").addDateColumn("col4")
+                .addDoubleColumn("col5").addDecimalColumn("col6")
+                .addRow("A", "B", 3, LocalDate.of(2020, 10, 23), 103.03, BigDecimal.valueOf(10303, 2))
+                .addRow("B", "B", 1, LocalDate.of(2020, 10, 21), 100.01, BigDecimal.valueOf(10001, 2))
+                .addRow("C", "B", 2, LocalDate.of(2020, 10, 22), 101.01, BigDecimal.valueOf(10101, 2))
                 ;
 
         DataFrame df2 = new DataFrame("DF2")
-                .addStringColumn("col1").addStringColumn("column2").addLongColumn("number").addDateColumn("date").addDoubleColumn("amount")
-                .addRow("A", "C", 2, LocalDate.of(2020, 10, 22), 101.01)
-                .addRow("X", "B", 1, LocalDate.of(2020, 10, 21), 100.01)
-                .addRow("A", "A", 3, LocalDate.of(2020, 10, 23), 105.05)
+                .addStringColumn("col1").addStringColumn("column2").addLongColumn("number").addDateColumn("date")
+                .addDoubleColumn("amount").addDecimalColumn("decimal")
+                .addRow("A", "C", 2, LocalDate.of(2020, 10, 22), 101.01, BigDecimal.valueOf(10101, 2))
+                .addRow("X", "B", 1, LocalDate.of(2020, 10, 21), 100.01, BigDecimal.valueOf(10001, 2))
+                .addRow("A", "A", 3, LocalDate.of(2020, 10, 23), 105.05, BigDecimal.valueOf(10505, 2))
                 ;
 
         DfCellComparator col1Comparator = df1.columnComparator(df2, "col1", "col1");
@@ -73,6 +77,17 @@ public class DfColumnCompareTest
         Assert.assertEquals(2.02, col5Comparator.compare(0, 0).dDelta(), TOLERANCE);
         Assert.assertEquals(0.0, col5Comparator.compare(1, 1).dDelta(), TOLERANCE);
         Assert.assertEquals(-4.04, col5Comparator.compare(2, 2).dDelta(), TOLERANCE);
+
+        DfCellComparator col6Comparator = df1.columnComparator(df2, "col6", "decimal");
+        Assert.assertTrue(col6Comparator.compare(0, 0).compared() > 0);
+        Assert.assertTrue(col6Comparator.compare(1, 1).compared() == 0);
+        Assert.assertTrue(col6Comparator.compare(2, 2).compared() < 0);
+
+        Assert.assertEquals(2.02, col6Comparator.compare(0, 0).dDelta(), TOLERANCE);
+        Assert.assertEquals(BigDecimal.valueOf(202, 2), ((DecimalComparisonResult) col6Comparator.compare(0, 0)).decDelta());
+        Assert.assertEquals(0.0, col6Comparator.compare(1, 1).dDelta(), TOLERANCE);
+        Assert.assertEquals(-4.04, col6Comparator.compare(2, 2).dDelta(), TOLERANCE);
+        Assert.assertEquals(BigDecimal.valueOf(-404, 2), ((DecimalComparisonResult) col6Comparator.compare(2, 2)).decDelta());
     }
 
     @Test
@@ -146,19 +161,19 @@ public class DfColumnCompareTest
     public void compareWithNullValues()
     {
         DataFrame df1 = new DataFrame("DF1")
-                .addStringColumn("col1").addLongColumn("col2").addDateColumn("col3").addDoubleColumn("col4")
-                .addRow("A",  null, LocalDate.of(2020, 6, 20), 100.15)
-                .addRow(null,    3,                      null, 100.15)
-                .addRow(null,    2,                      null,   null)
-                .addRow("D",  null, LocalDate.of(2020, 6, 22),   null)
+                .addStringColumn("col1").addLongColumn("col2").addDateColumn("col3").addDoubleColumn("col4").addDecimalColumn("col5")
+                .addRow("A",  null, LocalDate.of(2020, 6, 20), 100.15, null)
+                .addRow(null,    3,                      null, 100.15, null)
+                .addRow(null,    2,                      null,   null, BigDecimal.valueOf(10015, 2))
+                .addRow("D",  null, LocalDate.of(2020, 6, 22),   null, BigDecimal.valueOf(10015, 2))
                 ;
 
         DataFrame df2 = new DataFrame("DF2")
-                .addStringColumn("col1").addLongColumn("number").addDateColumn("date").addDoubleColumn("amount")
-                .addRow(null,    1,                      null, 101.15)
-                .addRow("X",  null,                      null,   null)
-                .addRow(null,    4, LocalDate.of(2020, 6, 21),   null)
-                .addRow("D",  null, LocalDate.of(2020, 6, 22), 100.15)
+                .addStringColumn("col1").addLongColumn("number").addDateColumn("date").addDoubleColumn("amount").addDecimalColumn("decimal")
+                .addRow(null,    1,                      null, 101.15, null)
+                .addRow("X",  null,                      null,   null, BigDecimal.valueOf(10015, 2))
+                .addRow(null,    4, LocalDate.of(2020, 6, 21),   null, null)
+                .addRow("D",  null, LocalDate.of(2020, 6, 22), 100.15, BigDecimal.valueOf(10015, 2))
                 ;
 
         DfCellComparator col1Comparator = df1.columnComparator(df2, "col1", "col1");
@@ -184,6 +199,12 @@ public class DfColumnCompareTest
         Assert.assertTrue(col4Comparator.compare(1, 1).rightIsNull());
         Assert.assertTrue(col4Comparator.compare(2, 2).bothAreNulls());
         Assert.assertTrue(col4Comparator.compare(3, 3).leftIsNull());
+
+        DfCellComparator col5Comparator = df1.columnComparator(df2, "col5", "decimal");
+        Assert.assertTrue(col5Comparator.compare(0, 0).bothAreNulls());
+        Assert.assertTrue(col5Comparator.compare(1, 1).leftIsNull());
+        Assert.assertTrue(col5Comparator.compare(2, 2).rightIsNull());
+        Assert.assertTrue(col5Comparator.compare(3, 3).noNulls());
     }
 
     @Test

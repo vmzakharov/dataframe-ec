@@ -1,5 +1,6 @@
 package io.github.vmzakharov.ecdataframe.dataframe;
 
+import io.github.vmzakharov.ecdataframe.dataframe.compare.DecimalComparisonResult;
 import io.github.vmzakharov.ecdataframe.dsl.value.DecimalValue;
 import io.github.vmzakharov.ecdataframe.dsl.value.Value;
 import io.github.vmzakharov.ecdataframe.dsl.value.ValueType;
@@ -38,7 +39,7 @@ extends DfObjectColumn<BigDecimal>
     {
         DfDecimalColumn otherStringColumn = (DfDecimalColumn) otherColumn;
 
-        return (thisRowIndex, otherRowIndex) -> new ComparisonResult.DecimalComparisonResult(
+        return (thisRowIndex, otherRowIndex) -> new DecimalComparisonResult(
                 this.getTypedObject(this.dataFrameRowIndex(thisRowIndex)),
                 otherStringColumn.getTypedObject(otherStringColumn.dataFrameRowIndex(otherRowIndex)));
     }
