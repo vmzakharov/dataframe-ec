@@ -10,6 +10,7 @@ implements Value
 
     public DataFrameValue(DataFrame newDataFrame)
     {
+        ErrorReporter.reportAndThrowIf(newDataFrame == null, "DataFrame value cannot contain null, a void value should be used instead");
         this.dataFrame = newDataFrame;
     }
 
@@ -21,7 +22,7 @@ implements Value
     @Override
     public String asStringLiteral()
     {
-        return "DataFrame [" + this.dataFrame.getName() + "] " + this.dataFrame.asCsvString();
+        return "DataFrame [" + this.dataFrame.getName() + ", rows: " + this.dataFrame.rowCount() + ", " + this.dataFrame.columnCount() + "] ";
     }
 
     @Override
