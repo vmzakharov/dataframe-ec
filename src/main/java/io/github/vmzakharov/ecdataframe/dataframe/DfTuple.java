@@ -62,24 +62,7 @@ implements Comparable<DfTuple>
     @Override
     public int compareTo(DfTuple that)
     {
-        Object[] these = this.items;
-        Object[] others = that.items;
-
-        if (these == others)
-        {
-            return 0;
-        }
-
-        for (int i = 0; i < these.length; i++)
-        {
-            int result = compareMindingNulls(these[i], others[i]);
-            if (result != 0)
-            {
-                return result;
-            }
-        }
-
-        return 0;
+        return this.compareTo(that, null);
     }
 
     @Override
@@ -108,7 +91,7 @@ implements Comparable<DfTuple>
             int result = compareMindingNulls(these[i], others[i]);
             if (result != 0)
             {
-                return sortOrders.get(i).order(result);
+                return sortOrders == null ? result : sortOrders.get(i).order(result);
             }
         }
 
