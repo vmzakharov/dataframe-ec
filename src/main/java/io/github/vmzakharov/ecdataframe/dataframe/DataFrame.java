@@ -35,6 +35,8 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Arrays;
 
+import static io.github.vmzakharov.ecdataframe.dataframe.DfColumnSortOrder.ASC;
+
 public class DataFrame
 {
     private final String name;
@@ -780,6 +782,11 @@ public class DataFrame
 
     public DataFrame sortBy(ListIterable<String> columnsToSortByNames)
     {
+        return this.sortBy(columnsToSortByNames, null);
+    }
+
+    public DataFrame sortBy(ListIterable<String> columnsToSortByNames, ListIterable<DfColumnSortOrder> sortOrders)
+    {
         this.unsort();
 
         // doing this before check for rowCount to make sure that the sort columns exist even if the data frame is empty
@@ -797,7 +804,14 @@ public class DataFrame
             tuples[i] = this.rowToTuple(i, columnsToSortBy);
         }
 
-        Arrays.sort(tuples);
+        if (sortOrders == null)
+        {
+            Arrays.sort(tuples);
+        }
+        else
+        {
+            Arrays.sort(tuples, (t1, t2) -> t1.compareTo(t2, sortOrders));
+        }
 
         this.virtualRowMap = ArrayIterate.collectInt(tuples, DfTuple::order);
 
@@ -805,6 +819,11 @@ public class DataFrame
     }
 
     public DataFrame sortByExpression(String expressionString)
+    {
+        return this.sortByExpression(expressionString, ASC);
+    }
+
+    public DataFrame sortByExpression(String expressionString, DfColumnSortOrder sortOrder)
     {
         this.unsort();
         if (this.rowCount == 0)
@@ -821,7 +840,7 @@ public class DataFrame
             tuples[i] = new DfTuple(i, new Object[] {this.evaluateExpression(expression, i)});
         }
 
-        Arrays.sort(tuples);
+        Arrays.sort(tuples, (t1, t2) -> t1.compareTo(t2, Lists.immutable.of(sortOrder)));
 
         this.virtualRowMap = ArrayIterate.collectInt(tuples, DfTuple::order);
 

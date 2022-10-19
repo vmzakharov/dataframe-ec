@@ -1,5 +1,6 @@
 package io.github.vmzakharov.ecdataframe.dataframe;
 
+import org.eclipse.collections.api.list.ListIterable;
 import org.eclipse.collections.impl.utility.ArrayIterate;
 
 import java.util.Arrays;
@@ -90,5 +91,27 @@ implements Comparable<DfTuple>
     public int order()
     {
         return this.order;
+    }
+
+    public int compareTo(DfTuple that, ListIterable<DfColumnSortOrder> sortOrders)
+    {
+        Object[] these = this.items;
+        Object[] others = that.items;
+
+        if (these == others)
+        {
+            return 0;
+        }
+
+        for (int i = 0; i < these.length; i++)
+        {
+            int result = compareMindingNulls(these[i], others[i]);
+            if (result != 0)
+            {
+                return sortOrders.get(i).order(result);
+            }
+        }
+
+        return 0;
     }
 }
