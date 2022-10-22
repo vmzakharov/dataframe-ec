@@ -7,6 +7,7 @@ import io.github.vmzakharov.ecdataframe.dsl.value.BooleanValue;
 import io.github.vmzakharov.ecdataframe.dsl.value.Value;
 import io.github.vmzakharov.ecdataframe.dsl.value.ValueType;
 import io.github.vmzakharov.ecdataframe.dsl.visitor.InMemoryEvaluationVisitor;
+import io.github.vmzakharov.ecdataframe.dsl.visitor.TypeInferenceVisitor;
 import io.github.vmzakharov.ecdataframe.util.ExpressionParserHelper;
 import org.eclipse.collections.api.DoubleIterable;
 import org.eclipse.collections.api.LongIterable;
@@ -288,6 +289,24 @@ public class DataFrame
     public String getName()
     {
         return this.name;
+    }
+
+    public DataFrame addColumn(String columnName, String expressionAsString)
+    {
+        TypeInferenceVisitor visitor = new TypeInferenceVisitor();
+
+        this.getColumns().each(col -> visitor.storeVariableType(col.getName(), col.getType()));
+
+        Expression expression = ExpressionParserHelper.DEFAULT.toExpressionOrScript(expressionAsString);
+
+        ValueType expressionType = visitor.inferExpressionType(expression);
+        if (visitor.hasErrors())
+        {
+            ErrorReporter.reportAndThrow("Cannot add calculated column " + columnName + " to data frame " + this.getName() + ": "
+                    + "failed to infer expression type of '" + expressionAsString + "'\n"
+                    + visitor.getErrors().collect(err -> err.getOne() + ": " + err.getTwo()).makeString("\n"));
+        }
+        return this.addColumn(columnName, expressionType, expressionAsString);
     }
 
     public DataFrame addColumn(String columnName, ValueType type)

@@ -82,7 +82,7 @@ public class TypeInferenceVisitor
         this.storeVariableType(expr.getVarName(), this.expressionTypeStack.pop());
     }
 
-    private void storeVariableType(String variableName, ValueType valueType)
+    public void storeVariableType(String variableName, ValueType valueType)
     {
         this.variableTypes.put(variableName, valueType);
     }

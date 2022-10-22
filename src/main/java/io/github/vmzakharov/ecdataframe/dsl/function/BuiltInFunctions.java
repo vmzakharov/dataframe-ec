@@ -329,16 +329,30 @@ final public class BuiltInFunctions
                 LocalDate date = null;
                 if (parameters.size() == 3)
                 {
+                    Value yearValue = parameters.get(0);
+                    Value monthValue = parameters.get(1);
+                    Value dayValue = parameters.get(2);
+
+                    if (yearValue.isVoid() || monthValue.isVoid() || dayValue.isVoid())
+                    {
+                        return Value.VOID;
+                    }
+
                     date = LocalDate.of(
-                            (int) ((LongValue) parameters.get(0)).longValue(),
-                            (int) ((LongValue) parameters.get(1)).longValue(),
-                            (int) ((LongValue) parameters.get(2)).longValue()
-                    );
+                            (int) ((LongValue) yearValue).longValue(),
+                            (int) ((LongValue) monthValue).longValue(),
+                            (int) ((LongValue) dayValue).longValue());
                 }
                 else if (parameters.size() == 1)
                 {
-                    String aString = parameters.get(0).stringValue();
-                    date = LocalDate.parse(aString, DateTimeFormatter.ISO_DATE);
+                    Value dateAsString = parameters.get(0);
+
+                    if (dateAsString.isVoid())
+                    {
+                        return Value.VOID;
+                    }
+
+                    date = LocalDate.parse(dateAsString.stringValue(), DateTimeFormatter.ISO_DATE);
                 }
                 else
                 {
@@ -374,7 +388,13 @@ final public class BuiltInFunctions
                     int[] params = new int[paramCount];
                     for (int i = 0; i < paramCount; i++)
                     {
-                        params[i] = (int) ((LongValue) parameters.get(i)).longValue();
+                        Value parameter = parameters.get(i);
+                        if (parameter.isVoid())
+                        {
+                            return Value.VOID;
+                        }
+
+                        params[i] = (int) ((LongValue) parameter).longValue();
                     }
 
                     switch (paramCount)
@@ -394,8 +414,14 @@ final public class BuiltInFunctions
                 }
                 else if (parameters.size() == 1)
                 {
-                    String aString = parameters.get(0).stringValue();
-                    dateTime = LocalDateTime.parse(aString, DateTimeFormatter.ISO_DATE_TIME);
+                    Value dateTimeAsString = parameters.get(0);
+
+                    if (dateTimeAsString.isVoid())
+                    {
+                        return Value.VOID;
+                    }
+
+                    dateTime = LocalDateTime.parse(dateTimeAsString.stringValue(), DateTimeFormatter.ISO_DATE_TIME);
                 }
                 else
                 {
@@ -425,6 +451,11 @@ final public class BuiltInFunctions
             public Value evaluate(EvalContext context)
             {
                 Value parameter = context.getVariable("string");
+                if (parameter.isVoid())
+                {
+                    return Value.VOID;
+                }
+
                 this.assertParameterType(STRING, parameter.getType());
                 String aString = parameter.stringValue();
 
@@ -444,6 +475,11 @@ final public class BuiltInFunctions
             public Value evaluate(EvalContext context)
             {
                 Value parameter = context.getVariable("string");
+                if (parameter.isVoid())
+                {
+                    return Value.VOID;
+                }
+
                 this.assertParameterType(STRING, parameter.getType());
                 String aString = parameter.stringValue();
 
@@ -463,8 +499,18 @@ final public class BuiltInFunctions
             public Value evaluate(EvalContext context)
             {
                 Value unscaled = context.getVariable("unscaledValue");
-                this.assertParameterType(LONG, unscaled.getType());
+                if (unscaled.isVoid())
+                {
+                    return Value.VOID;
+                }
+
                 Value scale = context.getVariable("scale");
+                if (scale.isVoid())
+                {
+                    return Value.VOID;
+                }
+
+                this.assertParameterType(LONG, unscaled.getType());
                 this.assertParameterType(LONG, scale.getType());
 
                 return new DecimalValue(BigDecimal.valueOf(

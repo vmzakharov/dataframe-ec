@@ -2,6 +2,8 @@ package io.github.vmzakharov.ecdataframe.dataframe;
 
 import org.junit.Assert;
 
+import java.math.BigDecimal;
+
 final public class DataFrameUtil
 {
     private DataFrameUtil()
@@ -33,8 +35,25 @@ final public class DataFrameUtil
         {
             for (int colIndex = 0; colIndex < colCount; colIndex++)
             {
-                Assert.assertEquals("Different values in row " + rowIndex + ", column " + colIndex,
-                        expected.getObject(rowIndex, colIndex), actual.getObject(rowIndex, colIndex));
+                Object expectedValue = expected.getObject(rowIndex, colIndex);
+                Object actualValue = actual.getObject(rowIndex, colIndex);
+
+                if (expectedValue instanceof BigDecimal)
+                {
+                    Assert.assertTrue("Invalid type of the actual value: " + actualValue.getClass().getName()
+                                    + " expected: BigDecimal",
+                            actualValue instanceof BigDecimal);
+
+                    Assert.assertEquals("Different values in row " + rowIndex + ", column " + colIndex
+                                    + " expected: " + expectedValue + ", actual: " + actualValue
+                                    + " (showing the result of expected.compareTo(actual)",
+                            0, ((BigDecimal) expectedValue).compareTo((BigDecimal) actualValue));
+                }
+                else
+                {
+                    Assert.assertEquals("Different values in row " + rowIndex + ", column " + colIndex,
+                            expectedValue, actualValue);
+                }
             }
         }
     }
