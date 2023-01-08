@@ -6,7 +6,7 @@ import io.github.vmzakharov.ecdataframe.dataframe.DfDateColumn;
 import io.github.vmzakharov.ecdataframe.dataframe.DfDateTimeColumn;
 import io.github.vmzakharov.ecdataframe.dataframe.DfDoubleColumn;
 import io.github.vmzakharov.ecdataframe.dataframe.DfLongColumn;
-import io.github.vmzakharov.ecdataframe.dataframe.ErrorReporter;
+import io.github.vmzakharov.ecdataframe.util.ErrorReporter;
 import io.github.vmzakharov.ecdataframe.dsl.value.ValueType;
 import org.eclipse.collections.api.block.procedure.Procedure;
 import org.eclipse.collections.api.list.ListIterable;

@@ -1,6 +1,6 @@
 package io.github.vmzakharov.ecdataframe.dsl.function;
 
-import io.github.vmzakharov.ecdataframe.dataframe.ErrorReporter;
+import io.github.vmzakharov.ecdataframe.util.ErrorReporter;
 import io.github.vmzakharov.ecdataframe.dsl.EvalContext;
 import io.github.vmzakharov.ecdataframe.dsl.FunctionDescriptor;
 import io.github.vmzakharov.ecdataframe.dsl.value.Value;

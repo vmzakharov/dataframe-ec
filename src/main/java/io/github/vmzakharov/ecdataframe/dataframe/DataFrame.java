@@ -8,6 +8,7 @@ import io.github.vmzakharov.ecdataframe.dsl.value.Value;
 import io.github.vmzakharov.ecdataframe.dsl.value.ValueType;
 import io.github.vmzakharov.ecdataframe.dsl.visitor.InMemoryEvaluationVisitor;
 import io.github.vmzakharov.ecdataframe.dsl.visitor.TypeInferenceVisitor;
+import io.github.vmzakharov.ecdataframe.util.ErrorReporter;
 import io.github.vmzakharov.ecdataframe.util.ExpressionParserHelper;
 import org.eclipse.collections.api.DoubleIterable;
 import org.eclipse.collections.api.LongIterable;

@@ -1,7 +1,7 @@
 package io.github.vmzakharov.ecdataframe.dsl.visitor;
 
 import io.github.vmzakharov.ecdataframe.dataframe.DataFrame;
-import io.github.vmzakharov.ecdataframe.dataframe.ErrorReporter;
+import io.github.vmzakharov.ecdataframe.util.ErrorReporter;
 import io.github.vmzakharov.ecdataframe.dataset.HierarchicalDataSet;
 import io.github.vmzakharov.ecdataframe.dsl.AnonymousScript;
 import io.github.vmzakharov.ecdataframe.dsl.AssingExpr;

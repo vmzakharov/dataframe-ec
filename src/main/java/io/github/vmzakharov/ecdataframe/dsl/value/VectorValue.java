@@ -1,6 +1,6 @@
 package io.github.vmzakharov.ecdataframe.dsl.value;
 
-import io.github.vmzakharov.ecdataframe.dataframe.ErrorReporter;
+import io.github.vmzakharov.ecdataframe.util.ErrorReporter;
 import io.github.vmzakharov.ecdataframe.dsl.UnaryOp;
 import org.eclipse.collections.api.list.ListIterable;
 import org.eclipse.collections.impl.factory.Lists;

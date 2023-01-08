@@ -7,6 +7,7 @@ import io.github.vmzakharov.ecdataframe.dataframe.aggregation.Min;
 import io.github.vmzakharov.ecdataframe.dataframe.aggregation.Same;
 import io.github.vmzakharov.ecdataframe.dataframe.aggregation.Sum;
 import io.github.vmzakharov.ecdataframe.dsl.value.ValueType;
+import io.github.vmzakharov.ecdataframe.util.ErrorReporter;
 import org.eclipse.collections.api.list.ListIterable;
 
 public abstract class AggregateFunction

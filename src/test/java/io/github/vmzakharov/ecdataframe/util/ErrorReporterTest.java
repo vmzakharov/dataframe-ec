@@ -1,6 +1,5 @@
 package io.github.vmzakharov.ecdataframe.util;
 
-import io.github.vmzakharov.ecdataframe.dataframe.ErrorReporter;
 import org.junit.Assert;
 import org.junit.Test;
 

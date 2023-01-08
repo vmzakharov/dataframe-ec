@@ -1,6 +1,6 @@
 package io.github.vmzakharov.ecdataframe.dsl.value;
 
-import io.github.vmzakharov.ecdataframe.dataframe.ErrorReporter;
+import io.github.vmzakharov.ecdataframe.util.ErrorReporter;
 
 abstract public class AbstractValue
 implements Value

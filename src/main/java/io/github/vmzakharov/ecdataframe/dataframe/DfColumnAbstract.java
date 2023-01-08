@@ -1,5 +1,7 @@
 package io.github.vmzakharov.ecdataframe.dataframe;
 
+import io.github.vmzakharov.ecdataframe.util.ErrorReporter;
+
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 

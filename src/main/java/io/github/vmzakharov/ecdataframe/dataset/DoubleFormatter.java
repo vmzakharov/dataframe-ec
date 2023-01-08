@@ -1,6 +1,6 @@
 package io.github.vmzakharov.ecdataframe.dataset;
 
-import io.github.vmzakharov.ecdataframe.dataframe.ErrorReporter;
+import io.github.vmzakharov.ecdataframe.util.ErrorReporter;
 import org.eclipse.collections.api.block.function.primitive.DoubleFunction;
 import org.eclipse.collections.impl.utility.StringIterate;
 

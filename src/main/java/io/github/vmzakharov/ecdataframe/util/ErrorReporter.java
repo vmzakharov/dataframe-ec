@@ -1,7 +1,5 @@
-package io.github.vmzakharov.ecdataframe.dataframe;
+package io.github.vmzakharov.ecdataframe.util;
 
-import io.github.vmzakharov.ecdataframe.util.Printer;
-import io.github.vmzakharov.ecdataframe.util.PrinterFactory;
 import org.eclipse.collections.api.block.function.Function;
 import org.eclipse.collections.api.block.function.Function2;
 

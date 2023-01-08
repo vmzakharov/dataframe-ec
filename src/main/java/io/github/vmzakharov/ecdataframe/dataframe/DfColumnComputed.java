@@ -4,6 +4,7 @@ import io.github.vmzakharov.ecdataframe.dsl.DataFrameEvalContext;
 import io.github.vmzakharov.ecdataframe.dsl.Expression;
 import io.github.vmzakharov.ecdataframe.dsl.value.Value;
 import io.github.vmzakharov.ecdataframe.dsl.visitor.InMemoryEvaluationVisitor;
+import io.github.vmzakharov.ecdataframe.util.ErrorReporter;
 
 public interface DfColumnComputed
 extends DfColumn
