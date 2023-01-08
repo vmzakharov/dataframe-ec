@@ -22,7 +22,7 @@ implements Value
     @Override
     public String asStringLiteral()
     {
-        return "DataFrame [" + this.dataFrame.getName() + ", rows: " + this.dataFrame.rowCount() + ", " + this.dataFrame.columnCount() + "] ";
+        return "DataFrame [" + this.dataFrame.getName() + ", rows: " + this.dataFrame.rowCount() + ", columns: " + this.dataFrame.columnCount() + "] ";
     }
 
     @Override
