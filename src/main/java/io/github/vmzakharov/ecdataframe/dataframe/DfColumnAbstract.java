@@ -88,4 +88,15 @@ implements DfColumn
 
         return newColumn;
     }
+
+    protected DfColumn copyColumn(DataFrame target)
+    {
+        target.addColumn(this.getName(), this.getType());
+
+        DfColumnStored newColumn = (DfColumnStored) target.getColumnAt(target.columnCount() - 1);
+
+        newColumn.ensureInitialCapacity(this.getSize());
+
+        return newColumn;
+    }
 }

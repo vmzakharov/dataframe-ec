@@ -827,13 +827,14 @@ public class DataFrame
 
         if (selectedColumnNamesToCopy == null)
         {
-            this.columns.forEach(col -> col.mergeWithInto(col, copied));
+            this.columns.forEach(col -> col.copyTo(copied));
+            copied.seal();
             return copied;
         }
 
         ListIterable<DfColumn> columnsToCopy = selectedColumnNamesToCopy.collect(this::getColumnNamed);
-        columnsToCopy.forEach(col -> col.mergeWithInto(col, copied));
-
+        columnsToCopy.forEach(col -> col.copyTo(copied));
+        copied.seal();
         return copied;
     }
 

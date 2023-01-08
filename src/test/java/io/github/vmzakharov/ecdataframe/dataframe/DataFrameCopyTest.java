@@ -84,28 +84,10 @@ public class DataFrameCopyTest
 
         df.addDoubleColumn("Twice", "Value * 2");
 
-        DataFrame copiedSchema = df.copy("MyNewCopy");
+        DataFrame copiedDataFrame = df.copy("MyNewCopy");
 
-        Assert.assertEquals(0, copiedSchema.rowCount());
-        Assert.assertEquals(df.columnCount(), copiedSchema.columnCount());
-        for (int i = 0; i < df.columnCount(); i++)
-        {
-            DfColumn sourceColumn = df.getColumnAt(i);
-            DfColumn copyColumn = copiedSchema.getColumnAt(i);
+        DataFrameUtil.assertEquals(df, copiedDataFrame);
 
-            Assert.assertEquals(sourceColumn.getName(), copyColumn.getName());
-            Assert.assertEquals(sourceColumn.getType(), copyColumn.getType());
-            Assert.assertTrue(copyColumn.isStored());
-            Assert.assertSame(copiedSchema, copyColumn.getDataFrame());
-
-            for (int j = 0; j < df.rowCount(); j++)
-            {
-                Value cellValue = df.getColumnAt(i).getValue(j);
-                Value copiedCellValue = copiedSchema.getColumnAt(i).getValue(j);
-
-                Assert.assertEquals(0, cellValue.compareTo(copiedCellValue));
-            }
-        }
     }
 
     @Test
@@ -122,13 +104,13 @@ public class DataFrameCopyTest
         df.addDoubleColumn("Twice", "Value * 2");
 
         ImmutableList<String> columnNamesToCopy = Lists.immutable.of("Name", "Twice");
-        DataFrame copiedSchema = df.copy("MyNewCopy", columnNamesToCopy);
+        DataFrame copiedDataFrame = df.copy("MyNewCopy", columnNamesToCopy);
 
-        Assert.assertEquals(0, copiedSchema.rowCount());
-        Assert.assertEquals(columnNamesToCopy.size(), copiedSchema.columnCount());
+        Assert.assertEquals(df.rowCount(), copiedDataFrame.rowCount());
+        Assert.assertEquals(columnNamesToCopy.size(), copiedDataFrame.columnCount());
         for (int i = 0; i < columnNamesToCopy.size(); i++)
         {
-            DfColumn copyColumn = copiedSchema.getColumnAt(i);
+            DfColumn copyColumn = copiedDataFrame.getColumnAt(i);
             DfColumn sourceColumn = df.getColumnNamed(copyColumn.getName());
 
             Assert.assertEquals(sourceColumn.getName(), copyColumn.getName());
@@ -138,7 +120,7 @@ public class DataFrameCopyTest
             for (int j = 0; j < df.rowCount(); j++)
             {
                 Value cellValue = df.getColumnNamed(copyColumn.getName()).getValue(j);
-                Value copiedCellValue = copiedSchema.getColumnAt(i).getValue(j);
+                Value copiedCellValue = copiedDataFrame.getColumnAt(i).getValue(j);
 
                 Assert.assertEquals(0, cellValue.compareTo(copiedCellValue));
             }
