@@ -1,6 +1,5 @@
 package io.github.vmzakharov.ecdataframe.dsl.function;
 
-import io.github.vmzakharov.ecdataframe.util.ErrorReporter;
 import io.github.vmzakharov.ecdataframe.dsl.EvalContext;
 import io.github.vmzakharov.ecdataframe.dsl.FunctionDescriptor;
 import io.github.vmzakharov.ecdataframe.dsl.value.Value;
@@ -78,22 +77,31 @@ implements FunctionDescriptor
 
     protected void assertParameterCount(int expectedCount, int actualCount)
     {
-        ErrorReporter.reportAndThrowIf(
-                expectedCount != actualCount,
-                () -> "Invalid number of parameters in a call to '" + this.getName() + "'. " + this.usageString());
+        if (expectedCount != actualCount)
+        {
+            exception("Invalid number of parameters in a call to '${functionName}'. ${usageString}")
+                    .with("functionName", this.getName()).with("usageString", this.usageString())
+                    .fire();
+        }
     }
 
     protected void assertParameterType(ValueType expected, ValueType actual)
     {
-        ErrorReporter.reportAndThrowIf(
-                expected != actual,
-                () -> "Invalid parameter type in a call to '" + this.getName() + "'. " + this.usageString());
+        if (expected != actual)
+        {
+            exception("Invalid parameter type in a call to '${functionName}'. ${usageString}")
+                    .with("functionName", this.getName()).with("usageString", this.usageString())
+                    .fire();
+        }
     }
 
     protected void assertParameterType(ListIterable<ValueType> expected, ValueType actual)
     {
-        ErrorReporter.reportAndThrowIf(
-                !expected.contains(actual),
-                () -> "Invalid parameter type in a call to '" + this.getName() + "'. " + this.usageString());
+        if (!expected.contains(actual))
+        {
+            exception("Invalid parameter type in a call to '${functionName}'. ${usageString}")
+                    .with("functionName", this.getName()).with("usageString", this.usageString())
+                    .fire();
+        }
     }
 }

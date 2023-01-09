@@ -6,6 +6,14 @@ abstract public class AbstractValue
 implements Value
 {
 
+    public void throwExceptionIfNull(Object newValue)
+    {
+        if (newValue == null)
+        {
+            exception("${type} value cannot contain null, a void value should be used instead").with("type", this.getType()).fire();
+        }
+    }
+
     @Override
     public String toString()
     {

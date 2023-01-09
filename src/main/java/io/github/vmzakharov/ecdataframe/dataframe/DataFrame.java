@@ -38,7 +38,6 @@ import java.util.Arrays;
 
 import static io.github.vmzakharov.ecdataframe.dataframe.DfColumnSortOrder.ASC;
 import static io.github.vmzakharov.ecdataframe.util.ErrorReporter.exception;
-import static io.github.vmzakharov.ecdataframe.util.ErrorReporter.reportAndThrowIf;
 
 public class DataFrame
 {
@@ -917,7 +916,8 @@ public class DataFrame
      */
     public DataFrame union(DataFrame other)
     {
-        reportAndThrowIf(this.columnCount() != other.columnCount(), "Attempting to union data frames with different numbers of columns");
+        exception("Attempting to union data frames with different numbers of columns").fireIf(this.columnCount() != other.columnCount());
+
         DataFrame dfUnion = new DataFrame("union");
 
         this.columns.forEach(

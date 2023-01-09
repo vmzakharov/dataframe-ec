@@ -19,7 +19,6 @@ import java.time.chrono.ChronoLocalDate;
 import java.time.chrono.ChronoLocalDateTime;
 
 import static io.github.vmzakharov.ecdataframe.util.ErrorReporter.exception;
-import static io.github.vmzakharov.ecdataframe.util.ErrorReporter.reportAndThrow;
 
 public class ObjectListDataSet
 extends HierarchicalDataSet
@@ -86,7 +85,7 @@ extends HierarchicalDataSet
             }
             catch (Throwable e)
             {
-                reportAndThrow("Failed to invoke " + methodHandle, e);
+                exception("Failed to invoke ${method}").with("methodDetails", methodHandle).fire(e);
             }
         }
         return currentValue;

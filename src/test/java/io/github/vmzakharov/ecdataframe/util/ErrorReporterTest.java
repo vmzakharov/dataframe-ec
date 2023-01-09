@@ -3,8 +3,26 @@ package io.github.vmzakharov.ecdataframe.util;
 import org.junit.Assert;
 import org.junit.Test;
 
+import static io.github.vmzakharov.ecdataframe.util.ErrorReporter.exception;
+
 public class ErrorReporterTest
 {
+    @Test
+    public void defaultExceptionType()
+    {
+        try
+        {
+            ErrorReporter.initialize();
+            exception("Hello").fire();
+            Assert.fail("didn't throw");
+        }
+        catch (RuntimeException e)
+        {
+            Assert.assertEquals(RuntimeException.class, e.getClass());
+            Assert.assertEquals("Hello", e.getMessage());
+        }
+    }
+
     @Test
     public void defaultExceptionTypeWithCauseArg()
     {
@@ -13,7 +31,7 @@ public class ErrorReporterTest
         try
         {
             ErrorReporter.initialize();
-            ErrorReporter.reportAndThrow("Hello", cause);
+            exception("Hello").fire(cause);
             Assert.fail("didn't throw");
         }
         catch (RuntimeException e)
@@ -25,6 +43,52 @@ public class ErrorReporterTest
     }
 
     @Test
+    public void defaultUnsupported()
+    {
+        try
+        {
+            ErrorReporter.initialize();
+            throw exception("Do it!").getUnsupported();
+        }
+        catch (UnsupportedOperationException e)
+        {
+            Assert.assertEquals(UnsupportedOperationException.class, e.getClass());
+            Assert.assertEquals("Do it!", e.getMessage());
+        }
+    }
+
+    @Test
+    public void overrideExceptionType()
+    {
+        try
+        {
+            ErrorReporter.exceptionFactories(VerySpecialException::new, VerySpecialException::new, DontWanna::new);
+            exception("Hello").fire();
+            Assert.fail("didn't throw");
+        }
+        catch (RuntimeException e)
+        {
+            Assert.assertEquals(VerySpecialException.class, e.getClass());
+            Assert.assertEquals("Hello", e.getMessage());
+        }
+    }
+
+    @Test
+    public void overrideUnsupported()
+    {
+        try
+        {
+            ErrorReporter.exceptionFactories(VerySpecialException::new, VerySpecialException::new, DontWanna::new);
+            throw exception("Do it!").getUnsupported();
+        }
+        catch (UnsupportedOperationException e)
+        {
+            Assert.assertEquals(DontWanna.class, e.getClass());
+            Assert.assertEquals("Do it!", e.getMessage());
+        }
+    }
+
+    @Test
     public void overrideExceptionTypeWithCauseArg()
     {
         Throwable cause = new RuntimeException("Boom!");
@@ -32,7 +96,7 @@ public class ErrorReporterTest
         try
         {
             ErrorReporter.exceptionFactories(VerySpecialException::new, VerySpecialException::new, DontWanna::new);
-            ErrorReporter.reportAndThrow("Hello", cause);
+            exception("Hello").fire(cause);
             Assert.fail("didn't throw");
         }
         catch (RuntimeException e)
@@ -43,8 +107,49 @@ public class ErrorReporterTest
         }
     }
 
+    @Test
+    public void errorPrinter()
+    {
+        CollectingPrinter printer = new CollectingPrinter();
+        ErrorReporter.setPrintedMessagePrefix("Boo-boo: ");
+        ErrorReporter.setErrorPrinter(printer);
+
+        try
+        {
+            exception("ouch").fire();
+        }
+        catch (RuntimeException e)
+        {
+            Assert.assertEquals("Boo-boo: ouch\n", printer.toString());
+        }
+
+        printer.clear();
+
+        try
+        {
+            exception("ow-ow").fire(new RuntimeException("Nothing to see here"));
+        }
+        catch (RuntimeException e)
+        {
+            Assert.assertEquals("Boo-boo: ow-ow\n", printer.toString());
+        }
+
+        printer.clear();
+
+        try
+        {
+            throw exception("oh, well").getUnsupported();
+        }
+        catch (UnsupportedOperationException e)
+        {
+            Assert.assertEquals("Boo-boo: oh, well\n", printer.toString());
+        }
+
+        ErrorReporter.initialize();
+    }
+
     private static class VerySpecialException
-    extends RuntimeException
+            extends RuntimeException
     {
         public VerySpecialException(String message)
         {
@@ -58,7 +163,7 @@ public class ErrorReporterTest
     }
 
     private static class DontWanna
-    extends UnsupportedOperationException
+            extends UnsupportedOperationException
     {
         public DontWanna(String message)
         {

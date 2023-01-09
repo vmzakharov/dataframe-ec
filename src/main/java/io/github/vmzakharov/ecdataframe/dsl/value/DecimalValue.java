@@ -15,7 +15,7 @@ implements NumberValue
 
     public DecimalValue(BigDecimal newValue)
     {
-        ErrorReporter.reportAndThrowIf(newValue == null, "Decimal value cannot contain null, a void value should be used instead");
+        this.throwExceptionIfNull(newValue);
         this.value = newValue;
     }
 

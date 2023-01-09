@@ -6,7 +6,6 @@ import io.github.vmzakharov.ecdataframe.dataframe.DfDateColumn;
 import io.github.vmzakharov.ecdataframe.dataframe.DfDateTimeColumn;
 import io.github.vmzakharov.ecdataframe.dataframe.DfDoubleColumn;
 import io.github.vmzakharov.ecdataframe.dataframe.DfLongColumn;
-import io.github.vmzakharov.ecdataframe.util.ErrorReporter;
 import io.github.vmzakharov.ecdataframe.dsl.value.ValueType;
 import org.eclipse.collections.api.block.procedure.Procedure;
 import org.eclipse.collections.api.list.ListIterable;
@@ -336,7 +335,7 @@ extends DataSetAbstract
         }
         catch (IOException e)
         {
-            ErrorReporter.reportAndThrow("Failed to infer schema from  '" + this.getDataFileName() + "'", e);
+            exception("Failed to infer schema from  '${fileName}'").with("fileName", this.getDataFileName()).fire(e);
         }
 
         return this.schema;
@@ -441,7 +440,8 @@ extends DataSetAbstract
         }
         catch (IOException e)
         {
-            ErrorReporter.reportAndThrow("Failed to load as a data frame '" + this.getDataFileName() + "'", e);
+            exception("Failed to load file as a data frame '${fileName}'")
+                    .with("fileName", this.getDataFileName()).fire(e);
         }
 
         return df;

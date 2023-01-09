@@ -3,8 +3,6 @@ package io.github.vmzakharov.ecdataframe.util;
 import org.eclipse.collections.api.block.function.Function;
 import org.eclipse.collections.api.block.function.Function2;
 
-import java.util.function.Supplier;
-
 final public class ErrorReporter
 {
     private static Function<String, ? extends RuntimeException> exceptionWithMessage;
@@ -67,32 +65,6 @@ final public class ErrorReporter
     public static void setPrintedMessagePrefix(String newPrintedMessagePrefix)
     {
         ErrorReporter.printedMessagePrefix = newPrintedMessagePrefix;
-    }
-
-    public static void reportAndThrowIf(boolean badThingHappened, String errorText)
-    {
-        if (badThingHappened)
-        {
-            ErrorReporter.logAndThrowException(errorText);
-        }
-    }
-
-    public static void reportAndThrowIf(boolean badThingHappened, Supplier<String> errorTextSupplier)
-    {
-        if (badThingHappened)
-        {
-            ErrorReporter.logAndThrowException(errorTextSupplier.get());
-        }
-    }
-
-    private static void logAndThrowException(String errorText)
-    {
-        throw logAndCreateException(errorText);
-    }
-
-    public static void reportAndThrow(String errorText, Throwable cause)
-    {
-        throw logAndCreateException(errorText, cause);
     }
 
     private static RuntimeException logAndCreateException(String errorText)

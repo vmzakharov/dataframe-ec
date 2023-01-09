@@ -1,18 +1,17 @@
 package io.github.vmzakharov.ecdataframe.dsl.value;
 
 import io.github.vmzakharov.ecdataframe.dataframe.DataFrame;
-import io.github.vmzakharov.ecdataframe.util.ErrorReporter;
 
 import static io.github.vmzakharov.ecdataframe.util.ErrorReporter.exception;
 
 public class DataFrameValue
-implements Value
+extends AbstractValue
 {
     private final DataFrame dataFrame;
 
     public DataFrameValue(DataFrame newDataFrame)
     {
-        ErrorReporter.reportAndThrowIf(newDataFrame == null, "DataFrame value cannot contain null, a void value should be used instead");
+        this.throwExceptionIfNull(newDataFrame);
         this.dataFrame = newDataFrame;
     }
 

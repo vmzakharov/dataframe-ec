@@ -6,7 +6,6 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 
 import static io.github.vmzakharov.ecdataframe.util.ErrorReporter.exception;
-import static io.github.vmzakharov.ecdataframe.util.ErrorReporter.reportAndThrowIf;
 
 public abstract class DfColumnAbstract
 implements DfColumn
@@ -80,9 +79,16 @@ implements DfColumn
 
     protected DfColumn validateAndCreateTargetColumn(DfColumn other, DataFrame target)
     {
-        reportAndThrowIf(!this.getType().equals(other.getType()),
-                () -> "Attempting to merge columns of different types: "
-                        + this.getName() + " (" + this.getType() + ") and " + other.getName() + " (" + other.getType() + ")");
+        if (!this.getType().equals(other.getType()))
+        {
+            exception("Attempting to merge columns of different types: ${firstColumnName} (${firstColumnType})"
+                    + " and ${secondColumnName} (${secondColumnType})")
+                    .with("firstColumnName", this.getName())
+                    .with("firstColumnType", this.getType())
+                    .with("secondColumnName", other.getName())
+                    .with("secondColumnType", other.getType())
+                    .fire();
+        }
 
         target.addColumn(this.getName(), this.getType());
 
