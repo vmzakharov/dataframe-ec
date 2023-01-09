@@ -35,7 +35,8 @@ public class LongFormatter
                 }
                 catch (ParseException e)
                 {
-                    throw ErrorReporter.exception("Failed to parse input string " + s, e);
+                    throw ErrorReporter.exception("Failed to parse input string to integer: '${inputString}'")
+                            .with("inputString", s).get(e);
                 }
             };
         }

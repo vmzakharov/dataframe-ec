@@ -39,6 +39,8 @@ import org.eclipse.collections.api.list.ListIterable;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
+import static io.github.vmzakharov.ecdataframe.util.ErrorReporter.*;
+
 public class InMemoryEvaluationVisitor
 implements ExpressionEvaluationVisitor
 {
@@ -93,7 +95,7 @@ implements ExpressionEvaluationVisitor
         {
             if (expr.getParameters().size() != functionScript.getParameterNames().size())
             {
-                ErrorReporter.reportAndThrow("Parameter count mismatch in an invocation of '" + functionName + "'");
+                reportAndThrow("Parameter count mismatch in an invocation of '" + functionName + "'");
             }
 
             functionScript.getParameterNames().forEachWithIndex(
@@ -109,14 +111,14 @@ implements ExpressionEvaluationVisitor
 
             if (functionDescriptor == null)
             {
-                ErrorReporter.reportAndThrow("Unknown function: '" + expr.getFunctionName() + "'");
+                reportAndThrow("Unknown function: '" + expr.getFunctionName() + "'");
             }
 
             if (functionDescriptor.hasExplicitParameters())
             {
                 if (expr.getParameters().size() != functionDescriptor.getParameterNames().size())
                 {
-                    ErrorReporter.reportAndThrow("Parameter count mismatch in an invocation of '" + functionName + "'");
+                    reportAndThrow("Parameter count mismatch in an invocation of '" + functionName + "'");
                 }
 
                 functionDescriptor.getParameterNames().forEachWithIndex(
@@ -177,7 +179,8 @@ implements ExpressionEvaluationVisitor
             return new DateTimeValue((LocalDateTime) rawValue);
         }
 
-        throw ErrorReporter.exception("Don't know how to handle " + rawValue.toString() + ", type: " + rawValue.getClass().getName());
+        throw exception("Don't know how to convert to value ${rawValue}, type: ${rawValueType}")
+                .with("rawValue", rawValue).with("rawValueType", rawValue.getClass().getName()).get();
     }
 
     @Override
@@ -203,7 +206,8 @@ implements ExpressionEvaluationVisitor
     @Override
     public Value visitFunctionScriptExpr(FunctionScript expr)
     {
-        throw ErrorReporter.exception("Cannot evaluate function declaration by itself. Function " + expr.getName());
+        throw exception("Cannot evaluate function declaration by itself. Function: ${functionName}")
+                .with("functionName", expr.getName()).get();
     }
 
     @Override

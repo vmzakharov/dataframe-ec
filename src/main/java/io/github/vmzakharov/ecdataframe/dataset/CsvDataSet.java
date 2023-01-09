@@ -38,6 +38,7 @@ import static io.github.vmzakharov.ecdataframe.dsl.value.ValueType.DATE_TIME;
 import static io.github.vmzakharov.ecdataframe.dsl.value.ValueType.DOUBLE;
 import static io.github.vmzakharov.ecdataframe.dsl.value.ValueType.LONG;
 import static io.github.vmzakharov.ecdataframe.dsl.value.ValueType.STRING;
+import static io.github.vmzakharov.ecdataframe.util.ErrorReporter.exception;
 
 public class CsvDataSet
 extends DataSetAbstract
@@ -170,7 +171,7 @@ extends DataSetAbstract
         }
         catch (IOException e)
         {
-            throw ErrorReporter.exception("Failed write data frame to '" + this.getDataFileName() + "'", e);
+            throw exception("Failed write data frame to '" + this.getDataFileName() + "'").get(e);
         }
     }
 
@@ -584,7 +585,7 @@ extends DataSetAbstract
                 columnPopulators.add(s -> lastColumn.addObject(schemaCol.parseAsDecimal(s)));
                 break;
             default:
-                throw ErrorReporter.exception("Don't know what to do with the column type: " + columnType);
+                throw exception("Don't know how to populate values for column type: ${columnType}").with("columnType", columnType).get();
         }
     }
 
@@ -823,7 +824,8 @@ extends DataSetAbstract
             {
                 if (insideQuotes && !this.isQuote(curChar))
                 {
-                    this.throwBadFormat("Unbalanced quotes at index " + index + " in " + aString);
+                    throw exception("Unbalanced quotes at index ${index} in ${aString}")
+                               .with("index", index).with("string", aString).get();
                 }
                 if (this.isTokenSeparator(curChar))
                 {
@@ -872,11 +874,6 @@ extends DataSetAbstract
                 }
             }
         }
-    }
-
-    private void throwBadFormat(String message)
-    {
-        throw ErrorReporter.exception(message);
     }
 
     private boolean isTokenSeparator(char aChar)

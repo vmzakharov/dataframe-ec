@@ -5,6 +5,8 @@ import io.github.vmzakharov.ecdataframe.util.ErrorReporter;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 
+import static io.github.vmzakharov.ecdataframe.util.ErrorReporter.*;
+
 public abstract class DfColumnAbstract
 implements DfColumn
 {
@@ -34,7 +36,7 @@ implements DfColumn
     {
         if (this.dataFrame != null)
         {
-            ErrorReporter.reportAndThrow("Column '" + this.getName() + "' has already been linked to a data frame");
+            reportAndThrow("Column '" + this.getName() + "' has already been linked to a data frame");
         }
 
         this.dataFrame = newDataFrame;
@@ -66,7 +68,7 @@ implements DfColumn
         }
         catch (NoSuchMethodException | IllegalAccessException | InstantiationException | InvocationTargetException e)
         {
-            throw ErrorReporter.exception("Failed to instantiate a column from " + this.getName(), e);
+            throw exception("Failed to instantiate a column from ${name}").with("name", this.getName()).get(e);
         }
 
         attachTo.addColumn(clonedColumn);
@@ -76,7 +78,7 @@ implements DfColumn
 
     protected DfColumn validateAndCreateTargetColumn(DfColumn other, DataFrame target)
     {
-        ErrorReporter.reportAndThrowIf(!this.getType().equals(other.getType()),
+        reportAndThrowIf(!this.getType().equals(other.getType()),
                 () -> "Attempting to merge columns of different types: "
                         + this.getName() + " (" + this.getType() + ") and " + other.getName() + " (" + other.getType() + ")");
 

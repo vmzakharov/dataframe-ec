@@ -19,6 +19,8 @@ import java.time.LocalDateTime;
 import java.time.chrono.ChronoLocalDate;
 import java.time.chrono.ChronoLocalDateTime;
 
+import static io.github.vmzakharov.ecdataframe.util.ErrorReporter.*;
+
 public class ObjectListDataSet
 extends HierarchicalDataSet
 {
@@ -49,7 +51,7 @@ extends HierarchicalDataSet
             return this.items.get(this.index);
         }
 
-        throw ErrorReporter.exception("No more elements in data set " + this.getName());
+        throw exception("No more elements in data set ${dataSetName}").with("dataSetName", this.getName()).get();
     }
 
     @Override
@@ -84,7 +86,7 @@ extends HierarchicalDataSet
             }
             catch (Throwable e)
             {
-                ErrorReporter.reportAndThrow("Failed to invoke " + methodHandle, e);
+                reportAndThrow("Failed to invoke " + methodHandle, e);
             }
         }
         return currentValue;
@@ -107,7 +109,7 @@ extends HierarchicalDataSet
 
             if (elementMethod == null)
             {
-                ErrorReporter.reportAndThrow("Unable to find " + element + " on " + currentClass.getName());
+                reportAndThrow("Unable to find " + element + " on " + currentClass.getName());
             }
 
             MethodHandle elementHandle;
@@ -119,7 +121,8 @@ extends HierarchicalDataSet
             }
             catch (IllegalAccessException e)
             {
-                throw ErrorReporter.exception("Failed to lookup method for " + element + " on " + currentClass.getName(), e);
+                throw exception("Failed to find a getter method for ${element} in class ${className}")
+                        .with("element", element).with("className", currentClass.getName()).get(e);
             }
 
             getters.add(elementHandle);
@@ -148,7 +151,7 @@ extends HierarchicalDataSet
 
             if (elementMethod == null)
             {
-                ErrorReporter.reportAndThrow("Unable to find " + element + " on " + currentClass.getName());
+                reportAndThrow("Unable to find " + element + " on " + currentClass.getName());
             }
 
             currentClass = elementMethod.getReturnType();
@@ -188,7 +191,7 @@ extends HierarchicalDataSet
     {
         if (this.items.size() == 0)
         {
-            ErrorReporter.reportAndThrow("The data set " + this.getName() + " contains no data");
+            reportAndThrow("The data set " + this.getName() + " contains no data");
         }
 
         return this.items.get(0);

@@ -15,14 +15,16 @@ final public class ErrorReporter
 
     private static String printedMessagePrefix;
 
+    private final FormatWithPlaceholders formatter;
+
     static
     {
         initialize();
     }
 
-    private ErrorReporter()
+    private ErrorReporter(String message)
     {
-        // Utility class should not have a public constructor
+        this.formatter = FormatWithPlaceholders.format(message);
     }
 
     /**
@@ -85,21 +87,21 @@ final public class ErrorReporter
 
     public static void reportAndThrow(String errorText)
     {
-        throw exception(errorText);
+        throw exceptionXXX(errorText);
     }
 
     public static void reportAndThrow(String errorText, Throwable cause)
     {
-        throw exception(errorText, cause);
+        throw exceptionXXX(errorText, cause);
     }
 
-    public static RuntimeException exception(String errorText)
+    private static RuntimeException exceptionXXX(String errorText)
     {
         errorPrinter.println(printedMessagePrefix + errorText);
         return exceptionWithMessage.apply(errorText);
     }
 
-    public static RuntimeException exception(String errorText, Throwable cause)
+    private static RuntimeException exceptionXXX(String errorText, Throwable cause)
     {
         errorPrinter.println(printedMessagePrefix + errorText);
         return exceptionWithMessageAndCause.apply(errorText, cause);
@@ -110,4 +112,54 @@ final public class ErrorReporter
         errorPrinter.println(printedMessagePrefix + errorText);
         return unsupportedWithMessage.apply(errorText);
     }
+
+    public static ErrorReporter exceptionKey(String messageKey)
+    {
+        return exception(messageKey);
+    }
+
+    public static ErrorReporter exception(String message)
+    {
+        return new ErrorReporter(message);
+    }
+
+    public ErrorReporter with(String name, Object value)
+    {
+        this.formatter.with(name, value.toString());
+        return this;
+    }
+
+    public RuntimeException get()
+    {
+        return ErrorReporter.exceptionXXX(this.formatter.toString());
+    }
+
+    public RuntimeException get(Throwable cause)
+    {
+        return ErrorReporter.exceptionXXX(this.formatter.toString(), cause);
+    }
+
+    public RuntimeException getUnsupported()
+    {
+        return ErrorReporter.unsupported(this.formatter.toString());
+    }
+
+    public void fireIf(boolean badThingHappened)
+    {
+        if (badThingHappened)
+        {
+            this.fire();
+        }
+    }
+
+    public void fire()
+    {
+        throw this.get();
+    }
+
+    public void fire(Throwable cause)
+    {
+        throw this.get(cause);
+    }
 }
+

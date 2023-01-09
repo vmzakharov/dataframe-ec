@@ -44,8 +44,13 @@ public interface DfColumn
 
     default Object aggregate(AggregateFunction aggregator)
     {
-        throw ErrorReporter.exception("Aggregation " + aggregator.getName() + "(" + aggregator.getDescription()
-            + ") cannot be performed on column " + this.getName() + " of type " + this.getType());
+        throw ErrorReporter.exception("Aggregation ${aggregatorName} (${aggregationDescription}) cannot be performed " +
+                                   "on column ${columnName} of type ${columnType}")
+                .with("aggregationName", aggregator.getName())
+                .with("aggregationDescription", aggregator.getDescription())
+                .with("columnName", this.getName())
+                .with("columnType", this.getType())
+                .get();
     }
 
     void applyAggregator(int targetRowIndex, DfColumn sourceColumn, int sourceRowIndex, AggregateFunction aggregateFunction);

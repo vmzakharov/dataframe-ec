@@ -8,6 +8,8 @@ import java.text.DecimalFormat;
 import java.text.ParseException;
 import java.util.regex.Pattern;
 
+import static io.github.vmzakharov.ecdataframe.util.ErrorReporter.*;
+
 public class DoubleFormatter
 {
     private DecimalFormat decimalFormat;
@@ -35,7 +37,8 @@ public class DoubleFormatter
                 }
                 catch (ParseException e)
                 {
-                    throw ErrorReporter.exception("Failed to parse input string as a floating point number '" + s + "'", e);
+                    throw exception("Failed to parse input string as a floating point number '${inputString}'")
+                            .with("inputString", s).get(e);
                 }
             };
         }
