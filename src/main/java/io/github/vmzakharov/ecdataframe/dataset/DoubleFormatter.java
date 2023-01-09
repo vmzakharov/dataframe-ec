@@ -1,6 +1,5 @@
 package io.github.vmzakharov.ecdataframe.dataset;
 
-import io.github.vmzakharov.ecdataframe.util.ErrorReporter;
 import org.eclipse.collections.api.block.function.primitive.DoubleFunction;
 import org.eclipse.collections.impl.utility.StringIterate;
 
@@ -8,7 +7,7 @@ import java.text.DecimalFormat;
 import java.text.ParseException;
 import java.util.regex.Pattern;
 
-import static io.github.vmzakharov.ecdataframe.util.ErrorReporter.*;
+import static io.github.vmzakharov.ecdataframe.util.ErrorReporter.exception;
 
 public class DoubleFormatter
 {

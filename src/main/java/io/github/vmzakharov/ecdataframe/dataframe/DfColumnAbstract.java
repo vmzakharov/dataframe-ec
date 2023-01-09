@@ -1,11 +1,11 @@
 package io.github.vmzakharov.ecdataframe.dataframe;
 
-import io.github.vmzakharov.ecdataframe.util.ErrorReporter;
-
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 
-import static io.github.vmzakharov.ecdataframe.util.ErrorReporter.*;
+import static io.github.vmzakharov.ecdataframe.util.ErrorReporter.exception;
+import static io.github.vmzakharov.ecdataframe.util.ErrorReporter.reportAndThrow;
+import static io.github.vmzakharov.ecdataframe.util.ErrorReporter.reportAndThrowIf;
 
 public abstract class DfColumnAbstract
 implements DfColumn

@@ -12,14 +12,14 @@ public class FormatWithPlaceholders
     private final String template;
     private final MutableMap<String, String> valuesByName = Maps.mutable.of();
 
-    public static FormatWithPlaceholders format(String newTemplate)
-    {
-        return new FormatWithPlaceholders(newTemplate);
-    }
-
     public FormatWithPlaceholders(String newTemplate)
     {
         this.template = newTemplate;
+    }
+
+    public static FormatWithPlaceholders format(String newTemplate)
+    {
+        return new FormatWithPlaceholders(newTemplate);
     }
 
     public FormatWithPlaceholders with(String name, String value)

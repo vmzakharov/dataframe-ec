@@ -8,7 +8,6 @@ import io.github.vmzakharov.ecdataframe.dsl.value.Value;
 import io.github.vmzakharov.ecdataframe.dsl.value.ValueType;
 import io.github.vmzakharov.ecdataframe.dsl.visitor.InMemoryEvaluationVisitor;
 import io.github.vmzakharov.ecdataframe.dsl.visitor.TypeInferenceVisitor;
-import io.github.vmzakharov.ecdataframe.util.ErrorReporter;
 import io.github.vmzakharov.ecdataframe.util.ExpressionParserHelper;
 import org.eclipse.collections.api.DoubleIterable;
 import org.eclipse.collections.api.LongIterable;
@@ -38,6 +37,9 @@ import java.time.LocalDateTime;
 import java.util.Arrays;
 
 import static io.github.vmzakharov.ecdataframe.dataframe.DfColumnSortOrder.ASC;
+import static io.github.vmzakharov.ecdataframe.util.ErrorReporter.exception;
+import static io.github.vmzakharov.ecdataframe.util.ErrorReporter.reportAndThrow;
+import static io.github.vmzakharov.ecdataframe.util.ErrorReporter.reportAndThrowIf;
 
 public class DataFrame
 {
@@ -158,13 +160,14 @@ public class DataFrame
         // todo: would like to make it impossible in the first place
         if (newColumn.getDataFrame() != this)
         {
-            ErrorReporter.reportAndThrow("Mixing columns from different data frames: attempting to add"
+            exception("Mixing columns from different data frames: attempting to add"
                     + " to '" + this.getName() + "' column '"
-                    + newColumn.getName() + "' already bound to '" + newColumn.getDataFrame().getName() + "'");
+                    + newColumn.getName() + "' already bound to '" + newColumn.getDataFrame().getName() + "'").fire();
         }
 
-        ErrorReporter.reportAndThrowIf(this.hasColumn(newColumn.getName()),
-                () -> "Column named '" + newColumn.getName() + "' is already in data frame '" + this.getName() + "'");
+        exception("Column named '${columnName}' is already in data frame '${dataFrameName}'")
+                .with("columnName", newColumn.getName()).with("dataFrameName", this.getName())
+                .fireIf(this.hasColumn(newColumn.getName()));
 
         this.columnsByName.put(newColumn.getName(), newColumn);
         this.columns.add(newColumn);
@@ -193,7 +196,9 @@ public class DataFrame
 
         if (column == null)
         {
-            ErrorReporter.reportAndThrow("Column '" + columnName + "' does not exist in data frame '" + this.getName() + "'");
+            exception("Column '${columnName}' does not exist in data frame '${dataFrameName}'")
+                .with("columnName", columnName).with("dataFrameName", this.getName())
+                .fire();
         }
 
         return column;
@@ -273,8 +278,9 @@ public class DataFrame
     {
         if (values.length > this.columnCount())
         {
-            ErrorReporter.reportAndThrow(
-                    "Adding more row elements (" + values.length + ") than there are columns in the data frame (" + this.columnCount() + ")");
+            exception("Adding more row elements (${elementCount}) than there are columns in the data frame (${columnCount})")
+                    .with("elementCount", values.length).with("columnCount", this.columnCount())
+                    .fire();
         }
 
         ArrayIterate.forEachWithIndex(values, (v, i) -> this.columns.get(i).addObject(v));
@@ -303,7 +309,7 @@ public class DataFrame
         ValueType expressionType = visitor.inferExpressionType(expression);
         if (visitor.hasErrors())
         {
-            ErrorReporter.reportAndThrow("Cannot add calculated column " + columnName + " to data frame " + this.getName() + ": "
+            reportAndThrow("Cannot add calculated column " + columnName + " to data frame " + this.getName() + ": "
                     + "failed to infer expression type of '" + expressionAsString + "'\n"
                     + visitor.getErrors().collect(err -> err.getOne() + ": " + err.getTwo()).makeString("\n"));
         }
@@ -333,7 +339,9 @@ public class DataFrame
                 this.addDecimalColumn(columnName);
                 break;
             default:
-                ErrorReporter.reportAndThrow("Cannot add a column " + columnName + " for values of type " + type);
+                exception("Cannot add a column ${columnName} for values of type ${type}")
+                    .with("columnName", columnName).with("type", type)
+                    .fire();
         }
         return this;
     }
@@ -361,7 +369,9 @@ public class DataFrame
                 this.addDecimalColumn(columnName, expressionAsString);
                 break;
             default:
-                ErrorReporter.reportAndThrow("Cannot add a column " + columnName + " for values of type " + type);
+                exception("Cannot add a column ${columnName} for values of type ${type}")
+                    .with("columnName", columnName).with("type", type)
+                    .fire();
         }
         return this;
     }
@@ -523,8 +533,8 @@ public class DataFrame
             this.rowCount = storedColumnsSizes.get(0);
             if (storedColumnsSizes.anySatisfy(e -> e != this.rowCount))
             {
-                ErrorReporter.reportAndThrow(
-                        "Stored column sizes are not the same when attempting to seal data frame '" + this.getName() + "'");
+                exception("Stored column sizes are not the same when attempting to seal data frame '${dataFrameName}'")
+                        .with("dataFrameName", this.getName()).fire();
             }
         }
 
@@ -904,7 +914,7 @@ public class DataFrame
      */
     public DataFrame union(DataFrame other)
     {
-        ErrorReporter.reportAndThrowIf(this.columnCount() != other.columnCount(), "Attempting to union data frames with different numbers of columns");
+        reportAndThrowIf(this.columnCount() != other.columnCount(), "Attempting to union data frames with different numbers of columns");
         DataFrame dfUnion = new DataFrame("union");
 
         this.columns.forEach(
@@ -1259,8 +1269,10 @@ public class DataFrame
     {
         if (thisJoinColumnNames.size() != otherJoinColumnNames.size())
         {
-            ErrorReporter.reportAndThrow("Attempting to join dataframes by different number of keys on each side: "
-                    + thisJoinColumnNames.makeString() + " to " + otherJoinColumnNames.makeString());
+            exception("Attempting to join dataframes by different number of keys on each side: ${side2KeyList} to ${side2KeyList}")
+                    .with("side1KeyList", thisJoinColumnNames.makeString())
+                    .with("side2KeyList", otherJoinColumnNames.makeString())
+                    .fire();
         }
 
         DataFrame joined = this.cloneStructureAsStored(this.getName() + "_" + other.getName());

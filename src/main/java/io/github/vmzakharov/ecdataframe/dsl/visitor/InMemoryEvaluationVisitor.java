@@ -1,7 +1,6 @@
 package io.github.vmzakharov.ecdataframe.dsl.visitor;
 
 import io.github.vmzakharov.ecdataframe.dataframe.DataFrame;
-import io.github.vmzakharov.ecdataframe.util.ErrorReporter;
 import io.github.vmzakharov.ecdataframe.dataset.HierarchicalDataSet;
 import io.github.vmzakharov.ecdataframe.dsl.AnonymousScript;
 import io.github.vmzakharov.ecdataframe.dsl.AssingExpr;
@@ -39,7 +38,7 @@ import org.eclipse.collections.api.list.ListIterable;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
-import static io.github.vmzakharov.ecdataframe.util.ErrorReporter.*;
+import static io.github.vmzakharov.ecdataframe.util.ErrorReporter.exception;
 
 public class InMemoryEvaluationVisitor
 implements ExpressionEvaluationVisitor
@@ -95,7 +94,9 @@ implements ExpressionEvaluationVisitor
         {
             if (expr.getParameters().size() != functionScript.getParameterNames().size())
             {
-                reportAndThrow("Parameter count mismatch in an invocation of '" + functionName + "'");
+                exception("Parameter count mismatch in an invocation of '${functionName}'")
+                    .with("functionName", functionName)
+                    .fire();
             }
 
             functionScript.getParameterNames().forEachWithIndex(
@@ -111,14 +112,15 @@ implements ExpressionEvaluationVisitor
 
             if (functionDescriptor == null)
             {
-                reportAndThrow("Unknown function: '" + expr.getFunctionName() + "'");
+                exception("Unknown function: '${functionName}'").with("functionName", expr.getFunctionName()).fire();
             }
 
             if (functionDescriptor.hasExplicitParameters())
             {
                 if (expr.getParameters().size() != functionDescriptor.getParameterNames().size())
                 {
-                    reportAndThrow("Parameter count mismatch in an invocation of '" + functionName + "'");
+                    exception("Parameter count mismatch in an invocation of '${functionName}'")
+                            .with("functionName", functionName).fire();
                 }
 
                 functionDescriptor.getParameterNames().forEachWithIndex(

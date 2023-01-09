@@ -62,7 +62,7 @@ implements NumberValue
     @Override
     public double doubleValue()
     {
-        ErrorReporter.reportAndThrow("Cannot convert decimal value to floating point");
+        ErrorReporter.exception("Cannot convert decimal value to floating point").fire();
         return 0.0;
     }
 

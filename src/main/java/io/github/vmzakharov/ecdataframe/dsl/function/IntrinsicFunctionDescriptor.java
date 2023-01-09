@@ -9,6 +9,8 @@ import io.github.vmzakharov.ecdataframe.dsl.value.VectorValue;
 import org.eclipse.collections.api.list.ListIterable;
 import org.eclipse.collections.impl.factory.Lists;
 
+import static io.github.vmzakharov.ecdataframe.util.ErrorReporter.exception;
+
 public abstract class IntrinsicFunctionDescriptor
 implements FunctionDescriptor
 {
@@ -61,8 +63,7 @@ implements FunctionDescriptor
 
     public Value evaluate(VectorValue parameters)
     {
-        ErrorReporter.reportAndThrow("Function " + this.name + " is not implemented");
-        return Value.VOID;
+        throw exception("Function ${functionName} is not implemented").with("functionName", this.name).get();
     }
 
     public String usageString()

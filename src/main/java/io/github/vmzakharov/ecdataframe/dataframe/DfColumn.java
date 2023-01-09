@@ -44,8 +44,8 @@ public interface DfColumn
 
     default Object aggregate(AggregateFunction aggregator)
     {
-        throw ErrorReporter.exception("Aggregation ${aggregatorName} (${aggregationDescription}) cannot be performed " +
-                                   "on column ${columnName} of type ${columnType}")
+        throw ErrorReporter.exception("Aggregation ${aggregatorName} (${aggregationDescription}) cannot be performed "
+                                   + "on column ${columnName} of type ${columnType}")
                 .with("aggregationName", aggregator.getName())
                 .with("aggregationDescription", aggregator.getDescription())
                 .with("columnName", this.getName())

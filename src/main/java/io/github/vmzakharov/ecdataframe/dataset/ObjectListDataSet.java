@@ -1,6 +1,5 @@
 package io.github.vmzakharov.ecdataframe.dataset;
 
-import io.github.vmzakharov.ecdataframe.util.ErrorReporter;
 import io.github.vmzakharov.ecdataframe.dsl.value.ValueType;
 import org.eclipse.collections.api.factory.Maps;
 import org.eclipse.collections.api.list.ListIterable;
@@ -19,7 +18,8 @@ import java.time.LocalDateTime;
 import java.time.chrono.ChronoLocalDate;
 import java.time.chrono.ChronoLocalDateTime;
 
-import static io.github.vmzakharov.ecdataframe.util.ErrorReporter.*;
+import static io.github.vmzakharov.ecdataframe.util.ErrorReporter.exception;
+import static io.github.vmzakharov.ecdataframe.util.ErrorReporter.reportAndThrow;
 
 public class ObjectListDataSet
 extends HierarchicalDataSet

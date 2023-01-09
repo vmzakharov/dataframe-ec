@@ -41,7 +41,9 @@ extends Expression, Comparable<Value>
 
     default Value apply(Value another, ArithmeticOp operation)
     {
-        ErrorReporter.reportAndThrow("Undefined operation " + operation.asString() + " on " + this.asStringLiteral());
+        ErrorReporter.exception("Undefined operation ${operation} on ${value}")
+            .with("operation", operation.asString()).with("value", this.asStringLiteral()).fire();
+
         return null;
     }
 
