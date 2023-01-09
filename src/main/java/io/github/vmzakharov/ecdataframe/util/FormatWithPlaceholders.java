@@ -7,6 +7,8 @@ import java.util.function.Supplier;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import static io.github.vmzakharov.ecdataframe.util.ErrorReporter.exception;
+
 public class FormatWithPlaceholders
 {
     private final String template;
@@ -24,6 +26,10 @@ public class FormatWithPlaceholders
 
     public FormatWithPlaceholders with(String name, String value)
     {
+        if (this.valuesByName.containsKey(name))
+        {
+            exception("Attempting to set error message template value twice for ${name}").with("name", name).fire();
+        }
         this.valuesByName.put(name, value);
         return this;
     }

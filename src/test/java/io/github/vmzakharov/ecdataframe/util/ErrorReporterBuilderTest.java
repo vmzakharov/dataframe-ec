@@ -11,7 +11,7 @@ public class ErrorReporterBuilderTest
         try
         {
             ErrorReporter.initialize();
-            ErrorReporter.reportAndThrow("Hello");
+            ErrorReporter.exception("Hello").fire();
             Assert.fail("didn't throw");
         }
         catch (RuntimeException e)

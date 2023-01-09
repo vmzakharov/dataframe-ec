@@ -4,7 +4,8 @@ import io.github.vmzakharov.ecdataframe.dsl.DataFrameEvalContext;
 import io.github.vmzakharov.ecdataframe.dsl.Expression;
 import io.github.vmzakharov.ecdataframe.dsl.value.Value;
 import io.github.vmzakharov.ecdataframe.dsl.visitor.InMemoryEvaluationVisitor;
-import io.github.vmzakharov.ecdataframe.util.ErrorReporter;
+
+import static io.github.vmzakharov.ecdataframe.util.ErrorReporter.exception;
 
 public interface DfColumnComputed
 extends DfColumn
@@ -22,7 +23,7 @@ extends DfColumn
     @Override
     default void setObject(int rowIndex, Object anObject)
     {
-        ErrorReporter.reportAndThrow("Cannot set a value on computed column '" + this.getName() + "'");
+        exception("Cannot set a value on computed column '${columnName}'").with("columnName", this.getName()).fire();
     }
 
     @Override
@@ -64,11 +65,12 @@ extends DfColumn
     @Override
     default void applyAggregator(int targetRowIndex, DfColumn sourceColumn, int sourceRowIndex, AggregateFunction aggregateFunction)
     {
-        ErrorReporter.reportAndThrow("Cannot store aggregated value into a computed column '" + this.getName() + "'");
+        exception("Cannot store aggregated value into a computed column '${columnNane}'")
+                .with("columnNane", this.getName()).fire();
     }
 
     default void throwUnmodifiableColumnException()
     {
-        throw ErrorReporter.unsupported("Cannot directly modify computed column '" + this.getName() + "'");
+        throw exception("Cannot directly modify computed column '${columnName}'").with("columnNane", this.getName()).getUnsupported();
     }
 }

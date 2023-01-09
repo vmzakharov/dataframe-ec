@@ -1,11 +1,12 @@
 package io.github.vmzakharov.ecdataframe.dsl;
 
-import io.github.vmzakharov.ecdataframe.util.ErrorReporter;
 import io.github.vmzakharov.ecdataframe.dataset.HierarchicalDataSet;
 import io.github.vmzakharov.ecdataframe.dsl.value.Value;
 import org.eclipse.collections.api.RichIterable;
 import org.eclipse.collections.api.map.MutableMap;
 import org.eclipse.collections.impl.factory.Maps;
+
+import static io.github.vmzakharov.ecdataframe.util.ErrorReporter.exception;
 
 public class SimpleEvalContext
 extends EvalContextAbstract
@@ -19,7 +20,7 @@ extends EvalContextAbstract
 
         if (value == null)
         {
-            ErrorReporter.reportAndThrow("Uninitialized variable: " + newVariableName);
+            exception("Uninitialized variable: ${variableName}").with("variableName", newVariableName).fire();
         }
 
         return value;

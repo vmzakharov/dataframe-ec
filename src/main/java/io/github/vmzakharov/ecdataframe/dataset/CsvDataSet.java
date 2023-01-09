@@ -219,8 +219,8 @@ extends DataSetAbstract
                     valueAsLiteral = this.formatterForColumn(columnIndex).format(dateTimeValue);
                     break;
                 default:
-                    ErrorReporter.reportAndThrow("Do not know how to convert value of type " + dfColumn.getType() + " to a string");
-                    valueAsLiteral = "";
+                    throw exception("Do not know how to convert value of type ${valueType} to a string")
+                            .with("valueType", dfColumn.getType()).get();
             }
         }
 
@@ -342,88 +342,6 @@ extends DataSetAbstract
         return this.schema;
     }
 
-    private DataFrame loadFlexi()
-    {
-        DataFrame df = new DataFrame(this.getName());
-        df.enablePooling();
-
-        if (this.schemaIsNotDefined())
-        {
-            this.schema = new CsvSchema(); // provides default separators, quote characters, etc.
-        }
-
-        try (BufferedReader reader = new BufferedReader(this.createReader(), BUFFER_SIZE))
-        {
-            MutableList<String> headers = this.splitMindingQs(reader.readLine()).collect(this::removeSurroundingQuotes);
-
-            if (headers.anySatisfy(String::isEmpty))
-            {
-                ErrorReporter.reportAndThrow("Error parsing a CSV file: a column header cannot be empty");
-            }
-
-            String dataRow = reader.readLine();
-
-            if (dataRow == null) // no data, just headers
-            {
-                if (this.getSchema().columnCount() == 0)
-                {
-                    headers.forEach(header -> this.schema.addColumn(header, STRING));
-                }
-
-                this.getSchema().getColumns().forEach(col -> df.addColumn(col.getName(), col.getType()));
-
-                return df;
-            }
-
-            MutableList<String> lineBuffer = Lists.mutable.withInitialCapacity(LINE_COUNT_FOR_TYPE_INFERENCE);
-            lineBuffer.add(dataRow);
-
-            // the schema is empty, need to infer columns properties from the first lineCountForTypeInference columns
-            if (this.getSchema().columnCount() == 0)
-            {
-                int loadedLineCount = 1; // already have one in the buffer
-                while (loadedLineCount++ < LINE_COUNT_FOR_TYPE_INFERENCE
-                        && (dataRow = reader.readLine()) != null)
-                {
-                    lineBuffer.add(dataRow);
-                }
-                this.inferSchema(headers, lineBuffer);
-            }
-            else if (headers.size() != this.schema.columnCount())
-            {
-                ErrorReporter.reportAndThrow(String.format(
-                        "The number of elements in the header does not match the number of columns in the schema %d vs %d",
-                        headers.size(), this.schema.columnCount()));
-            }
-
-            MutableList<Procedure<String>> columnPopulators = Lists.mutable.of();
-
-            this.getSchema().getColumns().forEach(col -> this.addDataFrameColumn(df, col, columnPopulators));
-
-            int columnCount = this.getSchema().columnCount();
-            MutableList<String> lineElements = Lists.mutable.withInitialCapacity(columnCount);
-
-            int lineNumber = 0;
-
-//            while (
-//                    (dataRow = this.getNextLine(lineBuffer, reader, lineNumber)) != null
-//                            && (loadAllLines || (lineNumber < headLineCount))
-//            )
-//            {
-//                this.parseAndAddLineToDataFrame(dataRow, lineElements, columnCount, columnPopulators);
-//                lineNumber++;
-//            }
-
-            df.seal();
-        }
-        catch (IOException e)
-        {
-            ErrorReporter.reportAndThrow("Failed to load as a data frame '" + this.getDataFileName() + "'", e);
-        }
-
-        return df;
-    }
-
     private DataFrame loadAsDataFrame(int headLineCount, boolean loadAllLines)
     {
         DataFrame df = new DataFrame(this.getName());
@@ -448,7 +366,7 @@ extends DataSetAbstract
 
                 if (headers.anySatisfy(String::isEmpty))
                 {
-                    ErrorReporter.reportAndThrow("Error parsing a CSV file: a column header cannot be empty");
+                    exception("Error parsing a CSV file: a column header cannot be empty").fire();
                 }
             }
             else
@@ -486,19 +404,18 @@ extends DataSetAbstract
             }
             else if (headers.size() != this.schema.columnCount())
             {
-                ErrorReporter.reportAndThrow(String.format(
-                                "The number of elements in the header (%d) does not match the number of columns in the schema (%d)",
-                                headers.size(), this.schema.columnCount()));
+                exception("The number of elements in the header (${headerCount}) does not match the number of columns in the schema (${schemaColumnCount})")
+                    .with("headerCount", headers.size()).with("schemaColumnCount", this.schema.columnCount()).fire();
             }
             else
             {
                 MutableList<String> schemaColumnNames = this.schema.getColumns().collect(CsvSchemaColumn::getName);
                 if (!headers.equals(schemaColumnNames))
                 {
-                    ErrorReporter.reportAndThrow(
-                        "Mismatch between the column header names in the data set " + headers.makeString("[", ",", "]")
-                        + " and in the schema: " + schemaColumnNames.makeString("[", ",", "]")
-                        );
+                    exception("Mismatch between the column header names in the data set ${headerColumnList} and in the schema: ${schemaColumnList}")
+                            .with("headerColumnList", headers.makeString("[", ",", "]"))
+                            .with("schemaColumnList", schemaColumnNames.makeString("[", ",", "]"))
+                            .fire();
                 }
             }
 
@@ -604,9 +521,12 @@ extends DataSetAbstract
 
             if (headers.size() != elements.size())
             {
-                ErrorReporter.reportAndThrow(
-                        "The number of elements in the header does not match the number of elements in the data row " + (lineIndex + 1) + " ("
-                                + headers.size() + " vs " + elements.size() + ")");
+                exception("The number of elements in the header does not match the number of elements in the data row ${rowIndex} "
+                        + "(${headerElementCount} vs ${rowElementCount})")
+                        .with("rowIndex", lineIndex + 1)
+                        .with("headerElementCount", headers.size())
+                        .with("rowElementCount", elements.size())
+                        .fire();
             }
 
             for (int columnIndex = 0; columnIndex < columnCount; columnIndex++)
@@ -704,10 +624,13 @@ extends DataSetAbstract
 
         if (this.getSchema().columnCount() != elements.size())
         {
-            ErrorReporter.reportAndThrow(
-                    "The number of columns in the schema (" + this.getSchema().columnCount()
-                    + ") does not match the number of elements in the data row  (" + elements.size() + "): "
-                    + line);
+            exception(
+                    "The number of columns in the schema (${schemaColumnCount}"
+                    + ") does not match the number of elements in the data row  (${rowElementCount}): ${dataRow}")
+                    .with("schemaColumnCount", this.getSchema().columnCount())
+                    .with("rowElementCount", elements.size())
+                    .with("dataRow", line)
+                    .fire();
         }
 
         for (int i = 0; i < columnCount; i++)

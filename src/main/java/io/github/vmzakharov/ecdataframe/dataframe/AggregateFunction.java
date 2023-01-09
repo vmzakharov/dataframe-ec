@@ -7,8 +7,9 @@ import io.github.vmzakharov.ecdataframe.dataframe.aggregation.Min;
 import io.github.vmzakharov.ecdataframe.dataframe.aggregation.Same;
 import io.github.vmzakharov.ecdataframe.dataframe.aggregation.Sum;
 import io.github.vmzakharov.ecdataframe.dsl.value.ValueType;
-import io.github.vmzakharov.ecdataframe.util.ErrorReporter;
 import org.eclipse.collections.api.list.ListIterable;
+
+import static io.github.vmzakharov.ecdataframe.util.ErrorReporter.exception;
 
 public abstract class AggregateFunction
 {
@@ -125,38 +126,47 @@ public abstract class AggregateFunction
 
     protected RuntimeException notApplicable(String scope)
     {
-        return ErrorReporter.unsupported(
-                "Aggregation '" + this.getName() + "' (" + this.getDescription() + ") cannot be performed on " + scope);
+        return exception("Aggregation '${operation}' (${operationDescription}) cannot be performed on ${operationScope}")
+                .with("operation", this.getName())
+                .with("operationDescription", this.getDescription())
+                .with("operationScope", scope)
+                .getUnsupported();
     }
 
     public long longInitialValue()
     {
-        throw ErrorReporter.unsupported("Operation " + this.getName() + " does not have a long initial value");
+        throw exception("Operation ${operation} does not have a long initial value")
+                .with("operation", this.getName()).getUnsupported();
     }
 
     public double doubleInitialValue()
     {
-        throw ErrorReporter.unsupported("Operation " + this.getName() + " does not have a double initial value");
+        throw exception("Operation ${operation} does not have a double initial value")
+                .with("operation", this.getName()).getUnsupported();
     }
 
     public Object objectInitialValue()
     {
-        throw ErrorReporter.unsupported("Operation " + this.getName() + " does not have a non-numeric initial value");
+        throw exception("Operation ${operation} does not have a non-numeric initial value")
+                .with("operation", this.getName()).getUnsupported();
     }
 
     protected long longAccumulator(long currentAggregate, long newValue)
     {
-        throw ErrorReporter.unsupported("Operation " + this.getName() + " does not support a long accumulator");
+        throw exception("Operation ${operation} does not support a long accumulator")
+                .with("operation", this.getName()).getUnsupported();
     }
 
     protected double doubleAccumulator(double currentAggregate, double newValue)
     {
-        throw ErrorReporter.unsupported("Operation " + this.getName() + " does not support a double accumulator");
+        throw exception("Operation ${operation} does not support a double accumulator")
+                .with("operation", this.getName()).getUnsupported();
     }
 
     protected Object objectAccumulator(Object currentAggregate, Object newValue)
     {
-        throw ErrorReporter.unsupported("Operation " + this.getName() + " does not support an non-numeric accumulator");
+        throw exception("Operation ${operation} does not support a non-numeric accumulator")
+                .with("operation", this.getName()).getUnsupported();
     }
 
     /**

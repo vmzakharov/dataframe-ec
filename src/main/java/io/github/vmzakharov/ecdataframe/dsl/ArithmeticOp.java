@@ -1,6 +1,5 @@
 package io.github.vmzakharov.ecdataframe.dsl;
 
-import io.github.vmzakharov.ecdataframe.util.ErrorReporter;
 import io.github.vmzakharov.ecdataframe.dsl.value.DecimalValue;
 import io.github.vmzakharov.ecdataframe.dsl.value.DoubleValue;
 import io.github.vmzakharov.ecdataframe.dsl.value.LongValue;
@@ -9,6 +8,8 @@ import io.github.vmzakharov.ecdataframe.dsl.value.Value;
 
 import java.math.BigDecimal;
 import java.math.MathContext;
+
+import static io.github.vmzakharov.ecdataframe.util.ErrorReporter.exception;
 
 public interface ArithmeticOp
         extends BinaryOp
@@ -143,7 +144,7 @@ public interface ArithmeticOp
 
     default Value applyString(String operand1, String operand2)
     {
-        throw ErrorReporter.unsupported("Cannot apply '" + this.asString() + "' to String");
+        throw exception("Cannot apply '${operation}' to String").with("operation", this.asString()).getUnsupported();
     }
 
     Value applyLong(long operand1, long operand2);

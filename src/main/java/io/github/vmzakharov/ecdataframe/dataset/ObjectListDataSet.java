@@ -109,7 +109,8 @@ extends HierarchicalDataSet
 
             if (elementMethod == null)
             {
-                reportAndThrow("Unable to find " + element + " on " + currentClass.getName());
+                exception("Unable to find ${element} on ${className}")
+                        .with("element", element).with("className", currentClass.getName()).fire();
             }
 
             MethodHandle elementHandle;
@@ -151,7 +152,8 @@ extends HierarchicalDataSet
 
             if (elementMethod == null)
             {
-                reportAndThrow("Unable to find " + element + " on " + currentClass.getName());
+                exception("Unable to find ${element} on ${className}")
+                        .with("element", element).with("className", currentClass.getName()).fire();
             }
 
             currentClass = elementMethod.getReturnType();
@@ -191,7 +193,8 @@ extends HierarchicalDataSet
     {
         if (this.items.size() == 0)
         {
-            reportAndThrow("The data set " + this.getName() + " contains no data");
+            exception("Attempting to access elements of the object data set ${dataSetName} with no data")
+                    .with("dataSetName", this.getName()).fire();
         }
 
         return this.items.get(0);

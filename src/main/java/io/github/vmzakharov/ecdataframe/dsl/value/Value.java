@@ -1,12 +1,13 @@
 package io.github.vmzakharov.ecdataframe.dsl.value;
 
-import io.github.vmzakharov.ecdataframe.util.ErrorReporter;
 import io.github.vmzakharov.ecdataframe.dsl.ArithmeticOp;
 import io.github.vmzakharov.ecdataframe.dsl.Expression;
 import io.github.vmzakharov.ecdataframe.dsl.PredicateOp;
 import io.github.vmzakharov.ecdataframe.dsl.UnaryOp;
 import io.github.vmzakharov.ecdataframe.dsl.visitor.ExpressionEvaluationVisitor;
 import io.github.vmzakharov.ecdataframe.dsl.visitor.ExpressionVisitor;
+
+import static io.github.vmzakharov.ecdataframe.util.ErrorReporter.exception;
 
 public interface Value
 extends Expression, Comparable<Value>
@@ -41,7 +42,7 @@ extends Expression, Comparable<Value>
 
     default Value apply(Value another, ArithmeticOp operation)
     {
-        ErrorReporter.exception("Undefined operation ${operation} on ${value}")
+        exception("Undefined operation ${operation} on ${value}")
             .with("operation", operation.asString()).with("value", this.asStringLiteral()).fire();
 
         return null;
@@ -49,12 +50,16 @@ extends Expression, Comparable<Value>
 
     default Value apply(UnaryOp operation)
     {
-        throw ErrorReporter.unsupported("Undefined operation " + operation.asString() + " on " + this.asStringLiteral());
+        throw exception("Undefined operation ${operation} on ${value}")
+                .with("operation", operation.asString()).with("value", this.asStringLiteral())
+                .getUnsupported();
     }
 
     default BooleanValue applyPredicate(Value another, PredicateOp operation)
     {
-        throw ErrorReporter.unsupported("Undefined operation " + operation.asString() + " on " + this.asStringLiteral());
+        throw exception("Undefined operation ${operation} on ${value}")
+                .with("operation", operation.asString()).with("value", this.asStringLiteral())
+                .getUnsupported();
     }
 
     @Override
@@ -70,6 +75,12 @@ extends Expression, Comparable<Value>
     }
 
     ValueType getType();
+
+    @Override
+    default int compareTo(Value o)
+    {
+        throw exception("Cannot compare values of type ${type}").with("type", this.getType()).getUnsupported();
+    }
 
     default boolean isVoid()
     {

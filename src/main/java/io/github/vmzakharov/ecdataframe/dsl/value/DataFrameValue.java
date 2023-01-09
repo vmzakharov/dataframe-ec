@@ -3,6 +3,8 @@ package io.github.vmzakharov.ecdataframe.dsl.value;
 import io.github.vmzakharov.ecdataframe.dataframe.DataFrame;
 import io.github.vmzakharov.ecdataframe.util.ErrorReporter;
 
+import static io.github.vmzakharov.ecdataframe.util.ErrorReporter.exception;
+
 public class DataFrameValue
 implements Value
 {
@@ -40,6 +42,6 @@ implements Value
     @Override
     public int compareTo(Value o)
     {
-        throw ErrorReporter.unsupported("Data Frame value comparison is not supported");
+        throw exception("Data Frame value comparison is not supported").getUnsupported();
     }
 }

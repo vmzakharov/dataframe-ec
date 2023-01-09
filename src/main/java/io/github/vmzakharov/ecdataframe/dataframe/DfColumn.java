@@ -2,7 +2,8 @@ package io.github.vmzakharov.ecdataframe.dataframe;
 
 import io.github.vmzakharov.ecdataframe.dsl.value.Value;
 import io.github.vmzakharov.ecdataframe.dsl.value.ValueType;
-import io.github.vmzakharov.ecdataframe.util.ErrorReporter;
+
+import static io.github.vmzakharov.ecdataframe.util.ErrorReporter.exception;
 
 public interface DfColumn
 {
@@ -44,7 +45,7 @@ public interface DfColumn
 
     default Object aggregate(AggregateFunction aggregator)
     {
-        throw ErrorReporter.exception("Aggregation ${aggregatorName} (${aggregationDescription}) cannot be performed "
+        throw exception("Aggregation ${aggregatorName} (${aggregationDescription}) cannot be performed "
                                    + "on column ${columnName} of type ${columnType}")
                 .with("aggregationName", aggregator.getName())
                 .with("aggregationDescription", aggregator.getDescription())
@@ -75,8 +76,10 @@ public interface DfColumn
 
     default DfCellComparator columnComparator(DfColumn otherColumn)
     {
-        throw ErrorReporter.unsupported("Column comparator is not implemented for column "
-                + this.getName() + " of type " + this.getType());
+        throw exception("Column comparator is not implemented for column ${columnName} of type ${type}")
+                .with("columnName", this.getName())
+                .with("columnType", this.getType())
+                .getUnsupported();
     }
 
     default int dataFrameRowIndex(int virtualRowIndex)

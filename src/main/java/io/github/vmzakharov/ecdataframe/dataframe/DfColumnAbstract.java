@@ -1,10 +1,11 @@
 package io.github.vmzakharov.ecdataframe.dataframe;
 
+import io.github.vmzakharov.ecdataframe.dsl.value.Value;
+
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 
 import static io.github.vmzakharov.ecdataframe.util.ErrorReporter.exception;
-import static io.github.vmzakharov.ecdataframe.util.ErrorReporter.reportAndThrow;
 import static io.github.vmzakharov.ecdataframe.util.ErrorReporter.reportAndThrowIf;
 
 public abstract class DfColumnAbstract
@@ -36,7 +37,8 @@ implements DfColumn
     {
         if (this.dataFrame != null)
         {
-            reportAndThrow("Column '" + this.getName() + "' has already been linked to a data frame");
+            exception("Column '${columnName}' has already been linked to a data frame")
+                    .with("columnName", this.getName()).fire();
         }
 
         this.dataFrame = newDataFrame;
@@ -89,5 +91,15 @@ implements DfColumn
         newColumn.ensureInitialCapacity(this.getSize() + other.getSize());
 
         return newColumn;
+    }
+
+    protected void throwAddingIncompatibleValueException(Value value)
+    {
+        exception("Attempting to add a value of type ${valueType} to a column ${columnName} of type ${columnType}: ${value}")
+                .with("valueType", value.getType())
+                .with("columnName", this.getName())
+                .with("columnType", this.getType())
+                .with("value", value.asStringLiteral())
+                .fire();
     }
 }

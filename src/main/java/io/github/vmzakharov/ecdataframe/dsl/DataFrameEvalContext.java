@@ -2,13 +2,14 @@ package io.github.vmzakharov.ecdataframe.dsl;
 
 import io.github.vmzakharov.ecdataframe.dataframe.DataFrame;
 import io.github.vmzakharov.ecdataframe.dataframe.DfColumn;
-import io.github.vmzakharov.ecdataframe.util.ErrorReporter;
 import io.github.vmzakharov.ecdataframe.dataset.HierarchicalDataSet;
 import io.github.vmzakharov.ecdataframe.dsl.value.Value;
 import org.eclipse.collections.api.RichIterable;
 import org.eclipse.collections.api.map.MapIterable;
 import org.eclipse.collections.api.map.MutableMap;
 import org.eclipse.collections.impl.factory.Maps;
+
+import static io.github.vmzakharov.ecdataframe.util.ErrorReporter.exception;
 
 public class DataFrameEvalContext
 extends EvalContextAbstract
@@ -89,7 +90,7 @@ extends EvalContextAbstract
     @Override
     public void removeVariable(String variableName)
     {
-        ErrorReporter.reportAndThrow("Cannot remove a variable from a data frame evaluation context");
+        exception("Cannot remove a variable from a data frame evaluation context").fire();
     }
 
     @Override
@@ -113,7 +114,7 @@ extends EvalContextAbstract
     @Override
     public void addDataSet(HierarchicalDataSet dataSet)
     {
-        ErrorReporter.reportAndThrow("Cannot add a data set to a data frame evaluation context");
+        exception("Cannot add a data set to a data frame evaluation context").fire();
     }
 
     @Override
@@ -131,7 +132,7 @@ extends EvalContextAbstract
     @Override
     public void removeAllVariables()
     {
-        throw ErrorReporter.unsupported("Cannot remove variables from a data frame evaluation context");
+        throw exception("Cannot remove variables from a data frame evaluation context").getUnsupported();
     }
 
     public DataFrame getDataFrame()

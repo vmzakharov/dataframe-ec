@@ -1,7 +1,6 @@
 package io.github.vmzakharov.ecdataframe.dataframe;
 
 import io.github.vmzakharov.ecdataframe.dsl.value.Value;
-import io.github.vmzakharov.ecdataframe.util.ErrorReporter;
 import org.eclipse.collections.api.list.ListIterable;
 
 public class DfStringColumnStored
@@ -31,10 +30,7 @@ implements DfStringColumn
         }
         else
         {
-            ErrorReporter.reportAndThrow(
-                "Attempting to add a value of type " + value.getType()
-                + " to a string column " + this.getName()
-                + ": " + value.asStringLiteral());
+            this.throwAddingIncompatibleValueException(value);
         }
     }
 

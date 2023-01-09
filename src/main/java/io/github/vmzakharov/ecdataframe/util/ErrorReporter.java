@@ -73,7 +73,7 @@ final public class ErrorReporter
     {
         if (badThingHappened)
         {
-            ErrorReporter.reportAndThrow(errorText);
+            ErrorReporter.logAndThrowException(errorText);
         }
     }
 
@@ -81,36 +81,30 @@ final public class ErrorReporter
     {
         if (badThingHappened)
         {
-            ErrorReporter.reportAndThrow(errorTextSupplier.get());
+            ErrorReporter.logAndThrowException(errorTextSupplier.get());
         }
     }
 
-    public static void reportAndThrow(String errorText)
+    private static void logAndThrowException(String errorText)
     {
-        throw exceptionXXX(errorText);
+        throw logAndCreateException(errorText);
     }
 
     public static void reportAndThrow(String errorText, Throwable cause)
     {
-        throw exceptionXXX(errorText, cause);
+        throw logAndCreateException(errorText, cause);
     }
 
-    private static RuntimeException exceptionXXX(String errorText)
+    private static RuntimeException logAndCreateException(String errorText)
     {
         errorPrinter.println(printedMessagePrefix + errorText);
         return exceptionWithMessage.apply(errorText);
     }
 
-    private static RuntimeException exceptionXXX(String errorText, Throwable cause)
+    private static RuntimeException logAndCreateException(String errorText, Throwable cause)
     {
         errorPrinter.println(printedMessagePrefix + errorText);
         return exceptionWithMessageAndCause.apply(errorText, cause);
-    }
-
-    public static RuntimeException unsupported(String errorText)
-    {
-        errorPrinter.println(printedMessagePrefix + errorText);
-        return unsupportedWithMessage.apply(errorText);
     }
 
     public static ErrorReporter exceptionKey(String messageKey)
@@ -131,17 +125,19 @@ final public class ErrorReporter
 
     public RuntimeException get()
     {
-        return ErrorReporter.exceptionXXX(this.formatter.toString());
+        return ErrorReporter.logAndCreateException(this.formatter.toString());
     }
 
     public RuntimeException get(Throwable cause)
     {
-        return ErrorReporter.exceptionXXX(this.formatter.toString(), cause);
+        return ErrorReporter.logAndCreateException(this.formatter.toString(), cause);
     }
 
     public RuntimeException getUnsupported()
     {
-        return ErrorReporter.unsupported(this.formatter.toString());
+        String errorText = this.formatter.toString();
+        errorPrinter.println(printedMessagePrefix + errorText);
+        return unsupportedWithMessage.apply(errorText);
     }
 
     public void fireIf(boolean badThingHappened)
@@ -162,4 +158,3 @@ final public class ErrorReporter
         throw this.get(cause);
     }
 }
-

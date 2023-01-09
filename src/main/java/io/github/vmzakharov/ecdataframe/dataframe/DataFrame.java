@@ -38,7 +38,6 @@ import java.util.Arrays;
 
 import static io.github.vmzakharov.ecdataframe.dataframe.DfColumnSortOrder.ASC;
 import static io.github.vmzakharov.ecdataframe.util.ErrorReporter.exception;
-import static io.github.vmzakharov.ecdataframe.util.ErrorReporter.reportAndThrow;
 import static io.github.vmzakharov.ecdataframe.util.ErrorReporter.reportAndThrowIf;
 
 public class DataFrame
@@ -309,9 +308,13 @@ public class DataFrame
         ValueType expressionType = visitor.inferExpressionType(expression);
         if (visitor.hasErrors())
         {
-            reportAndThrow("Cannot add calculated column " + columnName + " to data frame " + this.getName() + ": "
-                    + "failed to infer expression type of '" + expressionAsString + "'\n"
-                    + visitor.getErrors().collect(err -> err.getOne() + ": " + err.getTwo()).makeString("\n"));
+            exception("Cannot add calculated column ${columnName} to data frame ${dataFrameName}: "
+                    + "failed to infer the expression type of '${expression}'\n${errorList}")
+                    .with("columnName", columnName)
+                    .with("dataFrameName", this.getName())
+                    .with("expression", expressionAsString)
+                    .with("errorList", visitor.getErrors().collect(err -> err.getOne() + ": " + err.getTwo()).makeString("\n"))
+                    .fire();
         }
         return this.addColumn(columnName, expressionType, expressionAsString);
     }

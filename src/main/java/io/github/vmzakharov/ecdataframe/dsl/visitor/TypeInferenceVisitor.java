@@ -39,7 +39,7 @@ import org.eclipse.collections.impl.factory.Stacks;
 import org.eclipse.collections.impl.tuple.Tuples;
 
 public class TypeInferenceVisitor
-        implements ExpressionVisitor
+implements ExpressionVisitor
 {
     public static final String ERR_IF_ELSE_INCOMPATIBLE = "Incompatible types in branches of if-else";
     public static final String ERR_TYPES_IN_EXPRESSION = "Incompatible operand types in expression";
@@ -57,7 +57,7 @@ public class TypeInferenceVisitor
 
     private final EvalContext evalContext;
 
-    private MutableList<Twin<String>> errors = Lists.mutable.of();
+    private final MutableList<Twin<String>> errors = Lists.mutable.of();
 
     public TypeInferenceVisitor()
     {
