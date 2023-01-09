@@ -1,6 +1,5 @@
 package io.github.vmzakharov.ecdataframe.dataframe;
 
-import io.github.vmzakharov.ecdataframe.dsl.value.Value;
 import org.eclipse.collections.api.factory.Lists;
 import org.eclipse.collections.api.list.ImmutableList;
 import org.junit.Assert;
@@ -12,7 +11,10 @@ public class DataFrameCopyTest
     public void copySchema()
     {
         DataFrame df = new DataFrame("df1");
-        df.addStringColumn("Name").addLongColumn("Count").addDoubleColumn("Value");
+        df
+                .addStringColumn("Name")
+                .addLongColumn("Count")
+                .addDoubleColumn("Value");
         df
                 .addRow("Alice", 5, 23.45)
                 .addRow("Bob",  10, 12.34)
@@ -46,7 +48,10 @@ public class DataFrameCopyTest
     public void copySchemaConvertComputedToStored()
     {
         DataFrame df = new DataFrame("df1");
-        df.addStringColumn("Name").addLongColumn("Count").addDoubleColumn("Value");
+        df
+                .addStringColumn("Name")
+                .addLongColumn("Count")
+                .addDoubleColumn("Value");
         df
                 .addRow("Alice", 5, 23.45)
                 .addRow("Bob",  10, 12.34)
@@ -75,7 +80,10 @@ public class DataFrameCopyTest
     public void copyWholeDataFrame()
     {
         DataFrame df = new DataFrame("df1");
-        df.addStringColumn("Name").addLongColumn("Count").addDoubleColumn("Value");
+        df
+                .addStringColumn("Name")
+                .addLongColumn("Count")
+                .addDoubleColumn("Value");
         df
                 .addRow("Alice", 5, 23.45)
                 .addRow("Bob",  10, 12.34)
@@ -93,37 +101,34 @@ public class DataFrameCopyTest
     @Test
     public void copySomeColumnsToANewDataFrame()
     {
-        DataFrame df = new DataFrame("df1");
-        df.addStringColumn("Name").addLongColumn("Count").addDoubleColumn("Value");
-        df
+        DataFrame originalDataFrame = new DataFrame("df1");
+        originalDataFrame
+                .addStringColumn("Name")
+                .addLongColumn("Count")
+                .addDoubleColumn("Value");
+
+        originalDataFrame
                 .addRow("Alice", 5, 23.45)
                 .addRow("Bob",  10, 12.34)
                 .addRow("Carl", 11, 56.78)
                 .addRow("Deb",   0,  7.89);
 
-        df.addDoubleColumn("Twice", "Value * 2");
+        originalDataFrame.addDoubleColumn("Twice", "Value * 2");
+
+        DataFrame expectedDataFrame = new DataFrame("df2");
+        expectedDataFrame
+                .addStringColumn("Name")
+                .addDoubleColumn("Twice");
+
+        expectedDataFrame
+                .addRow("Alice",  46.9)
+                .addRow("Bob",    24.68)
+                .addRow("Carl",  113.56)
+                .addRow("Deb",    15.78);
 
         ImmutableList<String> columnNamesToCopy = Lists.immutable.of("Name", "Twice");
-        DataFrame copiedDataFrame = df.copy("MyNewCopy", columnNamesToCopy);
+        DataFrame copiedDataFrame = originalDataFrame.copy("MyNewCopy", columnNamesToCopy);
 
-        Assert.assertEquals(df.rowCount(), copiedDataFrame.rowCount());
-        Assert.assertEquals(columnNamesToCopy.size(), copiedDataFrame.columnCount());
-        for (int i = 0; i < columnNamesToCopy.size(); i++)
-        {
-            DfColumn copyColumn = copiedDataFrame.getColumnAt(i);
-            DfColumn sourceColumn = df.getColumnNamed(copyColumn.getName());
-
-            Assert.assertEquals(sourceColumn.getName(), copyColumn.getName());
-            Assert.assertEquals(sourceColumn.getType(), copyColumn.getType());
-            Assert.assertTrue(copyColumn.isStored());
-
-            for (int j = 0; j < df.rowCount(); j++)
-            {
-                Value cellValue = df.getColumnNamed(copyColumn.getName()).getValue(j);
-                Value copiedCellValue = copiedDataFrame.getColumnAt(i).getValue(j);
-
-                Assert.assertEquals(0, cellValue.compareTo(copiedCellValue));
-            }
-        }
+        DataFrameUtil.assertEquals(expectedDataFrame, copiedDataFrame);
     }
 }

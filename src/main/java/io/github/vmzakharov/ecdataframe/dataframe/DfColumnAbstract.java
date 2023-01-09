@@ -89,7 +89,7 @@ implements DfColumn
         return newColumn;
     }
 
-    protected DfColumn copyColumn(DataFrame target)
+    protected DfColumn copyColumnSchema(DataFrame target)
     {
         target.addColumn(this.getName(), this.getType());
 

@@ -67,7 +67,7 @@ extends DfColumnAbstract
 
     public DfColumn copyTo(DataFrame target)
     {
-        DfDoubleColumn mergedCol = (DfDoubleColumn) this.copyColumn(target);
+        DfDoubleColumn mergedCol = (DfDoubleColumn) this.copyColumnSchema(target);
 
         mergedCol.addAllItemsFrom(this);
         return mergedCol;

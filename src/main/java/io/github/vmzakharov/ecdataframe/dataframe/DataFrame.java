@@ -828,12 +828,13 @@ public class DataFrame
         if (selectedColumnNamesToCopy == null)
         {
             this.columns.forEach(col -> col.copyTo(copied));
-            copied.seal();
-            return copied;
+        }
+        else
+        {
+            ListIterable<DfColumn> columnsToCopy = selectedColumnNamesToCopy.collect(this::getColumnNamed);
+            columnsToCopy.forEach(col -> col.copyTo(copied));
         }
 
-        ListIterable<DfColumn> columnsToCopy = selectedColumnNamesToCopy.collect(this::getColumnNamed);
-        columnsToCopy.forEach(col -> col.copyTo(copied));
         copied.seal();
         return copied;
     }
