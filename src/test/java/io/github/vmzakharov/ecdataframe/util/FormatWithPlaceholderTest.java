@@ -3,7 +3,10 @@ package io.github.vmzakharov.ecdataframe.util;
 import org.junit.Assert;
 import org.junit.Test;
 
-import static io.github.vmzakharov.ecdataframe.util.FormatWithPlaceholders.*;
+import java.util.ResourceBundle;
+
+import static io.github.vmzakharov.ecdataframe.util.FormatWithPlaceholders.format;
+import static io.github.vmzakharov.ecdataframe.util.FormatWithPlaceholders.formatKey;
 
 public class FormatWithPlaceholderTest
 {
@@ -43,5 +46,15 @@ public class FormatWithPlaceholderTest
 
         Assert.assertEquals("Hello, (name is unknown). How are you today, (name is unknown)?",
                 format("Hello, ${name}. How are you ${time}, ${name}?").with("time", "today").toStringSupplier().get());
+    }
+
+    @Test
+    public void withResourceBundle()
+    {
+        FormatWithPlaceholders.addMessagesFromResourceBundle(ResourceBundle.getBundle("Messages"));
+
+        Assert.assertEquals("Hello, Alice! How are you?", formatKey("GREETING").with("name", "Alice").toString());
+
+        Assert.assertEquals("GREETINGS PROFESSOR FALKEN,", formatKey("SALUTATION").with("lastName", "FALKEN").toString());
     }
 }

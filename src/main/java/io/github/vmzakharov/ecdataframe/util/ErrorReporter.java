@@ -20,9 +20,9 @@ final public class ErrorReporter
         initialize();
     }
 
-    private ErrorReporter(String message)
+    private ErrorReporter(FormatWithPlaceholders newFormat)
     {
-        this.formatter = FormatWithPlaceholders.format(message);
+        this.formatter = newFormat;
     }
 
     /**
@@ -81,12 +81,12 @@ final public class ErrorReporter
 
     public static ErrorReporter exceptionKey(String messageKey)
     {
-        return exception(messageKey);
+        return new ErrorReporter(FormatWithPlaceholders.formatKey(messageKey));
     }
 
     public static ErrorReporter exception(String message)
     {
-        return new ErrorReporter(message);
+        return new ErrorReporter(FormatWithPlaceholders.format(message));
     }
 
     public ErrorReporter with(String name, Object value)

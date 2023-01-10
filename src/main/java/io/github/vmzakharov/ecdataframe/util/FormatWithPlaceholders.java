@@ -3,6 +3,8 @@ package io.github.vmzakharov.ecdataframe.util;
 import org.eclipse.collections.api.factory.Maps;
 import org.eclipse.collections.api.map.MutableMap;
 
+import java.util.Enumeration;
+import java.util.ResourceBundle;
 import java.util.function.Supplier;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -11,6 +13,7 @@ import static io.github.vmzakharov.ecdataframe.util.ErrorReporter.exception;
 
 public class FormatWithPlaceholders
 {
+    private static MutableMap<String, String> messagesByKey = Maps.mutable.of();
     private final String template;
     private final MutableMap<String, String> valuesByName = Maps.mutable.of();
 
@@ -22,6 +25,22 @@ public class FormatWithPlaceholders
     public static FormatWithPlaceholders format(String newTemplate)
     {
         return new FormatWithPlaceholders(newTemplate);
+    }
+
+    public static void addMessagesFromResourceBundle(ResourceBundle resourceBundle)
+    {
+        Enumeration<String> keys = resourceBundle.getKeys();
+        while (keys.hasMoreElements())
+        {
+            String key = keys.nextElement();
+            messagesByKey.put(key, resourceBundle.getString(key));
+        }
+    }
+
+    public static FormatWithPlaceholders formatKey(String messageKey)
+    {
+        String message = messagesByKey.get(messageKey);
+        return new FormatWithPlaceholders(message);
     }
 
     public FormatWithPlaceholders with(String name, String value)
