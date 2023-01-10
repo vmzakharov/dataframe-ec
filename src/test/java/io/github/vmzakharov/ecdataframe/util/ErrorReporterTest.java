@@ -149,7 +149,7 @@ public class ErrorReporterTest
     }
 
     private static class VerySpecialException
-            extends RuntimeException
+    extends RuntimeException
     {
         public VerySpecialException(String message)
         {

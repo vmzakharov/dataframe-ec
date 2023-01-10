@@ -1,8 +1,11 @@
 package io.github.vmzakharov.ecdataframe.util;
 
+import org.eclipse.collections.api.map.MutableMap;
+import org.eclipse.collections.impl.factory.Maps;
 import org.junit.Assert;
 import org.junit.Test;
 
+import java.util.Properties;
 import java.util.ResourceBundle;
 
 import static io.github.vmzakharov.ecdataframe.util.FormatWithPlaceholders.format;
@@ -55,6 +58,35 @@ public class FormatWithPlaceholderTest
 
         Assert.assertEquals("Hello, Alice! How are you?", formatKey("GREETING").with("name", "Alice").toString());
 
-        Assert.assertEquals("GREETINGS PROFESSOR FALKEN,", formatKey("SALUTATION").with("lastName", "FALKEN").toString());
+        Assert.assertEquals("GREETINGS PROFESSOR FALKEN.", formatKey("SALUTATION").with("lastName", "FALKEN").toString());
+    }
+
+    @Test
+    public void withProperties()
+    {
+        Properties props = new Properties();
+        props.setProperty("GREETING", "Hello, ${name}! How are you?");
+        props.setProperty("SALUTATION", "GREETINGS PROFESSOR ${lastName}.");
+
+        FormatWithPlaceholders.addMessagesFromProperties(props);
+
+        Assert.assertEquals("Hello, Alice! How are you?", formatKey("GREETING").with("name", "Alice").toString());
+
+        Assert.assertEquals("GREETINGS PROFESSOR FALKEN.", formatKey("SALUTATION").with("lastName", "FALKEN").toString());
+    }
+
+    @Test
+    public void withMap()
+    {
+        MutableMap<String, String> messagesByKey = Maps.mutable.with(
+            "GREETING", "Hello, ${name}! How are you?",
+            "SALUTATION", "GREETINGS PROFESSOR ${lastName}."
+        );
+
+        FormatWithPlaceholders.addMessagesFromMap(messagesByKey);
+
+        Assert.assertEquals("Hello, ${Alice}! How are you?", formatKey("GREETING").with("name", "${Alice}").toString());
+
+        Assert.assertEquals("GREETINGS PROFESSOR JENKINS.", formatKey("SALUTATION").with("lastName", "JENKINS").toString());
     }
 }

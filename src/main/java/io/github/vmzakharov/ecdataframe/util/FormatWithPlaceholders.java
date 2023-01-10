@@ -2,8 +2,11 @@ package io.github.vmzakharov.ecdataframe.util;
 
 import org.eclipse.collections.api.factory.Maps;
 import org.eclipse.collections.api.map.MutableMap;
+import org.eclipse.collections.impl.utility.MapIterate;
 
 import java.util.Enumeration;
+import java.util.Map;
+import java.util.Properties;
 import java.util.ResourceBundle;
 import java.util.function.Supplier;
 import java.util.regex.Matcher;
@@ -33,14 +36,29 @@ public class FormatWithPlaceholders
         while (keys.hasMoreElements())
         {
             String key = keys.nextElement();
-            messagesByKey.put(key, resourceBundle.getString(key));
+            addMessageByKey(key, resourceBundle.getString(key));
         }
+    }
+
+    static private void addMessageByKey(String key, String message)
+    {
+        messagesByKey.put(key, message);
     }
 
     public static FormatWithPlaceholders formatKey(String messageKey)
     {
         String message = messagesByKey.get(messageKey);
         return new FormatWithPlaceholders(message);
+    }
+
+    public static void addMessagesFromProperties(Properties properties)
+    {
+        properties.stringPropertyNames().forEach(name -> addMessageByKey(name,properties.getProperty(name)));
+    }
+
+    public static void addMessagesFromMap(Map<String, String> messagesByKey)
+    {
+        MapIterate.forEachKeyValue(messagesByKey, FormatWithPlaceholders::addMessageByKey);
     }
 
     public FormatWithPlaceholders with(String name, String value)
