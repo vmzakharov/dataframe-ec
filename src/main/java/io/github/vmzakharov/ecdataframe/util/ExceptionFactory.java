@@ -79,7 +79,7 @@ final public class ExceptionFactory
         return exceptionWithMessageAndCause.apply(errorText, cause);
     }
 
-    public static ExceptionFactory exceptionFromKey(String messageKey)
+    public static ExceptionFactory exceptionByKey(String messageKey)
     {
         return new ExceptionFactory(FormatWithPlaceholders.messageFromKey(messageKey));
     }

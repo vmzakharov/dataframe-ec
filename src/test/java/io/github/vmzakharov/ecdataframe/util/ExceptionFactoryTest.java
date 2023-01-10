@@ -5,7 +5,7 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import static io.github.vmzakharov.ecdataframe.util.ExceptionFactory.exception;
-import static io.github.vmzakharov.ecdataframe.util.ExceptionFactory.exceptionFromKey;
+import static io.github.vmzakharov.ecdataframe.util.ExceptionFactory.exceptionByKey;
 
 public class ExceptionFactoryTest
 {
@@ -32,7 +32,7 @@ public class ExceptionFactoryTest
         {
             FormatWithPlaceholders.addMessagesFromMap(Maps.mutable.with("HELLO", "Hello, ${Name}"));
             ExceptionFactory.initialize();
-            exceptionFromKey("HELLO").with("Name", "Bob").fire();
+            exceptionByKey("HELLO").with("Name", "Bob").fire();
             Assert.fail("didn't throw");
         }
         catch (RuntimeException e)
