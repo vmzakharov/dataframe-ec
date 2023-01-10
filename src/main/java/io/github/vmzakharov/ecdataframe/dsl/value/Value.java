@@ -7,7 +7,7 @@ import io.github.vmzakharov.ecdataframe.dsl.UnaryOp;
 import io.github.vmzakharov.ecdataframe.dsl.visitor.ExpressionEvaluationVisitor;
 import io.github.vmzakharov.ecdataframe.dsl.visitor.ExpressionVisitor;
 
-import static io.github.vmzakharov.ecdataframe.util.ErrorReporter.exception;
+import static io.github.vmzakharov.ecdataframe.util.ExceptionFactory.exception;
 
 public interface Value
 extends Expression, Comparable<Value>

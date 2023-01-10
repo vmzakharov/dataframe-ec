@@ -1,12 +1,13 @@
 package io.github.vmzakharov.ecdataframe.dataset;
 
-import io.github.vmzakharov.ecdataframe.util.ErrorReporter;
 import org.eclipse.collections.api.block.function.primitive.LongFunction;
 import org.eclipse.collections.impl.utility.StringIterate;
 
 import java.text.DecimalFormat;
 import java.text.ParseException;
 import java.util.regex.Pattern;
+
+import static io.github.vmzakharov.ecdataframe.util.ExceptionFactory.exception;
 
 public class LongFormatter
 {
@@ -35,7 +36,7 @@ public class LongFormatter
                 }
                 catch (ParseException e)
                 {
-                    throw ErrorReporter.exception("Failed to parse input string to integer: '${inputString}'")
+                    throw exception("Failed to parse input string to integer: '${inputString}'")
                             .with("inputString", s).get(e);
                 }
             };

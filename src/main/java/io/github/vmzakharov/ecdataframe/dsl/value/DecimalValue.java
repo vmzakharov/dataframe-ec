@@ -1,11 +1,12 @@
 package io.github.vmzakharov.ecdataframe.dsl.value;
 
-import io.github.vmzakharov.ecdataframe.util.ErrorReporter;
 import io.github.vmzakharov.ecdataframe.dsl.ArithmeticOp;
 import io.github.vmzakharov.ecdataframe.dsl.PredicateOp;
 import io.github.vmzakharov.ecdataframe.dsl.UnaryOp;
 
 import java.math.BigDecimal;
+
+import static io.github.vmzakharov.ecdataframe.util.ExceptionFactory.*;
 
 public class DecimalValue
 extends AbstractValue
@@ -62,8 +63,7 @@ implements NumberValue
     @Override
     public double doubleValue()
     {
-        ErrorReporter.exception("Cannot convert decimal value to floating point").fire();
-        return 0.0;
+        throw exception("Cannot convert decimal value to floating point").get();
     }
 
     @Override

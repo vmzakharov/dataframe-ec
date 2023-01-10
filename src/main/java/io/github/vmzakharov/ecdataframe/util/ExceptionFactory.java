@@ -3,7 +3,7 @@ package io.github.vmzakharov.ecdataframe.util;
 import org.eclipse.collections.api.block.function.Function;
 import org.eclipse.collections.api.block.function.Function2;
 
-final public class ErrorReporter
+final public class ExceptionFactory
 {
     private static Function<String, ? extends RuntimeException> exceptionWithMessage;
     private static Function2<String, Throwable, ? extends RuntimeException> exceptionWithMessageAndCause;
@@ -20,7 +20,7 @@ final public class ErrorReporter
         initialize();
     }
 
-    private ErrorReporter(FormatWithPlaceholders newFormat)
+    private ExceptionFactory(FormatWithPlaceholders newFormat)
     {
         this.formatter = newFormat;
     }
@@ -44,9 +44,9 @@ final public class ErrorReporter
             Function<String, ? extends UnsupportedOperationException> newUnsupportedWithMessage
     )
     {
-        ErrorReporter.exceptionWithMessage = newExceptionWithMessage;
-        ErrorReporter.exceptionWithMessageAndCause = newExceptionWithMessageAndCause;
-        ErrorReporter.unsupportedWithMessage = newUnsupportedWithMessage;
+        ExceptionFactory.exceptionWithMessage = newExceptionWithMessage;
+        ExceptionFactory.exceptionWithMessageAndCause = newExceptionWithMessageAndCause;
+        ExceptionFactory.unsupportedWithMessage = newUnsupportedWithMessage;
     }
 
     public static void initialize()
@@ -59,12 +59,12 @@ final public class ErrorReporter
 
     public static void setErrorPrinter(Printer newErrorPrinter)
     {
-        ErrorReporter.errorPrinter = newErrorPrinter;
+        ExceptionFactory.errorPrinter = newErrorPrinter;
     }
 
     public static void setPrintedMessagePrefix(String newPrintedMessagePrefix)
     {
-        ErrorReporter.printedMessagePrefix = newPrintedMessagePrefix;
+        ExceptionFactory.printedMessagePrefix = newPrintedMessagePrefix;
     }
 
     private static RuntimeException logAndCreateException(String errorText)
@@ -79,17 +79,17 @@ final public class ErrorReporter
         return exceptionWithMessageAndCause.apply(errorText, cause);
     }
 
-    public static ErrorReporter exceptionFromKey(String messageKey)
+    public static ExceptionFactory exceptionFromKey(String messageKey)
     {
-        return new ErrorReporter(FormatWithPlaceholders.messageFromKey(messageKey));
+        return new ExceptionFactory(FormatWithPlaceholders.messageFromKey(messageKey));
     }
 
-    public static ErrorReporter exception(String message)
+    public static ExceptionFactory exception(String message)
     {
-        return new ErrorReporter(FormatWithPlaceholders.message(message));
+        return new ExceptionFactory(FormatWithPlaceholders.message(message));
     }
 
-    public ErrorReporter with(String name, Object value)
+    public ExceptionFactory with(String name, Object value)
     {
         this.formatter.with(name, value.toString());
         return this;
@@ -97,12 +97,12 @@ final public class ErrorReporter
 
     public RuntimeException get()
     {
-        return ErrorReporter.logAndCreateException(this.formatter.toString());
+        return ExceptionFactory.logAndCreateException(this.formatter.toString());
     }
 
     public RuntimeException get(Throwable cause)
     {
-        return ErrorReporter.logAndCreateException(this.formatter.toString(), cause);
+        return ExceptionFactory.logAndCreateException(this.formatter.toString(), cause);
     }
 
     public RuntimeException getUnsupported()

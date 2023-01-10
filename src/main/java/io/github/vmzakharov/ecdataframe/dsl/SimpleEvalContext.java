@@ -6,7 +6,7 @@ import org.eclipse.collections.api.RichIterable;
 import org.eclipse.collections.api.map.MutableMap;
 import org.eclipse.collections.impl.factory.Maps;
 
-import static io.github.vmzakharov.ecdataframe.util.ErrorReporter.exception;
+import static io.github.vmzakharov.ecdataframe.util.ExceptionFactory.exception;
 
 public class SimpleEvalContext
 extends EvalContextAbstract

@@ -38,7 +38,7 @@ import org.eclipse.collections.api.list.ListIterable;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
-import static io.github.vmzakharov.ecdataframe.util.ErrorReporter.exception;
+import static io.github.vmzakharov.ecdataframe.util.ExceptionFactory.exception;
 
 public class InMemoryEvaluationVisitor
 implements ExpressionEvaluationVisitor

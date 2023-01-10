@@ -4,17 +4,17 @@ import org.eclipse.collections.api.factory.Maps;
 import org.junit.Assert;
 import org.junit.Test;
 
-import static io.github.vmzakharov.ecdataframe.util.ErrorReporter.exception;
-import static io.github.vmzakharov.ecdataframe.util.ErrorReporter.exceptionFromKey;
+import static io.github.vmzakharov.ecdataframe.util.ExceptionFactory.exception;
+import static io.github.vmzakharov.ecdataframe.util.ExceptionFactory.exceptionFromKey;
 
-public class ErrorReporterTest
+public class ExceptionFactoryTest
 {
     @Test
     public void defaultExceptionType()
     {
         try
         {
-            ErrorReporter.initialize();
+            ExceptionFactory.initialize();
             exception("Hello").fire();
             Assert.fail("didn't throw");
         }
@@ -31,7 +31,7 @@ public class ErrorReporterTest
         try
         {
             FormatWithPlaceholders.addMessagesFromMap(Maps.mutable.with("HELLO", "Hello, ${Name}"));
-            ErrorReporter.initialize();
+            ExceptionFactory.initialize();
             exceptionFromKey("HELLO").with("Name", "Bob").fire();
             Assert.fail("didn't throw");
         }
@@ -49,7 +49,7 @@ public class ErrorReporterTest
 
         try
         {
-            ErrorReporter.initialize();
+            ExceptionFactory.initialize();
             exception("Hello").fire(cause);
             Assert.fail("didn't throw");
         }
@@ -66,7 +66,7 @@ public class ErrorReporterTest
     {
         try
         {
-            ErrorReporter.initialize();
+            ExceptionFactory.initialize();
             throw exception("Do it!").getUnsupported();
         }
         catch (UnsupportedOperationException e)
@@ -81,7 +81,7 @@ public class ErrorReporterTest
     {
         try
         {
-            ErrorReporter.exceptionFactories(VerySpecialException::new, VerySpecialException::new, DontWanna::new);
+            ExceptionFactory.exceptionFactories(VerySpecialException::new, VerySpecialException::new, DontWanna::new);
             exception("Hello").fire();
             Assert.fail("didn't throw");
         }
@@ -97,7 +97,7 @@ public class ErrorReporterTest
     {
         try
         {
-            ErrorReporter.exceptionFactories(VerySpecialException::new, VerySpecialException::new, DontWanna::new);
+            ExceptionFactory.exceptionFactories(VerySpecialException::new, VerySpecialException::new, DontWanna::new);
             throw exception("Do it!").getUnsupported();
         }
         catch (UnsupportedOperationException e)
@@ -114,7 +114,7 @@ public class ErrorReporterTest
 
         try
         {
-            ErrorReporter.exceptionFactories(VerySpecialException::new, VerySpecialException::new, DontWanna::new);
+            ExceptionFactory.exceptionFactories(VerySpecialException::new, VerySpecialException::new, DontWanna::new);
             exception("Hello").fire(cause);
             Assert.fail("didn't throw");
         }
@@ -130,8 +130,8 @@ public class ErrorReporterTest
     public void errorPrinter()
     {
         CollectingPrinter printer = new CollectingPrinter();
-        ErrorReporter.setPrintedMessagePrefix("Boo-boo: ");
-        ErrorReporter.setErrorPrinter(printer);
+        ExceptionFactory.setPrintedMessagePrefix("Boo-boo: ");
+        ExceptionFactory.setErrorPrinter(printer);
 
         try
         {
@@ -164,7 +164,7 @@ public class ErrorReporterTest
             Assert.assertEquals("Boo-boo: oh, well\n", printer.toString());
         }
 
-        ErrorReporter.initialize();
+        ExceptionFactory.initialize();
     }
 
     private static class VerySpecialException

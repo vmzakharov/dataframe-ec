@@ -5,7 +5,7 @@ import io.github.vmzakharov.ecdataframe.dsl.value.Value;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 
-import static io.github.vmzakharov.ecdataframe.util.ErrorReporter.exception;
+import static io.github.vmzakharov.ecdataframe.util.ExceptionFactory.exception;
 
 public abstract class DfColumnAbstract
 implements DfColumn

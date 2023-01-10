@@ -9,7 +9,7 @@ import io.github.vmzakharov.ecdataframe.dataframe.aggregation.Sum;
 import io.github.vmzakharov.ecdataframe.dsl.value.ValueType;
 import org.eclipse.collections.api.list.ListIterable;
 
-import static io.github.vmzakharov.ecdataframe.util.ErrorReporter.exception;
+import static io.github.vmzakharov.ecdataframe.util.ExceptionFactory.exception;
 
 public abstract class AggregateFunction
 {

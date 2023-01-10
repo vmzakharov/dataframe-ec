@@ -3,7 +3,7 @@ package io.github.vmzakharov.ecdataframe.dsl.value;
 import io.github.vmzakharov.ecdataframe.dsl.ArithmeticOp;
 import io.github.vmzakharov.ecdataframe.dsl.UnaryOp;
 
-import static io.github.vmzakharov.ecdataframe.util.ErrorReporter.exception;
+import static io.github.vmzakharov.ecdataframe.util.ExceptionFactory.exception;
 
 abstract public class BooleanValue
 extends AbstractValue
