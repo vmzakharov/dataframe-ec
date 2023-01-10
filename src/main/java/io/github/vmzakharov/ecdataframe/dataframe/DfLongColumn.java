@@ -67,10 +67,10 @@ extends DfColumnAbstract
 
     public DfColumn copyTo(DataFrame target)
     {
-        DfLongColumn mergedCol = (DfLongColumn)  this.copyColumnSchema(target);
+        DfLongColumn tagetCol = (DfLongColumn)  this.copyColumnSchema(target);
 
-        mergedCol.addAllItemsFrom(this);
-        return mergedCol;
+        tagetCol.addAllItemsFrom(this);
+        return tagetCol;
     }
 
     protected abstract void addAllItemsFrom(DfLongColumn items);

@@ -818,22 +818,17 @@ public class DataFrame
      * If the list is set to null, all columns are copied (behaving in the same way as copy(String newName)).
      *
      * @param newName the name for the new data frame
-     * @param selectedColumnNamesToCopy the names of the columns to be copied
+     * @param columnNamesToCopy the names of the columns to be copied
      * @return a copy of the original data frame with the provided name and new schema
      */
-    public DataFrame copy(String newName, ListIterable<String> selectedColumnNamesToCopy)
+    public DataFrame copy(String newName, ListIterable<String> columnNamesToCopy)
     {
         DataFrame copied =  new DataFrame(newName);
 
-        if (selectedColumnNamesToCopy == null)
-        {
-            this.columns.forEach(col -> col.copyTo(copied));
-        }
-        else
-        {
-            ListIterable<DfColumn> columnsToCopy = selectedColumnNamesToCopy.collect(this::getColumnNamed);
-            columnsToCopy.forEach(col -> col.copyTo(copied));
-        }
+        ((columnNamesToCopy == null)
+                ? this.columns
+                : columnNamesToCopy.collect(this::getColumnNamed)
+        ).forEach(col -> col.copyTo(copied));
 
         copied.seal();
         return copied;

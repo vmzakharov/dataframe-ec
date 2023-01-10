@@ -31,9 +31,9 @@ implements DfObjectColumn<T>
 
     public DfColumn copyTo(DataFrame target)
     {
-        DfObjectColumnAbstract<T> mergedCol = (DfObjectColumnAbstract<T>) this.copyColumnSchema(target);
+        DfObjectColumnAbstract<T> tagetCol = (DfObjectColumnAbstract<T>) this.copyColumnSchema(target);
 
-        mergedCol.addAllItems(this.toList());
-        return mergedCol;
+        tagetCol.addAllItems(this.toList());
+        return tagetCol;
     }
 }
