@@ -25,7 +25,7 @@ public class FormatWithPlaceholders
         this.template = newTemplate;
     }
 
-    public static FormatWithPlaceholders format(String newTemplate)
+    public static FormatWithPlaceholders message(String newTemplate)
     {
         return new FormatWithPlaceholders(newTemplate);
     }
@@ -45,7 +45,7 @@ public class FormatWithPlaceholders
         messagesByKey.put(key, message);
     }
 
-    public static FormatWithPlaceholders formatKey(String messageKey)
+    public static FormatWithPlaceholders messageFromKey(String messageKey)
     {
         String message = messagesByKey.get(messageKey);
         return new FormatWithPlaceholders(message);
@@ -53,12 +53,12 @@ public class FormatWithPlaceholders
 
     public static void addMessagesFromProperties(Properties properties)
     {
-        properties.stringPropertyNames().forEach(name -> addMessageByKey(name,properties.getProperty(name)));
+        properties.stringPropertyNames().forEach(name -> addMessageByKey(name, properties.getProperty(name)));
     }
 
-    public static void addMessagesFromMap(Map<String, String> messagesByKey)
+    public static void addMessagesFromMap(Map<String, String> newMessagesByKey)
     {
-        MapIterate.forEachKeyValue(messagesByKey, FormatWithPlaceholders::addMessageByKey);
+        MapIterate.forEachKeyValue(newMessagesByKey, FormatWithPlaceholders::addMessageByKey);
     }
 
     public FormatWithPlaceholders with(String name, String value)

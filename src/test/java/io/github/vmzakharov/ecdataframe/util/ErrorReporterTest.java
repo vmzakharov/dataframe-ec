@@ -1,9 +1,11 @@
 package io.github.vmzakharov.ecdataframe.util;
 
+import org.eclipse.collections.api.factory.Maps;
 import org.junit.Assert;
 import org.junit.Test;
 
 import static io.github.vmzakharov.ecdataframe.util.ErrorReporter.exception;
+import static io.github.vmzakharov.ecdataframe.util.ErrorReporter.exceptionFromKey;
 
 public class ErrorReporterTest
 {
@@ -20,6 +22,23 @@ public class ErrorReporterTest
         {
             Assert.assertEquals(RuntimeException.class, e.getClass());
             Assert.assertEquals("Hello", e.getMessage());
+        }
+    }
+
+    @Test
+    public void exceptionMessageByKey()
+    {
+        try
+        {
+            FormatWithPlaceholders.addMessagesFromMap(Maps.mutable.with("HELLO", "Hello, ${Name}"));
+            ErrorReporter.initialize();
+            exceptionFromKey("HELLO").with("Name", "Bob").fire();
+            Assert.fail("didn't throw");
+        }
+        catch (RuntimeException e)
+        {
+            Assert.assertEquals(RuntimeException.class, e.getClass());
+            Assert.assertEquals("Hello, Bob", e.getMessage());
         }
     }
 

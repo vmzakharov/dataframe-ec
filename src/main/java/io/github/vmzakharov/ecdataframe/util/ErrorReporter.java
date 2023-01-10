@@ -79,14 +79,14 @@ final public class ErrorReporter
         return exceptionWithMessageAndCause.apply(errorText, cause);
     }
 
-    public static ErrorReporter exceptionKey(String messageKey)
+    public static ErrorReporter exceptionFromKey(String messageKey)
     {
-        return new ErrorReporter(FormatWithPlaceholders.formatKey(messageKey));
+        return new ErrorReporter(FormatWithPlaceholders.messageFromKey(messageKey));
     }
 
     public static ErrorReporter exception(String message)
     {
-        return new ErrorReporter(FormatWithPlaceholders.format(message));
+        return new ErrorReporter(FormatWithPlaceholders.message(message));
     }
 
     public ErrorReporter with(String name, Object value)
