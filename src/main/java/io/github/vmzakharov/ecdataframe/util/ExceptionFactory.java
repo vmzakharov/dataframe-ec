@@ -3,9 +3,7 @@ package io.github.vmzakharov.ecdataframe.util;
 import org.eclipse.collections.api.block.function.Function;
 import org.eclipse.collections.api.block.function.Function2;
 
-import java.util.function.Supplier;
-
-final public class ErrorReporter
+final public class ExceptionFactory
 {
     private static Function<String, ? extends RuntimeException> exceptionWithMessage;
     private static Function2<String, Throwable, ? extends RuntimeException> exceptionWithMessageAndCause;
@@ -15,14 +13,17 @@ final public class ErrorReporter
 
     private static String printedMessagePrefix;
 
+    private final FormatWithPlaceholders formatter;
+
     static
     {
         initialize();
+        ConfigureMessages.initialize();
     }
 
-    private ErrorReporter()
+    private ExceptionFactory(FormatWithPlaceholders newFormat)
     {
-        // Utility class should not have a public constructor
+        this.formatter = newFormat;
     }
 
     /**
@@ -44,9 +45,9 @@ final public class ErrorReporter
             Function<String, ? extends UnsupportedOperationException> newUnsupportedWithMessage
     )
     {
-        ErrorReporter.exceptionWithMessage = newExceptionWithMessage;
-        ErrorReporter.exceptionWithMessageAndCause = newExceptionWithMessageAndCause;
-        ErrorReporter.unsupportedWithMessage = newUnsupportedWithMessage;
+        ExceptionFactory.exceptionWithMessage = newExceptionWithMessage;
+        ExceptionFactory.exceptionWithMessageAndCause = newExceptionWithMessageAndCause;
+        ExceptionFactory.unsupportedWithMessage = newUnsupportedWithMessage;
     }
 
     public static void initialize()
@@ -59,55 +60,66 @@ final public class ErrorReporter
 
     public static void setErrorPrinter(Printer newErrorPrinter)
     {
-        ErrorReporter.errorPrinter = newErrorPrinter;
+        ExceptionFactory.errorPrinter = newErrorPrinter;
     }
 
     public static void setPrintedMessagePrefix(String newPrintedMessagePrefix)
     {
-        ErrorReporter.printedMessagePrefix = newPrintedMessagePrefix;
+        ExceptionFactory.printedMessagePrefix = newPrintedMessagePrefix;
     }
 
-    public static void reportAndThrowIf(boolean badThingHappened, String errorText)
-    {
-        if (badThingHappened)
-        {
-            ErrorReporter.reportAndThrow(errorText);
-        }
-    }
-
-    public static void reportAndThrowIf(boolean badThingHappened, Supplier<String> errorTextSupplier)
-    {
-        if (badThingHappened)
-        {
-            ErrorReporter.reportAndThrow(errorTextSupplier.get());
-        }
-    }
-
-    public static void reportAndThrow(String errorText)
-    {
-        throw exception(errorText);
-    }
-
-    public static void reportAndThrow(String errorText, Throwable cause)
-    {
-        throw exception(errorText, cause);
-    }
-
-    public static RuntimeException exception(String errorText)
+    private static RuntimeException logAndCreateException(String errorText)
     {
         errorPrinter.println(printedMessagePrefix + errorText);
         return exceptionWithMessage.apply(errorText);
     }
 
-    public static RuntimeException exception(String errorText, Throwable cause)
+    private static RuntimeException logAndCreateException(String errorText, Throwable cause)
     {
         errorPrinter.println(printedMessagePrefix + errorText);
         return exceptionWithMessageAndCause.apply(errorText, cause);
     }
 
-    public static RuntimeException unsupported(String errorText)
+    public static ExceptionFactory exceptionByKey(String messageKey)
     {
+        return new ExceptionFactory(FormatWithPlaceholders.messageFromKey(messageKey));
+    }
+
+    public static ExceptionFactory exception(String message)
+    {
+        return new ExceptionFactory(FormatWithPlaceholders.message(message));
+    }
+
+    public ExceptionFactory with(String name, Object value)
+    {
+        this.formatter.with(name, value.toString());
+        return this;
+    }
+
+    public RuntimeException get()
+    {
+        return ExceptionFactory.logAndCreateException(this.formatter.toString());
+    }
+
+    public RuntimeException get(Throwable cause)
+    {
+        return ExceptionFactory.logAndCreateException(this.formatter.toString(), cause);
+    }
+
+    public RuntimeException getUnsupported()
+    {
+        String errorText = this.formatter.toString();
         errorPrinter.println(printedMessagePrefix + errorText);
         return unsupportedWithMessage.apply(errorText);
+    }
+
+    public void fire()
+    {
+        throw this.get();
+    }
+
+    public void fire(Throwable cause)
+    {
+        throw this.get(cause);
     }
 }

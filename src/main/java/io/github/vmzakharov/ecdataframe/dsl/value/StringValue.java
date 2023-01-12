@@ -1,6 +1,5 @@
 package io.github.vmzakharov.ecdataframe.dsl.value;
 
-import io.github.vmzakharov.ecdataframe.util.ErrorReporter;
 import io.github.vmzakharov.ecdataframe.dsl.ArithmeticOp;
 import io.github.vmzakharov.ecdataframe.dsl.PredicateOp;
 import io.github.vmzakharov.ecdataframe.dsl.UnaryOp;
@@ -12,7 +11,7 @@ extends AbstractValue
 
     public StringValue(String newValue)
     {
-        ErrorReporter.reportAndThrowIf(newValue == null, "String value cannot contain null, a void value should be used instead");
+        this.throwExceptionIfNull(newValue);
         this.value = newValue;
     }
 

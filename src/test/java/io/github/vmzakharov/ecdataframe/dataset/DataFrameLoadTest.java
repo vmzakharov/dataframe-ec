@@ -288,11 +288,11 @@ public class DataFrameLoadTest
         {
             CsvDataSet dataSet = new StringBasedCsvDataSet("Foo", "Dates",
                     "Name,Date,Count\n"
-                            + "\"Alice\",1-Jan-2020,10\n"
-                            + "\"Bob\",01-Jan-2010,11\n"
-                            + "\"Carl\",21-Nov-2005,12\n"
-                            + "\"Diane\",2-Sep-2012,13\n"
-                            + "\"Ed\","
+                    + "\"Alice\",1-Jan-2020,10\n"
+                    + "\"Bob\",01-Jan-2010,11\n"
+                    + "\"Carl\",21-Nov-2005,12\n"
+                    + "\"Diane\",2-Sep-2012,13\n"
+                    + "\"Ed\","
             );
 
             DataFrame loaded = dataSet.loadAsDataFrame();

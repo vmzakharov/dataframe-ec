@@ -1,7 +1,6 @@
 package io.github.vmzakharov.ecdataframe.dsl.visitor;
 
 import io.github.vmzakharov.ecdataframe.dataframe.DataFrame;
-import io.github.vmzakharov.ecdataframe.util.ErrorReporter;
 import io.github.vmzakharov.ecdataframe.dataset.HierarchicalDataSet;
 import io.github.vmzakharov.ecdataframe.dsl.AnonymousScript;
 import io.github.vmzakharov.ecdataframe.dsl.AssingExpr;
@@ -38,6 +37,8 @@ import org.eclipse.collections.api.list.ListIterable;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+
+import static io.github.vmzakharov.ecdataframe.util.ExceptionFactory.exceptionByKey;
 
 public class InMemoryEvaluationVisitor
 implements ExpressionEvaluationVisitor
@@ -93,7 +94,7 @@ implements ExpressionEvaluationVisitor
         {
             if (expr.getParameters().size() != functionScript.getParameterNames().size())
             {
-                ErrorReporter.reportAndThrow("Parameter count mismatch in an invocation of '" + functionName + "'");
+                exceptionByKey("DSL_EXPLICIT_PARAM_MISMATCH").with("functionName", functionName).fire();
             }
 
             functionScript.getParameterNames().forEachWithIndex(
@@ -109,14 +110,14 @@ implements ExpressionEvaluationVisitor
 
             if (functionDescriptor == null)
             {
-                ErrorReporter.reportAndThrow("Unknown function: '" + expr.getFunctionName() + "'");
+                exceptionByKey("DSL_UNKNOWN_FUN").with("functionName", expr.getFunctionName()).fire();
             }
 
             if (functionDescriptor.hasExplicitParameters())
             {
                 if (expr.getParameters().size() != functionDescriptor.getParameterNames().size())
                 {
-                    ErrorReporter.reportAndThrow("Parameter count mismatch in an invocation of '" + functionName + "'");
+                    exceptionByKey("DSL_EXPLICIT_PARAM_MISMATCH").with("functionName", functionName).fire();
                 }
 
                 functionDescriptor.getParameterNames().forEachWithIndex(
@@ -177,7 +178,10 @@ implements ExpressionEvaluationVisitor
             return new DateTimeValue((LocalDateTime) rawValue);
         }
 
-        throw ErrorReporter.exception("Don't know how to handle " + rawValue.toString() + ", type: " + rawValue.getClass().getName());
+        throw exceptionByKey("DSL_FAIL_TO_CONVERT_RAW_VAL")
+                .with("rawValue", rawValue)
+                .with("rawValueType", rawValue.getClass().getName())
+                .get();
     }
 
     @Override
@@ -203,7 +207,7 @@ implements ExpressionEvaluationVisitor
     @Override
     public Value visitFunctionScriptExpr(FunctionScript expr)
     {
-        throw ErrorReporter.exception("Cannot evaluate function declaration by itself. Function " + expr.getName());
+        throw exceptionByKey("DSL_FUN_DECLARATION_EVAL").with("functionName", expr.getName()).get();
     }
 
     @Override

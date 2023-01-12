@@ -1,9 +1,12 @@
 package io.github.vmzakharov.ecdataframe.dataframe;
 
-import io.github.vmzakharov.ecdataframe.util.ErrorReporter;
+import io.github.vmzakharov.ecdataframe.dsl.value.Value;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
+
+import static io.github.vmzakharov.ecdataframe.util.ExceptionFactory.exception;
+import static io.github.vmzakharov.ecdataframe.util.ExceptionFactory.exceptionByKey;
 
 public abstract class DfColumnAbstract
 implements DfColumn
@@ -34,7 +37,7 @@ implements DfColumn
     {
         if (this.dataFrame != null)
         {
-            ErrorReporter.reportAndThrow("Column '" + this.getName() + "' has already been linked to a data frame");
+            exceptionByKey("DF_COL_ALREADY_LINKED").with("columnName", this.getName()).fire();
         }
 
         this.dataFrame = newDataFrame;
@@ -66,7 +69,7 @@ implements DfColumn
         }
         catch (NoSuchMethodException | IllegalAccessException | InstantiationException | InvocationTargetException e)
         {
-            throw ErrorReporter.exception("Failed to instantiate a column from " + this.getName(), e);
+            throw exceptionByKey("DF_COL_CLONE_FAILED").with("name", this.getName()).get(e);
         }
 
         attachTo.addColumn(clonedColumn);
@@ -76,9 +79,16 @@ implements DfColumn
 
     protected DfColumn validateAndCreateTargetColumn(DfColumn other, DataFrame target)
     {
-        ErrorReporter.reportAndThrowIf(!this.getType().equals(other.getType()),
-                () -> "Attempting to merge columns of different types: "
-                        + this.getName() + " (" + this.getType() + ") and " + other.getName() + " (" + other.getType() + ")");
+        if (!this.getType().equals(other.getType()))
+        {
+            exception("Attempting to merge columns of different types: ${firstColumnName} (${firstColumnType})"
+                    + " and ${secondColumnName} (${secondColumnType})")
+                    .with("firstColumnName", this.getName())
+                    .with("firstColumnType", this.getType())
+                    .with("secondColumnName", other.getName())
+                    .with("secondColumnType", other.getType())
+                    .fire();
+        }
 
         target.addColumn(this.getName(), this.getType());
 
@@ -98,5 +108,14 @@ implements DfColumn
         newColumn.ensureInitialCapacity(this.getSize());
 
         return newColumn;
+
+    protected void throwAddingIncompatibleValueException(Value value)
+    {
+        exceptionByKey("DF_BAD_VAL_ADD_TO_COL")
+                .with("valueType", value.getType())
+                .with("columnName", this.getName())
+                .with("columnType", this.getType())
+                .with("value", value.asStringLiteral())
+                .fire();
     }
 }

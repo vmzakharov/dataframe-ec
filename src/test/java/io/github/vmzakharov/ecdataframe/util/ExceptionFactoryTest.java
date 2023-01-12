@@ -1,17 +1,21 @@
 package io.github.vmzakharov.ecdataframe.util;
 
+import org.eclipse.collections.api.factory.Maps;
 import org.junit.Assert;
 import org.junit.Test;
 
-public class ErrorReporterTest
+import static io.github.vmzakharov.ecdataframe.util.ExceptionFactory.exception;
+import static io.github.vmzakharov.ecdataframe.util.ExceptionFactory.exceptionByKey;
+
+public class ExceptionFactoryTest
 {
     @Test
     public void defaultExceptionType()
     {
         try
         {
-            ErrorReporter.initialize();
-            ErrorReporter.reportAndThrow("Hello");
+            ExceptionFactory.initialize();
+            exception("Hello").fire();
             Assert.fail("didn't throw");
         }
         catch (RuntimeException e)
@@ -22,14 +26,31 @@ public class ErrorReporterTest
     }
 
     @Test
+    public void exceptionMessageByKey()
+    {
+        try
+        {
+            FormatWithPlaceholders.addMessagesFromMap(Maps.mutable.with("HELLO", "Hello, ${Name}"));
+            ExceptionFactory.initialize();
+            exceptionByKey("HELLO").with("Name", "Bob").fire();
+            Assert.fail("didn't throw");
+        }
+        catch (RuntimeException e)
+        {
+            Assert.assertEquals(RuntimeException.class, e.getClass());
+            Assert.assertEquals("Hello, Bob", e.getMessage());
+        }
+    }
+
+    @Test
     public void defaultExceptionTypeWithCauseArg()
     {
         Throwable cause = new RuntimeException("Boom!");
 
         try
         {
-            ErrorReporter.initialize();
-            ErrorReporter.reportAndThrow("Hello", cause);
+            ExceptionFactory.initialize();
+            exception("Hello").fire(cause);
             Assert.fail("didn't throw");
         }
         catch (RuntimeException e)
@@ -45,8 +66,8 @@ public class ErrorReporterTest
     {
         try
         {
-            ErrorReporter.initialize();
-            throw ErrorReporter.unsupported("Do it!");
+            ExceptionFactory.initialize();
+            throw exception("Do it!").getUnsupported();
         }
         catch (UnsupportedOperationException e)
         {
@@ -60,8 +81,8 @@ public class ErrorReporterTest
     {
         try
         {
-            ErrorReporter.exceptionFactories(VerySpecialException::new, VerySpecialException::new, DontWanna::new);
-            ErrorReporter.reportAndThrow("Hello");
+            ExceptionFactory.exceptionFactories(VerySpecialException::new, VerySpecialException::new, DontWanna::new);
+            exception("Hello").fire();
             Assert.fail("didn't throw");
         }
         catch (RuntimeException e)
@@ -76,8 +97,8 @@ public class ErrorReporterTest
     {
         try
         {
-            ErrorReporter.exceptionFactories(VerySpecialException::new, VerySpecialException::new, DontWanna::new);
-            throw ErrorReporter.unsupported("Do it!");
+            ExceptionFactory.exceptionFactories(VerySpecialException::new, VerySpecialException::new, DontWanna::new);
+            throw exception("Do it!").getUnsupported();
         }
         catch (UnsupportedOperationException e)
         {
@@ -93,8 +114,8 @@ public class ErrorReporterTest
 
         try
         {
-            ErrorReporter.exceptionFactories(VerySpecialException::new, VerySpecialException::new, DontWanna::new);
-            ErrorReporter.reportAndThrow("Hello", cause);
+            ExceptionFactory.exceptionFactories(VerySpecialException::new, VerySpecialException::new, DontWanna::new);
+            exception("Hello").fire(cause);
             Assert.fail("didn't throw");
         }
         catch (RuntimeException e)
@@ -109,12 +130,12 @@ public class ErrorReporterTest
     public void errorPrinter()
     {
         CollectingPrinter printer = new CollectingPrinter();
-        ErrorReporter.setPrintedMessagePrefix("Boo-boo: ");
-        ErrorReporter.setErrorPrinter(printer);
+        ExceptionFactory.setPrintedMessagePrefix("Boo-boo: ");
+        ExceptionFactory.setErrorPrinter(printer);
 
         try
         {
-            ErrorReporter.reportAndThrow("ouch");
+            exception("ouch").fire();
         }
         catch (RuntimeException e)
         {
@@ -125,7 +146,7 @@ public class ErrorReporterTest
 
         try
         {
-            ErrorReporter.reportAndThrow("ow-ow", new RuntimeException("Nothing to see here"));
+            exception("ow-ow").fire(new RuntimeException("Nothing to see here"));
         }
         catch (RuntimeException e)
         {
@@ -136,14 +157,14 @@ public class ErrorReporterTest
 
         try
         {
-            ErrorReporter.unsupported("oh, well");
+            throw exception("oh, well").getUnsupported();
         }
         catch (UnsupportedOperationException e)
         {
             Assert.assertEquals("Boo-boo: oh, well\n", printer.toString());
         }
 
-        ErrorReporter.initialize();
+        ExceptionFactory.initialize();
     }
 
     private static class VerySpecialException
@@ -161,7 +182,7 @@ public class ErrorReporterTest
     }
 
     private static class DontWanna
-    extends UnsupportedOperationException
+            extends UnsupportedOperationException
     {
         public DontWanna(String message)
         {

@@ -1,6 +1,5 @@
 package io.github.vmzakharov.ecdataframe.dataset;
 
-import io.github.vmzakharov.ecdataframe.util.ErrorReporter;
 import io.github.vmzakharov.ecdataframe.dsl.value.ValueType;
 import org.eclipse.collections.api.factory.Maps;
 import org.eclipse.collections.api.list.ListIterable;
@@ -18,6 +17,8 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.chrono.ChronoLocalDate;
 import java.time.chrono.ChronoLocalDateTime;
+
+import static io.github.vmzakharov.ecdataframe.util.ExceptionFactory.exceptionByKey;
 
 public class ObjectListDataSet
 extends HierarchicalDataSet
@@ -49,7 +50,7 @@ extends HierarchicalDataSet
             return this.items.get(this.index);
         }
 
-        throw ErrorReporter.exception("No more elements in data set " + this.getName());
+        throw exceptionByKey("OBJ_END_OF_DATA_SET").with("dataSetName", this.getName()).get();
     }
 
     @Override
@@ -84,7 +85,7 @@ extends HierarchicalDataSet
             }
             catch (Throwable e)
             {
-                ErrorReporter.reportAndThrow("Failed to invoke " + methodHandle, e);
+                exceptionByKey("OBJ_METHOD_INVOKE_FAIL").with("methodDetails", methodHandle).fire(e);
             }
         }
         return currentValue;
@@ -107,7 +108,8 @@ extends HierarchicalDataSet
 
             if (elementMethod == null)
             {
-                ErrorReporter.reportAndThrow("Unable to find " + element + " on " + currentClass.getName());
+                exceptionByKey("OBJ_PROPERTY_NOT_FOUND")
+                        .with("property", element).with("className", currentClass.getName()).fire();
             }
 
             MethodHandle elementHandle;
@@ -119,7 +121,10 @@ extends HierarchicalDataSet
             }
             catch (IllegalAccessException e)
             {
-                throw ErrorReporter.exception("Failed to lookup method for " + element + " on " + currentClass.getName(), e);
+                throw exceptionByKey("OBJ_PROPERTY_NOT_FOUND")
+                        .with("property", element)
+                        .with("className", currentClass.getName())
+                        .get(e);
             }
 
             getters.add(elementHandle);
@@ -148,7 +153,8 @@ extends HierarchicalDataSet
 
             if (elementMethod == null)
             {
-                ErrorReporter.reportAndThrow("Unable to find " + element + " on " + currentClass.getName());
+                exceptionByKey("OBJ_PROPERTY_NOT_FOUND")
+                        .with("property", element).with("className", currentClass.getName()).fire();
             }
 
             currentClass = elementMethod.getReturnType();
@@ -188,7 +194,7 @@ extends HierarchicalDataSet
     {
         if (this.items.size() == 0)
         {
-            ErrorReporter.reportAndThrow("The data set " + this.getName() + " contains no data");
+            exceptionByKey("OBJ_EMPTY_DATA_SET_ACCESS").with("dataSetName", this.getName()).fire();
         }
 
         return this.items.get(0);

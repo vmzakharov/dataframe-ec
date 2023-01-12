@@ -1,6 +1,5 @@
 package io.github.vmzakharov.ecdataframe.dsl.function;
 
-import io.github.vmzakharov.ecdataframe.util.ErrorReporter;
 import io.github.vmzakharov.ecdataframe.dsl.EvalContext;
 import io.github.vmzakharov.ecdataframe.dsl.FunctionDescriptor;
 import io.github.vmzakharov.ecdataframe.dsl.value.Value;
@@ -8,6 +7,8 @@ import io.github.vmzakharov.ecdataframe.dsl.value.ValueType;
 import io.github.vmzakharov.ecdataframe.dsl.value.VectorValue;
 import org.eclipse.collections.api.list.ListIterable;
 import org.eclipse.collections.impl.factory.Lists;
+
+import static io.github.vmzakharov.ecdataframe.util.ExceptionFactory.exceptionByKey;
 
 public abstract class IntrinsicFunctionDescriptor
 implements FunctionDescriptor
@@ -61,8 +62,7 @@ implements FunctionDescriptor
 
     public Value evaluate(VectorValue parameters)
     {
-        ErrorReporter.reportAndThrow("Function " + this.name + " is not implemented");
-        return Value.VOID;
+        throw exceptionByKey("DSL_FUN_NOT_IMPLEMENTED").with("functionName", this.name).get();
     }
 
     public String usageString()
@@ -77,22 +77,31 @@ implements FunctionDescriptor
 
     protected void assertParameterCount(int expectedCount, int actualCount)
     {
-        ErrorReporter.reportAndThrowIf(
-                expectedCount != actualCount,
-                () -> "Invalid number of parameters in a call to '" + this.getName() + "'. " + this.usageString());
+        if (expectedCount != actualCount)
+        {
+            exceptionByKey("DSL_INVALID_PARAM_COUNT")
+                    .with("functionName", this.getName()).with("usageString", this.usageString())
+                    .fire();
+        }
     }
 
     protected void assertParameterType(ValueType expected, ValueType actual)
     {
-        ErrorReporter.reportAndThrowIf(
-                expected != actual,
-                () -> "Invalid parameter type in a call to '" + this.getName() + "'. " + this.usageString());
+        if (expected != actual)
+        {
+            exceptionByKey("DSL_INVALID_PARAMETER_TYPE")
+                    .with("functionName", this.getName()).with("usageString", this.usageString())
+                    .fire();
+        }
     }
 
     protected void assertParameterType(ListIterable<ValueType> expected, ValueType actual)
     {
-        ErrorReporter.reportAndThrowIf(
-                !expected.contains(actual),
-                () -> "Invalid parameter type in a call to '" + this.getName() + "'. " + this.usageString());
+        if (!expected.contains(actual))
+        {
+            exceptionByKey("DSL_INVALID_PARAMETER_TYPE")
+                    .with("functionName", this.getName()).with("usageString", this.usageString())
+                    .fire();
+        }
     }
 }

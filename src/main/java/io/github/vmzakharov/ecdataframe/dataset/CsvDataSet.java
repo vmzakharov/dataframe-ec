@@ -6,7 +6,6 @@ import io.github.vmzakharov.ecdataframe.dataframe.DfDateColumn;
 import io.github.vmzakharov.ecdataframe.dataframe.DfDateTimeColumn;
 import io.github.vmzakharov.ecdataframe.dataframe.DfDoubleColumn;
 import io.github.vmzakharov.ecdataframe.dataframe.DfLongColumn;
-import io.github.vmzakharov.ecdataframe.util.ErrorReporter;
 import io.github.vmzakharov.ecdataframe.dsl.value.ValueType;
 import org.eclipse.collections.api.block.procedure.Procedure;
 import org.eclipse.collections.api.list.ListIterable;
@@ -38,6 +37,8 @@ import static io.github.vmzakharov.ecdataframe.dsl.value.ValueType.DATE_TIME;
 import static io.github.vmzakharov.ecdataframe.dsl.value.ValueType.DOUBLE;
 import static io.github.vmzakharov.ecdataframe.dsl.value.ValueType.LONG;
 import static io.github.vmzakharov.ecdataframe.dsl.value.ValueType.STRING;
+import static io.github.vmzakharov.ecdataframe.util.ExceptionFactory.exception;
+import static io.github.vmzakharov.ecdataframe.util.ExceptionFactory.exceptionByKey;
 
 public class CsvDataSet
 extends DataSetAbstract
@@ -170,7 +171,7 @@ extends DataSetAbstract
         }
         catch (IOException e)
         {
-            throw ErrorReporter.exception("Failed write data frame to '" + this.getDataFileName() + "'", e);
+            throw exceptionByKey("CSV_FILE_WRITE_FAIL").get(e);
         }
     }
 
@@ -218,8 +219,8 @@ extends DataSetAbstract
                     valueAsLiteral = this.formatterForColumn(columnIndex).format(dateTimeValue);
                     break;
                 default:
-                    ErrorReporter.reportAndThrow("Do not know how to convert value of type " + dfColumn.getType() + " to a string");
-                    valueAsLiteral = "";
+                    throw exceptionByKey("CSV_UNSUPPORTED_VAL_TO_STR")
+                            .with("valueType", dfColumn.getType()).get();
             }
         }
 
@@ -335,92 +336,10 @@ extends DataSetAbstract
         }
         catch (IOException e)
         {
-            ErrorReporter.reportAndThrow("Failed to infer schema from  '" + this.getDataFileName() + "'", e);
+            exceptionByKey("CSV_INFER_SCHEMA_FAIL").with("fileName", this.getDataFileName()).fire(e);
         }
 
         return this.schema;
-    }
-
-    private DataFrame loadFlexi()
-    {
-        DataFrame df = new DataFrame(this.getName());
-        df.enablePooling();
-
-        if (this.schemaIsNotDefined())
-        {
-            this.schema = new CsvSchema(); // provides default separators, quote characters, etc.
-        }
-
-        try (BufferedReader reader = new BufferedReader(this.createReader(), BUFFER_SIZE))
-        {
-            MutableList<String> headers = this.splitMindingQs(reader.readLine()).collect(this::removeSurroundingQuotes);
-
-            if (headers.anySatisfy(String::isEmpty))
-            {
-                ErrorReporter.reportAndThrow("Error parsing a CSV file: a column header cannot be empty");
-            }
-
-            String dataRow = reader.readLine();
-
-            if (dataRow == null) // no data, just headers
-            {
-                if (this.getSchema().columnCount() == 0)
-                {
-                    headers.forEach(header -> this.schema.addColumn(header, STRING));
-                }
-
-                this.getSchema().getColumns().forEach(col -> df.addColumn(col.getName(), col.getType()));
-
-                return df;
-            }
-
-            MutableList<String> lineBuffer = Lists.mutable.withInitialCapacity(LINE_COUNT_FOR_TYPE_INFERENCE);
-            lineBuffer.add(dataRow);
-
-            // the schema is empty, need to infer columns properties from the first lineCountForTypeInference columns
-            if (this.getSchema().columnCount() == 0)
-            {
-                int loadedLineCount = 1; // already have one in the buffer
-                while (loadedLineCount++ < LINE_COUNT_FOR_TYPE_INFERENCE
-                        && (dataRow = reader.readLine()) != null)
-                {
-                    lineBuffer.add(dataRow);
-                }
-                this.inferSchema(headers, lineBuffer);
-            }
-            else if (headers.size() != this.schema.columnCount())
-            {
-                ErrorReporter.reportAndThrow(String.format(
-                        "The number of elements in the header does not match the number of columns in the schema %d vs %d",
-                        headers.size(), this.schema.columnCount()));
-            }
-
-            MutableList<Procedure<String>> columnPopulators = Lists.mutable.of();
-
-            this.getSchema().getColumns().forEach(col -> this.addDataFrameColumn(df, col, columnPopulators));
-
-            int columnCount = this.getSchema().columnCount();
-            MutableList<String> lineElements = Lists.mutable.withInitialCapacity(columnCount);
-
-            int lineNumber = 0;
-
-//            while (
-//                    (dataRow = this.getNextLine(lineBuffer, reader, lineNumber)) != null
-//                            && (loadAllLines || (lineNumber < headLineCount))
-//            )
-//            {
-//                this.parseAndAddLineToDataFrame(dataRow, lineElements, columnCount, columnPopulators);
-//                lineNumber++;
-//            }
-
-            df.seal();
-        }
-        catch (IOException e)
-        {
-            ErrorReporter.reportAndThrow("Failed to load as a data frame '" + this.getDataFileName() + "'", e);
-        }
-
-        return df;
     }
 
     private DataFrame loadAsDataFrame(int headLineCount, boolean loadAllLines)
@@ -447,7 +366,7 @@ extends DataSetAbstract
 
                 if (headers.anySatisfy(String::isEmpty))
                 {
-                    ErrorReporter.reportAndThrow("Error parsing a CSV file: a column header cannot be empty");
+                    exceptionByKey("CSV_MISSING_COL_HEADER").fire();
                 }
             }
             else
@@ -485,19 +404,20 @@ extends DataSetAbstract
             }
             else if (headers.size() != this.schema.columnCount())
             {
-                ErrorReporter.reportAndThrow(String.format(
-                                "The number of elements in the header (%d) does not match the number of columns in the schema (%d)",
-                                headers.size(), this.schema.columnCount()));
+                exceptionByKey("CSV_SCHEMA_FILE_HEADER_MISMATCH")
+                    .with("headerCount", headers.size())
+                    .with("schemaColumnCount", this.schema.columnCount())
+                    .fire();
             }
             else
             {
                 MutableList<String> schemaColumnNames = this.schema.getColumns().collect(CsvSchemaColumn::getName);
                 if (!headers.equals(schemaColumnNames))
                 {
-                    ErrorReporter.reportAndThrow(
-                        "Mismatch between the column header names in the data set " + headers.makeString("[", ",", "]")
-                        + " and in the schema: " + schemaColumnNames.makeString("[", ",", "]")
-                        );
+                    exceptionByKey("CSV_SCHEMA_HEADER_NAME_MISMATCH")
+                            .with("headerColumnList", headers.makeString("[", ",", "]"))
+                            .with("schemaColumnList", schemaColumnNames.makeString("[", ",", "]"))
+                            .fire();
                 }
             }
 
@@ -523,7 +443,7 @@ extends DataSetAbstract
         }
         catch (IOException e)
         {
-            ErrorReporter.reportAndThrow("Failed to load as a data frame '" + this.getDataFileName() + "'", e);
+            exceptionByKey("CSV_FILE_LOAD_FAIL").with("fileName", this.getDataFileName()).fire(e);
         }
 
         return df;
@@ -584,7 +504,7 @@ extends DataSetAbstract
                 columnPopulators.add(s -> lastColumn.addObject(schemaCol.parseAsDecimal(s)));
                 break;
             default:
-                throw ErrorReporter.exception("Don't know what to do with the column type: " + columnType);
+                throw exceptionByKey("CSV_POPULATING_BAD_COL_TYPE").with("columnType", columnType).get();
         }
     }
 
@@ -603,9 +523,12 @@ extends DataSetAbstract
 
             if (headers.size() != elements.size())
             {
-                ErrorReporter.reportAndThrow(
-                        "The number of elements in the header does not match the number of elements in the data row " + (lineIndex + 1) + " ("
-                                + headers.size() + " vs " + elements.size() + ")");
+                exception("The number of elements in the header does not match the number of elements in the data row ${rowIndex} "
+                        + "(${headerElementCount} vs ${rowElementCount})")
+                        .with("rowIndex", lineIndex + 1)
+                        .with("headerElementCount", headers.size())
+                        .with("rowElementCount", elements.size())
+                        .fire();
             }
 
             for (int columnIndex = 0; columnIndex < columnCount; columnIndex++)
@@ -703,10 +626,13 @@ extends DataSetAbstract
 
         if (this.getSchema().columnCount() != elements.size())
         {
-            ErrorReporter.reportAndThrow(
-                    "The number of columns in the schema (" + this.getSchema().columnCount()
-                    + ") does not match the number of elements in the data row  (" + elements.size() + "): "
-                    + line);
+            exception(
+                    "The number of columns in the schema (${schemaColumnCount}"
+                    + ") does not match the number of elements in the data row  (${rowElementCount}): ${dataRow}")
+                    .with("schemaColumnCount", this.getSchema().columnCount())
+                    .with("rowElementCount", elements.size())
+                    .with("dataRow", line)
+                    .fire();
         }
 
         for (int i = 0; i < columnCount; i++)
@@ -823,7 +749,7 @@ extends DataSetAbstract
             {
                 if (insideQuotes && !this.isQuote(curChar))
                 {
-                    this.throwBadFormat("Unbalanced quotes at index " + index + " in " + aString);
+                    throw exceptionByKey("CSV_UNBALANCED_QUOTES").with("index", index).with("string", aString).get();
                 }
                 if (this.isTokenSeparator(curChar))
                 {
@@ -872,11 +798,6 @@ extends DataSetAbstract
                 }
             }
         }
-    }
-
-    private void throwBadFormat(String message)
-    {
-        throw ErrorReporter.exception(message);
     }
 
     private boolean isTokenSeparator(char aChar)

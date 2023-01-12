@@ -1,12 +1,13 @@
 package io.github.vmzakharov.ecdataframe.dsl;
 
-import io.github.vmzakharov.ecdataframe.util.ErrorReporter;
 import io.github.vmzakharov.ecdataframe.dsl.value.BooleanValue;
 import io.github.vmzakharov.ecdataframe.dsl.value.Value;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+
+import static io.github.vmzakharov.ecdataframe.util.ExceptionFactory.exceptionByKey;
 
 public interface PredicateOp
 extends BinaryOp
@@ -15,7 +16,7 @@ extends BinaryOp
     {
         if (operand1.isVoid() || operand2.isVoid())
         {
-            ErrorReporter.reportAndThrow("Cannot apply " + this.asString() + " operation to null values");
+            throw this.unsupportedOn("null values");
         }
 
         return operand1.applyPredicate(operand2, this);
@@ -23,31 +24,39 @@ extends BinaryOp
 
     default BooleanValue applyString(String operand1, String operand2)
     {
-        throw ErrorReporter.unsupported("Cannot apply '" + this.asString() + "' to strings");
+        throw this.unsupportedOn("strings");
     }
 
     default BooleanValue applyDecimal(BigDecimal operand1, BigDecimal operand2)
     {
-        throw ErrorReporter.unsupported("Cannot apply '" + this.asString() + "' to decimals");
+        throw this.unsupportedOn("decimals");
     }
 
     default BooleanValue applyDate(LocalDate operand1, LocalDate operand2)
     {
-        throw ErrorReporter.unsupported("Cannot apply '" + this.asString() + "' to dates");
+        throw this.unsupportedOn("dates");
     }
 
     default BooleanValue applyDateTime(LocalDateTime operand1, LocalDateTime operand2)
     {
-        throw ErrorReporter.unsupported("Cannot apply '" + this.asString() + "' to datetime values");
+        throw this.unsupportedOn("datetime values");
     }
 
     default BooleanValue applyLong(long operand1, long operand2)
     {
-        throw ErrorReporter.unsupported("Cannot apply '" + this.asString() + "' to longs");
+        throw this.unsupportedOn("longs");
     }
 
     default BooleanValue applyDouble(double operand1, double operand2)
     {
-        throw ErrorReporter.unsupported("Cannot apply '" + this.asString() + "' to doubles");
+        throw this.unsupportedOn("doubles");
+    }
+
+    default RuntimeException unsupportedOn(String type)
+    {
+        return exceptionByKey("DSL_OP_NOT_SUPPORTED")
+                .with("operation", this.asString())
+                .with("type", type)
+                .getUnsupported();
     }
 }

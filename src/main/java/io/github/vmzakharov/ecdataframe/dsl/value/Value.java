@@ -1,12 +1,13 @@
 package io.github.vmzakharov.ecdataframe.dsl.value;
 
-import io.github.vmzakharov.ecdataframe.util.ErrorReporter;
 import io.github.vmzakharov.ecdataframe.dsl.ArithmeticOp;
 import io.github.vmzakharov.ecdataframe.dsl.Expression;
 import io.github.vmzakharov.ecdataframe.dsl.PredicateOp;
 import io.github.vmzakharov.ecdataframe.dsl.UnaryOp;
 import io.github.vmzakharov.ecdataframe.dsl.visitor.ExpressionEvaluationVisitor;
 import io.github.vmzakharov.ecdataframe.dsl.visitor.ExpressionVisitor;
+
+import static io.github.vmzakharov.ecdataframe.util.ExceptionFactory.exceptionByKey;
 
 public interface Value
 extends Expression, Comparable<Value>
@@ -41,18 +42,23 @@ extends Expression, Comparable<Value>
 
     default Value apply(Value another, ArithmeticOp operation)
     {
-        ErrorReporter.reportAndThrow("Undefined operation " + operation.asString() + " on " + this.asStringLiteral());
-        return null;
+        throw exceptionByKey("DSL_UNDEFINED_OP_ON_VALUE")
+            .with("operation", operation.asString()).with("value", this.asStringLiteral())
+            .getUnsupported();
     }
 
     default Value apply(UnaryOp operation)
     {
-        throw ErrorReporter.unsupported("Undefined operation " + operation.asString() + " on " + this.asStringLiteral());
+        throw exceptionByKey("DSL_UNDEFINED_OP_ON_VALUE")
+            .with("operation", operation.asString()).with("value", this.asStringLiteral())
+            .getUnsupported();
     }
 
     default BooleanValue applyPredicate(Value another, PredicateOp operation)
     {
-        throw ErrorReporter.unsupported("Undefined operation " + operation.asString() + " on " + this.asStringLiteral());
+        throw exceptionByKey("DSL_UNDEFINED_OP_ON_VALUE")
+            .with("operation", operation.asString()).with("value", this.asStringLiteral())
+            .getUnsupported();
     }
 
     @Override
@@ -68,6 +74,12 @@ extends Expression, Comparable<Value>
     }
 
     ValueType getType();
+
+    @Override
+    default int compareTo(Value o)
+    {
+        throw exceptionByKey("DSL_COMPARE_NOT_SUPPORTED").with("type", this.getType()).getUnsupported();
+    }
 
     default boolean isVoid()
     {

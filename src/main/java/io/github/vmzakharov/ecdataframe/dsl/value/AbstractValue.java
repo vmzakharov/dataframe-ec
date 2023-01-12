@@ -1,10 +1,18 @@
 package io.github.vmzakharov.ecdataframe.dsl.value;
 
-import io.github.vmzakharov.ecdataframe.util.ErrorReporter;
+import static io.github.vmzakharov.ecdataframe.util.ExceptionFactory.exceptionByKey;
 
 abstract public class AbstractValue
 implements Value
 {
+
+    public void throwExceptionIfNull(Object newValue)
+    {
+        if (newValue == null)
+        {
+            exceptionByKey("DSL_NULL_VALUE_NOT_ALLOWED").with("type", this.getType()).fire();
+        }
+    }
 
     @Override
     public String toString()
@@ -16,12 +24,16 @@ implements Value
     {
         if (null == other)
         {
-            throw ErrorReporter.unsupported("Cannot compare a " + this.getClass().getName() + " to null");
+            throw exceptionByKey("DSL_COMPARE_TO_NULL")
+                    .with("className",  this.getClass().getSimpleName()).getUnsupported();
         }
 
         if (!other.isVoid() && (this.getClass() != other.getClass()))
         {
-            throw ErrorReporter.unsupported("Cannot compare a " + this.getClass().getName() + " to a " + other.getClass().getName());
+            throw exceptionByKey("DSL_COMPARE_INCOMPATIBLE")
+                    .with("thisClassName",  this.getClass().getSimpleName())
+                    .with("otherClassName", other.getClass().getSimpleName())
+                    .getUnsupported();
         }
     }
 }

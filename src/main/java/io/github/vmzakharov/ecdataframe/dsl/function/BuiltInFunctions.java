@@ -1,6 +1,5 @@
 package io.github.vmzakharov.ecdataframe.dsl.function;
 
-import io.github.vmzakharov.ecdataframe.util.ErrorReporter;
 import io.github.vmzakharov.ecdataframe.dsl.EvalContext;
 import io.github.vmzakharov.ecdataframe.dsl.value.BooleanValue;
 import io.github.vmzakharov.ecdataframe.dsl.value.DateTimeValue;
@@ -35,6 +34,7 @@ import static io.github.vmzakharov.ecdataframe.dsl.value.ValueType.DOUBLE;
 import static io.github.vmzakharov.ecdataframe.dsl.value.ValueType.LONG;
 import static io.github.vmzakharov.ecdataframe.dsl.value.ValueType.STRING;
 import static io.github.vmzakharov.ecdataframe.dsl.value.ValueType.VECTOR;
+import static io.github.vmzakharov.ecdataframe.util.ExceptionFactory.exceptionByKey;
 
 final public class BuiltInFunctions
 {
@@ -172,7 +172,9 @@ final public class BuiltInFunctions
                 int parameterCount = parameters.size();
                 if (parameterCount != 2 && parameterCount != 3)
                 {
-                    ErrorReporter.reportAndThrow("Invalid number of parameters in a call to '" + this.getName() + "'. " + this.usageString());
+                    exceptionByKey("DSL_INVALID_PARAM_COUNT")
+                            .with("functionName", this.getName()).with("usageString", this.usageString())
+                            .fire();
                 }
 
                 Value stringParam = parameters.get(0);
