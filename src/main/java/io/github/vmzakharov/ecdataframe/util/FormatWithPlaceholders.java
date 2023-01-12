@@ -12,8 +12,6 @@ import java.util.function.Supplier;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import static io.github.vmzakharov.ecdataframe.util.ExceptionFactory.exception;
-
 public class FormatWithPlaceholders
 {
     private static MutableMap<String, String> messagesByKey = Maps.mutable.of();
@@ -36,11 +34,11 @@ public class FormatWithPlaceholders
         while (keys.hasMoreElements())
         {
             String key = keys.nextElement();
-            addMessageByKey(key, resourceBundle.getString(key));
+            addMessage(key, resourceBundle.getString(key));
         }
     }
 
-    static private void addMessageByKey(String key, String message)
+    public static void addMessage(String key, String message)
     {
         messagesByKey.put(key, message);
     }
@@ -53,20 +51,16 @@ public class FormatWithPlaceholders
 
     public static void addMessagesFromProperties(Properties properties)
     {
-        properties.stringPropertyNames().forEach(name -> addMessageByKey(name, properties.getProperty(name)));
+        properties.stringPropertyNames().forEach(name -> addMessage(name, properties.getProperty(name)));
     }
 
     public static void addMessagesFromMap(Map<String, String> newMessagesByKey)
     {
-        MapIterate.forEachKeyValue(newMessagesByKey, FormatWithPlaceholders::addMessageByKey);
+        MapIterate.forEachKeyValue(newMessagesByKey, FormatWithPlaceholders::addMessage);
     }
 
     public FormatWithPlaceholders with(String name, String value)
     {
-        if (this.valuesByName.containsKey(name))
-        {
-            exception("Attempting to set error message template value twice for ${name}").with("name", name).fire();
-        }
         this.valuesByName.put(name, value);
         return this;
     }

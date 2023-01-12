@@ -9,7 +9,7 @@ import org.eclipse.collections.api.map.MapIterable;
 import org.eclipse.collections.api.map.MutableMap;
 import org.eclipse.collections.impl.factory.Maps;
 
-import static io.github.vmzakharov.ecdataframe.util.ExceptionFactory.exception;
+import static io.github.vmzakharov.ecdataframe.util.ExceptionFactory.exceptionByKey;
 
 public class DataFrameEvalContext
 extends EvalContextAbstract
@@ -90,7 +90,7 @@ extends EvalContextAbstract
     @Override
     public void removeVariable(String variableName)
     {
-        exception("Cannot remove a variable from a data frame evaluation context").fire();
+        exceptionByKey("DSL_ATTEMPT_TO_REMOVE_DF_VAR").fire();
     }
 
     @Override
@@ -114,7 +114,7 @@ extends EvalContextAbstract
     @Override
     public void addDataSet(HierarchicalDataSet dataSet)
     {
-        exception("Cannot add a data set to a data frame evaluation context").fire();
+        exceptionByKey("DSL_DF_EVAL_NO_DATASET").fire();
     }
 
     @Override
@@ -132,7 +132,7 @@ extends EvalContextAbstract
     @Override
     public void removeAllVariables()
     {
-        throw exception("Cannot remove variables from a data frame evaluation context").getUnsupported();
+        throw exceptionByKey("DSL_ATTEMPT_TO_REMOVE_DF_VAR").getUnsupported();
     }
 
     public DataFrame getDataFrame()

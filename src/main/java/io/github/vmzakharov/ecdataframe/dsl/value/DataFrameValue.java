@@ -2,7 +2,7 @@ package io.github.vmzakharov.ecdataframe.dsl.value;
 
 import io.github.vmzakharov.ecdataframe.dataframe.DataFrame;
 
-import static io.github.vmzakharov.ecdataframe.util.ExceptionFactory.exception;
+import static io.github.vmzakharov.ecdataframe.util.ExceptionFactory.exceptionByKey;
 
 public class DataFrameValue
 extends AbstractValue
@@ -41,6 +41,6 @@ extends AbstractValue
     @Override
     public int compareTo(Value o)
     {
-        throw exception("Data Frame value comparison is not supported").getUnsupported();
+        throw exceptionByKey("DSL_DF_COMPARE_UNSUPPORTED").getUnsupported();
     }
 }

@@ -34,7 +34,7 @@ import static io.github.vmzakharov.ecdataframe.dsl.value.ValueType.DOUBLE;
 import static io.github.vmzakharov.ecdataframe.dsl.value.ValueType.LONG;
 import static io.github.vmzakharov.ecdataframe.dsl.value.ValueType.STRING;
 import static io.github.vmzakharov.ecdataframe.dsl.value.ValueType.VECTOR;
-import static io.github.vmzakharov.ecdataframe.util.ExceptionFactory.exception;
+import static io.github.vmzakharov.ecdataframe.util.ExceptionFactory.exceptionByKey;
 
 final public class BuiltInFunctions
 {
@@ -172,7 +172,7 @@ final public class BuiltInFunctions
                 int parameterCount = parameters.size();
                 if (parameterCount != 2 && parameterCount != 3)
                 {
-                    exception("Invalid number of parameters in a call to '${functionName}'. ${usageString}")
+                    exceptionByKey("DSL_INVALID_PARAM_COUNT")
                             .with("functionName", this.getName()).with("usageString", this.usageString())
                             .fire();
                 }

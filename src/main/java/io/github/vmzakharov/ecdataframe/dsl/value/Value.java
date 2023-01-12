@@ -7,7 +7,7 @@ import io.github.vmzakharov.ecdataframe.dsl.UnaryOp;
 import io.github.vmzakharov.ecdataframe.dsl.visitor.ExpressionEvaluationVisitor;
 import io.github.vmzakharov.ecdataframe.dsl.visitor.ExpressionVisitor;
 
-import static io.github.vmzakharov.ecdataframe.util.ExceptionFactory.exception;
+import static io.github.vmzakharov.ecdataframe.util.ExceptionFactory.exceptionByKey;
 
 public interface Value
 extends Expression, Comparable<Value>
@@ -42,24 +42,23 @@ extends Expression, Comparable<Value>
 
     default Value apply(Value another, ArithmeticOp operation)
     {
-        exception("Undefined operation ${operation} on ${value}")
-            .with("operation", operation.asString()).with("value", this.asStringLiteral()).fire();
-
-        return null;
+        throw exceptionByKey("DSL_UNDEFINED_OP_ON_VALUE")
+            .with("operation", operation.asString()).with("value", this.asStringLiteral())
+            .getUnsupported();
     }
 
     default Value apply(UnaryOp operation)
     {
-        throw exception("Undefined operation ${operation} on ${value}")
-                .with("operation", operation.asString()).with("value", this.asStringLiteral())
-                .getUnsupported();
+        throw exceptionByKey("DSL_UNDEFINED_OP_ON_VALUE")
+            .with("operation", operation.asString()).with("value", this.asStringLiteral())
+            .getUnsupported();
     }
 
     default BooleanValue applyPredicate(Value another, PredicateOp operation)
     {
-        throw exception("Undefined operation ${operation} on ${value}")
-                .with("operation", operation.asString()).with("value", this.asStringLiteral())
-                .getUnsupported();
+        throw exceptionByKey("DSL_UNDEFINED_OP_ON_VALUE")
+            .with("operation", operation.asString()).with("value", this.asStringLiteral())
+            .getUnsupported();
     }
 
     @Override
@@ -79,7 +78,7 @@ extends Expression, Comparable<Value>
     @Override
     default int compareTo(Value o)
     {
-        throw exception("Cannot compare values of type ${type}").with("type", this.getType()).getUnsupported();
+        throw exceptionByKey("DSL_COMPARE_NOT_SUPPORTED").with("type", this.getType()).getUnsupported();
     }
 
     default boolean isVoid()

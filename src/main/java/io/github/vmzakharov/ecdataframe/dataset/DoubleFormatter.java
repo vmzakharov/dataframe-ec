@@ -7,7 +7,7 @@ import java.text.DecimalFormat;
 import java.text.ParseException;
 import java.util.regex.Pattern;
 
-import static io.github.vmzakharov.ecdataframe.util.ExceptionFactory.exception;
+import static io.github.vmzakharov.ecdataframe.util.ExceptionFactory.exceptionByKey;
 
 public class DoubleFormatter
 {
@@ -36,7 +36,8 @@ public class DoubleFormatter
                 }
                 catch (ParseException e)
                 {
-                    throw exception("Failed to parse input string as a floating point number '${inputString}'")
+                    throw exceptionByKey("CSV_PARSE_ERR")
+                            .with("type", "a floating point number")
                             .with("inputString", s).get(e);
                 }
             };

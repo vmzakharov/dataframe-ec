@@ -9,7 +9,7 @@ import io.github.vmzakharov.ecdataframe.dsl.value.Value;
 import java.math.BigDecimal;
 import java.math.MathContext;
 
-import static io.github.vmzakharov.ecdataframe.util.ExceptionFactory.exception;
+import static io.github.vmzakharov.ecdataframe.util.ExceptionFactory.exceptionByKey;
 
 public interface ArithmeticOp
         extends BinaryOp
@@ -144,7 +144,10 @@ public interface ArithmeticOp
 
     default Value applyString(String operand1, String operand2)
     {
-        throw exception("Cannot apply '${operation}' to String").with("operation", this.asString()).getUnsupported();
+        throw exceptionByKey("DSL_OP_NOT_SUPPORTED")
+                .with("operation", this.asString())
+                .with("type", "String")
+                .getUnsupported();
     }
 
     Value applyLong(long operand1, long operand2);

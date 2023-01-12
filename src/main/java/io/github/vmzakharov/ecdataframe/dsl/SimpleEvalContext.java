@@ -6,7 +6,7 @@ import org.eclipse.collections.api.RichIterable;
 import org.eclipse.collections.api.map.MutableMap;
 import org.eclipse.collections.impl.factory.Maps;
 
-import static io.github.vmzakharov.ecdataframe.util.ExceptionFactory.exception;
+import static io.github.vmzakharov.ecdataframe.util.ExceptionFactory.exceptionByKey;
 
 public class SimpleEvalContext
 extends EvalContextAbstract
@@ -20,7 +20,7 @@ extends EvalContextAbstract
 
         if (value == null)
         {
-            exception("Uninitialized variable: ${variableName}").with("variableName", newVariableName).fire();
+            exceptionByKey("DSL_VAR_UNINITIALIZED").with("variableName", newVariableName).fire();
         }
 
         return value;

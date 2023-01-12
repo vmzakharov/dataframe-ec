@@ -7,7 +7,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
-import static io.github.vmzakharov.ecdataframe.util.ExceptionFactory.exception;
+import static io.github.vmzakharov.ecdataframe.util.ExceptionFactory.exceptionByKey;
 
 public interface PredicateOp
 extends BinaryOp
@@ -54,6 +54,9 @@ extends BinaryOp
 
     default RuntimeException unsupportedOn(String type)
     {
-        return exception("Cannot apply '${operation}' to ${type}").with("operation", this.asString()).with("type", type).getUnsupported();
+        return exceptionByKey("DSL_OP_NOT_SUPPORTED")
+                .with("operation", this.asString())
+                .with("type", type)
+                .getUnsupported();
     }
 }

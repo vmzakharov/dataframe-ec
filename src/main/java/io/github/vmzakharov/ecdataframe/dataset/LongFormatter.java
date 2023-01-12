@@ -7,7 +7,7 @@ import java.text.DecimalFormat;
 import java.text.ParseException;
 import java.util.regex.Pattern;
 
-import static io.github.vmzakharov.ecdataframe.util.ExceptionFactory.exception;
+import static io.github.vmzakharov.ecdataframe.util.ExceptionFactory.exceptionByKey;
 
 public class LongFormatter
 {
@@ -36,8 +36,10 @@ public class LongFormatter
                 }
                 catch (ParseException e)
                 {
-                    throw exception("Failed to parse input string to integer: '${inputString}'")
-                            .with("inputString", s).get(e);
+                    throw exceptionByKey("CSV_PARSE_ERR")
+                            .with("type", "integer")
+                            .with("inputString", s)
+                            .get(e);
                 }
             };
         }

@@ -3,7 +3,7 @@ package io.github.vmzakharov.ecdataframe.dsl.value;
 import io.github.vmzakharov.ecdataframe.dsl.ArithmeticOp;
 import io.github.vmzakharov.ecdataframe.dsl.UnaryOp;
 
-import static io.github.vmzakharov.ecdataframe.util.ExceptionFactory.exception;
+import static io.github.vmzakharov.ecdataframe.util.ExceptionFactory.exceptionByKey;
 
 abstract public class BooleanValue
 extends AbstractValue
@@ -59,7 +59,10 @@ implements Value
     @Override
     public Value apply(Value another, ArithmeticOp operation)
     {
-        throw exception("Cannot apply '${operation}' to a boolean").with("operation", operation.asString()).getUnsupported();
+        throw exceptionByKey("DSL_OP_NOT_SUPPORTED")
+                .with("operation", operation.asString())
+                .with("type", this.getType().toString())
+                .getUnsupported();
     }
 
     @Override

@@ -4,6 +4,7 @@ import io.github.vmzakharov.ecdataframe.dsl.value.Value;
 import io.github.vmzakharov.ecdataframe.dsl.value.ValueType;
 
 import static io.github.vmzakharov.ecdataframe.util.ExceptionFactory.exception;
+import static io.github.vmzakharov.ecdataframe.util.ExceptionFactory.exceptionByKey;
 
 public interface DfColumn
 {
@@ -76,7 +77,7 @@ public interface DfColumn
 
     default DfCellComparator columnComparator(DfColumn otherColumn)
     {
-        throw exception("Column comparator is not implemented for column ${columnName} of type ${type}")
+        throw exceptionByKey("DF_NO_COL_COMPARATOR")
                 .with("columnName", this.getName())
                 .with("columnType", this.getType())
                 .getUnsupported();

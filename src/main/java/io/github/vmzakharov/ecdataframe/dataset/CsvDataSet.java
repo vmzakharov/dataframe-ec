@@ -38,6 +38,7 @@ import static io.github.vmzakharov.ecdataframe.dsl.value.ValueType.DOUBLE;
 import static io.github.vmzakharov.ecdataframe.dsl.value.ValueType.LONG;
 import static io.github.vmzakharov.ecdataframe.dsl.value.ValueType.STRING;
 import static io.github.vmzakharov.ecdataframe.util.ExceptionFactory.exception;
+import static io.github.vmzakharov.ecdataframe.util.ExceptionFactory.exceptionByKey;
 
 public class CsvDataSet
 extends DataSetAbstract
@@ -170,7 +171,7 @@ extends DataSetAbstract
         }
         catch (IOException e)
         {
-            throw exception("Failed write data frame to '" + this.getDataFileName() + "'").get(e);
+            throw exceptionByKey("CSV_FILE_WRITE_FAIL").get(e);
         }
     }
 
@@ -218,7 +219,7 @@ extends DataSetAbstract
                     valueAsLiteral = this.formatterForColumn(columnIndex).format(dateTimeValue);
                     break;
                 default:
-                    throw exception("Do not know how to convert value of type ${valueType} to a string")
+                    throw exceptionByKey("CSV_UNSUPPORTED_VAL_TO_STR")
                             .with("valueType", dfColumn.getType()).get();
             }
         }
@@ -335,7 +336,7 @@ extends DataSetAbstract
         }
         catch (IOException e)
         {
-            exception("Failed to infer schema from  '${fileName}'").with("fileName", this.getDataFileName()).fire(e);
+            exceptionByKey("CSV_INFER_SCHEMA_FAIL").with("fileName", this.getDataFileName()).fire(e);
         }
 
         return this.schema;
@@ -365,7 +366,7 @@ extends DataSetAbstract
 
                 if (headers.anySatisfy(String::isEmpty))
                 {
-                    exception("Error parsing a CSV file: a column header cannot be empty").fire();
+                    exceptionByKey("CSV_MISSING_COL_HEADER").fire();
                 }
             }
             else
@@ -403,15 +404,17 @@ extends DataSetAbstract
             }
             else if (headers.size() != this.schema.columnCount())
             {
-                exception("The number of elements in the header (${headerCount}) does not match the number of columns in the schema (${schemaColumnCount})")
-                    .with("headerCount", headers.size()).with("schemaColumnCount", this.schema.columnCount()).fire();
+                exceptionByKey("CSV_SCHEMA_FILE_HEADER_MISMATCH")
+                    .with("headerCount", headers.size())
+                    .with("schemaColumnCount", this.schema.columnCount())
+                    .fire();
             }
             else
             {
                 MutableList<String> schemaColumnNames = this.schema.getColumns().collect(CsvSchemaColumn::getName);
                 if (!headers.equals(schemaColumnNames))
                 {
-                    exception("Mismatch between the column header names in the data set ${headerColumnList} and in the schema: ${schemaColumnList}")
+                    exceptionByKey("CSV_SCHEMA_HEADER_NAME_MISMATCH")
                             .with("headerColumnList", headers.makeString("[", ",", "]"))
                             .with("schemaColumnList", schemaColumnNames.makeString("[", ",", "]"))
                             .fire();
@@ -440,8 +443,7 @@ extends DataSetAbstract
         }
         catch (IOException e)
         {
-            exception("Failed to load file as a data frame '${fileName}'")
-                    .with("fileName", this.getDataFileName()).fire(e);
+            exceptionByKey("CSV_FILE_LOAD_FAIL").with("fileName", this.getDataFileName()).fire(e);
         }
 
         return df;
@@ -502,7 +504,7 @@ extends DataSetAbstract
                 columnPopulators.add(s -> lastColumn.addObject(schemaCol.parseAsDecimal(s)));
                 break;
             default:
-                throw exception("Don't know how to populate values for column type: ${columnType}").with("columnType", columnType).get();
+                throw exceptionByKey("CSV_POPULATING_BAD_COL_TYPE").with("columnType", columnType).get();
         }
     }
 
@@ -747,8 +749,7 @@ extends DataSetAbstract
             {
                 if (insideQuotes && !this.isQuote(curChar))
                 {
-                    throw exception("Unbalanced quotes at index ${index} in ${aString}")
-                               .with("index", index).with("string", aString).get();
+                    throw exceptionByKey("CSV_UNBALANCED_QUOTES").with("index", index).with("string", aString).get();
                 }
                 if (this.isTokenSeparator(curChar))
                 {

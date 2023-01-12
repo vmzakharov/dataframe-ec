@@ -63,7 +63,7 @@ implements NumberValue
     @Override
     public double doubleValue()
     {
-        throw exception("Cannot convert decimal value to floating point").get();
+        throw exceptionByKey("DSL_NO_DEC_TO_FLOAT_CONVERSION").get();
     }
 
     @Override

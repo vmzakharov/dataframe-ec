@@ -10,7 +10,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
-import static io.github.vmzakharov.ecdataframe.util.ExceptionFactory.exception;
+import static io.github.vmzakharov.ecdataframe.util.ExceptionFactory.exceptionByKey;
 
 public interface UnaryOp
 {
@@ -211,6 +211,8 @@ public interface UnaryOp
 
     default RuntimeException unsupportedOn(String type)
     {
-        return exception("Cannot apply '${operation}' to a ${type}").with("operation", this.asString()).with("type", type).getUnsupported();
+        return exceptionByKey("DSL_OP_NOT_SUPPORTED")
+                .with("operation", this.asString())
+                .with("type", type).getUnsupported();
     }
 }

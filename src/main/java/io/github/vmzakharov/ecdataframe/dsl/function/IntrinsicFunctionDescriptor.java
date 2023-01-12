@@ -8,7 +8,7 @@ import io.github.vmzakharov.ecdataframe.dsl.value.VectorValue;
 import org.eclipse.collections.api.list.ListIterable;
 import org.eclipse.collections.impl.factory.Lists;
 
-import static io.github.vmzakharov.ecdataframe.util.ExceptionFactory.exception;
+import static io.github.vmzakharov.ecdataframe.util.ExceptionFactory.exceptionByKey;
 
 public abstract class IntrinsicFunctionDescriptor
 implements FunctionDescriptor
@@ -62,7 +62,7 @@ implements FunctionDescriptor
 
     public Value evaluate(VectorValue parameters)
     {
-        throw exception("Function ${functionName} is not implemented").with("functionName", this.name).get();
+        throw exceptionByKey("DSL_FUN_NOT_IMPLEMENTED").with("functionName", this.name).get();
     }
 
     public String usageString()
@@ -79,7 +79,7 @@ implements FunctionDescriptor
     {
         if (expectedCount != actualCount)
         {
-            exception("Invalid number of parameters in a call to '${functionName}'. ${usageString}")
+            exceptionByKey("DSL_INVALID_PARAM_COUNT")
                     .with("functionName", this.getName()).with("usageString", this.usageString())
                     .fire();
         }
@@ -89,7 +89,7 @@ implements FunctionDescriptor
     {
         if (expected != actual)
         {
-            exception("Invalid parameter type in a call to '${functionName}'. ${usageString}")
+            exceptionByKey("DSL_INVALID_PARAMETER_TYPE")
                     .with("functionName", this.getName()).with("usageString", this.usageString())
                     .fire();
         }
@@ -99,7 +99,7 @@ implements FunctionDescriptor
     {
         if (!expected.contains(actual))
         {
-            exception("Invalid parameter type in a call to '${functionName}'. ${usageString}")
+            exceptionByKey("DSL_INVALID_PARAMETER_TYPE")
                     .with("functionName", this.getName()).with("usageString", this.usageString())
                     .fire();
         }

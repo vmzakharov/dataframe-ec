@@ -18,6 +18,7 @@ final public class ExceptionFactory
     static
     {
         initialize();
+        ConfigureMessages.initialize();
     }
 
     private ExceptionFactory(FormatWithPlaceholders newFormat)
@@ -110,14 +111,6 @@ final public class ExceptionFactory
         String errorText = this.formatter.toString();
         errorPrinter.println(printedMessagePrefix + errorText);
         return unsupportedWithMessage.apply(errorText);
-    }
-
-    public void fireIf(boolean badThingHappened)
-    {
-        if (badThingHappened)
-        {
-            this.fire();
-        }
     }
 
     public void fire()

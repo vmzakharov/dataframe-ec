@@ -38,6 +38,7 @@ import java.util.Arrays;
 
 import static io.github.vmzakharov.ecdataframe.dataframe.DfColumnSortOrder.ASC;
 import static io.github.vmzakharov.ecdataframe.util.ExceptionFactory.exception;
+import static io.github.vmzakharov.ecdataframe.util.ExceptionFactory.exceptionByKey;
 
 public class DataFrame
 {
@@ -163,9 +164,12 @@ public class DataFrame
                     + newColumn.getName() + "' already bound to '" + newColumn.getDataFrame().getName() + "'").fire();
         }
 
-        exception("Column named '${columnName}' is already in data frame '${dataFrameName}'")
+        if (this.hasColumn(newColumn.getName()))
+        {
+            exceptionByKey("DF_DUPLICATE_COLUMN")
                 .with("columnName", newColumn.getName()).with("dataFrameName", this.getName())
-                .fireIf(this.hasColumn(newColumn.getName()));
+                .fire();
+        }
 
         this.columnsByName.put(newColumn.getName(), newColumn);
         this.columns.add(newColumn);
@@ -194,7 +198,7 @@ public class DataFrame
 
         if (column == null)
         {
-            exception("Column '${columnName}' does not exist in data frame '${dataFrameName}'")
+            exceptionByKey("DF_COLUMN_DOES_NOT_EXIST")
                 .with("columnName", columnName).with("dataFrameName", this.getName())
                 .fire();
         }
@@ -276,8 +280,9 @@ public class DataFrame
     {
         if (values.length > this.columnCount())
         {
-            exception("Adding more row elements (${elementCount}) than there are columns in the data frame (${columnCount})")
-                    .with("elementCount", values.length).with("columnCount", this.columnCount())
+            exceptionByKey("DF_ADDING_ROW_TOO_WIDE")
+                    .with("elementCount", values.length)
+                    .with("columnCount", this.columnCount())
                     .fire();
         }
 
@@ -341,7 +346,7 @@ public class DataFrame
                 this.addDecimalColumn(columnName);
                 break;
             default:
-                exception("Cannot add a column ${columnName} for values of type ${type}")
+                exceptionByKey("DF_ADD_COL_UNKNOWN_TYPE")
                     .with("columnName", columnName).with("type", type)
                     .fire();
         }
@@ -371,7 +376,7 @@ public class DataFrame
                 this.addDecimalColumn(columnName, expressionAsString);
                 break;
             default:
-                exception("Cannot add a column ${columnName} for values of type ${type}")
+                exceptionByKey("DF_ADD_COL_UNKNOWN_TYPE")
                     .with("columnName", columnName).with("type", type)
                     .fire();
         }
@@ -535,8 +540,7 @@ public class DataFrame
             this.rowCount = storedColumnsSizes.get(0);
             if (storedColumnsSizes.anySatisfy(e -> e != this.rowCount))
             {
-                exception("Stored column sizes are not the same when attempting to seal data frame '${dataFrameName}'")
-                        .with("dataFrameName", this.getName()).fire();
+                exceptionByKey("DF_DIFFERENT_COL_SIZES").with("dataFrameName", this.getName()).fire();
             }
         }
 
@@ -916,7 +920,10 @@ public class DataFrame
      */
     public DataFrame union(DataFrame other)
     {
-        exception("Attempting to union data frames with different numbers of columns").fireIf(this.columnCount() != other.columnCount());
+        if (this.columnCount() != other.columnCount())
+        {
+            exceptionByKey("DF_UNION_DIFF_COL_COUNT").fire();
+        }
 
         DataFrame dfUnion = new DataFrame("union");
 
@@ -1272,7 +1279,7 @@ public class DataFrame
     {
         if (thisJoinColumnNames.size() != otherJoinColumnNames.size())
         {
-            exception("Attempting to join dataframes by different number of keys on each side: ${side2KeyList} to ${side2KeyList}")
+            exceptionByKey("DF_JOIN_DIFF_KEY_COUNT")
                     .with("side1KeyList", thisJoinColumnNames.makeString())
                     .with("side2KeyList", otherJoinColumnNames.makeString())
                     .fire();

@@ -6,6 +6,7 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 
 import static io.github.vmzakharov.ecdataframe.util.ExceptionFactory.exception;
+import static io.github.vmzakharov.ecdataframe.util.ExceptionFactory.exceptionByKey;
 
 public abstract class DfColumnAbstract
 implements DfColumn
@@ -36,8 +37,7 @@ implements DfColumn
     {
         if (this.dataFrame != null)
         {
-            exception("Column '${columnName}' has already been linked to a data frame")
-                    .with("columnName", this.getName()).fire();
+            exceptionByKey("DF_COL_ALREADY_LINKED").with("columnName", this.getName()).fire();
         }
 
         this.dataFrame = newDataFrame;
@@ -69,7 +69,7 @@ implements DfColumn
         }
         catch (NoSuchMethodException | IllegalAccessException | InstantiationException | InvocationTargetException e)
         {
-            throw exception("Failed to instantiate a column from ${name}").with("name", this.getName()).get(e);
+            throw exceptionByKey("DF_COL_CLONE_FAILED").with("name", this.getName()).get(e);
         }
 
         attachTo.addColumn(clonedColumn);
@@ -101,7 +101,7 @@ implements DfColumn
 
     protected void throwAddingIncompatibleValueException(Value value)
     {
-        exception("Attempting to add a value of type ${valueType} to a column ${columnName} of type ${columnType}: ${value}")
+        exceptionByKey("DF_BAD_VAL_ADD_TO_COL")
                 .with("valueType", value.getType())
                 .with("columnName", this.getName())
                 .with("columnType", this.getType())
