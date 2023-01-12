@@ -99,6 +99,17 @@ implements DfColumn
         return newColumn;
     }
 
+    protected DfColumn copyColumnSchema(DataFrame target)
+    {
+        target.addColumn(this.getName(), this.getType());
+
+        DfColumnStored newColumn = (DfColumnStored) target.getColumnAt(target.columnCount() - 1);
+
+        newColumn.ensureInitialCapacity(this.getSize());
+
+        return newColumn;
+    }
+
     protected void throwAddingIncompatibleValueException(Value value)
     {
         exceptionByKey("DF_BAD_VAL_ADD_TO_COL")

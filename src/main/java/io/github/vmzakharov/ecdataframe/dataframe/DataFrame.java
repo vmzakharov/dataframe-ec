@@ -816,6 +816,40 @@ public class DataFrame
         return cloned;
     }
 
+    /**
+     * creates a copy of the whole data frame with the same schema as the original, including computed columns that
+     * are converted to stored columns of the same type
+     *
+     * @param newName the name for the new data frame
+     * @return a copy of the original data frame with the provided name and new schema
+     */
+    public DataFrame copy(String newName)
+    {
+        return this.copy(newName, null);
+    }
+
+    /**
+     * creates a copy of the parts of data frame with the same schema as the original, including computed columns that
+     * are converted to stored columns of the same type. Only the provided columns are copied to the new data frame.
+     * If the list is set to null, all columns are copied (behaving in the same way as copy(String newName)).
+     *
+     * @param newName the name for the new data frame
+     * @param columnNamesToCopy the names of the columns to be copied
+     * @return a copy of the original data frame with the provided name and new schema
+     */
+    public DataFrame copy(String newName, ListIterable<String> columnNamesToCopy)
+    {
+        DataFrame copied =  new DataFrame(newName);
+
+        ((columnNamesToCopy == null)
+                ? this.columns
+                : columnNamesToCopy.collect(this::getColumnNamed)
+        ).forEach(col -> col.copyTo(copied));
+
+        copied.seal();
+        return copied;
+    }
+
     public DataFrame sortBy(ListIterable<String> columnsToSortByNames)
     {
         return this.sortBy(columnsToSortByNames, null);
