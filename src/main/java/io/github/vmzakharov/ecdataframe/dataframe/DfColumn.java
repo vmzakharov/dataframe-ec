@@ -75,6 +75,8 @@ public interface DfColumn
 
     DfColumn mergeWithInto(DfColumn other, DataFrame target);
 
+    DfColumn copyTo(DataFrame target);
+
     default DfCellComparator columnComparator(DfColumn otherColumn)
     {
         throw exceptionByKey("DF_NO_COL_COMPARATOR")
