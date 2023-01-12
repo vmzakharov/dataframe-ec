@@ -99,8 +99,7 @@ implements DfColumn
         return newColumn;
     }
 
-    protected DfColumn copyColumnSchema(DataFrame target)
-    {
+    protected DfColumn copyColumnSchema(DataFrame target) {
         target.addColumn(this.getName(), this.getType());
 
         DfColumnStored newColumn = (DfColumnStored) target.getColumnAt(target.columnCount() - 1);
@@ -108,6 +107,7 @@ implements DfColumn
         newColumn.ensureInitialCapacity(this.getSize());
 
         return newColumn;
+    }
 
     protected void throwAddingIncompatibleValueException(Value value)
     {
