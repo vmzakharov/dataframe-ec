@@ -28,4 +28,12 @@ implements DfObjectColumn<T>
         mergedCol.addAllItems(((DfObjectColumnAbstract<T>) other).toList());
         return mergedCol;
     }
+
+    public DfColumn copyTo(DataFrame target)
+    {
+        DfObjectColumnAbstract<T> targetCol = (DfObjectColumnAbstract<T>) this.copyColumnSchema(target);
+
+        targetCol.addAllItems(this.toList());
+        return targetCol;
+    }
 }
