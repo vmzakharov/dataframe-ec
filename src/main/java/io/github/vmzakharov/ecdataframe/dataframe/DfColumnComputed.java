@@ -70,6 +70,6 @@ extends DfColumn
 
     default void throwUnmodifiableColumnException()
     {
-        throw exceptionByKey("DF_COMP_COL_MODIFICATION").with("columnNane", this.getName()).getUnsupported();
+        throw exceptionByKey("DF_CALC_COL_MODIFICATION").with("columnNane", this.getName()).getUnsupported();
     }
 }

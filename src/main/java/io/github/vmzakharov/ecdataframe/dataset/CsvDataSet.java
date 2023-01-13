@@ -37,7 +37,6 @@ import static io.github.vmzakharov.ecdataframe.dsl.value.ValueType.DATE_TIME;
 import static io.github.vmzakharov.ecdataframe.dsl.value.ValueType.DOUBLE;
 import static io.github.vmzakharov.ecdataframe.dsl.value.ValueType.LONG;
 import static io.github.vmzakharov.ecdataframe.dsl.value.ValueType.STRING;
-import static io.github.vmzakharov.ecdataframe.util.ExceptionFactory.exception;
 import static io.github.vmzakharov.ecdataframe.util.ExceptionFactory.exceptionByKey;
 
 public class CsvDataSet
@@ -523,8 +522,7 @@ extends DataSetAbstract
 
             if (headers.size() != elements.size())
             {
-                exception("The number of elements in the header does not match the number of elements in the data row ${rowIndex} "
-                        + "(${headerElementCount} vs ${rowElementCount})")
+                exceptionByKey("CSV_HEADER_ROW_SIZE_MISMATCH")
                         .with("rowIndex", lineIndex + 1)
                         .with("headerElementCount", headers.size())
                         .with("rowElementCount", elements.size())
@@ -626,9 +624,7 @@ extends DataSetAbstract
 
         if (this.getSchema().columnCount() != elements.size())
         {
-            exception(
-                    "The number of columns in the schema (${schemaColumnCount}"
-                    + ") does not match the number of elements in the data row  (${rowElementCount}): ${dataRow}")
+            exceptionByKey("CSV_SCHEMA_ROW_SIZE_MISMATCH")
                     .with("schemaColumnCount", this.getSchema().columnCount())
                     .with("rowElementCount", elements.size())
                     .with("dataRow", line)

@@ -3,7 +3,6 @@ package io.github.vmzakharov.ecdataframe.dataframe;
 import io.github.vmzakharov.ecdataframe.dsl.value.Value;
 import io.github.vmzakharov.ecdataframe.dsl.value.ValueType;
 
-import static io.github.vmzakharov.ecdataframe.util.ExceptionFactory.exception;
 import static io.github.vmzakharov.ecdataframe.util.ExceptionFactory.exceptionByKey;
 
 public interface DfColumn
@@ -46,8 +45,7 @@ public interface DfColumn
 
     default Object aggregate(AggregateFunction aggregator)
     {
-        throw exception("Aggregation ${aggregatorName} (${aggregationDescription}) cannot be performed "
-                                   + "on column ${columnName} of type ${columnType}")
+        throw exceptionByKey("DF_COL_UNSUPPORTED_AGG")
                 .with("aggregationName", aggregator.getName())
                 .with("aggregationDescription", aggregator.getDescription())
                 .with("columnName", this.getName())

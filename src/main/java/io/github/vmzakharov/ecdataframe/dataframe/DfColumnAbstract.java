@@ -5,7 +5,6 @@ import io.github.vmzakharov.ecdataframe.dsl.value.Value;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 
-import static io.github.vmzakharov.ecdataframe.util.ExceptionFactory.exception;
 import static io.github.vmzakharov.ecdataframe.util.ExceptionFactory.exceptionByKey;
 
 public abstract class DfColumnAbstract
@@ -81,8 +80,7 @@ implements DfColumn
     {
         if (!this.getType().equals(other.getType()))
         {
-            exception("Attempting to merge columns of different types: ${firstColumnName} (${firstColumnType})"
-                    + " and ${secondColumnName} (${secondColumnType})")
+            exceptionByKey("DF_MERGE_COL_DIFF_TYPES")
                     .with("firstColumnName", this.getName())
                     .with("firstColumnType", this.getType())
                     .with("secondColumnName", other.getName())

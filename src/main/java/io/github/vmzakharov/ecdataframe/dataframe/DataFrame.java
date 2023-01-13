@@ -37,7 +37,6 @@ import java.time.LocalDateTime;
 import java.util.Arrays;
 
 import static io.github.vmzakharov.ecdataframe.dataframe.DfColumnSortOrder.ASC;
-import static io.github.vmzakharov.ecdataframe.util.ExceptionFactory.exception;
 import static io.github.vmzakharov.ecdataframe.util.ExceptionFactory.exceptionByKey;
 
 public class DataFrame
@@ -159,9 +158,11 @@ public class DataFrame
         // todo: would like to make it impossible in the first place
         if (newColumn.getDataFrame() != this)
         {
-            exception("Mixing columns from different data frames: attempting to add"
-                    + " to '" + this.getName() + "' column '"
-                    + newColumn.getName() + "' already bound to '" + newColumn.getDataFrame().getName() + "'").fire();
+            exceptionByKey("DF_ADDING_ALREADY_BOUND_COL")
+                .with("dataFrameName", this.getName())
+                .with("columnName", newColumn.getName())
+                .with("existingDataFrameName", newColumn.getDataFrame().getName())
+                .fire();
         }
 
         if (this.hasColumn(newColumn.getName()))
@@ -312,8 +313,7 @@ public class DataFrame
         ValueType expressionType = visitor.inferExpressionType(expression);
         if (visitor.hasErrors())
         {
-            exception("Cannot add calculated column ${columnName} to data frame ${dataFrameName}: "
-                    + "failed to infer the expression type of '${expression}'\n${errorList}")
+            exceptionByKey("DF_CALC_COL_INFER_TYPE")
                     .with("columnName", columnName)
                     .with("dataFrameName", this.getName())
                     .with("expression", expressionAsString)
