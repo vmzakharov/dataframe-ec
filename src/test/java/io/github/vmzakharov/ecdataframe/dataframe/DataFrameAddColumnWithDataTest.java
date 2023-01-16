@@ -5,6 +5,7 @@ import org.eclipse.collections.impl.factory.primitive.DoubleLists;
 import org.eclipse.collections.impl.factory.primitive.LongLists;
 import org.junit.Test;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
@@ -22,15 +23,17 @@ public class DataFrameAddColumnWithDataTest
                         LocalDateTime.of(2020, 10, 21, 10, 10, 10),
                         LocalDateTime.of(2020, 11, 22, 11, 11, 11),
                         LocalDateTime.of(2020, 12, 23, 12, 12, 12)))
+                .addDecimalColumn("Waldo", Lists.immutable.of(BigDecimal.valueOf(123, 2), BigDecimal.valueOf(124, 2), BigDecimal.valueOf(125, 2)))
                 ;
 
         df.seal();
 
         DataFrame expected = new DataFrame("Frame")
-                .addStringColumn("Foo").addLongColumn("Bar").addDoubleColumn("Baz").addDateColumn("Qux").addDateTimeColumn("Quux")
-                .addRow("A", 1, 1.1, LocalDate.of(2020, 10, 21), LocalDateTime.of(2020, 10, 21, 10, 10, 10))
-                .addRow("B", 2, 2.2, LocalDate.of(2020, 11, 22), LocalDateTime.of(2020, 11, 22, 11, 11, 11))
-                .addRow("C", 3, 3.3, LocalDate.of(2020, 12, 23), LocalDateTime.of(2020, 12, 23, 12, 12, 12))
+                .addStringColumn("Foo").addLongColumn("Bar").addDoubleColumn("Baz")
+                .addDateColumn("Qux").addDateTimeColumn("Quux").addDecimalColumn("Waldo")
+                .addRow("A", 1, 1.1, LocalDate.of(2020, 10, 21), LocalDateTime.of(2020, 10, 21, 10, 10, 10), BigDecimal.valueOf(123, 2))
+                .addRow("B", 2, 2.2, LocalDate.of(2020, 11, 22), LocalDateTime.of(2020, 11, 22, 11, 11, 11), BigDecimal.valueOf(124, 2))
+                .addRow("C", 3, 3.3, LocalDate.of(2020, 12, 23), LocalDateTime.of(2020, 12, 23, 12, 12, 12), BigDecimal.valueOf(125, 2))
                 ;
 
         DataFrameUtil.assertEquals(expected, df);
