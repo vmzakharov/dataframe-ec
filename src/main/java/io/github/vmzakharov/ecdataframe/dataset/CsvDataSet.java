@@ -478,9 +478,7 @@ extends DataSetAbstract
     {
         ValueType columnType = schemaCol.getType();
 
-        df.addColumn(schemaCol.getName(), schemaCol.getType());
-
-        DfColumn lastColumn = df.getColumnAt(df.columnCount() - 1);
+        DfColumn lastColumn = df.newColumn(schemaCol.getName(), columnType);
 
         switch (columnType)
         {

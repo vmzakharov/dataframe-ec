@@ -2,6 +2,7 @@ package io.github.vmzakharov.ecdataframe.dataframe;
 
 import io.github.vmzakharov.ecdataframe.dsl.value.ValueType;
 import org.eclipse.collections.api.factory.Lists;
+import org.eclipse.collections.api.list.MutableList;
 import org.eclipse.collections.impl.factory.primitive.BooleanLists;
 import org.eclipse.collections.impl.list.Interval;
 import org.junit.Assert;
@@ -66,6 +67,56 @@ public class BasicDataFrameTest
 
         dataFrame.addRow("Beep", 10, 20.0, LocalDate.of(2020, 10, 20), LocalDateTime.of(2022, 8, 22, 10, 10, 10),
                 BigDecimal.valueOf(123.456));
+
+        Assert.assertEquals("Beep", dataFrame.getString("String", 0));
+        Assert.assertEquals("Beep-meep", dataFrame.getString("StringComp", 0));
+
+        Assert.assertEquals(10, dataFrame.getLong("Long", 0));
+        Assert.assertEquals(20, dataFrame.getLong("LongComp", 0));
+
+        Assert.assertEquals(20.0, dataFrame.getDouble("Double", 0), 0.000001);
+        Assert.assertEquals(30.0, dataFrame.getDouble("DoubleComp", 0), 0.000001);
+
+        Assert.assertEquals(LocalDate.of(2020, 10, 20), dataFrame.getDate("Date", 0));
+        Assert.assertEquals(LocalDateTime.of(2022, 8, 22, 10, 10, 10), dataFrame.getDateTime("DateTime", 0));
+
+        Assert.assertEquals(LocalDate.of(2021, 11, 15), dataFrame.getDate("DateComp", 0));
+        Assert.assertEquals(LocalDateTime.of(2022, 12, 25, 13, 12, 10), dataFrame.getDateTime("DateTimeComp", 0));
+
+        Assert.assertEquals(BigDecimal.valueOf(123.456), dataFrame.getDecimal("Decimal", 0));
+        Assert.assertEquals(BigDecimal.valueOf(456, 5), dataFrame.getDecimal("DecimalComp", 0));
+    }
+
+    @Test
+    public void newColumn()
+    {
+        MutableList<DfColumn> addedColumns = Lists.mutable.of();
+
+        DataFrame dataFrame = new DataFrame("df1");
+
+        addedColumns
+            .with(dataFrame.newColumn("String", ValueType.STRING))
+            .with(dataFrame.newColumn("Long", ValueType.LONG))
+            .with(dataFrame.newColumn("Double", ValueType.DOUBLE))
+            .with(dataFrame.newColumn("Date", ValueType.DATE))
+            .with(dataFrame.newColumn("DateTime", ValueType.DATE_TIME))
+            .with(dataFrame.newColumn("Decimal", ValueType.DECIMAL))
+            .with(dataFrame.newColumn("StringComp", ValueType.STRING, "String + \"-meep\""))
+            .with(dataFrame.newColumn("LongComp", ValueType.LONG, "Long * 2"))
+            .with(dataFrame.newColumn("DoubleComp", ValueType.DOUBLE, "Double + 10.0"))
+            .with(dataFrame.newColumn("DateComp", ValueType.DATE, "toDate(2021, 11, 15)"))
+            .with(dataFrame.newColumn("DateTimeComp", ValueType.DATE_TIME, "toDateTime(2022, 12, 25, 13, 12, 10)"))
+            .with(dataFrame.newColumn("DecimalComp", ValueType.DECIMAL, "toDecimal(456,5)"))
+        ;
+
+        dataFrame.addRow("Beep", 10, 20.0, LocalDate.of(2020, 10, 20), LocalDateTime.of(2022, 8, 22, 10, 10, 10),
+                BigDecimal.valueOf(123.456));
+
+        Lists.immutable.of("String", "Long", "Double", "Date", "DateTime", "Decimal",
+                           "StringComp", "LongComp", "DoubleComp", "DateComp", "DateTimeComp", "DecimalComp")
+           .forEachWithIndex(
+                   (colName, index) -> Assert.assertSame(dataFrame.getColumnNamed(colName), addedColumns.get(index))
+           );
 
         Assert.assertEquals("Beep", dataFrame.getString("String", 0));
         Assert.assertEquals("Beep-meep", dataFrame.getString("StringComp", 0));

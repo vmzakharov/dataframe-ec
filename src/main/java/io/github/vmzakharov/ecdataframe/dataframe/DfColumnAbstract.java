@@ -71,7 +71,7 @@ implements DfColumn
             throw exceptionByKey("DF_COL_CLONE_FAILED").with("name", this.getName()).get(e);
         }
 
-        attachTo.addColumn(clonedColumn);
+        attachTo.attachColumn(clonedColumn);
 
         return clonedColumn;
     }
@@ -88,9 +88,7 @@ implements DfColumn
                     .fire();
         }
 
-        target.addColumn(this.getName(), this.getType());
-
-        DfColumnStored newColumn = (DfColumnStored) target.getColumnAt(target.columnCount() - 1);
+        DfColumnStored newColumn = target.newColumn(this.getName(), this.getType());
 
         newColumn.ensureInitialCapacity(this.getSize() + other.getSize());
 
@@ -99,9 +97,7 @@ implements DfColumn
 
     protected DfColumn copyColumnSchema(DataFrame target)
     {
-        target.addColumn(this.getName(), this.getType());
-
-        DfColumnStored newColumn = (DfColumnStored) target.getColumnAt(target.columnCount() - 1);
+        DfColumnStored newColumn = target.newColumn(this.getName(), this.getType());
 
         newColumn.ensureInitialCapacity(this.getSize());
 

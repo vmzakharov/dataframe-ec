@@ -65,95 +65,101 @@ public class DataFrame
 
     public DataFrame addStringColumn(String newColumnName)
     {
-        return this.addColumn(new DfStringColumnStored(this, newColumnName));
+        return this.addColumn(newColumnName, ValueType.STRING);
     }
 
     public DataFrame addStringColumn(String newColumnName, String expressionAsString)
     {
-        return this.addColumn(new DfStringColumnComputed(this, newColumnName, expressionAsString));
+        return this.addColumn(newColumnName, ValueType.STRING, expressionAsString);
     }
 
     public DataFrame addStringColumn(String newColumnName, ListIterable<String> values)
     {
-        return this.addColumn(new DfStringColumnStored(this, newColumnName, values));
+        this.attachColumn(new DfStringColumnStored(this, newColumnName, values));
+        return this;
     }
 
     public DataFrame addLongColumn(String newColumnName)
     {
-        return this.addColumn(new DfLongColumnStored(this, newColumnName));
+        return this.addColumn(newColumnName, ValueType.LONG);
     }
 
     public DataFrame addLongColumn(String newColumnName, String expressionAsString)
     {
-        return this.addColumn(new DfLongColumnComputed(this, newColumnName, expressionAsString));
+        return this.addColumn(newColumnName, ValueType.LONG, expressionAsString);
     }
 
     public DataFrame addLongColumn(String newColumnName, LongIterable values)
     {
-        return this.addColumn(new DfLongColumnStored(this, newColumnName, values));
+        this.attachColumn(new DfLongColumnStored(this, newColumnName, values));
+        return this;
     }
 
     public DataFrame addDoubleColumn(String newColumnName)
     {
-        return this.addColumn(new DfDoubleColumnStored(this, newColumnName));
+        return this.addColumn(newColumnName, ValueType.DOUBLE);
     }
 
     public DataFrame addDoubleColumn(String newColumnName, String expressionAsString)
     {
-        return this.addColumn(new DfDoubleColumnComputed(this, newColumnName, expressionAsString));
+        return this.addColumn(newColumnName, ValueType.DOUBLE, expressionAsString);
     }
 
     public DataFrame addDoubleColumn(String newColumnName, DoubleIterable values)
     {
-        return this.addColumn(new DfDoubleColumnStored(this, newColumnName, values));
+        this.attachColumn(new DfDoubleColumnStored(this, newColumnName, values));
+        return this;
     }
 
     public DataFrame addDateColumn(String newColumnName)
     {
-        return this.addColumn(new DfDateColumnStored(this, newColumnName));
+        return this.addColumn(newColumnName, ValueType.DATE);
     }
 
     public DataFrame addDateColumn(String newColumnName, ListIterable<LocalDate> values)
     {
-        return this.addColumn(new DfDateColumnStored(this, newColumnName, values));
+        this.attachColumn(new DfDateColumnStored(this, newColumnName, values));
+        return this;
     }
 
     public DataFrame addDateColumn(String newColumnName, String expressionAsString)
     {
-        return this.addColumn(new DfDateColumnComputed(this, newColumnName, expressionAsString));
+        return this.addColumn(newColumnName, ValueType.DATE, expressionAsString);
     }
 
     public DataFrame addDateTimeColumn(String newColumnName)
     {
-        return this.addColumn(new DfDateTimeColumnStored(this, newColumnName));
+        return this.addColumn(newColumnName, ValueType.DATE_TIME);
     }
 
     public DataFrame addDateTimeColumn(String newColumnName, ListIterable<LocalDateTime> values)
     {
-        return this.addColumn(new DfDateTimeColumnStored(this, newColumnName, values));
+        this.attachColumn(new DfDateTimeColumnStored(this, newColumnName, values));
+        return this;
     }
 
     public DataFrame addDateTimeColumn(String newColumnName, String expressionAsString)
     {
-        return this.addColumn(new DfDateTimeColumnComputed(this, newColumnName, expressionAsString));
+        return this.addColumn(newColumnName, ValueType.DATE_TIME, expressionAsString);
     }
 
     public DataFrame addDecimalColumn(String newColumnName)
     {
-        return this.addColumn(new DfDecimalColumnStored(this, newColumnName));
-    }
-
-    public DataFrame addDecimalColumn(String newColumnName, ListIterable<BigDecimal> values)
-    {
-        return this.addColumn(new DfDecimalColumnStored(this, newColumnName, values));
+        return this.addColumn(newColumnName, ValueType.DECIMAL);
     }
 
     public DataFrame addDecimalColumn(String newColumnName, String expressionAsString)
     {
-        return this.addColumn(new DfDecimalColumnComputed(this, newColumnName, expressionAsString));
+        return this.addColumn(newColumnName, ValueType.DECIMAL, expressionAsString);
     }
 
-    public DataFrame addColumn(DfColumn newColumn)
+    public DataFrame addDecimalColumn(String newColumnName, ListIterable<BigDecimal> values)
+    {
+        this.attachColumn(new DfDecimalColumnStored(this, newColumnName, values));
+        return this;
+    }
+
+    public DfColumn attachColumn(DfColumn newColumn)
     {
         // todo: would like to make it impossible in the first place
         if (newColumn.getDataFrame() != this)
@@ -179,7 +185,8 @@ public class DataFrame
         {
             newColumn.enablePooling();
         }
-        return this;
+
+        return newColumn;
     }
 
     public void enablePooling()
@@ -323,64 +330,99 @@ public class DataFrame
         return this.addColumn(columnName, expressionType, expressionAsString);
     }
 
+    /**
+     * creates a stored column with the specified name of the specified type and attaches it to this dataframe.
+     * @param columnName the name of the column to be created
+     * @param type the type of the new column
+     * @return this data frame
+     */
     public DataFrame addColumn(String columnName, ValueType type)
     {
-        switch (type)
-        {
-            case LONG:
-                this.addLongColumn(columnName);
-                break;
-            case DOUBLE:
-                this.addDoubleColumn(columnName);
-                break;
-            case STRING:
-                this.addStringColumn(columnName);
-                break;
-            case DATE:
-                this.addDateColumn(columnName);
-                break;
-            case DATE_TIME:
-                this.addDateTimeColumn(columnName);
-                break;
-            case DECIMAL:
-                this.addDecimalColumn(columnName);
-                break;
-            default:
-                exceptionByKey("DF_ADD_COL_UNKNOWN_TYPE")
-                    .with("columnName", columnName).with("type", type)
-                    .fire();
-        }
+        this.newColumn(columnName, type);
         return this;
     }
 
-    public DataFrame addColumn(String columnName, ValueType type, String expressionAsString)
+    /**
+     * creates a stored column with the specified name of the specified type and attaches it to this dataframe.
+     * @param columnName the name of the column to be created
+     * @param type the type of the new column
+     * @return the newly created columns
+     */
+    public DfColumnStored newColumn(String columnName, ValueType type)
+    {
+        DfColumnStored created = this.createStoredColumn(columnName, type);
+        this.attachColumn(created);
+        return created;
+    }
+
+    private DfColumnStored createStoredColumn(String columnName, ValueType type)
     {
         switch (type)
         {
             case LONG:
-                this.addLongColumn(columnName, expressionAsString);
-                break;
+                return new DfLongColumnStored(this, columnName);
             case DOUBLE:
-                this.addDoubleColumn(columnName, expressionAsString);
-                break;
+                return new DfDoubleColumnStored(this, columnName);
             case STRING:
-                this.addStringColumn(columnName, expressionAsString);
-                break;
+                return new DfStringColumnStored(this, columnName);
             case DATE:
-                this.addDateColumn(columnName, expressionAsString);
-                break;
+                return new DfDateColumnStored(this, columnName);
             case DATE_TIME:
-                this.addDateTimeColumn(columnName, expressionAsString);
-                break;
+                return new DfDateTimeColumnStored(this, columnName);
             case DECIMAL:
-                this.addDecimalColumn(columnName, expressionAsString);
-                break;
+                return new DfDecimalColumnStored(this, columnName);
             default:
-                exceptionByKey("DF_ADD_COL_UNKNOWN_TYPE")
-                    .with("columnName", columnName).with("type", type)
-                    .fire();
+                throw exceptionByKey("DF_ADD_COL_UNKNOWN_TYPE")
+                        .with("columnName", columnName).with("type", type)
+                        .get();
         }
+    }
+
+    /**
+     * creates a calculated column with the specified name of the specified type and attaches it to this dataframe.
+     * @param columnName the name of the column to be created
+     * @param type the type of the new column
+     * @return the newly created columns
+     */
+    public DfColumnComputed newColumn(String columnName, ValueType type, String expressionAsString)
+    {
+        DfColumnComputed created = this.createComputedColumn(columnName, type, expressionAsString);
+        this.attachColumn(created);
+        return created;
+    }
+
+    /**
+     * creates a calculated column with the specified name of the specified type and attaches it to this dataframe.
+     * @param columnName the name of the column to be created
+     * @param type the type of the new column
+     * @param expressionAsString the expression
+     * @return this data frame
+     */
+    public DataFrame addColumn(String columnName, ValueType type, String expressionAsString)
+    {
+        this.newColumn(columnName, type, expressionAsString);
         return this;
+    }
+
+    public DfColumnComputed createComputedColumn(String columnName, ValueType type, String expressionAsString)
+    {
+        switch (type)
+        {
+            case LONG:
+                return new DfLongColumnComputed(this, columnName, expressionAsString);
+            case DOUBLE:
+                return new DfDoubleColumnComputed(this, columnName, expressionAsString);
+            case STRING:
+                return new DfStringColumnComputed(this, columnName, expressionAsString);
+            case DATE:
+                return new DfDateColumnComputed(this, columnName, expressionAsString);
+            case DATE_TIME:
+                return new DfDateTimeColumnComputed(this, columnName, expressionAsString);
+            case DECIMAL:
+                return new DfDecimalColumnComputed(this, columnName, expressionAsString);
+            default:
+                throw exceptionByKey("DF_ADD_COL_UNKNOWN_TYPE").with("columnName", columnName).with("type", type).get();
+        }
     }
 
     protected int rowIndexMap(int virtualRowIndex)
