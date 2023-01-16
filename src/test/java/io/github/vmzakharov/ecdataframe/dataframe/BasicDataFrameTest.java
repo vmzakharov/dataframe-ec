@@ -247,7 +247,7 @@ public class BasicDataFrameTest
             .addRow("Alice", 5, 23.45, "abc")
             .addRow("Deb",   0,  7.89, "xyz");
 
-        df.keepColumns(Lists.immutable.of("Name", "Foo"));
+        DataFrame result = df.keepColumns(Lists.immutable.of("Name", "Foo"));
 
         DataFrame expected = new DataFrame("expected")
             .addStringColumn("Name").addStringColumn("Foo")
@@ -255,6 +255,7 @@ public class BasicDataFrameTest
             .addRow("Deb",   "xyz");
 
         DataFrameUtil.assertEquals(expected, df);
+        Assert.assertSame(result, df);
     }
 
     @Test

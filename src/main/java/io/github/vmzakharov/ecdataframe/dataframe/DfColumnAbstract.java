@@ -71,9 +71,7 @@ implements DfColumn
             throw exceptionByKey("DF_COL_CLONE_FAILED").with("name", this.getName()).get(e);
         }
 
-        attachTo.attachColumn(clonedColumn);
-
-        return clonedColumn;
+        return attachTo.attachColumn(clonedColumn);
     }
 
     protected DfColumn validateAndCreateTargetColumn(DfColumn other, DataFrame target)

@@ -382,6 +382,7 @@ public class DataFrame
      * creates a calculated column with the specified name of the specified type and attaches it to this dataframe.
      * @param columnName the name of the column to be created
      * @param type the type of the new column
+     * @param expressionAsString the expression
      * @return the newly created columns
      */
     public DfColumnComputed newColumn(String columnName, ValueType type, String expressionAsString)
@@ -1572,7 +1573,7 @@ public class DataFrame
      */
     public DataFrame keepColumns(ListIterable<String> columnNamesToKeep)
     {
-        ListIterable<DfColumn> columnsToKeep = columnNamesToKeep.collect(this::getColumnNamed); // will throw if a column doesn't exist
+        columnNamesToKeep.forEach(this::getColumnNamed); // will throw if a column doesn't exist
 
         MutableList<String> columnNamesToDrop = this.columns.collect(DfColumn::getName).reject(columnNamesToKeep::contains);
 
