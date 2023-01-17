@@ -1,4 +1,14 @@
 # Releases
+### 0.19.1
+* adds copy() function to data frame (as discussed in issue #11)
+* adds newColumn() methods - same as addColumn(), but it returns the newly created column rather than the data frame itself
+* introduces template based error message formatting and converts all inlined error messages to message lookup by key 
+This change supports overriding error messages with messages provided by the application. Supports loading message 
+templates from resource bundles, properties, and maps
+* renames ErrorReporter to ExceptionFactory and refactors the API
+* supports type inference of computed column expressions
+### 0.18.5
+* adds support for ascending and descending column sort order and expression sort order
 ### 0.18.4
 * adds support for the decimal type (high/arbitrary precision)
 * improves error handling and reporting

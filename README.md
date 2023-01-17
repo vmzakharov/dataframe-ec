@@ -10,7 +10,7 @@ For more on Eclipse Collections see: https://www.eclipse.org/collections/.
 <dependency>
   <groupId>io.github.vmzakharov</groupId>
   <artifactId>dataframe-ec</artifactId>
-  <version>0.18.5</version>
+  <version>0.19.1</version>
 </dependency>
 ```
 
@@ -209,12 +209,12 @@ DataFrame totalsByCustomer = orders.sumBy(Lists.immutable.of("Count", "Price"), 
 
 `totalsByCustomer`
 
-|Customer | Count | Price|
-|---|---:|---:|
-|"Alice" | 9 | 42.9500|
-|"Bob" | 10 | 40.3400|
-|"Carl" | 11 | 44.7800|
-|"Doris" | 1 | 5.0000|
+| Customer | Count |   Price |
+|----------|------:|--------:|
+| "Alice"  |     9 | 42.9500 |
+| "Bob"    |    10 | 40.3400 |
+| "Carl"   |    11 | 44.7800 |
+| "Doris"  |     1 |  5.0000 |
 
 #### Add a Calculated Column
 ```
@@ -222,13 +222,13 @@ orders.addDoubleColumn("AvgDonutPrice", "Price / Count");
 ```
 `orders`
 
-|Customer | Count | Price | Date | AvgDonutPrice|
-|---|---:|---:|---|---:|
-|"Alice" | 5 | 23.4500 | 2020-10-15 | 4.6900|
-|"Bob" | 10 | 40.3400 | 2020-11-10 | 4.0340|
-|"Alice" | 4 | 19.5000 | 2020-10-19 | 4.8750|
-|"Carl" | 11 | 44.7800 | 2020-12-25 | 4.0709|
-|"Doris" | 1 | 5.0000 | 2020-09-01 | 5.0000|
+| Customer | Count |   Price | Date       | AvgDonutPrice |
+|----------|------:|--------:|------------|--------------:|
+| "Alice"  |     5 | 23.4500 | 2020-10-15 |        4.6900 |
+| "Bob"    |    10 | 40.3400 | 2020-11-10 |        4.0340 |
+| "Alice"  |     4 | 19.5000 | 2020-10-19 |        4.8750 |
+| "Carl"   |    11 | 44.7800 | 2020-12-25 |        4.0709 |
+| "Doris"  |     1 |  5.0000 | 2020-09-01 |        5.0000 |
 
 #### Filter
 Selection of a sub dataframe with the rows matching the filter condition
@@ -453,15 +453,15 @@ There is no implicit type conversion of values and variables to avoid inadverten
 
 The following are examples of literals
 
-| Type     | Example|
-|----------| ---|
-| String   | `"Hello"` or `'Abracadabra'` (both single and double quotes are supported)|
-|  Long    | `123`|
-|  Double  | `123.456`|
-|  Decimal | There is no decimal literal per se, however there is a built-in function `toDecimal()` that lets specify decimal constants, e.g. `toDecimal(1234, 3)`|
-|  Date    | There is no date literal per se, however there is a built-in function `toDate()` that lets specify date constants, e.g. `toDate(2021, 11, 25)`|
-|  Vector  | `(1, 2, 3)` <br>`('A', 'B', 'C')` <br>`(x, x + 1, x + 2)`|
-|  Boolean | there are no literal of boolean type as there was no scenario where they would be required, however boolean variables and expressions are fully supported|
+| Type    | Example                                                                                                                                                   |
+|---------|-----------------------------------------------------------------------------------------------------------------------------------------------------------|
+| String  | `"Hello"` or `'Abracadabra'` (both single and double quotes are supported)                                                                                |
+| Long    | `123`                                                                                                                                                     |
+| Double  | `123.456`                                                                                                                                                 |
+| Decimal | There is no decimal literal per se, however there is a built-in function `toDecimal()` that lets specify decimal constants, e.g. `toDecimal(1234, 3)`     |
+| Date    | There is no date literal per se, however there is a built-in function `toDate()` that lets specify date constants, e.g. `toDate(2021, 11, 25)`            |
+| Vector  | `(1, 2, 3)` <br>`('A', 'B', 'C')` <br>`(x, x + 1, x + 2)`                                                                                                 |
+| Boolean | there are no literal of boolean type as there was no scenario where they would be required, however boolean variables and expressions are fully supported |
 
 ### Variables
 
@@ -480,15 +480,15 @@ substr(a + b, 3)
 
 ### Expressions
 
-| Category          | Expression                   | Example|
-|-------------------|------------------------------| -------------|
-| Unary             | `-`<br>`not`                 | `-123`<br>`not (a > b)`|
-| Binary Arithmetic | `+` `-` `*` `/`              | `1 + 2`<br>`unit_price * quantity`<br>string concatenation:<br> `"Hello, " + "world!"`|
-| Comparison        | `>` `>=` `<` `<=` `==` `!=`  |
-| Boolean           | `and`<br>`or`<br>`xor`       |
-| Containment       | `in`<br>`not in`             | vectors: <br>`"a" in ("a", "b", "c")`<br>`x not in (1, 2, 3)`<br>strings:<br>`'ello' in 'Hello!'`<br>`"bye" not in "Hello!"`|
-| Empty             | `is empty`<br>`is not empty` | `"" is empty`<br>`'Hello' is not empty`<br>vectors:<br>`(1, 2, 3) is not empty`<br>`() is empty`|
-| Null check        | `is null`<br>`is not null`   | `"" is null`<br>`'Hello' is not null`<br>`x is null ? 0.0 : abs(x)`|
+| Category          | Expression                   | Example                                                                                                                      |
+|-------------------|------------------------------|------------------------------------------------------------------------------------------------------------------------------|
+| Unary             | `-`<br>`not`                 | `-123`<br>`not (a > b)`                                                                                                      |
+| Binary Arithmetic | `+` `-` `*` `/`              | `1 + 2`<br>`unit_price * quantity`<br>string concatenation:<br> `"Hello, " + "world!"`                                       |
+| Comparison        | `>` `>=` `<` `<=` `==` `!=`  |                                                                                                                              |
+| Boolean           | `and`<br>`or`<br>`xor`       |                                                                                                                              |
+| Containment       | `in`<br>`not in`             | vectors: <br>`"a" in ("a", "b", "c")`<br>`x not in (1, 2, 3)`<br>strings:<br>`'ello' in 'Hello!'`<br>`"bye" not in "Hello!"` |
+| Empty             | `is empty`<br>`is not empty` | `"" is empty`<br>`'Hello' is not empty`<br>vectors:<br>`(1, 2, 3) is not empty`<br>`() is empty`                             |
+| Null check        | `is null`<br>`is not null`   | `"" is null`<br>`'Hello' is not null`<br>`x is null ? 0.0 : abs(x)`                                                          |
 
 ### Statements
 
@@ -505,23 +505,22 @@ Recursion (direct or indirect) is not supported.
 
 #### Built-in functions
 
-| Function   | Usage|
-|------------| ---|
-| abs        | abs(number)|
-| contains   | contains(string, substring)|
-| print      | print()|
-| println    | println()|
-| startsWith | startsWith(string, prefix)|
-| substr     | substr(string, beginIndex[, endIndex])|
-| toDate     | toDate(string in the yyyy-mm-dd format)<br>toDate(yyyy, mm, dd)|
-| toDateTime | toDateTime(yyyy, mm, dd, hh, mm, ss)|
-| toDouble   | toDouble(string)|
-| toLong     | toLong(string)|
-| toDecimal  | toUpper(unscaledValue, scale)|
-| toString   | toString(number)|
-| toUpper    | toUpper(string)|
-| withinDays | withinDays(date1, date2, numberOfDays)|
-
+| Function   | Usage                                                           |
+|------------|-----------------------------------------------------------------|
+| abs        | abs(number)                                                     |
+| contains   | contains(string, substring)                                     |
+| print      | print()                                                         |
+| println    | println()                                                       |
+| startsWith | startsWith(string, prefix)                                      |
+| substr     | substr(string, beginIndex[, endIndex])                          |
+| toDate     | toDate(string in the yyyy-mm-dd format)<br>toDate(yyyy, mm, dd) |
+| toDateTime | toDateTime(yyyy, mm, dd, hh, mm, ss)                            |
+| toDouble   | toDouble(string)                                                |
+| toLong     | toLong(string)                                                  |
+| toDecimal  | toUpper(unscaledValue, scale)                                   |
+| toString   | toString(number)                                                |
+| toUpper    | toUpper(string)                                                 |
+| withinDays | withinDays(date1, date2, numberOfDays)                          |
 
 #### User Declared Function Example 1
 ```
