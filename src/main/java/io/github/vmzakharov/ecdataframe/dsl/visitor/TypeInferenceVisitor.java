@@ -28,6 +28,7 @@ import io.github.vmzakharov.ecdataframe.dsl.function.BuiltInFunctions;
 import io.github.vmzakharov.ecdataframe.dsl.function.IntrinsicFunctionDescriptor;
 import io.github.vmzakharov.ecdataframe.dsl.value.Value;
 import io.github.vmzakharov.ecdataframe.dsl.value.ValueType;
+import io.github.vmzakharov.ecdataframe.util.FormatWithPlaceholders;
 import org.eclipse.collections.api.list.ListIterable;
 import org.eclipse.collections.api.list.MutableList;
 import org.eclipse.collections.api.map.MutableMap;
@@ -38,17 +39,11 @@ import org.eclipse.collections.impl.factory.Maps;
 import org.eclipse.collections.impl.factory.Stacks;
 import org.eclipse.collections.impl.tuple.Tuples;
 
+import static io.github.vmzakharov.ecdataframe.util.FormatWithPlaceholders.*;
+
 public class TypeInferenceVisitor
 implements ExpressionVisitor
 {
-    public static final String ERR_IF_ELSE_INCOMPATIBLE = "Incompatible types in branches of if-else";
-    public static final String ERR_TYPES_IN_EXPRESSION = "Incompatible operand types in expression";
-
-    public static final String ERR_UNEXPECTED_TYPE = "Required expression type %s, was %s";
-    public static final String ERR_UNDEFINED_VARIABLE = "Undefined variable";
-    public static final String ERR_UNDEFINED_FUNCTION = "Undefined function";
-    public static final String ERR_CONDITION_NOT_BOOLEAN = "Condition type is not boolean";
-
     private final MutableStack<ValueType> expressionTypeStack = Stacks.mutable.of();
     private final MutableMap<String, ValueType> variableTypes = Maps.mutable.of();
 
@@ -139,7 +134,7 @@ implements ExpressionVisitor
         // so no point in propagating this error as we can't meaningfully evaluate expression
         if (resultType.isVoid() && !type1.isVoid() && !type2.isVoid())
         {
-            this.recordError(ERR_TYPES_IN_EXPRESSION, PrettyPrintVisitor.exprToString(expr));
+            this.recordError(messageFromKey("TYPE_INFER_TYPES_IN_EXPRESSION").toString(), PrettyPrintVisitor.exprToString(expr));
         }
 
         this.store(resultType);
@@ -227,7 +222,7 @@ implements ExpressionVisitor
         else
         {
             this.store(ValueType.VOID);
-            this.recordError(ERR_TYPES_IN_EXPRESSION, PrettyPrintVisitor.exprToString(expr));
+            this.recordError(messageFromKey("TYPE_INFER_TYPES_IN_EXPRESSION").toString(), PrettyPrintVisitor.exprToString(expr));
         }
     }
 
@@ -260,7 +255,7 @@ implements ExpressionVisitor
             }
             else
             {
-                this.recordError(ERR_UNDEFINED_FUNCTION, expr.getFunctionName());
+                this.recordError(messageFromKey("TYPE_INFER_UNDEFINED_FUNCTION").toString(), expr.getFunctionName());
             }
         }
     }
@@ -338,7 +333,7 @@ implements ExpressionVisitor
             else
             {
                 variableType = ValueType.VOID;
-                this.recordError(ERR_UNDEFINED_VARIABLE, PrettyPrintVisitor.exprToString(expr));
+                this.recordError(messageFromKey("TYPE_INFER_UNDEFINED_VARIABLE").toString(), PrettyPrintVisitor.exprToString(expr));
             }
         }
 
@@ -400,7 +395,7 @@ implements ExpressionVisitor
         // void means we have already failed in the condition expression so no point in propagating this error
         if (!conditionType.isBoolean() && !conditionType.isVoid())
         {
-            this.recordError(ERR_CONDITION_NOT_BOOLEAN, PrettyPrintVisitor.exprToString(expr));
+            this.recordError(messageFromKey("TYPE_INFER_CONDITION_NOT_BOOLEAN").toString(), PrettyPrintVisitor.exprToString(expr));
         }
 
         expr.getIfScript().accept(this);
@@ -415,7 +410,7 @@ implements ExpressionVisitor
             this.store(valueType);
             if (valueType.isVoid())
             {
-                this.recordError(ERR_IF_ELSE_INCOMPATIBLE, PrettyPrintVisitor.exprToString(expr));
+                this.recordError(messageFromKey("TYPE_INFER_ELSE_INCOMPATIBLE").toString(), PrettyPrintVisitor.exprToString(expr));
             }
         }
         else
@@ -431,6 +426,6 @@ implements ExpressionVisitor
 
     private String unexpectedTypeMessage(ValueType expected, ValueType actual)
     {
-        return String.format(ERR_UNEXPECTED_TYPE, expected.toString(), actual.toString());
+        return String.format(messageFromKey("TYPE_INFER_UNEXPECTED_TYPE").toString(), expected.toString(), actual.toString());
     }
 }

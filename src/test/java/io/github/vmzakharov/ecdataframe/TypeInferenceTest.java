@@ -16,9 +16,7 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import static io.github.vmzakharov.ecdataframe.TypeInferenceUtil.assertScriptType;
-import static io.github.vmzakharov.ecdataframe.dsl.visitor.TypeInferenceVisitor.ERR_IF_ELSE_INCOMPATIBLE;
-import static io.github.vmzakharov.ecdataframe.dsl.visitor.TypeInferenceVisitor.ERR_TYPES_IN_EXPRESSION;
-import static io.github.vmzakharov.ecdataframe.dsl.visitor.TypeInferenceVisitor.ERR_UNDEFINED_VARIABLE;
+import static io.github.vmzakharov.ecdataframe.util.FormatWithPlaceholders.messageFromKey;
 
 public class TypeInferenceTest
 {
@@ -192,8 +190,12 @@ public class TypeInferenceTest
     @Test
     public void containsIncompatibleTypes()
     {
-        this.assertError("1 in 'abc'", this.prettyPrint("1 in 'abc'"), ERR_TYPES_IN_EXPRESSION);
-        this.assertError("1.1 not in 'abc'", this.prettyPrint("1.1 not in 'abc'"), ERR_TYPES_IN_EXPRESSION);
+        this.assertError(
+                "1 in 'abc'", this.prettyPrint("1 in 'abc'"),
+                messageFromKey("TYPE_INFER_TYPES_IN_EXPRESSION").toString());
+        this.assertError(
+                "1.1 not in 'abc'", this.prettyPrint("1.1 not in 'abc'"),
+                messageFromKey("TYPE_INFER_TYPES_IN_EXPRESSION").toString());
     }
 
     @Test
@@ -202,7 +204,7 @@ public class TypeInferenceTest
         this.assertError(
                 "x = 5\ny = 'abc'\nx + y",
                 "(x + y)",
-                ERR_TYPES_IN_EXPRESSION);
+                messageFromKey("TYPE_INFER_TYPES_IN_EXPRESSION").toString());
     }
 
     @Test
@@ -222,7 +224,7 @@ public class TypeInferenceTest
                         + "else\n"
                         + "  'abc'\n"
                         + "endif"),
-                ERR_IF_ELSE_INCOMPATIBLE);
+                messageFromKey("TYPE_INFER_ELSE_INCOMPATIBLE").toString());
     }
 
     @Test
@@ -235,7 +237,7 @@ public class TypeInferenceTest
         this.assertError(context,
                 "x = 5\nif a > b then\n  x\nelse\n y\nendif",
                 this.prettyPrint("if a > b then\n  x\nelse\n y\nendif"),
-                ERR_IF_ELSE_INCOMPATIBLE);
+                messageFromKey("TYPE_INFER_ELSE_INCOMPATIBLE").toString());
     }
 
     @Test
@@ -244,7 +246,7 @@ public class TypeInferenceTest
         this.assertError(
                 "x = 5\nx == 'abc'\n",
                 this.prettyPrint("x == 'abc'"),
-                ERR_TYPES_IN_EXPRESSION);
+                messageFromKey("TYPE_INFER_TYPES_IN_EXPRESSION").toString());
     }
 
     /*
@@ -259,8 +261,8 @@ public class TypeInferenceTest
                 + "x + 'abc'\n"
                 + "'x' < 1\n",
                 Lists.immutable.of(
-                        Tuples.twin(ERR_TYPES_IN_EXPRESSION, "(x + \"abc\")"),
-                        Tuples.twin(ERR_TYPES_IN_EXPRESSION, "(\"x\" < 1)")
+                        Tuples.twin(messageFromKey("TYPE_INFER_TYPES_IN_EXPRESSION").toString(), "(x + \"abc\")"),
+                        Tuples.twin(messageFromKey("TYPE_INFER_TYPES_IN_EXPRESSION").toString(), "(\"x\" < 1)")
                 ));
 
         this.assertErrors(
@@ -268,8 +270,8 @@ public class TypeInferenceTest
                 + "x + 1\n"
                 + "'x' < y\n",
                 Lists.immutable.of(
-                        Tuples.twin(ERR_UNDEFINED_VARIABLE, "x"),
-                        Tuples.twin(ERR_TYPES_IN_EXPRESSION, "(\"x\" < y)")
+                        Tuples.twin(messageFromKey("TYPE_INFER_UNDEFINED_VARIABLE").toString(), "x"),
+                        Tuples.twin(messageFromKey("TYPE_INFER_TYPES_IN_EXPRESSION").toString(), "(\"x\" < y)")
                 ));
 
         this.assertErrors(
@@ -278,8 +280,8 @@ public class TypeInferenceTest
                 + "else 1\n"
                 + "endif",
                 Lists.immutable.of(
-                        Tuples.twin(ERR_UNDEFINED_VARIABLE, "x"),
-                        Tuples.twin(ERR_IF_ELSE_INCOMPATIBLE, "if (x > 3) then\n"
+                        Tuples.twin(messageFromKey("TYPE_INFER_UNDEFINED_VARIABLE").toString(), "x"),
+                        Tuples.twin(messageFromKey("TYPE_INFER_ELSE_INCOMPATIBLE").toString(), "if (x > 3) then\n"
                                 + "  \"abc\"\n"
                                 + "else\n"
                                 + "  1\n"
@@ -295,20 +297,20 @@ public class TypeInferenceTest
         this.assertError(context,
                 "x == 'abc'\n",
                 this.prettyPrint("x == 'abc'"),
-                ERR_TYPES_IN_EXPRESSION);
+                messageFromKey("TYPE_INFER_TYPES_IN_EXPRESSION").toString());
     }
 
     @Test
     public void undefinedVariables()
     {
-        this.assertError("1 + abc", "abc", ERR_UNDEFINED_VARIABLE);
-        this.assertError("x == 'abc'\ny + x", "x", ERR_UNDEFINED_VARIABLE);
+        this.assertError("1 + abc", "abc", messageFromKey("TYPE_INFER_UNDEFINED_VARIABLE").toString());
+        this.assertError("x == 'abc'\ny + x", "x", messageFromKey("TYPE_INFER_UNDEFINED_VARIABLE").toString());
         this.assertError(
                   "if x == 4\n"
                 + "then 'four'\n"
                 + "else 'not four'\n"
                 + "endif",
-                "x", ERR_UNDEFINED_VARIABLE);
+                "x", messageFromKey("TYPE_INFER_UNDEFINED_VARIABLE").toString());
     }
 
     private void assertErrors(String scriptString, ListIterable<Twin<String>> expectedErrors)

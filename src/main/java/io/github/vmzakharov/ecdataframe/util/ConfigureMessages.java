@@ -67,5 +67,12 @@ final public class ConfigureMessages
         addMessage("DSL_UNKNOWN_FUN",                 "Unknown function: '${functionName}'");
         addMessage("DSL_FAIL_TO_CONVERT_RAW_VAL",     "Don't know how to convert to value ${rawValue}, type: ${rawValueType}");
         addMessage("DSL_FUN_DECLARATION_EVAL",        "A standalone function declaration cannot be evaluated. Function: ${functionName}");
+        addMessage("TYPE_INFER_ELSE_INCOMPATIBLE",    "Incompatible types in branches of if-else");
+        addMessage("TYPE_INFER_TYPES_IN_EXPRESSION",  "Incompatible operand types in expression");
+        addMessage("TYPE_INFER_UNEXPECTED_TYPE",      "Required expression type %s, was %s");
+        addMessage("TYPE_INFER_UNDEFINED_VARIABLE",   "Undefined variable");
+        addMessage("TYPE_INFER_UNDEFINED_FUNCTION",   "Undefined function");
+        addMessage("TYPE_INFER_COND_NOT_BOOLEAN",     "Condition type is not boolean");
+
     }
 }
