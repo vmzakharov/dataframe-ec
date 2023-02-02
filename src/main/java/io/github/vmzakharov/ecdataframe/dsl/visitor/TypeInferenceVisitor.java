@@ -28,7 +28,6 @@ import io.github.vmzakharov.ecdataframe.dsl.function.BuiltInFunctions;
 import io.github.vmzakharov.ecdataframe.dsl.function.IntrinsicFunctionDescriptor;
 import io.github.vmzakharov.ecdataframe.dsl.value.Value;
 import io.github.vmzakharov.ecdataframe.dsl.value.ValueType;
-import io.github.vmzakharov.ecdataframe.util.FormatWithPlaceholders;
 import org.eclipse.collections.api.list.ListIterable;
 import org.eclipse.collections.api.list.MutableList;
 import org.eclipse.collections.api.map.MutableMap;
@@ -39,7 +38,7 @@ import org.eclipse.collections.impl.factory.Maps;
 import org.eclipse.collections.impl.factory.Stacks;
 import org.eclipse.collections.impl.tuple.Tuples;
 
-import static io.github.vmzakharov.ecdataframe.util.FormatWithPlaceholders.*;
+import static io.github.vmzakharov.ecdataframe.util.FormatWithPlaceholders.messageFromKey;
 
 public class TypeInferenceVisitor
 implements ExpressionVisitor

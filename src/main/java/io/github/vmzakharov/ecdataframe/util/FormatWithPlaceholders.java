@@ -14,7 +14,8 @@ import java.util.regex.Pattern;
 
 public class FormatWithPlaceholders
 {
-    private static MutableMap<String, String> messagesByKey = Maps.mutable.of();
+    public static final String UNKNOWN_KEY_MESSAGE = "Unknown message key: \"%s\"";
+    private static final MutableMap<String, String> MESSAGES_BY_KEY = Maps.mutable.of();
     private final String template;
     private final MutableMap<String, String> valuesByName = Maps.mutable.of();
 
@@ -40,12 +41,12 @@ public class FormatWithPlaceholders
 
     public static void addMessage(String key, String message)
     {
-        messagesByKey.put(key, message);
+        MESSAGES_BY_KEY.put(key, message);
     }
 
     public static FormatWithPlaceholders messageFromKey(String messageKey)
     {
-        String message = messagesByKey.get(messageKey);
+        String message = MESSAGES_BY_KEY.getIfAbsent(messageKey, () -> String.format(UNKNOWN_KEY_MESSAGE, messageKey));
         return new FormatWithPlaceholders(message);
     }
 

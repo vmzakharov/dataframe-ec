@@ -8,6 +8,7 @@ import org.junit.Test;
 import java.util.Properties;
 import java.util.ResourceBundle;
 
+import static io.github.vmzakharov.ecdataframe.util.FormatWithPlaceholders.UNKNOWN_KEY_MESSAGE;
 import static io.github.vmzakharov.ecdataframe.util.FormatWithPlaceholders.message;
 import static io.github.vmzakharov.ecdataframe.util.FormatWithPlaceholders.messageFromKey;
 
@@ -88,5 +89,12 @@ public class FormatWithPlaceholderTest
         Assert.assertEquals("Hello, ${Alice}! How are you?", messageFromKey("GREETING").with("name", "${Alice}").toString());
 
         Assert.assertEquals("GREETINGS PROFESSOR JENKINS.", messageFromKey("SALUTATION").with("lastName", "JENKINS").toString());
+    }
+
+    @Test
+    public void unknownKey()
+    {
+        String key = "Oompa Loompa";
+        Assert.assertEquals(String.format(UNKNOWN_KEY_MESSAGE, key), messageFromKey(key).toString());
     }
 }
