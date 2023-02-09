@@ -30,7 +30,7 @@ extends AbstractValue
     @Override
     public String asStringLiteral()
     {
-        return '"' + this.value + '"';
+        return this.value.indexOf('\"') == -1 ? '"' + this.value + '"' : '\'' + this.value + '\'';
     }
 
     @Override

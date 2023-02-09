@@ -105,6 +105,7 @@ public class StandaloneExpressionFromStringTest
         Assert.assertTrue(ExpressionTestUtil.evaluateToBoolean("\"foo\" in (\"foo\", \"bar\", \"baz\")"));
         Assert.assertFalse(ExpressionTestUtil.evaluateToBoolean("\"foo\" in (\"qux\", \"bar\", \"baz\")"));
         Assert.assertFalse(ExpressionTestUtil.evaluateToBoolean("'foo' in ('qux', 'bar', 'baz')"));
+        Assert.assertFalse(ExpressionTestUtil.evaluateToBoolean("'foo' in (\"qux\", 'ba\"r', 'baz', \"wal'do\")"));
         Assert.assertTrue(ExpressionTestUtil.evaluateToBoolean("123 in (456, 567, 123)"));
         Assert.assertFalse(ExpressionTestUtil.evaluateToBoolean("123 in (456, 567, 789)"));
         Assert.assertFalse(ExpressionTestUtil.evaluateToBoolean("123 in ()"));

@@ -173,4 +173,16 @@ public class ScriptFromStringTest
         Assert.assertEquals(1, ((LongValue) result).longValue());
     }
 
+    @Test
+    public void scriptWithMixedQuotes()
+    {
+        String scriptText =
+                "x = 'ba\"r'\n"
+                + "x in (\"qux\", 'ba\"r', 'baz', \"wal'do\")";
+
+        AnonymousScript script = ExpressionTestUtil.toScript(scriptText);
+        Value result = script.evaluate(new InMemoryEvaluationVisitor());
+        Assert.assertTrue(result.isBoolean());
+        Assert.assertTrue(((BooleanValue) result).isTrue());
+    }
 }

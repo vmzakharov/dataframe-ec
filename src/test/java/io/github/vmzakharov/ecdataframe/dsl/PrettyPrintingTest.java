@@ -160,6 +160,17 @@ public class PrettyPrintingTest
     }
 
     @Test
+    public void nestedQuotes()
+    {
+        String  expressionAsString = "'foo' in (\"qux\", 'ba\"r', 'baz', \"wal'do\")";
+        Expression expression = ExpressionTestUtil.toExpression(expressionAsString);
+
+        String result = PrettyPrintVisitor.exprToString(expression);
+
+        Assert.assertEquals("(\"foo\" in (\"qux\", 'ba\"r', \"baz\", \"wal'do\"))", result);
+    }
+
+    @Test
     public void expressionToString()
     {
         String expressionAsString = "(1 + 2)/ (7.0 +9)";
