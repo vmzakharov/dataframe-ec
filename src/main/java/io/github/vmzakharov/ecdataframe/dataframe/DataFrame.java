@@ -636,8 +636,8 @@ public class DataFrame
     /**
      * Aggregate the values in the specified columns grouped by values in the specified group by columns
      *
-     * @param aggregators - the aggregate functions to be applied to columns to aggregate
-     * @param columnsToGroupByNames - the columns to group by
+     * @param aggregators the aggregate functions to be applied to columns to aggregate
+     * @param columnsToGroupByNames the columns to group by
      * @return a data frame with a summary row for each unique combination of the values in the columns to group by,
      * containing aggregated values in the columns to aggregate
      */
@@ -651,8 +651,8 @@ public class DataFrame
     /**
      * Add up values in columns into summary rows group by values in the specified group by columns
      *
-     * @param columnsToSumNames     - the columns to aggregate
-     * @param columnsToGroupByNames - the columns to group by
+     * @param columnsToSumNames     the columns to aggregate
+     * @param columnsToGroupByNames the columns to group by
      * @return a data frame with a row for each unique combination of the values in the columns to group by, containing
      * summed up values in the columns to aggregate
      */
@@ -750,6 +750,49 @@ public class DataFrame
     public DataFrame sumByWithIndex(ListIterable<String> columnsToSumNames, ListIterable<String> columnsToGroupByNames)
     {
         return this.aggregateByWithIndex(columnsToSumNames.collect(AggregateFunction::sum), columnsToGroupByNames);
+    }
+
+    /**
+     * Extracts unique rows from the data frame. Returns a new data frame with the same schema as this data frame and
+     * only containing unique row values. This is the same as calling the {@link #unique(ListIterable)} method with the
+     * list of all the data frame columns as its parameter.
+     * @return a new data frame with a row for each unique combination of row values for the specified columns in this
+     * dataframe
+     */
+    public DataFrame unique()
+    {
+        return this.uniqueRowsForColumns(this.columns);
+    }
+
+    /**
+     * Extracts unique valued in rows, in multiple columns, for the specified columns. Returns a new data frame
+     * containing the specified columns with unique row values from this dataframe.
+     * @param columnNames the list of columns from which to select unique row values
+     * @return a new data frame with a row for each unique combination of row values for the specified columns in this
+     * dataframe
+     */
+    public DataFrame unique(ListIterable<String> columnNames)
+    {
+        return this.uniqueRowsForColumns(columnNames.collect(this::getColumnNamed));
+    }
+
+    private DataFrame uniqueRowsForColumns(ListIterable<DfColumn> uniqueColumns)
+    {
+        ListIterable<String> columnNames = uniqueColumns.collect(DfColumn::getName);
+
+        DataFrame result = new DataFrame("Unique " + this.getName());
+
+        uniqueColumns.forEach(col  -> result.addColumn(col.getName(), col.getType()));
+
+        DfIndexKeeper index = new DfIndexKeeper(result, columnNames);
+
+        for (int rowIndex = 0; rowIndex < this.rowCount; rowIndex++)
+        {
+            ListIterable<Object> keyValue = index.computeKeyFrom(this, rowIndex);
+            index.getRowIndexAtKeyIfAbsentAdd(keyValue);
+        }
+
+        return result;
     }
 
     public Twin<DataFrame> partition(String filterExpressionString)
