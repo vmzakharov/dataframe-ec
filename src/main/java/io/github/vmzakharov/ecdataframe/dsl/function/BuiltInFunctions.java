@@ -26,6 +26,7 @@ import java.time.LocalDateTime;
 import java.time.Period;
 import java.time.format.DateTimeFormatter;
 
+import static io.github.vmzakharov.ecdataframe.dsl.value.Value.VOID;
 import static io.github.vmzakharov.ecdataframe.dsl.value.ValueType.BOOLEAN;
 import static io.github.vmzakharov.ecdataframe.dsl.value.ValueType.DATE;
 import static io.github.vmzakharov.ecdataframe.dsl.value.ValueType.DATE_TIME;
@@ -61,114 +62,65 @@ final public class BuiltInFunctions
         addFunctionDescriptor(new IntrinsicFunctionDescriptor("print")
         {
             @Override
-            public Value evaluate(VectorValue parameters)
+            public Value evaluate(EvalContext context)
             {
+                VectorValue parameters = this.getParameterVectorFrom(context);
                 Printer printer = PrinterFactory.getPrinter();
                 parameters.getElements().collect(Value::stringValue).forEach(printer::print);
-                return Value.VOID;
+                return VOID;
             }
         });
 
         addFunctionDescriptor(new IntrinsicFunctionDescriptor("println")
         {
             @Override
-            public Value evaluate(VectorValue parameters)
+            public Value evaluate(EvalContext context)
             {
+                VectorValue parameters = this.getParameterVectorFrom(context);
                 Printer printer = PrinterFactory.getPrinter();
                 parameters.getElements().collect(Value::stringValue).forEach(printer::print);
                 printer.newLine();
-                return Value.VOID;
+                return VOID;
             }
         });
 
-        addFunctionDescriptor(new IntrinsicFunctionDescriptor("startsWith", Lists.immutable.of("string", "prefix"))
-        {
-            @Override
-            public Value evaluate(EvalContext context)
-            {
-                String aString = context.getVariable("string").stringValue();
-                String aPrefix = context.getVariable("prefix").stringValue();
+        addFunctionDescriptor(new IntrinsicFunctionDescriptorBuilder("startsWith", Lists.immutable.of("string", "prefix"))
+                .returnType(BOOLEAN)
+                .action(context ->
+                        BooleanValue.valueOf(context.getString("string").startsWith(context.getString("prefix")))
+                )
+        );
 
-                return BooleanValue.valueOf(aString.startsWith(aPrefix));
-            }
+        addFunctionDescriptor(new IntrinsicFunctionDescriptorBuilder("contains", Lists.immutable.of("string", "substring"))
+                .returnType(BOOLEAN)
+                .action(context ->
+                    BooleanValue.valueOf(context.getString("string").contains(context.getString("substring")))
+                )
+        );
 
-            @Override
-            public ValueType returnType(ListIterable<ValueType> paraValueTypes)
-            {
-                return BOOLEAN;
-            }
-        });
+        addFunctionDescriptor(new IntrinsicFunctionDescriptorBuilder("toUpper", Lists.immutable.of("string"))
+                .returnType(STRING)
+                .action(context -> new StringValue(context.getString("string").toUpperCase()))
+        );
 
-        addFunctionDescriptor(new IntrinsicFunctionDescriptor("contains", Lists.immutable.of("string", "substring"))
-        {
-            @Override
-            public Value evaluate(EvalContext context)
-            {
-                String aString = context.getVariable("string").stringValue();
-                String substring = context.getVariable("substring").stringValue();
+        addFunctionDescriptor(new IntrinsicFunctionDescriptorBuilder("trim", Lists.immutable.of("string"))
+                .returnType(STRING)
+                .action(context -> new StringValue(context.getString("string").trim()))
+        );
 
-                return BooleanValue.valueOf(aString.contains(substring));
-            }
-
-            @Override
-            public ValueType returnType(ListIterable<ValueType> paraValueTypes)
-            {
-                return BOOLEAN;
-            }
-        });
-
-        addFunctionDescriptor(new IntrinsicFunctionDescriptor("toUpper", Lists.immutable.of("string"))
-        {
-            @Override
-            public Value evaluate(EvalContext context)
-            {
-                return new StringValue(context.getVariable("string").stringValue().toUpperCase());
-            }
-
-            @Override
-            public ValueType returnType(ListIterable<ValueType> parameterTypes)
-            {
-                return STRING;
-            }
-        });
-
-        addFunctionDescriptor(new IntrinsicFunctionDescriptor("trim", Lists.immutable.of("string"))
-        {
-            @Override
-            public Value evaluate(EvalContext context)
-            {
-                return new StringValue(context.getVariable("string").stringValue().trim());
-            }
-
-            @Override
-            public ValueType returnType(ListIterable<ValueType> parameterTypes)
-            {
-                return STRING;
-            }
-        });
-
-        addFunctionDescriptor(new IntrinsicFunctionDescriptor("toDecimal", Lists.immutable.of("unscaledValue", "scale"))
-        {
-            @Override
-            public Value evaluate(EvalContext context)
-            {
-                long unscaledValue = ((LongValue) context.getVariable("unscaledValue")).longValue();
-                int scale  = (int) ((LongValue) context.getVariable("scale")).longValue();
-                return new DecimalValue(BigDecimal.valueOf(unscaledValue, scale));
-            }
-
-            @Override
-            public ValueType returnType(ListIterable<ValueType> parameterTypes)
-            {
-                return ValueType.DECIMAL;
-            }
-        });
+        addFunctionDescriptor(new IntrinsicFunctionDescriptorBuilder("toDecimal", Lists.immutable.of("unscaledValue", "scale"))
+                .returnType(DECIMAL)
+                .action(context ->
+                    new DecimalValue(BigDecimal.valueOf(context.getLong("unscaledValue"), (int) context.getLong("scale")))
+                )
+        );
 
         addFunctionDescriptor(new IntrinsicFunctionDescriptor("substr")
         {
             @Override
-            public Value evaluate(VectorValue parameters)
+            public Value evaluate(EvalContext context)
             {
+                VectorValue parameters = this.getParameterVectorFrom(context);
                 int parameterCount = parameters.size();
                 if (parameterCount != 2 && parameterCount != 3)
                 {
@@ -180,7 +132,7 @@ final public class BuiltInFunctions
                 Value stringParam = parameters.get(0);
                 if (stringParam.isVoid())
                 {
-                    return Value.VOID;
+                    return VOID;
                 }
 
                 String aString = stringParam.stringValue();
@@ -197,15 +149,15 @@ final public class BuiltInFunctions
             }
 
             @Override
-            public ValueType returnType(ListIterable<ValueType> paraValueTypes)
-            {
-                return STRING;
-            }
-
-            @Override
             public String usageString()
             {
                 return "Usage: " + this.getName() + "(string, beginIndex[, endIndex])";
+            }
+
+            @Override
+            public ValueType returnType(ListIterable<ValueType> parameterTypes)
+            {
+                return STRING;
             }
         });
 
@@ -218,7 +170,7 @@ final public class BuiltInFunctions
 
                 if (parameter.isVoid())
                 {
-                    return Value.VOID;
+                    return VOID;
                 }
 
                 if (!parameter.isNumber())
@@ -242,29 +194,17 @@ final public class BuiltInFunctions
             }
         });
 
-        addFunctionDescriptor(new IntrinsicFunctionDescriptor("toString", Lists.immutable.of("number"))
-        {
-            @Override
-            public Value evaluate(EvalContext context)
-            {
-                Value value = context.getVariable("number");
-
-                return new StringValue(value.stringValue());
-            }
-
-            @Override
-            public ValueType returnType(ListIterable<ValueType> paraValueTypes)
-            {
-                return STRING;
-            }
-        });
+        addFunctionDescriptor(new IntrinsicFunctionDescriptorBuilder("toString", Lists.immutable.of("number"))
+                .returnType(STRING)
+                .action(context -> new StringValue(context.getVariable("number").stringValue()))
+        );
 
         addFunctionDescriptor(new IntrinsicFunctionDescriptor("v")
         {
             @Override
-            public Value evaluate(VectorValue parameters)
+            public Value evaluate(EvalContext context)
             {
-                return parameters;
+                return this.getParameterVectorFrom(context);
             }
 
             @Override
@@ -280,10 +220,10 @@ final public class BuiltInFunctions
             private final MutableMap<String, DateTimeFormatter> dateTimeFormatters = Maps.mutable.of();
 
             @Override
-            public Value evaluate(EvalContext context)
+            public StringValue evaluate(EvalContext context)
             {
                 Value value = context.getVariable("object");
-                String pattern = context.getVariable("pattern").stringValue();
+                String pattern = context.getString("pattern");
 
                 String result = "not used";
                 if (value.isNumber())
@@ -311,7 +251,7 @@ final public class BuiltInFunctions
             }
 
             @Override
-            public ValueType returnType(ListIterable<ValueType> paraValueTypes)
+            public ValueType returnType(ListIterable<ValueType> parameterTypes)
             {
                 return STRING;
             }
@@ -326,8 +266,10 @@ final public class BuiltInFunctions
         addFunctionDescriptor(new IntrinsicFunctionDescriptor("toDate")
         {
             @Override
-            public Value evaluate(VectorValue parameters)
+            public Value evaluate(EvalContext context)
             {
+                VectorValue parameters = this.getParameterVectorFrom(context);
+
                 LocalDate date = null;
                 if (parameters.size() == 3)
                 {
@@ -337,7 +279,7 @@ final public class BuiltInFunctions
 
                     if (yearValue.isVoid() || monthValue.isVoid() || dayValue.isVoid())
                     {
-                        return Value.VOID;
+                        return VOID;
                     }
 
                     date = LocalDate.of(
@@ -351,7 +293,7 @@ final public class BuiltInFunctions
 
                     if (dateAsString.isVoid())
                     {
-                        return Value.VOID;
+                        return VOID;
                     }
 
                     date = LocalDate.parse(dateAsString.stringValue(), DateTimeFormatter.ISO_DATE);
@@ -381,8 +323,9 @@ final public class BuiltInFunctions
         addFunctionDescriptor(new IntrinsicFunctionDescriptor("toDateTime")
         {
             @Override
-            public Value evaluate(VectorValue parameters)
+            public Value evaluate(EvalContext context)
             {
+                VectorValue parameters = this.getParameterVectorFrom(context);
                 LocalDateTime dateTime = null;
                 int paramCount = parameters.size();
                 if (parameters.size() > 4)
@@ -393,7 +336,7 @@ final public class BuiltInFunctions
                         Value parameter = parameters.get(i);
                         if (parameter.isVoid())
                         {
-                            return Value.VOID;
+                            return VOID;
                         }
 
                         params[i] = (int) ((LongValue) parameter).longValue();
@@ -420,7 +363,7 @@ final public class BuiltInFunctions
 
                     if (dateTimeAsString.isVoid())
                     {
-                        return Value.VOID;
+                        return VOID;
                     }
 
                     dateTime = LocalDateTime.parse(dateTimeAsString.stringValue(), DateTimeFormatter.ISO_DATE_TIME);
@@ -455,7 +398,7 @@ final public class BuiltInFunctions
                 Value parameter = context.getVariable("string");
                 if (parameter.isVoid())
                 {
-                    return Value.VOID;
+                    return VOID;
                 }
 
                 this.assertParameterType(STRING, parameter.getType());
@@ -479,7 +422,7 @@ final public class BuiltInFunctions
                 Value parameter = context.getVariable("string");
                 if (parameter.isVoid())
                 {
-                    return Value.VOID;
+                    return VOID;
                 }
 
                 this.assertParameterType(STRING, parameter.getType());
@@ -503,13 +446,13 @@ final public class BuiltInFunctions
                 Value unscaled = context.getVariable("unscaledValue");
                 if (unscaled.isVoid())
                 {
-                    return Value.VOID;
+                    return VOID;
                 }
 
                 Value scale = context.getVariable("scale");
                 if (scale.isVoid())
                 {
-                    return Value.VOID;
+                    return VOID;
                 }
 
                 this.assertParameterType(LONG, unscaled.getType());
@@ -528,26 +471,13 @@ final public class BuiltInFunctions
             }
         });
 
-        addFunctionDescriptor(new IntrinsicFunctionDescriptor("withinDays", Lists.immutable.of("date1", "date2", "numberOfDays"))
-        {
-            @Override
-            public Value evaluate(EvalContext context)
-            {
-                LocalDate date1 = ((DateValue) context.getVariable("date1")).dateValue();
-                LocalDate date2 = ((DateValue) context.getVariable("date2")).dateValue();
-                long numberOfDays = ((LongValue) context.getVariable("numberOfDays")).longValue();
-
-                Period period = Period.between(date1, date2);
-
-                return BooleanValue.valueOf(Math.abs(period.getDays()) <= numberOfDays);
-            }
-
-            @Override
-            public ValueType returnType(ListIterable<ValueType> paraValueTypes)
-            {
-                return BOOLEAN;
-            }
-        });
+        addFunctionDescriptor(new IntrinsicFunctionDescriptorBuilder("withinDays", Lists.immutable.of("date1", "date2", "numberOfDays"))
+                .returnType(BOOLEAN)
+                .action(context -> {
+                        Period period = Period.between(context.getDate("date1"), context.getDate("date2"));
+                        return BooleanValue.valueOf(Math.abs(period.getDays()) <= context.getLong("numberOfDays"));
+                    })
+        );
     }
 
     public static void addFunctionDescriptor(IntrinsicFunctionDescriptor fd)

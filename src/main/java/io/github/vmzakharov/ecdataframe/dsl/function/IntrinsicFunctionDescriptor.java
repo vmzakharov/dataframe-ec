@@ -55,15 +55,12 @@ implements FunctionDescriptor
         return ValueType.VOID;
     }
 
-    public Value evaluate(EvalContext context)
-    {
-        return this.evaluate((VectorValue) context.getVariableOrDefault(this.magicalParameterName(), VectorValue.EMPTY));
-    }
+    abstract public Value evaluate(EvalContext context);
 
-    public Value evaluate(VectorValue parameters)
-    {
-        throw exceptionByKey("DSL_FUN_NOT_IMPLEMENTED").with("functionName", this.name).get();
-    }
+     protected VectorValue getParameterVectorFrom(EvalContext context)
+     {
+         return (VectorValue) context.getVariableOrDefault(this.magicalParameterName(), VectorValue.EMPTY);
+     }
 
     public String usageString()
     {

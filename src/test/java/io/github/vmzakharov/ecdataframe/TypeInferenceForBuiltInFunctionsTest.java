@@ -1,11 +1,11 @@
 package io.github.vmzakharov.ecdataframe;
 
+import io.github.vmzakharov.ecdataframe.dsl.EvalContext;
 import io.github.vmzakharov.ecdataframe.dsl.function.BuiltInFunctions;
 import io.github.vmzakharov.ecdataframe.dsl.function.IntrinsicFunctionDescriptor;
 import io.github.vmzakharov.ecdataframe.dsl.value.LongValue;
 import io.github.vmzakharov.ecdataframe.dsl.value.Value;
 import io.github.vmzakharov.ecdataframe.dsl.value.ValueType;
-import io.github.vmzakharov.ecdataframe.dsl.value.VectorValue;
 import org.eclipse.collections.api.list.ListIterable;
 import org.junit.Test;
 
@@ -84,7 +84,7 @@ public class TypeInferenceForBuiltInFunctionsTest
         BuiltInFunctions.addFunctionDescriptor(new IntrinsicFunctionDescriptor("two")
         {
             @Override
-            public Value evaluate(VectorValue parameters)
+            public Value evaluate(EvalContext context)
             {
                 return new LongValue(2);
             }

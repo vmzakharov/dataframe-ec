@@ -1,9 +1,13 @@
 package io.github.vmzakharov.ecdataframe.dsl;
 
+import io.github.vmzakharov.ecdataframe.dsl.value.DateValue;
+import io.github.vmzakharov.ecdataframe.dsl.value.LongValue;
 import io.github.vmzakharov.ecdataframe.dsl.value.Value;
 import org.eclipse.collections.api.map.MapIterable;
 import org.eclipse.collections.api.map.MutableMap;
 import org.eclipse.collections.impl.factory.Maps;
+
+import java.time.LocalDate;
 
 import static io.github.vmzakharov.ecdataframe.util.ExceptionFactory.exceptionByKey;
 
@@ -75,5 +79,23 @@ implements EvalContext
                 this.declaredFunctions.put(k, v);
             }
         });
+    }
+
+    @Override
+    public String getString(String variableName)
+    {
+        return this.getVariable(variableName).stringValue();
+    }
+
+    @Override
+    public long getLong(String variableName)
+    {
+        return ((LongValue) this.getVariable(variableName)).longValue();
+    }
+
+    @Override
+    public LocalDate getDate(String variableName)
+    {
+        return ((DateValue) this.getVariable(variableName)).dateValue();
     }
 }
