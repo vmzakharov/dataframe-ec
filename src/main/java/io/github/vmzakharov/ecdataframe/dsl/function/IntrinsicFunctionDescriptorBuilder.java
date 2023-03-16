@@ -4,6 +4,7 @@ import io.github.vmzakharov.ecdataframe.dsl.EvalContext;
 import io.github.vmzakharov.ecdataframe.dsl.value.Value;
 import io.github.vmzakharov.ecdataframe.dsl.value.ValueType;
 import org.eclipse.collections.api.list.ListIterable;
+import org.eclipse.collections.impl.factory.Lists;
 
 import java.util.function.Function;
 
@@ -13,17 +14,26 @@ extends IntrinsicFunctionDescriptor
     private Function<EvalContext, Value> action = ignore -> Value.VOID;
     private Function<ListIterable<ValueType>, ValueType> returnTypeFunction = ignore -> ValueType.VOID;
 
-    public IntrinsicFunctionDescriptorBuilder(
-            String newName,
-            ListIterable<String> newParameterNames)
+    public IntrinsicFunctionDescriptorBuilder(String newName)
     {
-        super(newName, newParameterNames);
+        super(newName);
     }
 
     public IntrinsicFunctionDescriptorBuilder action(Function<EvalContext, Value> newAction)
     {
         this.action = newAction;
         return this;
+    }
+
+    public IntrinsicFunctionDescriptorBuilder parameterNames(ListIterable<String> parameterNames)
+    {
+        this.setParameterNames(parameterNames);
+        return this;
+    }
+
+    public IntrinsicFunctionDescriptorBuilder parameterNames(String... parameterNames)
+    {
+        return this.parameterNames(Lists.immutable.of(parameterNames));
     }
 
     public IntrinsicFunctionDescriptorBuilder returnType(ValueType newReturnType)

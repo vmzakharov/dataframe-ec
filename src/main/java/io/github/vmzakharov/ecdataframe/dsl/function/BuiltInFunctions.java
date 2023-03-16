@@ -84,31 +84,33 @@ final public class BuiltInFunctions
             }
         });
 
-        addFunctionDescriptor(new IntrinsicFunctionDescriptorBuilder("startsWith", Lists.immutable.of("string", "prefix"))
+        addFunctionDescriptor(new IntrinsicFunctionDescriptorBuilder("startsWith")
+                .parameterNames("string", "prefix")
                 .returnType(BOOLEAN)
                 .action(context ->
                         BooleanValue.valueOf(context.getString("string").startsWith(context.getString("prefix")))
                 )
         );
 
-        addFunctionDescriptor(new IntrinsicFunctionDescriptorBuilder("contains", Lists.immutable.of("string", "substring"))
+        addFunctionDescriptor(new IntrinsicFunctionDescriptorBuilder("contains")
+                .parameterNames("string", "substring")
                 .returnType(BOOLEAN)
-                .action(context ->
-                    BooleanValue.valueOf(context.getString("string").contains(context.getString("substring")))
-                )
+                .action(context -> BooleanValue.valueOf(context.getString("string").contains(context.getString("substring"))))
         );
 
-        addFunctionDescriptor(new IntrinsicFunctionDescriptorBuilder("toUpper", Lists.immutable.of("string"))
+        addFunctionDescriptor(new IntrinsicFunctionDescriptorBuilder("toUpper")
+                .parameterNames("string")
                 .returnType(STRING)
                 .action(context -> new StringValue(context.getString("string").toUpperCase()))
         );
 
-        addFunctionDescriptor(new IntrinsicFunctionDescriptorBuilder("trim", Lists.immutable.of("string"))
+        addFunctionDescriptor(new IntrinsicFunctionDescriptorBuilder("trim")
+                .parameterNames("string")
                 .returnType(STRING)
                 .action(context -> new StringValue(context.getString("string").trim()))
         );
 
-        addFunctionDescriptor(new IntrinsicFunctionDescriptorBuilder("toDecimal", Lists.immutable.of("unscaledValue", "scale"))
+        addFunctionDescriptor(new IntrinsicFunctionDescriptorBuilder("toDecimal").parameterNames("unscaledValue", "scale")
                 .returnType(DECIMAL)
                 .action(context ->
                     new DecimalValue(BigDecimal.valueOf(context.getLong("unscaledValue"), (int) context.getLong("scale")))
@@ -194,7 +196,8 @@ final public class BuiltInFunctions
             }
         });
 
-        addFunctionDescriptor(new IntrinsicFunctionDescriptorBuilder("toString", Lists.immutable.of("number"))
+        addFunctionDescriptor(new IntrinsicFunctionDescriptorBuilder("toString")
+                .parameterNames("number")
                 .returnType(STRING)
                 .action(context -> new StringValue(context.getVariable("number").stringValue()))
         );
@@ -471,7 +474,8 @@ final public class BuiltInFunctions
             }
         });
 
-        addFunctionDescriptor(new IntrinsicFunctionDescriptorBuilder("withinDays", Lists.immutable.of("date1", "date2", "numberOfDays"))
+        addFunctionDescriptor(new IntrinsicFunctionDescriptorBuilder("withinDays")
+                .parameterNames("date1", "date2", "numberOfDays")
                 .returnType(BOOLEAN)
                 .action(context -> {
                         Period period = Period.between(context.getDate("date1"), context.getDate("date2"));

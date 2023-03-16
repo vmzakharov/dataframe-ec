@@ -15,19 +15,18 @@ implements FunctionDescriptor
 {
     private final String name;
     private final String normalizedName;
-    private final ListIterable<String> parameterNames;
-    private ListIterable<ValueType> expectedParameterTypes;
+    private ListIterable<String> parameterNames;
 
     public IntrinsicFunctionDescriptor(String newName, ListIterable<String> newParameterNames)
     {
         this.name = newName;
         this.normalizedName = this.name.toUpperCase();
-        this.parameterNames = newParameterNames;
+        this.setParameterNames(newParameterNames);
     }
 
     public IntrinsicFunctionDescriptor(String newName)
     {
-        this(newName, Lists.immutable.of());
+        this(newName, Lists.immutable.empty());
     }
 
     public String getName()
@@ -38,6 +37,11 @@ implements FunctionDescriptor
     public String getNormalizedName()
     {
         return this.normalizedName;
+    }
+
+    protected void setParameterNames(ListIterable<String> newParameterNames)
+    {
+        this.parameterNames = newParameterNames;
     }
 
     public ListIterable<String> getParameterNames()
