@@ -135,8 +135,8 @@ public class DataFrameCompare
         return this.reason;
     }
 
-    private void reason(String reason)
+    private void reason(String newReason)
     {
-        this.reason = reason;
+        this.reason = newReason;
     }
 }
