@@ -753,25 +753,25 @@ public class DataFrame
     }
 
     /**
-     * Extracts unique rows from the data frame. Returns a new data frame with the same schema as this data frame and
-     * only containing unique row values. This is the same as calling the {@link #unique(ListIterable)} method with the
-     * list of all the data frame columns as its parameter.
-     * @return a new data frame with a row for each unique combination of row values for the specified columns in this
-     * dataframe
+     * Extracts distinct rows from the data frame. Returns a new data frame with the same schema as this data frame and
+     * only containing distinct row values. This is the same as calling the {@link #distinct(ListIterable)} method with
+     * the list of all the data frame columns as its parameter.
+     * @return a new data frame with a row for each distinct (unique) combination of row values for the specified
+     * columns in this dataframe
      */
-    public DataFrame unique()
+    public DataFrame distinct()
     {
         return this.uniqueRowsForColumns(this.columns);
     }
 
     /**
-     * Extracts unique valued in rows, in multiple columns, for the specified columns. Returns a new data frame
-     * containing the specified columns with unique row values from this dataframe.
+     * Extracts distinct valued in rows, in multiple columns, for the specified columns. Returns a new data frame
+     * containing the specified columns with distinct row values from this dataframe.
      * @param columnNames the list of columns from which to select unique row values
-     * @return a new data frame with a row for each unique combination of row values for the specified columns in this
-     * dataframe
+     * @return a new data frame with a row for each distinct (unique) combination of row values for the specified
+     * columns in this dataframe
      */
-    public DataFrame unique(ListIterable<String> columnNames)
+    public DataFrame distinct(ListIterable<String> columnNames)
     {
         return this.uniqueRowsForColumns(columnNames.collect(this::getColumnNamed));
     }
@@ -780,7 +780,7 @@ public class DataFrame
     {
         ListIterable<String> columnNames = uniqueColumns.collect(DfColumn::getName);
 
-        DataFrame result = new DataFrame("Unique " + this.getName());
+        DataFrame result = new DataFrame("Distinct " + this.getName());
 
         uniqueColumns.forEach(col  -> result.addColumn(col.getName(), col.getType()));
 

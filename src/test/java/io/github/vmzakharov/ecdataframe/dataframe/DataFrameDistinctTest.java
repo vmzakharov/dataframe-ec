@@ -8,7 +8,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
-public class DataFrameUniqueTest
+public class DataFrameDistinctTest
 {
     private DataFrame df;
 
@@ -42,7 +42,7 @@ public class DataFrameUniqueTest
                         .addRow(2, "Bob", 123.456, LocalDate.of(2022, 11, 15), LocalDateTime.of(2023, 11, 22, 20, 45, 55), BigDecimal.valueOf(456, 2))
                         .addRow(1, "Alice", 123.456, LocalDate.of(2022, 12, 15), LocalDateTime.of(2023, 11, 22, 20, 45, 55), BigDecimal.valueOf(567, 1))
                 ,
-                this.df.unique()
+                this.df.distinct()
         );
     }
 
@@ -56,7 +56,7 @@ public class DataFrameUniqueTest
                         .addRow(1, "Alice", 123.456)
                         .addRow(2, "Bob", 123.456)
                 ,
-                this.df.unique(Lists.immutable.of("Id", "Name", "Foo"))
+                this.df.distinct(Lists.immutable.of("Id", "Name", "Foo"))
         );
     }
 
@@ -71,7 +71,7 @@ public class DataFrameUniqueTest
                     .addRow(123.456, LocalDate.of(2022, 11, 15), LocalDateTime.of(2023, 11, 22, 20, 45, 55), BigDecimal.valueOf(456, 2))
                     .addRow(123.456, LocalDate.of(2022, 12, 15), LocalDateTime.of(2023, 11, 22, 20, 45, 55), BigDecimal.valueOf(567, 1))
                 ,
-                this.df.unique(Lists.immutable.of("Foo", "Bar", "Baz", "Qux"))
+                this.df.distinct(Lists.immutable.of("Foo", "Bar", "Baz", "Qux"))
         );
     }
 }
