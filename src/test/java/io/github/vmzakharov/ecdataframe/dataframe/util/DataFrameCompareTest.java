@@ -14,7 +14,6 @@ import static io.github.vmzakharov.ecdataframe.dsl.value.ValueType.DECIMAL;
 import static io.github.vmzakharov.ecdataframe.dsl.value.ValueType.DOUBLE;
 import static io.github.vmzakharov.ecdataframe.dsl.value.ValueType.LONG;
 import static io.github.vmzakharov.ecdataframe.dsl.value.ValueType.STRING;
-import static io.github.vmzakharov.ecdataframe.util.FormatWithPlaceholders.addMessage;
 import static io.github.vmzakharov.ecdataframe.util.FormatWithPlaceholders.messageFromKey;
 
 public class DataFrameCompareTest

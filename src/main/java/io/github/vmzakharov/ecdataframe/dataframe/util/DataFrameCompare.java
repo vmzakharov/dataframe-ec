@@ -27,6 +27,13 @@ public class DataFrameCompare
     {
     }
 
+    /**
+     * Compares two data frames. The data frames are considered equal if they have the same dimensions, the same column
+     * types and headers and cells in the same positions contain equal values.
+     * @param thisDf the first data frame to be compared
+     * @param thatDf the second data frame to be compared
+     * @return true if the data frames are equal, false otherwise
+     */
     public boolean equal(DataFrame thisDf, DataFrame thatDf)
     {
         if (this.dimensionsDoNotMatch(thisDf, thatDf)
@@ -39,6 +46,13 @@ public class DataFrameCompare
         return this.cellValuesMatch(thisDf, thatDf);
     }
 
+    /**
+     * Compares two data frames ignoring the order of rows. The data frames are sorted and then compared.
+     * Note: this method has a side effect of sorting dataframes.
+     * @param thisDf the first data frame to be compared
+     * @param thatDf the second data frame to be compared
+     * @return true if the data frames are equal, false otherwise
+     */
     public boolean equalIgnoreOrder(DataFrame thisDf, DataFrame thatDf)
     {
         if (this.dimensionsDoNotMatch(thisDf, thatDf)
