@@ -1,5 +1,6 @@
 package io.github.vmzakharov.ecdataframe.util;
 
+import static io.github.vmzakharov.ecdataframe.util.FormatWithPlaceholders.*;
 import static io.github.vmzakharov.ecdataframe.util.FormatWithPlaceholders.addMessage;
 
 final public class ConfigureMessages
@@ -11,6 +12,11 @@ final public class ConfigureMessages
 
     public static void initialize()
     {
+        if (hasMessages())
+        {
+            return;
+        }
+
         addMessage("AGG_NOT_APPLICABLE",              "Aggregation '${operation}' (${operationDescription}) cannot be performed on ${operationScope}");
         addMessage("AGG_NO_INITIAL_VALUE",            "Aggregation ${operation} does not have a long initial value");
         addMessage("AGG_NO_ACCUMULATOR",              "Aggregation ${operation} does not support a ${type} accumulator");
@@ -69,10 +75,13 @@ final public class ConfigureMessages
         addMessage("DSL_FUN_DECLARATION_EVAL",        "A standalone function declaration cannot be evaluated. Function: ${functionName}");
         addMessage("TYPE_INFER_ELSE_INCOMPATIBLE",    "Incompatible types in branches of if-else");
         addMessage("TYPE_INFER_TYPES_IN_EXPRESSION",  "Incompatible operand types in expression");
-        addMessage("TYPE_INFER_UNEXPECTED_TYPE",      "Required expression type %s, was %s");
+        addMessage("TYPE_INFER_UNEXPECTED_TYPE",      "Required expression type ${expectedType}, was ${actualType}");
         addMessage("TYPE_INFER_UNDEFINED_VARIABLE",   "Undefined variable");
         addMessage("TYPE_INFER_UNDEFINED_FUNCTION",   "Undefined function");
         addMessage("TYPE_INFER_COND_NOT_BOOLEAN",     "Condition type is not boolean");
-
+        addMessage("DF_EQ_COL_TYPE_MISMATCH",         "Column types don't match: ${lhColumnTypes} vs. ${rhColumnTypes}");
+        addMessage("DF_EQ_COL_HEADER_MISMATCH",       "Column headers don't match: ${lhColumnHeaders} vs. ${rhColumnHeaders}");
+        addMessage("DF_EQ_DIM_MISMATCH",              "Dimensions don't match: rows ${lhRowCount}, cols ${lhColumnCount}, vs. rows ${rhRowCount}, cols ${rhRowCount}");
+        addMessage("DF_EQ_CELL_VALUE_MISMATCH",       "Different values in row ${rowIndex}, column ${columnIndex}: ${lhValue} vs. ${rhValue}");
     }
 }

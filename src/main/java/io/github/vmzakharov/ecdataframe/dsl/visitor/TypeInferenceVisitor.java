@@ -425,6 +425,9 @@ implements ExpressionVisitor
 
     private String unexpectedTypeMessage(ValueType expected, ValueType actual)
     {
-        return String.format(messageFromKey("TYPE_INFER_UNEXPECTED_TYPE").toString(), expected.toString(), actual.toString());
+        return messageFromKey("TYPE_INFER_UNEXPECTED_TYPE")
+                .with("expectedType", expected.toString())
+                .with("actualType", actual.toString())
+                .toString();
     }
 }

@@ -3,9 +3,13 @@ package io.github.vmzakharov.ecdataframe.dataframe.util;
 import io.github.vmzakharov.ecdataframe.dataframe.DataFrame;
 import io.github.vmzakharov.ecdataframe.dataframe.DfColumn;
 import io.github.vmzakharov.ecdataframe.dsl.value.ValueType;
+import io.github.vmzakharov.ecdataframe.util.ConfigureMessages;
+import io.github.vmzakharov.ecdataframe.util.FormatWithPlaceholders;
 import org.eclipse.collections.api.list.ImmutableList;
 
 import java.math.BigDecimal;
+
+import static io.github.vmzakharov.ecdataframe.util.FormatWithPlaceholders.messageFromKey;
 
 /**
  * A utility class used to compare two data frames.
@@ -13,6 +17,11 @@ import java.math.BigDecimal;
 public class DataFrameCompare
 {
     private String reason = "";
+
+    static
+    {
+        ConfigureMessages.initialize();
+    }
 
     public DataFrameCompare()
     {
@@ -59,18 +68,14 @@ public class DataFrameCompare
 
                 if ((thisValue instanceof BigDecimal) && (thatValue != null))
                 {
-                    if (!(thatValue instanceof BigDecimal))
+                    if (!(thatValue instanceof BigDecimal)
+                        || (((BigDecimal) thisValue).compareTo((BigDecimal) thatValue) != 0)
+                    )
                     {
-                        this.reason("Invalid type of the right hand value: " + thatValue.getClass().getName()
-                                + ", expected: BigDecimal");
-                        return false;
-                    }
-
-                    if (((BigDecimal) thisValue).compareTo((BigDecimal) thatValue) != 0)
-                    {
-                        this.reason("Different values in row " + rowIndex + ", column " + colIndex
-                                + " lh: " + thisValue + ", rh: " + thatValue
-                                + " (showing the result of left hand.compareTo(right hand)");
+                        this.reason(messageFromKey("DF_EQ_CELL_VALUE_MISMATCH")
+                                .with("rowIndex", rowIndex).with("columnIndex", colIndex)
+                                .with("lhValue", String.valueOf(thisValue)).with("rhValue", String.valueOf(thatValue))
+                        );
                         return false;
                     }
                 }
@@ -79,8 +84,10 @@ public class DataFrameCompare
                     if ((thisValue == null && thatValue != null)
                             || (thisValue != null && !thisValue.equals(thatValue)))
                     {
-                        this.reason("Different values in row " + rowIndex + ", column " + colIndex + ": " + thisValue
-                                + " vs. " + thatValue);
+                        this.reason(messageFromKey("DF_EQ_CELL_VALUE_MISMATCH")
+                                .with("rowIndex", rowIndex).with("columnIndex", colIndex)
+                                .with("lhValue", String.valueOf(thisValue)).with("rhValue", String.valueOf(thatValue))
+                        );
                         return false;
                     }
                 }
@@ -100,7 +107,8 @@ public class DataFrameCompare
             return false;
         }
 
-        this.reason = "Column types " + thisColumnTypes + " vs. " + thatColumnTypes;
+        this.reason(messageFromKey("DF_EQ_COL_TYPE_MISMATCH")
+                .with("lhColumnTypes", thisColumnTypes.toString()).with("rhColumnTypes", thatColumnTypes.toString()));
         return true;
     }
 
@@ -114,7 +122,8 @@ public class DataFrameCompare
             return false;
         }
 
-        this.reason("Column names " + thisColumnNames + " vs. " + thatColumnNames);
+        this.reason(messageFromKey("DF_EQ_COL_HEADER_MISMATCH")
+            .with("lhColumnHeaders", thisColumnNames.toString()).with("rhColumnHeaders", thatColumnNames.toString()));
         return true;
     }
 
@@ -125,8 +134,9 @@ public class DataFrameCompare
             return false;
         }
 
-        this.reason("Dimensions don't match: rows " + thisDf.rowCount() + ", cols " + thisDf.columnCount()
-                + ", vs. rows " + thatDf.rowCount() + ", cols " + thatDf.columnCount());
+        this.reason(messageFromKey("DF_EQ_DIM_MISMATCH")
+                        .with("lhRowCount", thisDf.rowCount()).with("lhColumnCount", thisDf.columnCount())
+                        .with("rhRowCount", thatDf.rowCount()).with("rhColumnCount", thatDf.columnCount()));
         return true;
     }
 
@@ -138,5 +148,10 @@ public class DataFrameCompare
     private void reason(String newReason)
     {
         this.reason = newReason;
+    }
+
+    private void reason(FormatWithPlaceholders newReasonFormat)
+    {
+        this.reason = newReasonFormat.toString();
     }
 }

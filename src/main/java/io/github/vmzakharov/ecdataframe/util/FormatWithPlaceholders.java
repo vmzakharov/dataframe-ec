@@ -29,6 +29,11 @@ public class FormatWithPlaceholders
         return new FormatWithPlaceholders(newTemplate);
     }
 
+    public static boolean hasMessages()
+    {
+        return MESSAGES_BY_KEY.size() > 0;
+    }
+
     public static void addMessagesFromResourceBundle(ResourceBundle resourceBundle)
     {
         Enumeration<String> keys = resourceBundle.getKeys();
@@ -63,6 +68,18 @@ public class FormatWithPlaceholders
     public FormatWithPlaceholders with(String name, String value)
     {
         this.valuesByName.put(name, value);
+        return this;
+    }
+
+    public FormatWithPlaceholders with(String name, long value)
+    {
+        this.valuesByName.put(name, String.valueOf(value));
+        return this;
+    }
+
+    public FormatWithPlaceholders with(String name, double value)
+    {
+        this.valuesByName.put(name, String.valueOf(value));
         return this;
     }
 
