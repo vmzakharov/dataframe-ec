@@ -1,11 +1,14 @@
 # Releases
+### 0.19.2
+* adds `distinct()` method to data frame
+* various enhancements and bug fixes
 ### 0.19.1
-* adds copy() function to data frame (as discussed in issue #11)
-* adds newColumn() methods - same as addColumn(), but it returns the newly created column rather than the data frame itself
+* adds `copy()` method to data frame (as discussed in issue #11)
+* adds `newColumn()` methods - same as `addColumn()`, but it returns the newly created column rather than the data frame itself
 * introduces template based error message formatting and converts all inlined error messages to message lookup by key 
 This change supports overriding error messages with messages provided by the application. Supports loading message 
 templates from resource bundles, properties, and maps
-* renames ErrorReporter to ExceptionFactory and refactors the API
+* renames `ErrorReporter` to `ExceptionFactory` and refactors the API
 * supports type inference of computed column expressions
 ### 0.18.5
 * adds support for ascending and descending column sort order and expression sort order
@@ -15,7 +18,7 @@ templates from resource bundles, properties, and maps
 * bug fixes
 ### 0.18.3
 * changes data frame sort by column and sort by expression implementations to be stable
-* adds format() built-in function which supports rich formatting of numeric and date values
+* adds `format()` built-in function which supports rich formatting of numeric and date values
 ###  0.18.1
 * validates that the header names in a CSV data set match the schema
 * makes error printer configurable on ErrorReporter

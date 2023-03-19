@@ -10,7 +10,7 @@ For more on Eclipse Collections see: https://www.eclipse.org/collections/.
 <dependency>
   <groupId>io.github.vmzakharov</groupId>
   <artifactId>dataframe-ec</artifactId>
-  <version>0.19.1</version>
+  <version>0.19.2</version>
 </dependency>
 ```
 
@@ -23,6 +23,7 @@ For more on Eclipse Collections see: https://www.eclipse.org/collections/.
 - drop one or more columns
 - select a subset of rows based on a criteria
 - sort by one or more columns or by an expression
+- select distinct rows based on all column values or a subset of columns
 - union - concatenating data frames with the same schemas
 - join with another data frame, based on the specified column values, inner and outer joins are supported
 - join with complements, a single operation that returns three data frames - a complement of this data frame in another one, an inner join of the data frames, and a complement of the other data frame in this one
@@ -209,12 +210,12 @@ DataFrame totalsByCustomer = orders.sumBy(Lists.immutable.of("Count", "Price"), 
 
 `totalsByCustomer`
 
-| Customer | Count |   Price |
-|----------|------:|--------:|
-| "Alice"  |     9 | 42.9500 |
-| "Bob"    |    10 | 40.3400 |
-| "Carl"   |    11 | 44.7800 |
-| "Doris"  |     1 |  5.0000 |
+|Customer | Count | Price|
+|---|---:|---:|
+|"Alice" | 9 | 42.9500|
+|"Bob" | 10 | 40.3400|
+|"Carl" | 11 | 44.7800|
+|"Doris" | 1 | 5.0000|
 
 #### Add a Calculated Column
 ```
@@ -222,13 +223,13 @@ orders.addDoubleColumn("AvgDonutPrice", "Price / Count");
 ```
 `orders`
 
-| Customer | Count |   Price | Date       | AvgDonutPrice |
-|----------|------:|--------:|------------|--------------:|
-| "Alice"  |     5 | 23.4500 | 2020-10-15 |        4.6900 |
-| "Bob"    |    10 | 40.3400 | 2020-11-10 |        4.0340 |
-| "Alice"  |     4 | 19.5000 | 2020-10-19 |        4.8750 |
-| "Carl"   |    11 | 44.7800 | 2020-12-25 |        4.0709 |
-| "Doris"  |     1 |  5.0000 | 2020-09-01 |        5.0000 |
+|Customer | Count | Price | Date | AvgDonutPrice|
+|---|---:|---:|---|---:|
+|"Alice" | 5 | 23.4500 | 2020-10-15 | 4.6900|
+|"Bob" | 10 | 40.3400 | 2020-11-10 | 4.0340|
+|"Alice" | 4 | 19.5000 | 2020-10-19 | 4.8750|
+|"Carl" | 11 | 44.7800 | 2020-12-25 | 4.0709|
+|"Doris" | 1 | 5.0000 | 2020-09-01 | 5.0000|
 
 #### Filter
 Selection of a sub dataframe with the rows matching the filter condition
@@ -324,6 +325,23 @@ DataFrame combinedOrders = orders.union(otherOrders);
 |"Carl" | 11 | 44.7800 | 2020-12-25|
 |"Doris" | 1 | 5.0000 | 2020-09-01|
 |"Eve" | 2 | 9.8000 | 2020-12-05|
+
+#### Distinct
+Say we want to get a list of all clients who placed orders, which are listed in the `orders` data frame above. We can
+use the `distinct()` method for that:
+
+```
+DataFrame distinctCustomers = orders.distinct(Lists.immutable.of("Customer"));
+```
+
+`distinctCustomers`
+
+|Customer|
+|---|
+|"Alice"|
+|"Bob"|
+|"Carl"|
+|"Doris"|
 
 #### Join
 ```
@@ -505,22 +523,22 @@ Recursion (direct or indirect) is not supported.
 
 #### Built-in functions
 
-| Function   | Usage                                                           |
-|------------|-----------------------------------------------------------------|
-| abs        | abs(number)                                                     |
-| contains   | contains(string, substring)                                     |
-| print      | print()                                                         |
-| println    | println()                                                       |
-| startsWith | startsWith(string, prefix)                                      |
-| substr     | substr(string, beginIndex[, endIndex])                          |
+| Function   | Usage                                                          |
+|------------|----------------------------------------------------------------|
+| abs        | abs(number)                                                    |
+| contains   | contains(string, substring)                                    |
+| print      | print(value)                                                   |
+| println    | println(value)                                                 |
+| startsWith | startsWith(string, prefix)                                     |
+| substr     | substr(string, beginIndex[, endIndex])                         |
 | toDate     | toDate(string in the yyyy-mm-dd format)<br>toDate(yyyy, mm, dd) |
-| toDateTime | toDateTime(yyyy, mm, dd, hh, mm, ss)                            |
-| toDouble   | toDouble(string)                                                |
-| toLong     | toLong(string)                                                  |
-| toDecimal  | toUpper(unscaledValue, scale)                                   |
-| toString   | toString(number)                                                |
-| toUpper    | toUpper(string)                                                 |
-| withinDays | withinDays(date1, date2, numberOfDays)                          |
+| toDateTime | toDateTime(yyyy, mm, dd, hh, mm, ss)                           |
+| toDouble   | toDouble(string)                                               |
+| toLong     | toLong(string)                                                 |
+| toDecimal  | toUpper(unscaledValue, scale)                                  |
+| toString   | toString(number)                                               |
+| toUpper    | toUpper(string)                                                |
+| withinDays | withinDays(date1, date2, numberOfDays)                         |
 
 #### User Declared Function Example 1
 ```
