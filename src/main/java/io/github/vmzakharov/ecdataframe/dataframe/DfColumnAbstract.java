@@ -2,9 +2,6 @@ package io.github.vmzakharov.ecdataframe.dataframe;
 
 import io.github.vmzakharov.ecdataframe.dsl.value.Value;
 
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
-
 import static io.github.vmzakharov.ecdataframe.util.ExceptionFactory.exceptionByKey;
 
 public abstract class DfColumnAbstract
