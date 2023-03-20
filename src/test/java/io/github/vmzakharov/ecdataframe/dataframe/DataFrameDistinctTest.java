@@ -34,15 +34,29 @@ public class DataFrameDistinctTest
     public void allColumns()
     {
         DataFrameUtil.assertEquals(
-                new DataFrame("expected")
-                        .addLongColumn("Id").addStringColumn("Name").addDoubleColumn("Foo").addDateColumn("Bar").addDateTimeColumn("Baz").addDecimalColumn("Qux")
-                        .addRow(3, "Carl", 789.001, LocalDate.of(2022, 11, 15), LocalDateTime.of(2023, 11, 22, 20, 45, 55), BigDecimal.valueOf(456, 2))
-                        .addRow(1, "Alice", 123.456, LocalDate.of(2022, 12, 15), LocalDateTime.of(2023, 11, 22, 20, 45, 55), BigDecimal.valueOf(123, 2))
-                        .addRow(2, "Bob", 123.456, LocalDate.of(2022, 12, 15), LocalDateTime.of(2023, 11, 22, 20, 45, 55), BigDecimal.valueOf(123, 2))
-                        .addRow(2, "Bob", 123.456, LocalDate.of(2022, 11, 15), LocalDateTime.of(2023, 11, 22, 20, 45, 55), BigDecimal.valueOf(456, 2))
-                        .addRow(1, "Alice", 123.456, LocalDate.of(2022, 12, 15), LocalDateTime.of(2023, 11, 22, 20, 45, 55), BigDecimal.valueOf(567, 1))
-                ,
-                this.df.distinct()
+            new DataFrame("expected")
+                .addLongColumn("Id").addStringColumn("Name").addDoubleColumn("Foo").addDateColumn("Bar").addDateTimeColumn("Baz").addDecimalColumn("Qux")
+                .addRow(3, "Carl", 789.001, LocalDate.of(2022, 11, 15), LocalDateTime.of(2023, 11, 22, 20, 45, 55), BigDecimal.valueOf(456, 2))
+                .addRow(1, "Alice", 123.456, LocalDate.of(2022, 12, 15), LocalDateTime.of(2023, 11, 22, 20, 45, 55), BigDecimal.valueOf(123, 2))
+                .addRow(2, "Bob", 123.456, LocalDate.of(2022, 12, 15), LocalDateTime.of(2023, 11, 22, 20, 45, 55), BigDecimal.valueOf(123, 2))
+                .addRow(2, "Bob", 123.456, LocalDate.of(2022, 11, 15), LocalDateTime.of(2023, 11, 22, 20, 45, 55), BigDecimal.valueOf(456, 2))
+                .addRow(1, "Alice", 123.456, LocalDate.of(2022, 12, 15), LocalDateTime.of(2023, 11, 22, 20, 45, 55), BigDecimal.valueOf(567, 1))
+            ,
+            this.df.distinct()
+        );
+    }
+
+    @Test
+    public void oneColumn()
+    {
+        DataFrameUtil.assertEquals(
+            new DataFrame("expected")
+                .addStringColumn("Name")
+                .addRow("Carl")
+                .addRow("Alice")
+                .addRow("Bob")
+            ,
+            this.df.distinct(Lists.immutable.of("Name"))
         );
     }
 
@@ -50,13 +64,13 @@ public class DataFrameDistinctTest
     public void someColumns()
     {
         DataFrameUtil.assertEquals(
-                new DataFrame("expected")
-                        .addLongColumn("Id").addStringColumn("Name").addDoubleColumn("Foo")
-                        .addRow(3, "Carl", 789.001)
-                        .addRow(1, "Alice", 123.456)
-                        .addRow(2, "Bob", 123.456)
-                ,
-                this.df.distinct(Lists.immutable.of("Id", "Name", "Foo"))
+            new DataFrame("expected")
+                .addLongColumn("Id").addStringColumn("Name").addDoubleColumn("Foo")
+                .addRow(3, "Carl", 789.001)
+                .addRow(1, "Alice", 123.456)
+                .addRow(2, "Bob", 123.456)
+            ,
+            this.df.distinct(Lists.immutable.of("Id", "Name", "Foo"))
         );
     }
 
@@ -64,14 +78,14 @@ public class DataFrameDistinctTest
     public void someOtherColumns()
     {
         DataFrameUtil.assertEquals(
-                new DataFrame("expected")
-                    .addDoubleColumn("Foo").addDateColumn("Bar").addDateTimeColumn("Baz").addDecimalColumn("Qux")
-                    .addRow(789.001, LocalDate.of(2022, 11, 15), LocalDateTime.of(2023, 11, 22, 20, 45, 55), BigDecimal.valueOf(456, 2))
-                    .addRow(123.456, LocalDate.of(2022, 12, 15), LocalDateTime.of(2023, 11, 22, 20, 45, 55), BigDecimal.valueOf(123, 2))
-                    .addRow(123.456, LocalDate.of(2022, 11, 15), LocalDateTime.of(2023, 11, 22, 20, 45, 55), BigDecimal.valueOf(456, 2))
-                    .addRow(123.456, LocalDate.of(2022, 12, 15), LocalDateTime.of(2023, 11, 22, 20, 45, 55), BigDecimal.valueOf(567, 1))
-                ,
-                this.df.distinct(Lists.immutable.of("Foo", "Bar", "Baz", "Qux"))
+            new DataFrame("expected")
+                .addDoubleColumn("Foo").addDateColumn("Bar").addDateTimeColumn("Baz").addDecimalColumn("Qux")
+                .addRow(789.001, LocalDate.of(2022, 11, 15), LocalDateTime.of(2023, 11, 22, 20, 45, 55), BigDecimal.valueOf(456, 2))
+                .addRow(123.456, LocalDate.of(2022, 12, 15), LocalDateTime.of(2023, 11, 22, 20, 45, 55), BigDecimal.valueOf(123, 2))
+                .addRow(123.456, LocalDate.of(2022, 11, 15), LocalDateTime.of(2023, 11, 22, 20, 45, 55), BigDecimal.valueOf(456, 2))
+                .addRow(123.456, LocalDate.of(2022, 12, 15), LocalDateTime.of(2023, 11, 22, 20, 45, 55), BigDecimal.valueOf(567, 1))
+            ,
+            this.df.distinct(Lists.immutable.of("Foo", "Bar", "Baz", "Qux"))
         );
     }
 }
