@@ -159,7 +159,7 @@ public class DataFrame
         return this;
     }
 
-    public DfColumn attachColumn(DfColumn newColumn)
+    private DfColumn attachColumn(DfColumn newColumn)
     {
         // todo: would like to make it impossible in the first place
         if (newColumn.getDataFrame() != this)

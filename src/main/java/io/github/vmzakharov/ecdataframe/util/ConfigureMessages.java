@@ -29,7 +29,6 @@ final public class ConfigureMessages
         addMessage("DF_JOIN_DIFF_KEY_COUNT",          "Attempting to join dataframes by different number of keys on each side: ${side2KeyList} to ${side2KeyList}");
         addMessage("DF_NO_COL_COMPARATOR",            "Column comparator is not implemented for column ${columnName} of type ${type}");
         addMessage("DF_COL_ALREADY_LINKED",           "Column '${columnName}' has already been linked to a data frame");
-        addMessage("DF_COL_CLONE_FAILED",             "Failed to clone schema from column ${name}");
         addMessage("DF_BAD_VAL_ADD_TO_COL",           "Attempting to add a value ${value} of type ${valueType} to a column ${columnName} of type ${columnType}");
         addMessage("DF_SET_VAL_ON_COMP_COL",          "Cannot set a value on computed column '${columnName}'");
         addMessage("DF_AGG_VAL_TO_COMP_COL",          "Cannot store aggregated value into a computed column '${columnNane}'");

@@ -51,27 +51,11 @@ implements DfColumn
     @Override
     public DfColumn cloneSchemaAndAttachTo(DataFrame attachTo, String newName)
     {
-        DfColumn clonedColumn;
-        try
-        {
-            Class<?> myClass = this.getClass();
-            if (this.isStored())
-            {
-                Constructor<?> nameConstructor = myClass.getDeclaredConstructor(DataFrame.class, String.class);
-                clonedColumn = (DfColumn) nameConstructor.newInstance(attachTo, newName);
-            }
-            else
-            {
-                Constructor<?> nameConstructor = myClass.getDeclaredConstructor(DataFrame.class, String.class, String.class);
-                clonedColumn = (DfColumn) nameConstructor.newInstance(attachTo, newName, ((DfColumnComputed) this).getExpressionAsString());
-            }
-        }
-        catch (NoSuchMethodException | IllegalAccessException | InstantiationException | InvocationTargetException e)
-        {
-            throw exceptionByKey("DF_COL_CLONE_FAILED").with("name", this.getName()).get(e);
-        }
-
-        return attachTo.attachColumn(clonedColumn);
+        return this.isStored()
+                ?
+                attachTo.newColumn(newName, this.getType())
+                :
+                attachTo.newColumn(newName, this.getType(), ((DfColumnComputed) this).getExpressionAsString());
     }
 
     protected DfColumn validateAndCreateTargetColumn(DfColumn other, DataFrame target)
