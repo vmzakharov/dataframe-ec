@@ -22,6 +22,7 @@ final public class ConfigureMessages
         addMessage("AGG_NO_ACCUMULATOR",              "Aggregation ${operation} does not support a ${type} accumulator");
         addMessage("DF_DUPLICATE_COLUMN",             "Column named '${columnName}' is already in data frame '${dataFrameName}'");
         addMessage("DF_COLUMN_DOES_NOT_EXIST",        "Column '${columnName}' does not exist in data frame '${dataFrameName}'");
+        addMessage("DF_INDEX_DOES_NOT_EXIST",         "Column '${indexName}' does not exist in data frame '${dataFrameName}'");
         addMessage("DF_ADDING_ROW_TOO_WIDE",          "Adding more row elements (${elementCount}) than there are columns in the data frame (${columnCount})");
         addMessage("DF_ADD_COL_UNKNOWN_TYPE",         "Cannot add a column ${columnName} for values of type ${type}");
         addMessage("DF_DIFFERENT_COL_SIZES",          "Stored column sizes are not the same when attempting to seal data frame '${dataFrameName}'");

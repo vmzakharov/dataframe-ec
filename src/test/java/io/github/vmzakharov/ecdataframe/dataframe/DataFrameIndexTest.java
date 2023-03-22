@@ -5,6 +5,8 @@ import org.eclipse.collections.impl.factory.primitive.IntLists;
 import org.junit.Assert;
 import org.junit.Test;
 
+import static io.github.vmzakharov.ecdataframe.util.FormatWithPlaceholders.messageFromKey;
+
 public class DataFrameIndexTest
 {
     @Test
@@ -23,9 +25,17 @@ public class DataFrameIndexTest
         DfIndex index = new DfIndex(dataFrame, Lists.immutable.of("Name"));
 
         Assert.assertEquals(IntLists.immutable.of(0, 2), index.getRowIndicesAtKey(Lists.immutable.of("Alice")));
+        Assert.assertEquals(2, index.sizeAt(Lists.immutable.of("Alice")));
+
         Assert.assertEquals(IntLists.immutable.of(1, 3, 4), index.getRowIndicesAtKey(Lists.immutable.of("Carol")));
+        Assert.assertEquals(3, index.sizeAt(Lists.immutable.of("Carol")));
+
         Assert.assertEquals(IntLists.immutable.of(5), index.getRowIndicesAtKey(Lists.immutable.of("Abigail")));
+        Assert.assertEquals(1, index.sizeAt(Lists.immutable.of("Abigail")));
+
         Assert.assertEquals(IntLists.immutable.of(), index.getRowIndicesAtKey(Lists.immutable.of("Bob")));
+
+        Assert.assertEquals(0, index.sizeAt(Lists.immutable.of("Xavier")));
     }
 
     @Test
@@ -77,5 +87,47 @@ public class DataFrameIndexTest
         Assert.assertEquals(IntLists.immutable.of(5), index.getRowIndicesAtKey(Lists.immutable.of("Carol", 10L)));
 
         Assert.assertEquals(IntLists.immutable.of(2), index.getRowIndicesAtKey(Lists.immutable.of("Abigail", 10L)));
+    }
+
+    @Test
+    public void dataFrameWrappedIndex()
+    {
+        DataFrame dataFrame = new DataFrame("FrameOfData")
+                .addStringColumn("Name").addStringColumn("Foo").addLongColumn("Bar").addDoubleColumn("Baz")
+                .addRow("Alice",   "Pqr",  11L, 20.0)
+                .addRow("Carol",   "Abc",  12L, 10.0)
+                .addRow("Alice",   "Def",  13L, 25.0)
+                .addRow("Carol",   "Xyz",  14L, 40.0)
+                .addRow("Carol",   "Xyz",  15L, 40.0)
+                .addRow("Abigail", "Def",  16L, 11.0)
+                ;
+
+        dataFrame.createIndex("ByName", Lists.immutable.of("Name"));
+
+        Assert.assertEquals(IntLists.immutable.of(0, 2), dataFrame.index("ByName").getRowIndicesAtKey(Lists.immutable.of("Alice")));
+        Assert.assertEquals(2, dataFrame.index("ByName").sizeAt(Lists.immutable.of("Alice")));
+
+        StringBuilder carols = new StringBuilder();
+        dataFrame.index("ByName")
+             .iterateAt("Carol")
+             .forEach(c -> carols.append(c.getString("Name")));
+
+        Assert.assertEquals("CarolCarolCarol", carols.toString());
+
+        dataFrame.dropIndex("ByName");
+
+        try
+        {
+            dataFrame.index("ByName").sizeAt("Carol");
+        }
+        catch (RuntimeException e)
+        {
+            Assert.assertEquals(
+                messageFromKey("DF_INDEX_DOES_NOT_EXIST")
+                    .with("indexName", "ByName")
+                    .with("dataFrameName", dataFrame.getName())
+                    .toString(),
+                e.getMessage());
+        }
     }
 }

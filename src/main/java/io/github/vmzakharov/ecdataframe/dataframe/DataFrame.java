@@ -13,6 +13,7 @@ import org.eclipse.collections.api.DoubleIterable;
 import org.eclipse.collections.api.LongIterable;
 import org.eclipse.collections.api.block.function.primitive.IntIntToIntFunction;
 import org.eclipse.collections.api.block.predicate.primitive.IntPredicate;
+import org.eclipse.collections.api.block.procedure.Procedure;
 import org.eclipse.collections.api.list.ImmutableList;
 import org.eclipse.collections.api.list.ListIterable;
 import org.eclipse.collections.api.list.MutableList;
@@ -40,6 +41,7 @@ import static io.github.vmzakharov.ecdataframe.dataframe.DfColumnSortOrder.ASC;
 import static io.github.vmzakharov.ecdataframe.util.ExceptionFactory.exceptionByKey;
 
 public class DataFrame
+implements DfIterate
 {
     private final String name;
     private final MutableMap<String, DfColumn> columnsByName = Maps.mutable.of();
@@ -53,6 +55,8 @@ public class DataFrame
     private MutableBooleanList bitmap = null;
 
     private MutableList<MutableIntList> aggregateIndex = null;
+
+    private MutableMap<String, DfIndex> indices = Maps.mutable.of();
 
     public DataFrame(String newName)
     {
@@ -1700,6 +1704,38 @@ public class DataFrame
     public boolean isNotEmpty()
     {
         return !this.isEmpty();
+    }
+
+    public void createIndex(String indexName, ListIterable<String> columnNames)
+    {
+        this.indices.put(indexName, new DfIndex(this, columnNames));
+    }
+
+    public void dropIndex(String indexName)
+    {
+        this.indices.remove(indexName);
+    }
+
+    public DfIndex index(String indexName)
+    {
+        DfIndex found = this.indices.get(indexName);
+        if (found == null)
+        {
+            exceptionByKey("DF_INDEX_DOES_NOT_EXIST").with("indexName", indexName).with("dataFrameName", this.getName()).fire();
+        }
+
+        return found;
+    }
+
+    @Override
+    public void forEach(Procedure<DfCursor> action)
+    {
+        DfCursor cursor = new DfCursor(this);
+
+        for (int i = 0; i < this.rowCount; i++)
+        {
+            action.value(cursor.rowIndex(i));
+        }
     }
 
     private enum JoinType
