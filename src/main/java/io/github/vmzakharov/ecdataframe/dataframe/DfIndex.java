@@ -39,9 +39,9 @@ public class DfIndex
         }
     }
 
-    public IntList getRowIndicesAtKey(Object... keys)
+    public IntList getRowIndicesAtKey(Object... keyElements)
     {
-        return this.getRowIndicesAtKey(Lists.immutable.of(keys));
+        return this.getRowIndicesAtKey(Lists.immutable.of(keyElements));
     }
 
     public IntList getRowIndicesAtKey(ListIterable<Object> key)
@@ -49,9 +49,14 @@ public class DfIndex
         return this.rowIndexByKey.getIfAbsent(key, () -> EMPTY_LIST);
     }
 
-    public int sizeAt(Object... keys)
+    /**
+     * returns the number of data frame rows corresponding to this index value
+     * @param keyElements the index value elements to look up
+     * @return the number of data frame rows corresponding to this index value
+     */
+    public int sizeAt(Object... keyElements)
     {
-        return this.sizeAt(Lists.immutable.of(keys));
+        return this.sizeAt(Lists.immutable.of(keyElements));
     }
 
     /**
@@ -79,9 +84,9 @@ public class DfIndex
         rowIndicesAtKey.add(rowIndex);
     }
 
-    public DfIndexIterator iterateAt(Object... keys)
+    public DfIndexIterator iterateAt(Object... keyElements)
     {
-        return this.iterateAt(Lists.immutable.with(keys));
+        return this.iterateAt(Lists.immutable.with(keyElements));
     }
 
     public DfIndexIterator iterateAt(ListIterable<Object> key)

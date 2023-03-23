@@ -54,10 +54,12 @@ public class DataFrameIndexTest
 
         DfIndex index = new DfIndex(dataFrame, Lists.immutable.of("Name", "Foo"));
 
+        Assert.assertEquals(IntLists.immutable.of(0, 3), index.getRowIndicesAtKey("Alice", "Def"));
         Assert.assertEquals(IntLists.immutable.of(0, 3), index.getRowIndicesAtKey(Lists.immutable.of("Alice", "Def")));
         Assert.assertEquals(IntLists.immutable.of(), index.getRowIndicesAtKey(Lists.immutable.of("Alice", "Xyz")));
         Assert.assertEquals(IntLists.immutable.of(), index.getRowIndicesAtKey(Lists.immutable.of("Alice")));
 
+        Assert.assertEquals(IntLists.immutable.of(1), index.getRowIndicesAtKey("Carol", "Abc"));
         Assert.assertEquals(IntLists.immutable.of(1), index.getRowIndicesAtKey(Lists.immutable.of("Carol", "Abc")));
         Assert.assertEquals(IntLists.immutable.of(4, 5), index.getRowIndicesAtKey(Lists.immutable.of("Carol", "Xyz")));
 
