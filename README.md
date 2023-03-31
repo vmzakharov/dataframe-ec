@@ -13,6 +13,9 @@ For more on Eclipse Collections see: https://www.eclipse.org/collections/.
   <version>0.19.3</version>
 </dependency>
 ```
+## Code Kata
+
+Learn datafram-ec with Kata! Check out [dataframe-ec kata](https://github.com/vmzakharov/dataframe-ec-kata), an easy and fun way to learn the basics of data frame APIs and common usage patterns. This kata is set up as a series of failing unit tests. Your job is to write code to make them pass. The idea is inspired by the Japanese concept of kata in the martial arts. Just like in the martial arts, you can repeat a kata multiple times to make improvements to your solutions.
 
 ## Data Frame Operations
 
