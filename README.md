@@ -10,7 +10,7 @@ For more on Eclipse Collections see: https://www.eclipse.org/collections/.
 <dependency>
   <groupId>io.github.vmzakharov</groupId>
   <artifactId>dataframe-ec</artifactId>
-  <version>0.19.2</version>
+  <version>0.19.3</version>
 </dependency>
 ```
 

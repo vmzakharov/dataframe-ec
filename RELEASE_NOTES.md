@@ -1,13 +1,14 @@
 # Releases
+### 0.19.3
+* indexing is possible on the dataframe directly, without needing a utility class. Data frame now supports methods `createIndex`, `index`, `dropIndex`
+* introduces `forEach` iterate pattern for data frame and for data frame index
 ### 0.19.2
 * adds `distinct()` method to data frame
 * various enhancements and bug fixes
 ### 0.19.1
 * adds `copy()` method to data frame (as discussed in issue #11)
 * adds `newColumn()` methods - same as `addColumn()`, but it returns the newly created column rather than the data frame itself
-* introduces template based error message formatting and converts all inlined error messages to message lookup by key 
-This change supports overriding error messages with messages provided by the application. Supports loading message 
-templates from resource bundles, properties, and maps
+* introduces template based error message formatting and converts all inlined error messages to message lookup by key. This change supports overriding error messages with messages provided by the application. Supports loading message templates from resource bundles, properties, and maps.
 * renames `ErrorReporter` to `ExceptionFactory` and refactors the API
 * supports type inference of computed column expressions
 ### 0.18.5
