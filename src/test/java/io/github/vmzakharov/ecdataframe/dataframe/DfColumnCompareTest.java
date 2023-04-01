@@ -178,8 +178,16 @@ public class DfColumnCompareTest
 
         DfCellComparator col1Comparator = df1.columnComparator(df2, "col1", "col1");
         Assert.assertTrue(col1Comparator.compare(0, 0).rightIsNull());
+        Assert.assertFalse(col1Comparator.compare(0, 0).leftIsNull());
+        Assert.assertFalse(col1Comparator.compare(0, 0).noNulls());
+
         Assert.assertTrue(col1Comparator.compare(1, 1).leftIsNull());
+
         Assert.assertTrue(col1Comparator.compare(2, 2).bothAreNulls());
+        Assert.assertTrue(col1Comparator.compare(2, 2).rightIsNull());
+        Assert.assertTrue(col1Comparator.compare(2, 2).leftIsNull());
+        Assert.assertFalse(col1Comparator.compare(2, 2).noNulls());
+
         Assert.assertTrue(col1Comparator.compare(3, 3).noNulls());
 
         DfCellComparator col2Comparator = df1.columnComparator(df2, "col2", "number");

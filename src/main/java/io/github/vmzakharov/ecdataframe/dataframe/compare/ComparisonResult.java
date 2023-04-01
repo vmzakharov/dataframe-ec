@@ -48,12 +48,12 @@ abstract public class ComparisonResult
 
     public boolean leftIsNull()
     {
-        return this.nullSide == LEFT_NULL;
+        return this.nullSide == LEFT_NULL || this.nullSide == BOTH_NULLS;
     }
 
     public boolean rightIsNull()
     {
-        return this.nullSide == RIGHT_NULL;
+        return this.nullSide == RIGHT_NULL || this.nullSide == BOTH_NULLS;
     }
 
     public boolean noNulls()
@@ -66,7 +66,7 @@ abstract public class ComparisonResult
         return this.nullSide;
     }
 
-    public void nullSide(NullSide newNullSide)
+    private void nullSide(NullSide newNullSide)
     {
         this.nullSide = newNullSide;
     }
