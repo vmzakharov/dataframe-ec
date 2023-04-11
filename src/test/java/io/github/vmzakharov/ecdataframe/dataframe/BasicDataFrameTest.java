@@ -347,4 +347,25 @@ public class BasicDataFrameTest
 
         df.seal();
     }
+
+    @Test
+    public void columnSchema()
+    {
+        DataFrame df = new DataFrame("df1")
+                .addStringColumn("Name").addLongColumn("Count").addDoubleColumn("Value")
+                .addRow("Alice", 5, 23.45)
+                .addRow("Bob",  10, 12.34);
+
+        df.addColumn("Two Values", "Value * 2");
+
+        DataFrameUtil.assertEquals(
+                new DataFrame("Expected Schema")
+                        .addStringColumn("Name").addStringColumn("Type").addStringColumn("Stored").addStringColumn("Expression")
+                        .addRow("Name", "STRING", "Y", "")
+                        .addRow("Count", "LONG", "Y", "")
+                        .addRow("Value", "DOUBLE", "Y", "")
+                        .addRow("Two Values", "DOUBLE", "N", "Value * 2"),
+                df.schema()
+        );
+    }
 }

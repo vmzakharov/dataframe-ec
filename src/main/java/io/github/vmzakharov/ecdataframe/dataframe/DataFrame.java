@@ -1738,6 +1738,24 @@ implements DfIterate
         }
     }
 
+    public DataFrame schema()
+    {
+        DataFrame columnDescriptors = new DataFrame("Columns of " + this.getName())
+                .addStringColumn("Name").addStringColumn("Type").addStringColumn("Stored").addStringColumn("Expression");
+
+        this.getColumns().forEach(
+            col -> columnDescriptors.addRow(
+                col.getName(),
+                col.getType().toString(),
+                col.isStored() ? "Y" : "N",
+                col.isComputed() ? ((DfColumnComputed) col).getExpressionAsString() : ""
+            )
+        );
+
+        columnDescriptors.seal();
+        return columnDescriptors;
+    }
+
     private enum JoinType
     {
         INNER_JOIN, OUTER_JOIN, JOIN_WITH_COMPLEMENTS;
