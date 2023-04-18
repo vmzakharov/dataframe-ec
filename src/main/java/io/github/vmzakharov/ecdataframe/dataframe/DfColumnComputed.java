@@ -29,7 +29,6 @@ extends DfColumn
     @Override
     default Value getValue(int rowIndex)
     {
-        // todo: column in the variable expr or some other optimization?
         DataFrameEvalContext evalContext = this.getDataFrame().getEvalContext();
         evalContext.setRowIndex(rowIndex);
 

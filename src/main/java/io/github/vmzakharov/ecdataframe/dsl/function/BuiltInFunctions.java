@@ -191,7 +191,6 @@ final public class BuiltInFunctions
             @Override
             public ValueType returnType(ListIterable<ValueType> parameterTypes)
             {
-                // todo - error handling
                 return parameterTypes.get(0);
             }
         });
