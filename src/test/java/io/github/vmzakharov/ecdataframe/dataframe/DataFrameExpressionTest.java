@@ -23,10 +23,10 @@ public class DataFrameExpressionTest
                 .addStringColumn("Name").addLongColumn("Count").addDoubleColumn("Value");
 
         this.df
-                .addRow("Alice",  5, 23.45)
-                .addRow("Bob",   10, 12.34)
+                .addRow("Alice", 5, 23.45)
+                .addRow("Bob", 10, 12.34)
                 .addRow("Carol", 11, 56.78)
-                .addRow("Dan",    0,  7.89);
+                .addRow("Dan", 0, 7.89);
     }
 
     @Test
@@ -37,7 +37,13 @@ public class DataFrameExpressionTest
         MutableLongList values = LongLists.mutable.of();
 
         IntInterval.zeroTo(3)
-                .collectLong(i -> ((LongValue) this.df.evaluateExpression(expression, i)).longValue(), values);
+                   .collectLong(i -> {
+                               this.df.getEvalContext().setRowIndex(i);
+                               return ((LongValue) expression.evaluate(this.df.getEvalVisitor())).longValue();
+                           }
+                           , values
+                   );
+
         Assert.assertEquals(LongLists.immutable.of(10, 20, 22, 0), values);
     }
 
@@ -46,7 +52,11 @@ public class DataFrameExpressionTest
     {
         Expression expression = ExpressionTestUtil.toExpression("substr(Name, 2) + \"X\"");
 
-        ImmutableList<Object> values = IntInterval.zeroTo(3).collect(i -> this.df.evaluateExpression(expression, i).stringValue());
+        ImmutableList<Object> values = IntInterval.zeroTo(3).collect(i -> {
+                    this.df.getEvalContext().setRowIndex(i);
+                    return expression.evaluate(this.df.getEvalVisitor()).stringValue();
+                }
+        );
 
         Assert.assertEquals(Lists.immutable.of("iceX", "bX", "rolX", "nX"), values);
     }

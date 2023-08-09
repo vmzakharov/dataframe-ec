@@ -1,9 +1,7 @@
 package io.github.vmzakharov.ecdataframe.dataframe;
 
-import io.github.vmzakharov.ecdataframe.dsl.DataFrameEvalContext;
 import io.github.vmzakharov.ecdataframe.dsl.Expression;
 import io.github.vmzakharov.ecdataframe.dsl.value.Value;
-import io.github.vmzakharov.ecdataframe.dsl.visitor.InMemoryEvaluationVisitor;
 
 import static io.github.vmzakharov.ecdataframe.util.ExceptionFactory.exceptionByKey;
 
@@ -29,10 +27,9 @@ extends DfColumn
     @Override
     default Value getValue(int rowIndex)
     {
-        DataFrameEvalContext evalContext = this.getDataFrame().getEvalContext();
-        evalContext.setRowIndex(rowIndex);
+        this.getDataFrame().getEvalContext().setRowIndex(rowIndex);
 
-        return this.getExpression().evaluate(new InMemoryEvaluationVisitor(evalContext));
+        return this.getExpression().evaluate(this.getDataFrame().getEvalVisitor());
     }
 
     @Override

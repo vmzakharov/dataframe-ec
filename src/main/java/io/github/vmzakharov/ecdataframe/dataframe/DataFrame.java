@@ -6,6 +6,7 @@ import io.github.vmzakharov.ecdataframe.dsl.Expression;
 import io.github.vmzakharov.ecdataframe.dsl.value.BooleanValue;
 import io.github.vmzakharov.ecdataframe.dsl.value.Value;
 import io.github.vmzakharov.ecdataframe.dsl.value.ValueType;
+import io.github.vmzakharov.ecdataframe.dsl.visitor.ExpressionEvaluationVisitor;
 import io.github.vmzakharov.ecdataframe.dsl.visitor.InMemoryEvaluationVisitor;
 import io.github.vmzakharov.ecdataframe.dsl.visitor.TypeInferenceVisitor;
 import io.github.vmzakharov.ecdataframe.util.ExpressionParserHelper;
@@ -48,7 +49,9 @@ implements DfIterate
     private final MutableList<DfColumn> columns = Lists.mutable.of();
     private int rowCount = 0;
 
-    private final DataFrameEvalContext evalContext; // todo: thread safety?
+    private final ThreadLocal<DataFrameEvalContext> localEvalContext;
+    private final ThreadLocal<ExpressionEvaluationVisitor> localEvalVisitor;
+
     private IntList virtualRowMap = null;
     private boolean poolingEnabled = false;
 
@@ -56,13 +59,19 @@ implements DfIterate
 
     private MutableList<MutableIntList> aggregateIndex = null;
 
-    private MutableMap<String, DfIndex> indices = Maps.mutable.of();
+    private final MutableMap<String, DfIndex> indices = Maps.mutable.of();
 
     public DataFrame(String newName)
     {
         this.name = newName;
 
-        this.evalContext = new DataFrameEvalContext(this);
+        this.localEvalContext = ThreadLocal.withInitial(
+                () -> new DataFrameEvalContext(DataFrame.this)
+        );
+
+        this.localEvalVisitor = ThreadLocal.withInitial(
+                () -> new InMemoryEvaluationVisitor(DataFrame.this.localEvalContext.get())
+        );
 
         this.resetBitmap();
     }
@@ -561,12 +570,17 @@ implements DfIterate
 
     public DataFrameEvalContext getEvalContext()
     {
-        return this.evalContext;
+        return this.localEvalContext.get();
+    }
+
+    public ExpressionEvaluationVisitor getEvalVisitor()
+    {
+        return this.localEvalVisitor.get();
     }
 
     public void setExternalEvalContext(EvalContext newEvalContext)
     {
-        this.evalContext.setNestedContext(newEvalContext);
+        this.getEvalContext().setNestedContext(newEvalContext);
     }
 
     /**
@@ -804,14 +818,12 @@ implements DfIterate
         DataFrame selected = this.cloneStructure(this.name + "-selected");
         DataFrame rejected = this.cloneStructure(this.name + "-rejected");
 
-        DataFrameEvalContext context = new DataFrameEvalContext(this);
         Expression filterExpression = ExpressionParserHelper.DEFAULT.toExpression(filterExpressionString);
-        InMemoryEvaluationVisitor evaluationVisitor = new InMemoryEvaluationVisitor(context);
 
         for (int i = 0; i < this.rowCount; i++)
         {
-            context.setRowIndex(i);
-            Value select = filterExpression.evaluate(evaluationVisitor);
+            this.getEvalContext().setRowIndex(i);
+            Value select = filterExpression.evaluate(this.getEvalVisitor());
             if (((BooleanValue) select).isTrue())
             {
                 selected.copyRowFrom(this, i);
@@ -831,13 +843,11 @@ implements DfIterate
     public DataFrame selectBy(String filterExpressionString)
     {
         DataFrame filtered = this.cloneStructure(this.getName() + "-selected");
-        DataFrameEvalContext context = new DataFrameEvalContext(this);
         Expression filterExpression = ExpressionParserHelper.DEFAULT.toExpression(filterExpressionString);
-        InMemoryEvaluationVisitor evaluationVisitor = new InMemoryEvaluationVisitor(context);
         for (int i = 0; i < this.rowCount; i++)
         {
-            context.setRowIndex(i);
-            Value select = filterExpression.evaluate(evaluationVisitor);
+            this.getEvalContext().setRowIndex(i);
+            Value select = filterExpression.evaluate(this.getEvalVisitor());
             if (((BooleanValue) select).isTrue())
             {
                 filtered.copyRowFrom(this, i);
@@ -997,7 +1007,8 @@ implements DfIterate
         DfTuple[] tuples = new DfTuple[this.rowCount];
         for (int i = 0; i < this.rowCount; i++)
         {
-            tuples[i] = new DfTuple(i, new Object[] {this.evaluateExpression(expression, i)});
+            this.getEvalContext().setRowIndex(i);
+            tuples[i] = new DfTuple(i, new Object[] {expression.evaluate(this.getEvalVisitor())});
         }
 
         Arrays.sort(tuples, (t1, t2) -> t1.compareTo(t2, Lists.immutable.of(sortOrder)));
@@ -1005,12 +1016,6 @@ implements DfIterate
         this.virtualRowMap = ArrayIterate.collectInt(tuples, DfTuple::order);
 
         return this;
-    }
-
-    public Value evaluateExpression(Expression expression, int rowIndex)
-    {
-        this.getEvalContext().setRowIndex(rowIndex);
-        return expression.evaluate(new InMemoryEvaluationVisitor(this.evalContext));
     }
 
     private DfTuple rowToTuple(int rowIndex, ListIterable<DfColumn> columnsToCollect)
@@ -1113,14 +1118,12 @@ implements DfIterate
     {
         this.bitmap = BooleanArrayList.newWithNValues(this.rowCount, false);
 
-        DataFrameEvalContext context = new DataFrameEvalContext(this);
         Expression filterExpression = ExpressionParserHelper.DEFAULT.toExpression(filterExpressionString);
-        InMemoryEvaluationVisitor evaluationVisitor = new InMemoryEvaluationVisitor(context);
 
         for (int i = 0; i < this.rowCount; i++)
         {
-            context.setRowIndex(i);
-            BooleanValue evalResult = (BooleanValue) filterExpression.evaluate(evaluationVisitor);
+            this.getEvalContext().setRowIndex(i);
+            BooleanValue evalResult = (BooleanValue) filterExpression.evaluate(this.getEvalVisitor());
             if (evalResult.isTrue())
             {
                 this.bitmap.set(i, true);
