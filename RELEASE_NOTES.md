@@ -1,4 +1,8 @@
 # Releases
+### 0.19.4
+* ensures data frame based expression evaluation is thread safe
+* adds `schema()` method to data frame to report its schema (its column descriptions) as a data frame
+* ensures consistency of results for column value comparisons for null values
 ### 0.19.3
 * indexing is possible on the dataframe directly, without needing a utility class. Data frame now supports methods `createIndex`, `index`, `dropIndex`
 * introduces `forEach` iterate pattern for data frame and for data frame index
@@ -34,13 +38,13 @@
 * introduces date-time column type
 * adds date-time projection tests
 * supports fluent API for lookup joins (experimental)
-* renames Const() aggregation function to Same() to avoid keyword collision 
+* renames `Const()` aggregation function to `Same()` to avoid keyword collision 
 ### 0.17.1
 * adds Const() aggregation function
-* adds isEmpty() and isNotEmpty() methods for DataFrame
+* adds `isEmpty()` and `isNotEmpty()` methods for DataFrame
 * adds a dedicated method to error reporter to throw unsupported operation exceptions
 * removes avro implementation of hierarchical data set
-* adds trim() built-in function
+* adds `trim()` built-in function
 * fixes type inference for the is null/is not null operators
 ### 0.17.0
 * adds handling of null arguments to some built-in functions

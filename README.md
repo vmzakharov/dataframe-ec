@@ -10,7 +10,7 @@ For more on Eclipse Collections see: https://www.eclipse.org/collections/.
 <dependency>
   <groupId>io.github.vmzakharov</groupId>
   <artifactId>dataframe-ec</artifactId>
-  <version>0.19.3</version>
+  <version>0.19.4</version>
 </dependency>
 ```
 ## Code Kata
@@ -22,7 +22,7 @@ Learn dataframe-ec with Kata! Check out [dataframe-ec kata](https://github.com/v
 - create a data frame programmatically or load from a csv file
 - add a column to a data frame, columns can be
     - stored or computed
-    - of type: string, integer (long), double, date
+    - of type: string, integer (long), double, date, date/time
 - drop one or more columns
 - select a subset of rows based on a criteria
 - sort by one or more columns or by an expression
@@ -194,7 +194,7 @@ The following aggregation functions are supported
 - `max`
 - `avg`
 - `count`
-- `same` - the resul is `null` if the aggregated values are not the equal to each other, otherwise it equals to that value
+- `same` - the result is `null` if the aggregated values are not the equal to each other, otherwise it equals to that value
 
 ```
 DataFrame orderStats = orders.aggregate(Lists.immutable.of(max("Price", "MaxPrice"), min("Price", "MinPrice"), sum("Price", "Total")));
@@ -526,22 +526,22 @@ Recursion (direct or indirect) is not supported.
 
 #### Built-in functions
 
-| Function   | Usage                                                          |
-|------------|----------------------------------------------------------------|
-| abs        | abs(number)                                                    |
-| contains   | contains(string, substring)                                    |
-| print      | print(value)                                                   |
-| println    | println(value)                                                 |
-| startsWith | startsWith(string, prefix)                                     |
-| substr     | substr(string, beginIndex[, endIndex])                         |
+| Function   | Usage                                                           |
+|------------|-----------------------------------------------------------------|
+| abs        | abs(number)                                                     |
+| contains   | contains(string, substring)                                     |
+| print      | print(value)                                                    |
+| println    | println(value)                                                  |
+| startsWith | startsWith(string, prefix)                                      |
+| substr     | substr(string, beginIndex[, endIndex])                          |
 | toDate     | toDate(string in the yyyy-mm-dd format)<br>toDate(yyyy, mm, dd) |
-| toDateTime | toDateTime(yyyy, mm, dd, hh, mm, ss)                           |
-| toDouble   | toDouble(string)                                               |
-| toLong     | toLong(string)                                                 |
-| toDecimal  | toUpper(unscaledValue, scale)                                  |
-| toString   | toString(number)                                               |
-| toUpper    | toUpper(string)                                                |
-| withinDays | withinDays(date1, date2, numberOfDays)                         |
+| toDateTime | toDateTime(yyyy, mm, dd, hh, mm, ss)                            |
+| toDouble   | toDouble(string)                                                |
+| toLong     | toLong(string)                                                  |
+| toDecimal  | toUpper(unscaledValue, scale)                                   |
+| toString   | toString(number)                                                |
+| toUpper    | toUpper(string)                                                 |
+| withinDays | withinDays(date1, date2, numberOfDays)                          |
 
 #### User Declared Function Example 1
 ```
