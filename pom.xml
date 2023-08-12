@@ -3,7 +3,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>io.github.vmzakharov</groupId>
     <artifactId>dataframe-ec</artifactId>
-    <version>0.19.4-SNAPSHOT</version>
+    <version>0.19.4</version>
     <packaging>jar</packaging>
     <name>dataframe-ec</name>
     <description>A tabular data structure based on the Eclipse Collections framework</description>
