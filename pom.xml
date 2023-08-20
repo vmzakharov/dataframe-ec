@@ -37,7 +37,7 @@
         <antlr4.version>4.9.2</antlr4.version>
         <checkstyle.version>8.41</checkstyle.version>
         <checkstyle.plugin.version>3.1.2</checkstyle.plugin.version>
-        <pitest.version>1.6.3</pitest.version>
+        <pitest.version>1.14.3</pitest.version>
         <junit.version>4.13.2</junit.version>
     </properties>
 
