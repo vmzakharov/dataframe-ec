@@ -8,11 +8,13 @@ import io.github.vmzakharov.ecdataframe.dsl.value.StringValue;
 import io.github.vmzakharov.ecdataframe.dsl.value.ValueType;
 import io.github.vmzakharov.ecdataframe.dsl.visitor.PrettyPrintVisitor;
 import io.github.vmzakharov.ecdataframe.dsl.visitor.TypeInferenceVisitor;
+import io.github.vmzakharov.ecdataframe.util.ConfigureMessages;
 import org.eclipse.collections.api.list.ListIterable;
 import org.eclipse.collections.api.tuple.Twin;
 import org.eclipse.collections.impl.factory.Lists;
 import org.eclipse.collections.impl.tuple.Tuples;
 import org.junit.Assert;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 import static io.github.vmzakharov.ecdataframe.TypeInferenceUtil.assertScriptType;
@@ -20,6 +22,12 @@ import static io.github.vmzakharov.ecdataframe.util.FormatWithPlaceholders.messa
 
 public class TypeInferenceTest
 {
+    @BeforeClass
+    public static void initializeErrorMessages()
+    {
+        ConfigureMessages.initialize();
+    }
+
     @Test
     public void intTypeInference()
     {
@@ -188,14 +196,56 @@ public class TypeInferenceTest
     }
 
     @Test
+    public void vectors()
+    {
+        assertScriptType("('a', 'b', 1)", ValueType.VECTOR);
+        assertScriptType("v('a', 'b', 1)", ValueType.VECTOR);
+
+        assertScriptType("(1.23, 'b', 1)[0]", ValueType.DOUBLE);
+        assertScriptType("(1.23, 'b', 1)[1]", ValueType.STRING);
+        assertScriptType("(1.23, 'b', 1)[2]", ValueType.LONG);
+
+        assertScriptType("x = v('a', 'b', 1)\n"
+                        + "x[1]",
+                ValueType.VOID);
+
+        assertScriptType("x = v('a', 'b', 1)\n"
+                        + "i = 2\n"
+                        + "x[i]",
+                ValueType.VOID);
+    }
+
+    @Test
+    public void vectorsWithErrors()
+    {
+        this.assertError("'abc'[2]",
+                messageFromKey("IDX_EXPR_VECTOR_TYPE_INVALID").with("vectorType", ValueType.STRING.name()).toString());
+
+        this.assertErrors("x[45]",
+                Lists.immutable.of(
+                        Tuples.twin(
+                                messageFromKey("TYPE_INFER_UNDEFINED_VARIABLE").toString(),
+                                "x"),
+                        Tuples.twin(
+                                messageFromKey("IDX_EXPR_VECTOR_TYPE_INVALID").with("vectorType", ValueType.VOID.name()).toString(),
+                                "x[45]")
+                ));
+
+        this.assertError(
+                "(1.23, 'b', 1)['abc']",
+                messageFromKey("IDX_EXPR_INDEX_TYPE_INVALID").with("indexType", ValueType.STRING.name()).toString());
+
+        this.assertError(
+                "(1.23, 'b', 1)[1.23]",
+                messageFromKey("IDX_EXPR_INDEX_TYPE_INVALID").with("indexType", ValueType.DOUBLE.name()).toString());
+    }
+
+    @Test
     public void containsIncompatibleTypes()
     {
-        this.assertError(
-                "1 in 'abc'", this.prettyPrint("1 in 'abc'"),
-                messageFromKey("TYPE_INFER_TYPES_IN_EXPRESSION").toString());
-        this.assertError(
-                "1.1 not in 'abc'", this.prettyPrint("1.1 not in 'abc'"),
-                messageFromKey("TYPE_INFER_TYPES_IN_EXPRESSION").toString());
+        this.assertError("1 in 'abc'", messageFromKey("TYPE_INFER_TYPES_IN_EXPRESSION").toString());
+
+        this.assertError("1.1 not in 'abc'", messageFromKey("TYPE_INFER_TYPES_IN_EXPRESSION").toString());
     }
 
     @Test
@@ -322,6 +372,11 @@ public class TypeInferenceTest
         Assert.assertTrue("Expected a type inference error", visitor.hasErrors());
 
         Assert.assertEquals(expectedErrors, visitor.getErrors());
+    }
+
+    private void assertError(String scriptString, String errorText)
+    {
+        this.assertError(new SimpleEvalContext(), scriptString, this.prettyPrint(scriptString), errorText);
     }
 
     private void assertError(String scriptString, String errorDescription, String errorText)

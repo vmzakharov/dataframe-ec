@@ -79,6 +79,8 @@ final public class ConfigureMessages
         addMessage("TYPE_INFER_UNDEFINED_VARIABLE",   "Undefined variable");
         addMessage("TYPE_INFER_UNDEFINED_FUNCTION",   "Undefined function");
         addMessage("TYPE_INFER_COND_NOT_BOOLEAN",     "Condition type is not boolean");
+        addMessage("IDX_EXPR_INDEX_TYPE_INVALID",     "Invalid index value type ${indexType} in a vector index expression, should be an integer");
+        addMessage("IDX_EXPR_VECTOR_TYPE_INVALID",    "Invalid expression type ${vectorType} in a vector index expression, should be a vector");
         addMessage("DF_EQ_COL_TYPE_MISMATCH",         "Column types don't match: ${lhColumnTypes} vs. ${rhColumnTypes}");
         addMessage("DF_EQ_COL_HEADER_MISMATCH",       "Column headers don't match: ${lhColumnHeaders} vs. ${rhColumnHeaders}");
         addMessage("DF_EQ_DIM_MISMATCH",              "Dimensions don't match: rows ${lhRowCount}, cols ${lhColumnCount}, vs. rows ${rhRowCount}, cols ${rhRowCount}");

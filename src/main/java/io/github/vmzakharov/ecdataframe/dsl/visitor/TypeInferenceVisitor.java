@@ -26,6 +26,7 @@ import io.github.vmzakharov.ecdataframe.dsl.VarExpr;
 import io.github.vmzakharov.ecdataframe.dsl.VectorExpr;
 import io.github.vmzakharov.ecdataframe.dsl.function.BuiltInFunctions;
 import io.github.vmzakharov.ecdataframe.dsl.function.IntrinsicFunctionDescriptor;
+import io.github.vmzakharov.ecdataframe.dsl.value.LongValue;
 import io.github.vmzakharov.ecdataframe.dsl.value.Value;
 import io.github.vmzakharov.ecdataframe.dsl.value.ValueType;
 import org.eclipse.collections.api.list.ListIterable;
@@ -72,8 +73,7 @@ implements ExpressionVisitor
     @Override
     public void visitAssignExpr(AssingExpr expr)
     {
-        expr.getExpression().accept(this);
-        this.storeVariableType(expr.getVarName(), this.expressionTypeStack.pop());
+        this.storeVariableType(expr.getVarName(), this.processAndPopResult(expr.getExpression()));
     }
 
     public void storeVariableType(String variableName, ValueType valueType)
@@ -91,11 +91,9 @@ implements ExpressionVisitor
     {
         ValueType resultType;
 
-        expr.getOperand1().accept(this);
-        ValueType type1 = this.expressionTypeStack.pop();
+        ValueType type1 = this.processAndPopResult(expr.getOperand1());
 
-        expr.getOperand2().accept(this);
-        ValueType type2 = this.expressionTypeStack.pop();
+        ValueType type2 = this.processAndPopResult(expr.getOperand2());
 
         resultType = ValueType.VOID;
 
@@ -161,7 +159,7 @@ implements ExpressionVisitor
      */
     public boolean hasErrors()
     {
-        return this.getErrors().size() > 0;
+        return this.getErrors().notEmpty();
     }
 
     public String getErrorDescription()
@@ -197,8 +195,7 @@ implements ExpressionVisitor
     @Override
     public void visitUnaryExpr(UnaryExpr expr)
     {
-        expr.getOperand().accept(this);
-        ValueType operandType = this.expressionTypeStack.pop();
+        ValueType operandType = this.processAndPopResult(expr.getOperand());
         UnaryOp operation = expr.getOperation();
 
         if (operation == UnaryOp.MINUS && operandType.isNumber())
@@ -229,6 +226,12 @@ implements ExpressionVisitor
     {
         this.expressionTypeStack.push(valueType);
         this.lastExpressionType = valueType;
+    }
+
+    private ValueType processAndPopResult(Expression expr)
+    {
+        expr.accept(this);
+        return this.expressionTypeStack.pop();
     }
 
     @Override
@@ -355,15 +358,50 @@ implements ExpressionVisitor
     @Override
     public void visitIndexExpr(IndexExpr expr)
     {
-        // see the todo above
+        Expression vectorExpr = expr.getVectorExpr();
+        ValueType vectorType = this.processAndPopResult(vectorExpr);
+
+        Expression indexExpr = expr.getIndexExpr();
+
+        if (indexExpr instanceof Value && vectorExpr instanceof VectorExpr) // the vector and the index are both specified as literals
+        {
+            Value indexVal = (Value) indexExpr;
+
+            if (indexVal.isLong())
+            {
+                long index = ((LongValue) indexVal).longValue();
+                Expression exprAtIndex = ((VectorExpr) vectorExpr).getElements().get((int) index);
+                exprAtIndex.accept(this);
+                return;
+            }
+        }
+
+        // the vector and the index are expressions with an unknown value and/or with wrong types
+
+        if (!vectorType.isVector())
+        {
+            this.recordError(
+                    messageFromKey("IDX_EXPR_VECTOR_TYPE_INVALID").with("vectorType", vectorType.toString()).toString(),
+                    PrettyPrintVisitor.exprToString(expr));
+        }
+
+        ValueType indexType = this.processAndPopResult(indexExpr);
+        if (!indexType.isLong())
+        {
+            // invalid index type
+            this.recordError(
+                    messageFromKey("IDX_EXPR_INDEX_TYPE_INVALID").with("indexType", indexType.toString()).toString(),
+                    PrettyPrintVisitor.exprToString(expr));
+        }
+
+        // all types appear valid, but we can't infer the type at the specific index
         this.store(ValueType.VOID);
     }
 
     @Override
     public void visitDecimalExpr(DecimalExpr expr)
     {
-        expr.unscaledValueExpr().accept(this);
-        ValueType unscaledValueType = this.expressionTypeStack.pop();
+        ValueType unscaledValueType = this.processAndPopResult(expr.unscaledValueExpr());
 
         if (!unscaledValueType.isLong() && !unscaledValueType.isVoid())
         {
@@ -372,8 +410,7 @@ implements ExpressionVisitor
                     PrettyPrintVisitor.exprToString(expr.unscaledValueExpr()));
         }
 
-        expr.scaleExpr().accept(this);
-        ValueType scaleType = this.expressionTypeStack.pop();
+        ValueType scaleType = this.processAndPopResult(expr.scaleExpr());
 
         if (!scaleType.isLong() && !scaleType.isVoid())
         {
@@ -388,8 +425,7 @@ implements ExpressionVisitor
     @Override
     public void visitIfElseExpr(IfElseExpr expr)
     {
-        expr.getCondition().accept(this);
-        ValueType conditionType = this.expressionTypeStack.pop();
+        ValueType conditionType = this.processAndPopResult(expr.getCondition());
 
         // void means we have already failed in the condition expression so no point in propagating this error
         if (!conditionType.isBoolean() && !conditionType.isVoid())
@@ -397,13 +433,11 @@ implements ExpressionVisitor
             this.recordError(messageFromKey("TYPE_INFER_CONDITION_NOT_BOOLEAN").toString(), PrettyPrintVisitor.exprToString(expr));
         }
 
-        expr.getIfScript().accept(this);
-        ValueType ifType = this.expressionTypeStack.pop();
+        ValueType ifType = this.processAndPopResult(expr.getIfScript());
 
         if (expr.hasElseSection())
         {
-            expr.getElseScript().accept(this);
-            ValueType elseType = this.expressionTypeStack.pop();
+            ValueType elseType = this.processAndPopResult(expr.getElseScript());
 
             ValueType valueType = this.arithmeticTypeCompatibleWith(ifType, elseType);
             this.store(valueType);

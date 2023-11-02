@@ -27,6 +27,12 @@ extends Expression, Comparable<Value>
         }
 
         @Override
+        public boolean isVoid()
+        {
+            return true;
+        }
+
+        @Override
         public int compareTo(Value other)
         {
             return this == other ? 0 : -1;
@@ -83,7 +89,7 @@ extends Expression, Comparable<Value>
 
     default boolean isVoid()
     {
-        return this == VOID;
+        return false;
     }
 
     default boolean isBoolean()
