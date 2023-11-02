@@ -813,6 +813,19 @@ implements DfIterate
         return result;
     }
 
+    /**
+     * Returns two data frames, splitting the rows of this data frame based on the evaluation of a criteria expression
+     * passes as the parameter into this method. The two data frames will contain, respectively: the rows for which the
+     * expression evaluates to {@code true} (the selected rows) and the rows for which the expression evaluates to
+     * {@code false} (the rejected rows).
+     *
+     * @param filterExpressionString the expression based on which the rows in this data frame will be partitioned
+     * @return a {@link org.eclipse.collections.api.tuple.Twin} containing a data frame with the selected rows (matching the filter criteria) as its
+     * first element and a data frame containing the rejected rows (failing the filter criteria) as its second element
+     *
+     * @see DataFrame#selectBy(String)
+     * @see DataFrame#rejectBy(String)
+     */
     public Twin<DataFrame> partition(String filterExpressionString)
     {
         DataFrame selected = this.cloneStructure(this.name + "-selected");
@@ -840,15 +853,46 @@ implements DfIterate
         return Tuples.twin(selected, rejected);
     }
 
+    /**
+     * Creates a new data frame from this one by copying the rows of this data frame for which the specified filter
+     * expression returns {@code true}.
+     *
+     * @param filterExpressionString the expression based on which rows will be selected into the result data frame
+     * @return a new data frame, which is a copy of this data frame with only the rows that satisfy the filter criteria
+     * 
+     * @see DataFrame#rejectBy(String) 
+     * @see DataFrame#partition(String)
+     */
     public DataFrame selectBy(String filterExpressionString)
     {
-        DataFrame filtered = this.cloneStructure(this.getName() + "-selected");
+        return this.filterBy(filterExpressionString, "selected", true);
+    }
+
+    /**
+     * Creates a new data frame from this one by copying the rows of this data frame for which the specified filter
+     * expression returns {@code false}. In other words the result is a copy of this data frame, *except* the rows for
+     * which the expression is {@code true}.
+     *
+     * @param filterExpressionString the expression based on which rows will be excluded from the result data frame
+     * @return a new data frame, which is a copy of this data frame excluding the rows satisfying the filter criteria
+     *
+     * @see DataFrame#selectBy(String)
+     * @see DataFrame#partition(String)
+     */
+    public DataFrame rejectBy(String filterExpressionString)
+    {
+        return this.filterBy(filterExpressionString, "rejected", false);
+    }
+
+    private DataFrame filterBy(String filterExpressionString, String operation, boolean select)
+    {
+        DataFrame filtered = this.cloneStructure(this.getName() + "-" + operation);
         Expression filterExpression = ExpressionParserHelper.DEFAULT.toExpression(filterExpressionString);
         for (int i = 0; i < this.rowCount; i++)
         {
             this.getEvalContext().setRowIndex(i);
-            Value select = filterExpression.evaluate(this.getEvalVisitor());
-            if (((BooleanValue) select).isTrue())
+            Value filterValue = filterExpression.evaluate(this.getEvalVisitor());
+            if (((BooleanValue) filterValue).is(select))
             {
                 filtered.copyRowFrom(this, i);
             }

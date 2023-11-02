@@ -24,6 +24,12 @@ implements Value
         }
 
         @Override
+        public boolean is(boolean booleanValue)
+        {
+            return booleanValue;
+        }
+
+        @Override
         public String asStringLiteral()
         {
             return "TRUE";
@@ -42,6 +48,12 @@ implements Value
         public boolean isFalse()
         {
             return true;
+        }
+
+        @Override
+        public boolean is(boolean booleanValue)
+        {
+            return !booleanValue;
         }
 
         @Override
@@ -74,6 +86,8 @@ implements Value
     public abstract boolean isTrue();
 
     public abstract boolean isFalse();
+
+    public abstract boolean is(boolean booleanValue);
 
     @Override
     public ValueType getType()

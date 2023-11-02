@@ -4,6 +4,8 @@ import org.eclipse.collections.api.tuple.Twin;
 import org.junit.Before;
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+
 public class DataFrameFilterTest
 {
     private DataFrame dataFrame;
@@ -33,6 +35,35 @@ public class DataFrameFilterTest
                 .addRow("Abigail", "Def",  15L, 15.0, 11.0);
 
         DataFrameUtil.assertEquals(expected, filtered);
+
+        assertEquals("FrameOfData-selected", filtered.getName());
+    }
+
+    @Test
+    public void simpleRejection()
+    {
+        DataFrame filtered = this.dataFrame.rejectBy("Foo == \"Def\" or Foo == \"Abc\"");
+
+        DataFrame expected = new DataFrame("FrameOfData")
+                .addStringColumn("Name").addStringColumn("Foo").addLongColumn("Bar").addDoubleColumn("Baz").addDoubleColumn("Qux")
+                .addRow("Alice",   "Pqr",  11L, 10.0, 20.0)
+                .addRow("Carol",   "Xyz",  14L, 14.0, 40.0)
+                ;
+
+        DataFrameUtil.assertEquals(expected, filtered);
+
+        assertEquals("FrameOfData-rejected", filtered.getName());
+    }
+
+    @Test
+    public void selectedIsOppositeOfRejected()
+    {
+        String filterExpression = "Foo == \"Def\" or Foo == \"Abc\"";
+
+        DataFrame selected = this.dataFrame.selectBy(filterExpression);
+        DataFrame rejectedOpposite = this.dataFrame.rejectBy("not (" + filterExpression + ")");
+
+        DataFrameUtil.assertEquals(selected, rejectedOpposite);
     }
 
     @Test
