@@ -41,6 +41,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Arrays;
+import java.util.function.Supplier;
 
 import static io.github.vmzakharov.ecdataframe.dataframe.DfColumnSortOrder.ASC;
 import static io.github.vmzakharov.ecdataframe.util.ExceptionFactory.exceptionByKey;
@@ -1834,7 +1835,7 @@ implements DfIterate
         private EvalContext nestedContext;
         private int rowIndex;
 
-        private final MutableMap<String, ValueGetter> resolvedVariables = Maps.mutable.of();
+        private final MutableMap<String, Supplier<Value>> resolvedVariables = Maps.mutable.of();
 
         public DataFrameEvalContext(DataFrame newDataFrame)
         {
@@ -1860,7 +1861,7 @@ implements DfIterate
         @Override
         public Value getVariable(String variableName)
         {
-            ValueGetter valueGetter = this.resolvedVariables.get(variableName);
+            Supplier<Value> valueGetter = this.resolvedVariables.get(variableName);
 
             if (valueGetter == null)
             {
@@ -1881,7 +1882,7 @@ implements DfIterate
                 this.resolvedVariables.put(variableName, valueGetter);
             }
 
-            return valueGetter.getValue();
+            return valueGetter.get();
         }
 
         @Override
@@ -1959,11 +1960,6 @@ implements DfIterate
         public void setNestedContext(EvalContext newEvalContext)
         {
             this.nestedContext = newEvalContext;
-        }
-
-        private interface ValueGetter
-        {
-            Value getValue();
         }
     }
 }
