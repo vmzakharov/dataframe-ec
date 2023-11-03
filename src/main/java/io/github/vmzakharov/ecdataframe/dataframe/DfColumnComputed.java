@@ -27,7 +27,7 @@ extends DfColumn
     @Override
     default Value getValue(int rowIndex)
     {
-        this.getDataFrame().getEvalContext().setRowIndex(rowIndex);
+        this.getDataFrame().setEvalContextRowIndex(rowIndex);
 
         return this.getExpression().evaluate(this.getDataFrame().getEvalVisitor());
     }

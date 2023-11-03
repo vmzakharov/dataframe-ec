@@ -191,7 +191,7 @@ public class DataFrameComputedColumnsTest
         outerContext.setDeclaredFunctions(outerScript.getFunctions());
         outerContext.setVariable("numbers", ExpressionTestUtil.evaluateExpression("(5, 10)"));
 
-        this.df.getEvalContext().setNestedContext(outerContext);
+        this.df.setExternalEvalContext(outerContext);
 
         Assert.assertEquals(DoubleLists.immutable.of(46.9, 24.68, 58.78, 9.89), this.df.getDoubleColumn("Complication").toDoubleList());
     }

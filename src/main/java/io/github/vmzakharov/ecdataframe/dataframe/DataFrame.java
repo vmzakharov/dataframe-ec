@@ -1,8 +1,11 @@
 package io.github.vmzakharov.ecdataframe.dataframe;
 
-import io.github.vmzakharov.ecdataframe.dsl.DataFrameEvalContext;
+import io.github.vmzakharov.ecdataframe.dataset.HierarchicalDataSet;
 import io.github.vmzakharov.ecdataframe.dsl.EvalContext;
+import io.github.vmzakharov.ecdataframe.dsl.EvalContextAbstract;
 import io.github.vmzakharov.ecdataframe.dsl.Expression;
+import io.github.vmzakharov.ecdataframe.dsl.FunctionScript;
+import io.github.vmzakharov.ecdataframe.dsl.SimpleEvalContext;
 import io.github.vmzakharov.ecdataframe.dsl.value.BooleanValue;
 import io.github.vmzakharov.ecdataframe.dsl.value.Value;
 import io.github.vmzakharov.ecdataframe.dsl.value.ValueType;
@@ -12,6 +15,7 @@ import io.github.vmzakharov.ecdataframe.dsl.visitor.TypeInferenceVisitor;
 import io.github.vmzakharov.ecdataframe.util.ExpressionParserHelper;
 import org.eclipse.collections.api.DoubleIterable;
 import org.eclipse.collections.api.LongIterable;
+import org.eclipse.collections.api.RichIterable;
 import org.eclipse.collections.api.block.function.primitive.IntIntToIntFunction;
 import org.eclipse.collections.api.block.predicate.primitive.IntPredicate;
 import org.eclipse.collections.api.block.procedure.Procedure;
@@ -568,9 +572,14 @@ implements DfIterate
         return this.columnsByName.containsKey(columnName);
     }
 
-    public DataFrameEvalContext getEvalContext()
+    private DataFrameEvalContext getEvalContext()
     {
         return this.localEvalContext.get();
+    }
+
+    public void setEvalContextRowIndex(int rowIndex)
+    {
+        this.getEvalContext().setRowIndex(rowIndex);
     }
 
     public ExpressionEvaluationVisitor getEvalVisitor()
@@ -1815,6 +1824,146 @@ implements DfIterate
         public boolean isJoinWithComplements()
         {
             return this == JOIN_WITH_COMPLEMENTS;
+        }
+    }
+
+    private static class DataFrameEvalContext
+    extends EvalContextAbstract
+    {
+        final private DataFrame dataFrame;
+        private EvalContext nestedContext;
+        private int rowIndex;
+
+        private final MutableMap<String, ValueGetter> resolvedVariables = Maps.mutable.of();
+
+        public DataFrameEvalContext(DataFrame newDataFrame)
+        {
+            this(newDataFrame, new SimpleEvalContext());
+        }
+
+        public DataFrameEvalContext(DataFrame newDataFrame, EvalContext newNestedContext)
+        {
+            this.dataFrame = newDataFrame;
+            this.nestedContext = newNestedContext;
+        }
+
+        public int getRowIndex()
+        {
+            return this.rowIndex;
+        }
+
+        public void setRowIndex(int newRowIndex)
+        {
+            this.rowIndex = newRowIndex;
+        }
+
+        @Override
+        public Value getVariable(String variableName)
+        {
+            ValueGetter valueGetter = this.resolvedVariables.get(variableName);
+
+            if (valueGetter == null)
+            {
+                if (this.getDataFrame().hasColumn(variableName))
+                {
+                    DfColumn column = this.dataFrame.getColumnNamed(variableName);
+                    valueGetter = () -> column.getValue(this.getRowIndex());
+                }
+                else if (this.getContextVariables().containsKey(variableName))
+                {
+                    valueGetter = () -> this.getContextVariables().get(variableName);
+                }
+                else
+                {
+                    valueGetter = () -> this.getNestedContext().getVariable(variableName);
+                }
+
+                this.resolvedVariables.put(variableName, valueGetter);
+            }
+
+            return valueGetter.getValue();
+        }
+
+        @Override
+        public Value getVariableOrDefault(String variableName, Value defaultValue)
+        {
+            Value value = this.getVariable(variableName);
+
+            return value == Value.VOID ? defaultValue : value;
+        }
+
+        @Override
+        public boolean hasVariable(String variableName)
+        {
+            return this.getDataFrame().hasColumn(variableName) || this.getNestedContext().hasVariable(variableName);
+        }
+
+        @Override
+        public void removeVariable(String variableName)
+        {
+            exceptionByKey("DSL_ATTEMPT_TO_REMOVE_DF_VAR").fire();
+        }
+
+        @Override
+        public MapIterable<String, FunctionScript> getDeclaredFunctions()
+        {
+            return this.getNestedContext().getDeclaredFunctions();
+        }
+
+        @Override
+        public FunctionScript getDeclaredFunction(String functionName)
+        {
+            FunctionScript functionScript =  super.getDeclaredFunction(functionName);
+            if (functionScript == null)
+            {
+                functionScript = this.getNestedContext().getDeclaredFunction(functionName);
+            }
+
+            return functionScript;
+        }
+
+        @Override
+        public void addDataSet(HierarchicalDataSet dataSet)
+        {
+            exceptionByKey("DSL_DF_EVAL_NO_DATASET").fire();
+        }
+
+        @Override
+        public HierarchicalDataSet getDataSet(String dataSetName)
+        {
+            return this.getNestedContext().getDataSet(dataSetName);
+        }
+
+        @Override
+        public RichIterable<String> getVariableNames()
+        {
+            return this.getNestedContext().getVariableNames();
+        }
+
+        @Override
+        public void removeAllVariables()
+        {
+            throw exceptionByKey("DSL_ATTEMPT_TO_REMOVE_DF_VAR").getUnsupported();
+        }
+
+        public DataFrame getDataFrame()
+        {
+            return this.dataFrame;
+        }
+
+        public EvalContext getNestedContext()
+        {
+            return this.nestedContext;
+        }
+
+        public void setNestedContext(EvalContext newEvalContext)
+        {
+            this.nestedContext = newEvalContext;
+        }
+
+        private interface ValueGetter
+        {
+            Value getValue();
         }
     }
 }

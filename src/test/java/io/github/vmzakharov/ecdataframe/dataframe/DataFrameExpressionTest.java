@@ -38,7 +38,7 @@ public class DataFrameExpressionTest
 
         IntInterval.zeroTo(3)
                    .collectLong(i -> {
-                               this.df.getEvalContext().setRowIndex(i);
+                               this.df.setEvalContextRowIndex(i);
                                return ((LongValue) expression.evaluate(this.df.getEvalVisitor())).longValue();
                            }
                            , values
@@ -53,7 +53,7 @@ public class DataFrameExpressionTest
         Expression expression = ExpressionTestUtil.toExpression("substr(Name, 2) + \"X\"");
 
         ImmutableList<Object> values = IntInterval.zeroTo(3).collect(i -> {
-                    this.df.getEvalContext().setRowIndex(i);
+                    this.df.setEvalContextRowIndex(i);
                     return expression.evaluate(this.df.getEvalVisitor()).stringValue();
                 }
         );
