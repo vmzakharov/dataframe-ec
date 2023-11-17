@@ -49,7 +49,7 @@ public class DataFrameToStringTest
                 + "\"Alice\",1234,2020-01-01,\"Accounting\",110000.0\n"
                 + "\"Bob\",1233,2010-01-01,\"Bee-bee-boo-boo\",100000.0\n"
                 + "\"Carl\",10000,2005-11-21,\"Controllers\",130000.0\n"
-                + "",
+                ,
                 dataFrame.asCsvString(3));
     }
 
@@ -74,7 +74,32 @@ public class DataFrameToStringTest
                 + "\"Carl\",10000,,\"Controllers\",130000.0\n"
                 + "\"Diane\",10001,2012-09-20,\"\",\n"
                 + "\"Ed\",10002,,\"\",0.0\n"
-                + "",
+                ,
                 dataFrame.asCsvString());
+    }
+
+    @Test
+    public void toStringMethod()
+    {
+        DataFrame dataFrame = new DataFrame("Employees")
+                .addStringColumn("Name").addLongColumn("EmployeeId").addDateColumn("HireDate").addStringColumn("Dept")
+                .addRow("Alice", 1234, LocalDate.of(2020, 1, 1), "Accounting")
+                .addRow("Bob", 1233, LocalDate.of(2010, 1, 1), "Bee-bee-boo-boo")
+                .addRow("Carl", 10000, LocalDate.of(2005, 11, 21), "Controllers")
+                .addRow("Diane", 10001, LocalDate.of(2012, 9, 20), "IT")
+                .addRow("Ed", 10002, LocalDate.of(2013, 9, 20), "Accounting")
+                .addRow("Frank", 10003, null, "Event Planning")
+                .addRow("Grace", 10004, LocalDate.of(2012, 10, 20), "")
+                .addRow("Heidi", 10005, LocalDate.of(2023, 6, 20), null)
+                .addRow("Ivan", 10006, LocalDate.of(2012, 12, 22), "")
+                .addRow("Judy", 10007, LocalDate.of(2017, 1, 2), "")
+                .addRow("Mike", 10008, LocalDate.of(2011, 11, 12), "")
+                ;
+
+        String expected = "Employees [11 rows]\n"
+                + dataFrame.asCsvString(10)
+                + "...\n";
+
+        Assert.assertEquals(expected, dataFrame.toString());
     }
 }

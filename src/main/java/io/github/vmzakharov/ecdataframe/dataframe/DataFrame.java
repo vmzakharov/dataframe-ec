@@ -177,6 +177,30 @@ implements DfIterate
         return this;
     }
 
+    /**
+     * Returns a string representation of the data frame, which consists of the data frame's name, the row count, and up
+     * to the first 10 rows of its data. If the data frame contains more than 10 rows, the first 10 rows are followed by
+     * the ellipsis punctuation mark ("...").
+     *
+     * @return a string representation of the data frame
+     */
+    @Override
+    public String toString()
+    {
+        StringBuilder sb = new StringBuilder()
+                .append(this.getName())
+                .append(" [").append(this.rowCount).append(" rows]")
+                .append('\n')
+                .append(this.asCsvString(10));
+
+        if (this.rowCount() > 10)
+        {
+            sb.append("...\n");
+        }
+
+        return sb.toString();
+    }
+
     private DfColumn attachColumn(DfColumn newColumn)
     {
         // todo: would like to make it impossible in the first place
