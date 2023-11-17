@@ -403,7 +403,7 @@ extends DataSetAbstract
             }
             else if (headers.size() != this.schema.columnCount())
             {
-                exceptionByKey("CSV_SCHEMA_FILE_HEADER_MISMATCH")
+                exceptionByKey("CSV_SCHEMA_HEADER_SIZE_MISMATCH")
                     .with("headerCount", headers.size())
                     .with("schemaColumnCount", this.schema.columnCount())
                     .fire();

@@ -27,7 +27,7 @@ final public class ConfigureMessages
         addMessage("DF_ADD_COL_UNKNOWN_TYPE",         "Cannot add a column ${columnName} for values of type ${type}");
         addMessage("DF_DIFFERENT_COL_SIZES",          "Stored column sizes are not the same when attempting to seal data frame '${dataFrameName}'");
         addMessage("DF_UNION_DIFF_COL_COUNT",         "Attempting to union data frames with different numbers of columns");
-        addMessage("DF_JOIN_DIFF_KEY_COUNT",          "Attempting to join dataframes by different number of keys on each side: ${side2KeyList} to ${side2KeyList}");
+        addMessage("DF_JOIN_DIFF_KEY_COUNT",          "Attempting to join dataframes by different number of keys on each side: ${side1KeyList} to ${side2KeyList}");
         addMessage("DF_NO_COL_COMPARATOR",            "Column comparator is not implemented for column ${columnName} of type ${type}");
         addMessage("DF_COL_ALREADY_LINKED",           "Column '${columnName}' has already been linked to a data frame");
         addMessage("DF_BAD_VAL_ADD_TO_COL",           "Attempting to add a value ${value} of type ${valueType} to a column ${columnName} of type ${columnType}");
@@ -37,7 +37,6 @@ final public class ConfigureMessages
         addMessage("DF_CALC_COL_INFER_TYPE",          "Cannot add calculated column ${columnName} to data frame ${dataFrameName}: failed to infer the expression type of '${expression}'\n${errorList}");
         addMessage("DF_MERGE_COL_DIFF_TYPES",         "Attempting to merge columns of different types: ${firstColumnName} (${firstColumnType}) and ${secondColumnName} (${secondColumnType})");
         addMessage("DF_COL_UNSUPPORTED_AGG",          "Aggregation ${aggregatorName} (${aggregationDescription}) cannot be performed on column ${columnName} of type ${columnType}");
-        addMessage("DF_ADDING_ALREADY_BOUND_COL",     "Mixing columns from different data frames: attempting to add to '${dataFrameName}' column '${columnName}', but it is already bound to '${existingDataFrameName}'");
         addMessage("CSV_FILE_WRITE_FAIL",             "Failed to write data frame to '${fileName}'");
         addMessage("CSV_UNSUPPORTED_VAL_TO_STR",      "Do not know how to convert value of type ${valueType} to a string");
         addMessage("CSV_INFER_SCHEMA_FAIL",           "Failed to infer schema from  '${fileName}'");
@@ -67,7 +66,7 @@ final public class ConfigureMessages
         addMessage("DSL_COMPARE_INCOMPATIBLE",        "Cannot compare a ${className} to a ${otherClassName}");
         addMessage("DSL_DF_COMPARE_UNSUPPORTED",      "Data Frame value comparison is not supported");
         addMessage("DSL_NO_DEC_TO_FLOAT_CONVERSION",  "Cannot convert decimal value to floating point");
-        addMessage("DSL_UNDEFINED_OP_ON_VALUE",       "Undefined operation ${operation} on ${value}");
+        addMessage("DSL_UNDEFINED_OP_ON_VALUE",       "Undefined operation '${operation}' on ${value}");
         addMessage("DSL_COMPARE_NOT_SUPPORTED",       "Comparison of values of type ${type} is not supported");
         addMessage("DSL_EXPLICIT_PARAM_MISMATCH",     "Parameter count mismatch in an invocation of '${functionName}'");
         addMessage("DSL_UNKNOWN_FUN",                 "Unknown function: '${functionName}'");

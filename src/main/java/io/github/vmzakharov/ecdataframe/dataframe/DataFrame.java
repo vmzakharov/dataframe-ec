@@ -201,18 +201,8 @@ implements DfIterate
         return sb.toString();
     }
 
-    private DfColumn attachColumn(DfColumn newColumn)
+    private void attachColumn(DfColumn newColumn)
     {
-        // todo: would like to make it impossible in the first place
-        if (newColumn.getDataFrame() != this)
-        {
-            exceptionByKey("DF_ADDING_ALREADY_BOUND_COL")
-                .with("dataFrameName", this.getName())
-                .with("columnName", newColumn.getName())
-                .with("existingDataFrameName", newColumn.getDataFrame().getName())
-                .fire();
-        }
-
         if (this.hasColumn(newColumn.getName()))
         {
             exceptionByKey("DF_DUPLICATE_COLUMN")
@@ -228,7 +218,10 @@ implements DfIterate
             newColumn.enablePooling();
         }
 
-        return newColumn;
+        if (newColumn.isStored() && newColumn.getSize() > 0)
+        {
+            this.determineRowCount();
+        }
     }
 
     public void enablePooling()
@@ -285,9 +278,9 @@ implements DfIterate
     /**
      * Convert the data frame into a multi-line CSV string. The output will include column headers.
      *
-     * @param limit number of rows to convert, all rows if the value is negative. If the value is zero the result will
+     * @param limit number of rows to return, all rows if the value is negative. If the value is zero the result will
      *              only contain column names.
-     * @return a string representation of the data frame.
+     * @return a CSV string representation of the data frame rows.
      */
     public String asCsvString(int limit)
     {
@@ -625,8 +618,17 @@ implements DfIterate
      */
     public DataFrame seal()
     {
+        this.determineRowCount();
+        this.resetBitmap();
+
+        this.columns.forEach(DfColumn::seal);
+        return this;
+    }
+
+    private void determineRowCount()
+    {
         MutableIntList storedColumnsSizes = this.columns.select(DfColumn::isStored).collectInt(DfColumn::getSize);
-        if (storedColumnsSizes.size() == 0)
+        if (storedColumnsSizes.isEmpty())
         {
             this.rowCount = 0;
         }
@@ -638,11 +640,6 @@ implements DfIterate
                 exceptionByKey("DF_DIFFERENT_COL_SIZES").with("dataFrameName", this.getName()).fire();
             }
         }
-
-        this.resetBitmap();
-
-        this.columns.forEach(DfColumn::seal);
-        return this;
     }
 
     /**

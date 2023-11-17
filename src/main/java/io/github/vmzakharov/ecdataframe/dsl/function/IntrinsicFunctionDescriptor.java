@@ -51,7 +51,7 @@ implements FunctionDescriptor
 
     public boolean hasExplicitParameters()
     {
-        return this.parameterNames.size() > 0;
+        return this.parameterNames.notEmpty();
     }
 
     public ValueType returnType(ListIterable<ValueType> parameterTypes)
@@ -90,7 +90,7 @@ implements FunctionDescriptor
     {
         if (expected != actual)
         {
-            exceptionByKey("DSL_INVALID_PARAMETER_TYPE")
+            exceptionByKey("DSL_INVALID_PARAM_TYPE")
                     .with("functionName", this.getName()).with("usageString", this.usageString())
                     .fire();
         }
@@ -100,7 +100,7 @@ implements FunctionDescriptor
     {
         if (!expected.contains(actual))
         {
-            exceptionByKey("DSL_INVALID_PARAMETER_TYPE")
+            exceptionByKey("DSL_INVALID_PARAM_TYPE")
                     .with("functionName", this.getName()).with("usageString", this.usageString())
                     .fire();
         }
