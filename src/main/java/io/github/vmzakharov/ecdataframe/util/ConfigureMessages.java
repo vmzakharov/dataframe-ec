@@ -82,7 +82,7 @@ final public class ConfigureMessages
         addMessage("IDX_EXPR_VECTOR_TYPE_INVALID",    "Invalid expression type ${vectorType} in a vector index expression, should be a vector");
         addMessage("DF_EQ_COL_TYPE_MISMATCH",         "Column types don't match: ${lhColumnTypes} vs. ${rhColumnTypes}");
         addMessage("DF_EQ_COL_HEADER_MISMATCH",       "Column headers don't match: ${lhColumnHeaders} vs. ${rhColumnHeaders}");
-        addMessage("DF_EQ_DIM_MISMATCH",              "Dimensions don't match: rows ${lhRowCount}, cols ${lhColumnCount}, vs. rows ${rhRowCount}, cols ${rhRowCount}");
+        addMessage("DF_EQ_DIM_MISMATCH",              "Dimensions don't match: rows ${lhRowCount}, cols ${lhColumnCount}, vs. rows ${rhRowCount}, cols ${rhColCount}");
         addMessage("DF_EQ_CELL_VALUE_MISMATCH",       "Different values in row ${rowIndex}, column ${columnIndex}: ${lhValue} vs. ${rhValue}");
     }
 }
