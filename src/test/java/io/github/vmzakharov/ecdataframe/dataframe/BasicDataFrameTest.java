@@ -348,6 +348,15 @@ public class BasicDataFrameTest
         df.seal();
     }
 
+    @Test(expected = RuntimeException.class)
+    public void dataFrameRowsDifSize()
+    {
+        DataFrame df = new DataFrame("df1")
+                .addStringColumn("Foo", Lists.immutable.of("A", "B", "C"))
+                .addStringColumn("Bar", Lists.immutable.of("X", "Y"));
+//        df.seal();
+    }
+
     @Test
     public void columnSchema()
     {

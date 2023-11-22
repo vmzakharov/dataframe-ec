@@ -28,8 +28,6 @@ public class DataFrameBitmapTest
     @Test
     public void selectionOfFlaggedRows()
     {
-        this.dataFrame.resetBitmap();
-
         this.dataFrame.setFlag(0);
         this.dataFrame.setFlag(2);
         this.dataFrame.setFlag(3);
@@ -80,8 +78,6 @@ public class DataFrameBitmapTest
     @Test
     public void selectionOfNotFlaggedRows()
     {
-        this.dataFrame.resetBitmap();
-
         this.dataFrame.setFlag(1);
         this.dataFrame.setFlag(4);
 
@@ -114,7 +110,6 @@ public class DataFrameBitmapTest
     {
         this.dataFrame.sortBy(Lists.immutable.of("Foo"));
 
-        this.dataFrame.resetBitmap();
         this.dataFrame.setFlag(1);
         this.dataFrame.setFlag(4);
 
@@ -184,7 +179,6 @@ public class DataFrameBitmapTest
                 .addRow("Alice",   "Pqr",  11L, 10.0, 20.0)
                 .addRow("Bob",     "Def",  13L, 13.0, 25.0)
                 .addRow("Carol",   "Xyz",  14L, 14.0, 40.0)
-                .seal()
         ;
 
         DataFrame flagged = df.selectFlagged();

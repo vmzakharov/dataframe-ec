@@ -57,7 +57,7 @@ implements DfColumnStored
     }
 
     @Override
-    public void seal()
+    public void disablePooling()
     {
         this.pool = null;
     }

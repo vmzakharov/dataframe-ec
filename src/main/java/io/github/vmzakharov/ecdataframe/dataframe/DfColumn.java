@@ -61,12 +61,12 @@ public interface DfColumn
 
     void addRowToColumn(int rowIndex, DfColumn target);
 
-    default void seal()
+    default void enablePooling()
     {
         // nothing
     }
 
-    default void enablePooling()
+    default void disablePooling()
     {
         // nothing
     }

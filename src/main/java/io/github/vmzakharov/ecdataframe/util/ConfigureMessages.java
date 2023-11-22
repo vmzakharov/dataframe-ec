@@ -25,7 +25,7 @@ final public class ConfigureMessages
         addMessage("DF_INDEX_DOES_NOT_EXIST",         "Column '${indexName}' does not exist in data frame '${dataFrameName}'");
         addMessage("DF_ADDING_ROW_TOO_WIDE",          "Adding more row elements (${elementCount}) than there are columns in the data frame (${columnCount})");
         addMessage("DF_ADD_COL_UNKNOWN_TYPE",         "Cannot add a column ${columnName} for values of type ${type}");
-        addMessage("DF_DIFFERENT_COL_SIZES",          "Stored column sizes are not the same when attempting to seal data frame '${dataFrameName}'");
+        addMessage("DF_DIFFERENT_COL_SIZES",          "Stored column sizes are not the same when attempting to set up data frame '${dataFrameName}'");
         addMessage("DF_UNION_DIFF_COL_COUNT",         "Attempting to union data frames with different numbers of columns");
         addMessage("DF_JOIN_DIFF_KEY_COUNT",          "Attempting to join dataframes by different number of keys on each side: ${side1KeyList} to ${side2KeyList}");
         addMessage("DF_NO_COL_COMPARATOR",            "Column comparator is not implemented for column ${columnName} of type ${type}");

@@ -612,7 +612,9 @@ implements DfIterate
 
     /**
      * Indicates that no further updates will be made to this data frame and ensures that the data frame is in a
-     * consistent internal state.
+     * consistent internal state. This method should be invoked when done populating a data frame with data. Failure to
+     * do so may result in degraded performance or delayed problem detection. It is usually OK to skip it in the context
+     * of unit tests.
      *
      * @return the data frame
      */
@@ -620,9 +622,14 @@ implements DfIterate
     {
         this.determineRowCount();
         this.resetBitmap();
-
-        this.columns.forEach(DfColumn::seal);
+        this.disablePooling();
         return this;
+    }
+
+    private void disablePooling()
+    {
+        this.poolingEnabled = false;
+        this.columns.forEach(DfColumn::disablePooling);
     }
 
     private void determineRowCount()
@@ -1149,11 +1156,24 @@ implements DfIterate
 
     public void setFlag(int rowIndex)
     {
+        this.ensureBitmapCapacity();
         this.bitmap.set(rowIndex, true);
+    }
+
+    private void ensureBitmapCapacity()
+    {
+        if (this.bitmap.size() < this.rowCount)
+        {
+            for (int i = this.bitmap.size(); i <= this.rowCount; i++)
+            {
+                this.bitmap.add(false);
+            }
+        }
     }
 
     public boolean isFlagged(int rowIndex)
     {
+        this.ensureBitmapCapacity();
         return this.bitmap.get(rowIndex);
     }
 
@@ -1191,7 +1211,7 @@ implements DfIterate
      */
     public void flagRowsBy(String filterExpressionString)
     {
-        this.bitmap = BooleanArrayList.newWithNValues(this.rowCount, false);
+        this.resetBitmap();
 
         Expression filterExpression = ExpressionParserHelper.DEFAULT.toExpression(filterExpressionString);
 
