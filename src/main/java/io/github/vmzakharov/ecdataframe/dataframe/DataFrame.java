@@ -735,7 +735,7 @@ implements DfIterate
             sumIndex = Lists.mutable.of();
         }
 
-        int[] counts = new int[this.rowCount()]; // todo: a bit wasteful?
+        int[] inputRowCountPerAggregateRow = new int[this.rowCount()]; // sizing for the worst case scenario: no aggregation
 
         ListIterable<String> columnsToAggregateNames = aggregators.collect(AggregateFunction::getColumnName);
         ListIterable<DfColumn> columnsToAggregate = this.getColumnsToAggregate(columnsToAggregateNames);
@@ -761,6 +761,7 @@ implements DfIterate
             ListIterable<Object> keyValue = index.computeKeyFrom(this, rowIndex);
 
             int accumulatorRowIndex;
+
             if (index.doesNotContain(keyValue))
             {
                 // new entry in the aggregated data frame - need to initialize accumulators
@@ -785,7 +786,7 @@ implements DfIterate
                 sumIndex.get(accumulatorRowIndex).add(rowIndex);
             }
 
-            counts[accumulatorRowIndex]++;
+            inputRowCountPerAggregateRow[accumulatorRowIndex]++;
 
             for (int colIndex = 0; colIndex < columnsToAggregate.size(); colIndex++)
             {
@@ -798,7 +799,7 @@ implements DfIterate
             aggregatedDataFrame.aggregateIndex = sumIndex;
         }
 
-        aggregators.forEach(agg -> agg.finishAggregating(aggregatedDataFrame, counts));
+        aggregators.forEach(agg -> agg.finishAggregating(aggregatedDataFrame, inputRowCountPerAggregateRow));
 
         return aggregatedDataFrame;
     }
@@ -968,11 +969,6 @@ implements DfIterate
         }
     }
 
-    private void copyIndexedRowFrom(DataFrame source, int rowIndex)
-    {
-        this.copyRowFrom(source, source.rowIndexMap(rowIndex));
-    }
-
     public DataFrame cloneStructure(String newName)
     {
         DataFrame cloned = new DataFrame(newName);
@@ -1041,13 +1037,19 @@ implements DfIterate
     {
         this.unsort();
 
+        this.virtualRowMap = this.buildSortedRowIndexMap(columnsToSortByNames, sortOrders);
+
+        return this;
+    }
+
+    private IntList buildSortedRowIndexMap(ListIterable<String> columnsToSortByNames, ListIterable<DfColumnSortOrder> sortOrders)
+    {
         // doing this before check for rowCount to make sure that the sort columns exist even if the data frame is empty
         ListIterable<DfColumn> columnsToSortBy = this.columnsNamed(columnsToSortByNames);
 
         if (this.rowCount == 0)
         {
-            this.virtualRowMap = IntLists.immutable.empty();
-            return this;
+            return IntLists.immutable.empty();
         }
 
         DfTuple[] tuples = new DfTuple[this.rowCount];
@@ -1065,9 +1067,7 @@ implements DfIterate
             Arrays.sort(tuples, (t1, t2) -> t1.compareTo(t2, sortOrders));
         }
 
-        this.virtualRowMap = ArrayIterate.collectInt(tuples, DfTuple::order);
-
-        return this;
+        return ArrayIterate.collectInt(tuples, DfTuple::order);
     }
 
     public DataFrame sortByExpression(String expressionString)
@@ -1487,22 +1487,20 @@ implements DfIterate
                 renamedOtherColumns);
     }
 
-    // todo: do not override sort order (use an external sort)
-    // todo: optimize away column lookup when joining
     private Triplet<DataFrame> join(
             DataFrame other,
             JoinType joinType,
-            ListIterable<String> thisJoinColumnNames,
+            ListIterable<String> theseJoinColumnNames,
             ListIterable<String> thisAdditionalSortColumnNames,
             ListIterable<String> otherJoinColumnNames,
             ListIterable<String> otherAdditionalSortColumnNames,
             MutableMap<String, String> renamedOtherColumns
     )
     {
-        if (thisJoinColumnNames.size() != otherJoinColumnNames.size())
+        if (theseJoinColumnNames.size() != otherJoinColumnNames.size())
         {
             exceptionByKey("DF_JOIN_DIFF_KEY_COUNT")
-                    .with("side1KeyList", thisJoinColumnNames.makeString())
+                    .with("side1KeyList", theseJoinColumnNames.makeString())
                     .with("side2KeyList", otherJoinColumnNames.makeString())
                     .fire();
         }
@@ -1517,14 +1515,16 @@ implements DfIterate
                 other.columns.collect(DfColumn::getName));
 
         otherColumnNameMap.forEachKeyValue(renamedOtherColumns::put);
-        otherJoinColumnNames.forEachInBoth(thisJoinColumnNames, renamedOtherColumns::put);
+        otherJoinColumnNames.forEachInBoth(theseJoinColumnNames, renamedOtherColumns::put);
 
         other.columns
                 .reject(col -> otherJoinColumnNames.contains(col.getName()))
                 .forEach(col -> joined.addColumn(otherColumnNameMap.get(col.getName()), col.getType()));
 
-        this.sortBy(thisJoinColumnNames.toList().withAll(thisAdditionalSortColumnNames));
-        other.sortBy(otherJoinColumnNames.toList().withAll(otherAdditionalSortColumnNames));
+        // building separate indexes for sorting rather than sorting the data frames directly to preserve their existing
+        // sort order (if any)
+        IntList thisSortedIndexMap = this.buildSortedRowIndexMap(theseJoinColumnNames.toList().withAll(thisAdditionalSortColumnNames), null);
+        IntList otherSortedIndexMap = other.buildSortedRowIndexMap(otherJoinColumnNames.toList().withAll(otherAdditionalSortColumnNames), null);
 
         int thisRowIndex = 0;
         int otherRowIndex = 0;
@@ -1537,18 +1537,24 @@ implements DfIterate
         ListIterable<String> theseColumnNames = this.columns.collect(DfColumn::getName);
         int theseColumnCount = theseColumnNames.size();
 
-        IntList joinColumnIndices = thisJoinColumnNames.collectInt(theseColumnNames::indexOf);
+        IntList joinColumnIndices = theseJoinColumnNames.collectInt(theseColumnNames::indexOf);
 
         ListIterable<String> otherColumnNames = other.columns
                 .collect(DfColumn::getName)
                 .reject(otherJoinColumnNames::contains);
 
+        ListIterable<DfColumn> theseColumns = this.columnsNamed(theseColumnNames);
+        ListIterable<DfColumn> otherColumns = other.columnsNamed(otherColumnNames);
+
+        ListIterable<DfColumn> theseJoinColumns = this.columnsNamed(theseJoinColumnNames);
+        ListIterable<DfColumn> otherJoinColumns = other.columnsNamed(otherJoinColumnNames);
+
         IntIntToIntFunction keyComparator = (thisIndex, otherIndex) -> {
-            for (int i = 0; i < thisJoinColumnNames.size(); i++)
+            for (int i = 0; i < theseJoinColumns.size(); i++)
             {
                 int result = DfTuple.compareMindingNulls(
-                        this.getObject(thisJoinColumnNames.get(i), thisIndex),
-                        other.getObject(otherJoinColumnNames.get(i), otherIndex)
+                        theseJoinColumns.get(i).getObject(thisSortedIndexMap.get(thisIndex)),
+                        otherJoinColumns.get(i).getObject(otherSortedIndexMap.get(otherIndex))
                 );
                 if (result != 0)
                 {
@@ -1563,13 +1569,13 @@ implements DfIterate
         {
             comparison = keyComparator.valueOf(thisRowIndex, otherRowIndex);
 
-            final int thisMakeFinal = thisRowIndex;
-            final int otherMakeFinal = otherRowIndex;
+            final int thisSortedIndex = thisSortedIndexMap.get(thisRowIndex);
+            final int otherSortedIndex = otherSortedIndexMap.get(otherRowIndex);
 
             if (comparison == 0)
             {
-                theseColumnNames.forEachWithIndex((colName, i) -> rowData[i] = this.getObject(colName, thisMakeFinal));
-                otherColumnNames.forEachWithIndex((colName, i) -> rowData[theseColumnCount + i] = other.getObject(colName, otherMakeFinal));
+                theseColumns.forEachWithIndex((col, i) -> rowData[i] = col.getObject(thisSortedIndex));
+                otherColumns.forEachWithIndex((col, i) -> rowData[theseColumnCount + i] = col.getObject(otherSortedIndex));
 
                 joined.addRow(rowData);
                 thisRowIndex++;
@@ -1583,13 +1589,13 @@ implements DfIterate
                     if (joinType.isOuterJoin())
                     {
                         Arrays.fill(rowData, null);
-                        theseColumnNames.forEachWithIndex((colName, i) -> rowData[i] = this.getObject(colName, thisMakeFinal));
+                        theseColumns.forEachWithIndex((col, i) -> rowData[i] = col.getObject(thisSortedIndex));
 
                         joined.addRow(rowData);
                     }
                     else if (joinType.isJoinWithComplements())
                     {
-                        thisComplementOther.copyIndexedRowFrom(this, thisMakeFinal);
+                        thisComplementOther.copyRowFrom(this, thisSortedIndex);
                     }
                     thisRowIndex++;
                 }
@@ -1601,17 +1607,18 @@ implements DfIterate
                         Arrays.fill(rowData, null);
 
                         joinColumnIndices.forEachWithIndex(
-                                (joinColumnIndex, sourceKeyIndex)
-                                        -> rowData[joinColumnIndex] = other.getObject(otherJoinColumnNames.get(sourceKeyIndex), otherMakeFinal)
+                                (joinColumnIndex, sourceKeyIndex) ->
+                                        rowData[joinColumnIndex] = otherJoinColumns.get(sourceKeyIndex).getObject(otherSortedIndex)
                         );
 
-                        otherColumnNames.forEachWithIndex((colName, i) -> rowData[theseColumnCount + i] = other.getObject(colName, otherMakeFinal));
+                        otherColumns.forEachWithIndex(
+                                (col, i) -> rowData[theseColumnCount + i] = col.getObject(otherSortedIndex));
 
                         joined.addRow(rowData);
                     }
                     else if (joinType.isJoinWithComplements())
                     {
-                        otherComplementThis.copyIndexedRowFrom(other, otherMakeFinal);
+                        otherComplementThis.copyRowFrom(other, otherSortedIndex);
                     }
                     otherRowIndex++;
                 }
@@ -1623,10 +1630,10 @@ implements DfIterate
         {
             while (thisRowIndex < thisRowCount)
             {
-                int thisMakeFinal = thisRowIndex;
+                final int thisSortedIndex = thisSortedIndexMap.get(thisRowIndex);
 
                 Arrays.fill(rowData, null);
-                theseColumnNames.forEachWithIndex((colName, i) -> rowData[i] = this.getObject(colName, thisMakeFinal));
+                theseColumns.forEachWithIndex((col, i) -> rowData[i] = col.getObject(thisSortedIndex));
 
                 joined.addRow(rowData);
 
@@ -1635,16 +1642,18 @@ implements DfIterate
 
             while (otherRowIndex < otherRowCount)
             {
-                int otherMakeFinal = otherRowIndex;
+                final int otherSortedIndex = otherSortedIndexMap.get(otherRowIndex);
 
                 Arrays.fill(rowData, null);
 
                 joinColumnIndices.forEachWithIndex(
                         (joinColumnIndex, sourceKeyIndex)
-                                -> rowData[joinColumnIndex] = other.getObject(otherJoinColumnNames.get(sourceKeyIndex), otherMakeFinal)
+                                -> rowData[joinColumnIndex] = otherJoinColumns.get(sourceKeyIndex).getObject(otherSortedIndex)
                 );
 
-                otherColumnNames.forEachWithIndex((colName, i) -> rowData[theseColumnCount + i] = other.getObject(colName, otherMakeFinal));
+                otherColumns.forEachWithIndex(
+                        (col, i) -> rowData[theseColumnCount + i] = col.getObject(otherSortedIndex)
+                );
 
                 joined.addRow(rowData);
 
@@ -1655,19 +1664,21 @@ implements DfIterate
         {
             while (thisRowIndex < thisRowCount)
             {
-                thisComplementOther.copyIndexedRowFrom(this, thisRowIndex);
+                thisComplementOther.copyRowFrom(this, thisSortedIndexMap.get(thisRowIndex));
                 thisRowIndex++;
             }
 
             while (otherRowIndex < otherRowCount)
             {
-                otherComplementThis.copyIndexedRowFrom(other, otherRowIndex);
+                otherComplementThis.copyRowFrom(other, otherSortedIndexMap.get(otherRowIndex));
                 otherRowIndex++;
             }
         }
 
+        joined.seal();
         thisComplementOther.seal();
         otherComplementThis.seal();
+
         return Tuples.triplet(thisComplementOther, joined, otherComplementThis);
     }
 

@@ -1,5 +1,6 @@
-package io.github.vmzakharov.ecdataframe.dataframe;
+package io.github.vmzakharov.ecdataframe.dataframe.bench;
 
+import io.github.vmzakharov.ecdataframe.dataframe.DataFrame;
 import io.github.vmzakharov.ecdataframe.util.Stopwatch;
 import org.eclipse.collections.api.list.MutableList;
 import org.eclipse.collections.impl.factory.Lists;
@@ -15,8 +16,8 @@ import java.util.concurrent.CountDownLatch;
  */
 public class DataFrameParallelTest
 {
-    public static final int ROW_COUNT = 5_000_000;
-    public static final int THREAD_COUNT = 10;
+    private static final int ROW_COUNT = 5_000_000;
+    private static final int THREAD_COUNT = 10;
 
 //    private static final long EXPECTED = (long) ROW_COUNT * (ROW_COUNT - 1) / 2;
     private static final long EXPECTED = (long) ROW_COUNT * (ROW_COUNT - 1);
