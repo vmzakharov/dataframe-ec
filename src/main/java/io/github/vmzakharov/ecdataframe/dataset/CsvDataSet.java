@@ -90,7 +90,8 @@ extends DataSetAbstract
 
     /**
      * Empty values in the source file (two adjacent separators) will be loaded as null values as this data set is
-     * loaded into a data frame
+     * loaded into a data frame. By default, they are treated as empty values of the corresponding column type (e.g.
+     * empty strings for string columns, zeroes for numeric columns, etc.)
      * @return this data set
      */
     public CsvDataSet convertEmptyElementsToNulls()
@@ -101,7 +102,7 @@ extends DataSetAbstract
 
     /**
      * Empty values in the source file (two adjacent separators) will be converted to the respective zero or empty
-     * values depending on the column type as this data set is loaded into a data frame
+     * values depending on the column type as this data set is loaded into a data frame. This is the default behavior.
      * @return this data set
      */
     public CsvDataSet convertEmptyElementsToValues()

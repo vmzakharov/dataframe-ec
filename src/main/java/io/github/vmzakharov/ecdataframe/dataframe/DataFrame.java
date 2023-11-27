@@ -312,6 +312,12 @@ implements DfIterate
         return this.rowCount;
     }
 
+    /**
+     * adds a row to the data frame populated with the default empty values depending on the column type (nulls,
+     * zeroes, etc.)
+     *
+     * @return this data frame
+     */
     public DataFrame addRow()
     {
         this.columns.forEach(DfColumn::addEmptyValue);

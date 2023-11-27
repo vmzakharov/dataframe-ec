@@ -44,11 +44,12 @@ public class DfIndexKeeper
             // need to be effectively final so introducing another variable rather than reusing rowIndex
             int lastRowIndex = this.indexedDataFrame.rowCount() - 1;
             this.addIndex(key, lastRowIndex);
-            // todo - use addObject/add Empty instead?
+
             this.columnsToIndexBy.forEachWithIndex((col, i) -> col.setObject(lastRowIndex, key.get(i)));
 
             rowIndex = lastRowIndex;
         }
+
         return rowIndex;
     }
 
