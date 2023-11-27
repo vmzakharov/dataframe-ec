@@ -10,7 +10,7 @@ For more on Eclipse Collections see: https://www.eclipse.org/collections/.
 <dependency>
   <groupId>io.github.vmzakharov</groupId>
   <artifactId>dataframe-ec</artifactId>
-  <version>0.19.4</version>
+  <version>0.19.5</version>
 </dependency>
 ```
 ## Code Kata
@@ -33,7 +33,7 @@ Learn dataframe-ec with Kata! Check out [dataframe-ec kata](https://github.com/v
 - lookup join - enrich a data frame by adding one or more columns based on value lookup in another data frame
 - find relative complements (set differences) of two data frames based on the specified column values
 - aggregation - aggregating the entire data frame or grouping by the specified column values and aggregating within a group
-- flag rows - individually or matching a criteria.
+- flag rows - individually or matching a criteria <br>...and more!
 
 ### Examples
 
@@ -48,7 +48,7 @@ Customer,  Count,  Price,  Date
 ```
 
 Then a data frame can be loaded from this file as shown below. The file schema can be inferred, like in this example, or specified explicitly.
-```
+```Java
 DataFrame ordersFromFile  = new CsvDataSet("donut_orders.csv", "Donut Orders").loadAsDataFrame();
 ```
 
@@ -61,7 +61,7 @@ DataFrame ordersFromFile  = new CsvDataSet("donut_orders.csv", "Donut Orders").l
 |"Clyde" | 4.0000 | 19.5000 | 2020-10-19|
 
 The `loadAsDataFrame()` method can take a numeric parameter, which specifies how many rows of data to load. For example:
-```
+```Java
 DataFrame firstTwoOrders = new CsvDataSet("donut_orders.csv", "Donut Orders").loadAsDataFrame(2);
 ```
 `firstTwoOrders`
@@ -82,7 +82,7 @@ Customer|Count|Price|Date
 
 A data frame can be loaded from this file by providing a schema
 
-```
+```Java
 CsvSchema donutSchema = new CsvSchema()
         .separator('|')
         .nullMarker("*null*");
@@ -104,7 +104,7 @@ DataFrame schemingDonuts = dataSet.loadAsDataFrame();
 |"Clyde" | 4 | 19.5000 | null|
 
 A data frame can be created **programmatically** by providing values for individual rows or columns. Here is a sample constructing a data frame row by row:
-```
+```Java
 DataFrame orders = new DataFrame("Donut Orders")
     .addStringColumn("Customer").addLongColumn("Count").addDoubleColumn("Price").addDateColumn("Date")
     .addRow("Alice",  5, 23.45, LocalDate.of(2020, 10, 15))
@@ -125,7 +125,7 @@ DataFrame orders = new DataFrame("Donut Orders")
 
 This way of creating a data frame is more useful for contexts like unit tests, where readability matters. In your applications you probably want to load a data frame from a file or populate individual columns with strongly typed values as in the following example, which produces a data frame with the same exact contents as the one in the example above:
 
-```
+```Java
 DataFrame ordersByCol = new DataFrame("Donut Orders")
         .addStringColumn("Customer", Lists.immutable.of("Alice", "Bob", "Alice", "Carl", "Doris"))
         .addLongColumn("Count", LongLists.immutable.of(5, 10, 4, 11, 1))
@@ -147,7 +147,7 @@ ordersByCol.seal(); // finished constructing a data frame
 
 A data frame can also be created from a hierarchical data set via a **projection operator** supported by the DSL. Let's say we have two record types: `Person` and `Address`. Then we can use the projection operator to turn a list of `Person` objects into a data frame as follows.
 
-```
+```Java
 var visitor = new InMemoryEvaluationVisitor();
 visitor.getContext().addDataSet(
         new ObjectListDataSet("Person", Lists.immutable.of(
@@ -176,7 +176,7 @@ DataFrame projectionValue = ((DataFrameValue) script.evaluate(visitor)).dataFram
 |"Carl" | 50 | "Idaho"|
 
 #### Sum of Columns
-```
+```Java
 DataFrame totalOrdered = orders.sum(Lists.immutable.of("Count", "Price"));
 ```
 
@@ -196,7 +196,7 @@ The following aggregation functions are supported
 - `count`
 - `same` - the result is `null` if the aggregated values are not the equal to each other, otherwise it equals to that value
 
-```
+```Java
 DataFrame orderStats = orders.aggregate(Lists.immutable.of(max("Price", "MaxPrice"), min("Price", "MinPrice"), sum("Price", "Total")));
 ```
 
@@ -207,7 +207,7 @@ DataFrame orderStats = orders.aggregate(Lists.immutable.of(max("Price", "MaxPric
 |44.7800 | 5.0000 | 133.0700|
 
 #### Sum With Group By
-```
+```Java
 DataFrame totalsByCustomer = orders.sumBy(Lists.immutable.of("Count", "Price"), Lists.immutable.of("Customer"));
 ```
 
@@ -221,8 +221,8 @@ DataFrame totalsByCustomer = orders.sumBy(Lists.immutable.of("Count", "Price"), 
 |"Doris" | 1 | 5.0000|
 
 #### Add a Calculated Column
-```
-orders.addDoubleColumn("AvgDonutPrice", "Price / Count");
+```Java
+orders.addColumn("AvgDonutPrice", "Price / Count");
 ```
 `orders`
 
@@ -235,8 +235,8 @@ orders.addDoubleColumn("AvgDonutPrice", "Price / Count");
 |"Doris" | 1 | 5.0000 | 2020-09-01 | 5.0000|
 
 #### Filter
-Selection of a sub dataframe with the rows matching the filter condition
-```
+Selection of a dataframe containing the rows matching the filter condition
+```Java
 DataFrame bigOrders = orders.selectBy("Count >= 10");
 ```
 `bigOrders`
@@ -246,8 +246,20 @@ DataFrame bigOrders = orders.selectBy("Count >= 10");
 |"Bob" | 10 | 40.3400 | 2020-11-10 | 4.0340|
 |"Carl" | 11 | 44.7800 | 2020-12-25 | 4.0709|
 
-Select two subsets both matching and not matching the filter condition respectively
+Selection of a dataframe *without* the rows matching the filter condition
+```Java
+DataFrame smallOrders = orders.rejectBy("Count >= 10");
 ```
+`smallOrders`
+
+|Customer | Count | Price | Date | AvgDonutPrice|
+|---|---:|---:|---|---:|
+|"Alice" | 5 | 23.4500 | 2020-10-15 | 4.6900|
+|"Alice" | 4 | 19.5000 | 2020-10-19 | 4.8750|
+|"Doris" | 1 | 5.0000 | 2020-09-01 | 5.0000|
+
+Split the rows of a data frame into two subsets both matching and not matching the filter condition respectively
+```Java
 Twin<DataFrame> highAndLow = orders.partition("Count >= 10");
 ```
 Result - a pair of data frames:
@@ -268,7 +280,7 @@ Result - a pair of data frames:
 |"Doris" | 1 | 5.0000 | 2020-09-01 | 5.0000|
 
 #### Drop Column
-```
+```Java
 orders.dropColumn("AvgDonutPrice");
 ```
 `orders`
@@ -283,7 +295,7 @@ orders.dropColumn("AvgDonutPrice");
 
 #### Sort
 Sort by the order date:
-```
+```Java
 orders.sortBy(Lists.immutable.of("Date"));
 ```
 `orders`
@@ -297,7 +309,7 @@ orders.sortBy(Lists.immutable.of("Date"));
 |"Carl" | 11 | 44.7800 | 2020-12-25|
 
 Sort by Customer ignoring the first letter of their name
-```
+```Java
 orders.sortByExpression("substr(Customer, 1)");
 ```
 `orders`
@@ -311,7 +323,9 @@ orders.sortByExpression("substr(Customer, 1)");
 |"Doris" | 1 | 5.0000 | 2020-09-01|
 
 #### Union
-```
+
+The union operation concatenates two data frames with the same schema. Note that it does not remove duplicate rows.
+```Java
 DataFrame otherOrders = new DataFrame("Other Donut Orders")
     .addStringColumn("Customer").addLongColumn("Count").addDoubleColumn("Price").addDateColumn("Date")
     .addRow("Eve",  2, 9.80, LocalDate.of(2020, 12, 5));
@@ -333,7 +347,7 @@ DataFrame combinedOrders = orders.union(otherOrders);
 Say we want to get a list of all clients who placed orders, which are listed in the `orders` data frame above. We can
 use the `distinct()` method for that:
 
-```
+```Java
 DataFrame distinctCustomers = orders.distinct(Lists.immutable.of("Customer"));
 ```
 
@@ -347,7 +361,7 @@ DataFrame distinctCustomers = orders.distinct(Lists.immutable.of("Customer"));
 |"Doris"|
 
 #### Join
-```
+```Java
 DataFrame joining1 = new DataFrame("df1")
         .addStringColumn("Foo").addStringColumn("Bar").addStringColumn("Letter").addLongColumn("Baz")
         .addRow("Pinky", "pink", "B", 8)
@@ -372,7 +386,7 @@ DataFrame joined = joining1.outerJoin(joining2, Lists.immutable.of("Bar", "Lette
 |null | "red" | "A" | null | "Apple" | 1|
 
 #### Join With Complements
-```
+```Java
 DataFrame sideA = new DataFrame("Side A")
         .addStringColumn("Key").addLongColumn("Value")
         .addRow("A", 1)
@@ -416,7 +430,7 @@ Complement of A in B:
 
 #### Lookup
 
-```
+```Java
 DataFrame pets = new DataFrame("Pets")
         .addStringColumn("Name").addLongColumn("Pet Kind Code")
         .addRow("Sweet Pea", 1)

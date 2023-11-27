@@ -1,4 +1,9 @@
 # Releases
+### 0.19.5
+* adds `rejectBy()` method to data frame (a companion to `selectBy()`)
+* adds a friendly `toString()` implementation to data frame
+* fix: data frame join no longer changes the source dataframes sort order 
+* minor fixes and enhancements including join performance and expression type inference
 ### 0.19.4
 * ensures data frame based expression evaluation is thread safe
 * adds `schema()` method to data frame to report its schema (its column descriptions) as a data frame
