@@ -25,31 +25,31 @@ public class ValueTest
     }
 
     @Test(expected = RuntimeException.class)
-    public void StringValuesWrapNulls()
+    public void stringValuesWrapNulls()
     {
         new StringValue(null);
     }
 
     @Test(expected = RuntimeException.class)
-    public void DecimalValuesCannotWrapNulls()
+    public void decimalValuesCannotWrapNulls()
     {
         new DecimalValue(null);
     }
 
     @Test(expected = RuntimeException.class)
-    public void DateValuesCannotWrapNulls()
+    public void dateValuesCannotWrapNulls()
     {
         new DateValue(null);
     }
 
     @Test(expected = RuntimeException.class)
-    public void DateTimeValuesCannotWrapNulls()
+    public void dateTimeValuesCannotWrapNulls()
     {
         new DateTimeValue(null);
     }
 
     @Test(expected = RuntimeException.class)
-    public void DataFrameValuesCannotWrapNulls()
+    public void dataFrameValuesCannotWrapNulls()
     {
         new DataFrameValue(null);
     }
