@@ -11,11 +11,6 @@ implements Comparable<DfTuple>
     private final Object[] items;
     private final int order;
 
-    public DfTuple(Object... newItems)
-    {
-        this(0, newItems);
-    }
-
     public DfTuple(int newOrder, Object... newItems)
     {
         this.order = newOrder;
@@ -39,18 +34,13 @@ implements Comparable<DfTuple>
     @Override
     public boolean equals(Object o)
     {
-        if (this == o)
+        if (o instanceof DfTuple)
         {
-            return true;
+            DfTuple dfTuple = (DfTuple) o;
+            return Arrays.equals(this.items, dfTuple.items);
         }
 
-        if (o == null || this.getClass() != o.getClass())
-        {
-            return false;
-        }
-
-        DfTuple dfTuple = (DfTuple) o;
-        return Arrays.equals(this.items, dfTuple.items);
+        return false;
     }
 
     @Override
@@ -60,15 +50,9 @@ implements Comparable<DfTuple>
     }
 
     @Override
-    public int compareTo(DfTuple that)
-    {
-        return this.compareTo(that, null);
-    }
-
-    @Override
     public String toString()
     {
-        return ArrayIterate.makeString(this.items);
+        return this.order + ":" + ArrayIterate.makeString(this.items);
     }
 
     public int order()
@@ -76,19 +60,20 @@ implements Comparable<DfTuple>
         return this.order;
     }
 
-    public int compareTo(DfTuple that, ListIterable<DfColumnSortOrder> sortOrders)
+    @Override
+    public int compareTo(DfTuple other)
     {
-        Object[] these = this.items;
-        Object[] others = that.items;
+        return this.compareTo(other, null);
+    }
 
-        if (these == others)
-        {
-            return 0;
-        }
+    public int compareTo(DfTuple other, ListIterable<DfColumnSortOrder> sortOrders)
+    {
+        Object[] theseItems = this.items;
 
-        for (int i = 0; i < these.length; i++)
+        for (int i = 0; i < theseItems.length; i++)
         {
-            int result = compareMindingNulls(these[i], others[i]);
+            int result = compareMindingNulls(theseItems[i], other.items[i]);
+
             if (result != 0)
             {
                 return sortOrders == null ? result : sortOrders.get(i).order(result);

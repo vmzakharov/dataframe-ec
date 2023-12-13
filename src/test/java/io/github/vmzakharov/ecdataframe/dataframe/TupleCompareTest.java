@@ -10,12 +10,12 @@ public class TupleCompareTest
     @Test
     public void compare()
     {
-        DfTuple t1 = new DfTuple("B", null);
-        DfTuple t2 = new DfTuple(null, null);
-        DfTuple t3 = new DfTuple("A", null);
-        DfTuple t4 = new DfTuple(null, 2L);
-        DfTuple t5 = new DfTuple("A", 2L);
-        DfTuple t6 = new DfTuple(null, null);
+        DfTuple t1 = new DfTuple(0, "B", null);
+        DfTuple t2 = new DfTuple(0, null, null);
+        DfTuple t3 = new DfTuple(0, "A", null);
+        DfTuple t4 = new DfTuple(0, null, 2L);
+        DfTuple t5 = new DfTuple(0, "A", 2L);
+        DfTuple t6 = new DfTuple(0, null, null);
 
         Assert.assertTrue(t1.compareTo(t2) > 0);
         Assert.assertTrue(t2.compareTo(t1) < 0);
@@ -40,12 +40,12 @@ public class TupleCompareTest
     @Test
     public void sort()
     {
-        DfTuple t2 = new DfTuple(null, null);
-        DfTuple t6 = new DfTuple(null, null);
-        DfTuple t4 = new DfTuple(null, 2L);
-        DfTuple t3 = new DfTuple("A", null);
-        DfTuple t5 = new DfTuple("A", 2L);
-        DfTuple t1 = new DfTuple("B", null);
+        DfTuple t2 = new DfTuple(0, null, null);
+        DfTuple t6 = new DfTuple(0, null, null);
+        DfTuple t4 = new DfTuple(0, null, 2L);
+        DfTuple t3 = new DfTuple(0, "A", null);
+        DfTuple t5 = new DfTuple(0, "A", 2L);
+        DfTuple t1 = new DfTuple(0, "B", null);
 
         DfTuple[] tuples = new DfTuple[] {t1, t2, t3, t4, t5, t6};
 

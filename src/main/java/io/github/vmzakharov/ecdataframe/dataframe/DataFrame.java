@@ -312,12 +312,6 @@ implements DfIterate
         return this.rowCount;
     }
 
-    /**
-     * adds a row to the data frame populated with the default empty values depending on the column type (nulls,
-     * zeroes, etc.)
-     *
-     * @return this data frame
-     */
     public DataFrame addRow()
     {
         this.columns.forEach(DfColumn::addEmptyValue);
@@ -1096,7 +1090,7 @@ implements DfIterate
         for (int i = 0; i < this.rowCount; i++)
         {
             this.getEvalContext().setRowIndex(i);
-            tuples[i] = new DfTuple(i, new Object[] {expression.evaluate(this.getEvalVisitor())});
+            tuples[i] = new DfTuple(i, expression.evaluate(this.getEvalVisitor()));
         }
 
         Arrays.sort(tuples, (t1, t2) -> t1.compareTo(t2, Lists.immutable.of(sortOrder)));
