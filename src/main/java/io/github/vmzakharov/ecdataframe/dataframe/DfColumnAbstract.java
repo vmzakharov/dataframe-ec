@@ -74,7 +74,7 @@ implements DfColumn
         return newColumn;
     }
 
-    protected DfColumn copyColumnSchema(DataFrame target)
+    protected DfColumn copyColumnSchemaAndEnsureCapacity(DataFrame target)
     {
         DfColumnStored newColumn = target.newColumn(this.getName(), this.getType());
 

@@ -31,7 +31,7 @@ implements DfObjectColumn<T>
 
     public DfColumn copyTo(DataFrame target)
     {
-        DfObjectColumnAbstract<T> targetCol = (DfObjectColumnAbstract<T>) this.copyColumnSchema(target);
+        DfObjectColumnAbstract<T> targetCol = (DfObjectColumnAbstract<T>) this.copyColumnSchemaAndEnsureCapacity(target);
 
         targetCol.addAllItems(this.toList());
         return targetCol;

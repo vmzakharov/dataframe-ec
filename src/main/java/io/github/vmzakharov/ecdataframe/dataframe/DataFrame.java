@@ -41,6 +41,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Arrays;
+import java.util.LinkedHashSet;
 import java.util.function.Supplier;
 
 import static io.github.vmzakharov.ecdataframe.dataframe.DfColumnSortOrder.ASC;
@@ -658,6 +659,97 @@ implements DfIterate
     public DataFrame sum(ListIterable<String> columnsToAggregateNames)
     {
         return this.aggregate(columnsToAggregateNames.collect(AggregateFunction::sum));
+    }
+
+    /**
+     * Pivot the data frame. This operation produces another data frame, with the columns that correspond to the values
+     * of the key column, populated with the values from the values columns. THe values are aggregated by one or more
+     * aggregation function.
+     *
+     * @param columnsToGroupByNames the columns to group by the resulting pivot table
+     * @param pivotColumnName the column the values of which will become columns for the pivoted data frame
+     * @param aggregators the aggregate functions to aggregate values in the value columns specified in
+     *                    their parameters
+     * @return a new data frame representing a pivot table view of this data frame
+     */
+    public DataFrame pivot(
+            ListIterable<String> columnsToGroupByNames,
+            String pivotColumnName,
+            ListIterable<AggregateFunction> aggregators
+            )
+    {
+        DataFrame pivoted = new DataFrame(this.getName() + "-pivoted");
+
+        // index columns first
+        ListIterable<DfColumn> columnsToGroupBy = this.columnsNamed(columnsToGroupByNames);
+
+        columnsToGroupBy.forEach(col -> pivoted.addColumn(col.getName(), col.getType()));
+
+        // then columns derived from pivot dimension values
+        // first, find distinct pivot dimension values
+        DfColumn pivotColumn = this.getColumnNamed(pivotColumnName);
+
+        LinkedHashSet<String> pivotColumnValues = new LinkedHashSet<>();
+//        MutableSortedSet<String> pivotColumnValues = SortedSets.mutable.of();
+
+        for (int i = 0; i < pivotColumn.getSize(); i++)
+        {
+            pivotColumnValues.add(pivotColumn.getValueAsString(i));
+        }
+
+        AggregateFunction aggregator = aggregators.get(0);
+
+        DfColumn valueColum = this.getColumnNamed(aggregator.getColumnName());
+
+        ValueType targetType = aggregators.get(0).targetColumnType(valueColum.getType());
+
+        // then add columns for each aggregation corresponding to each pivot value
+        pivotColumnValues.forEach(pivotColumnValue -> pivoted.addColumn(pivotColumnValue, targetType));
+
+//        ListIterable<DfColumn> pivotColumns = pivoted.columnsNamed(pivotColumnValues.toList());
+        ListIterable<DfColumn> pivotColumns = pivoted.columnsNamed(Lists.immutable.withAll(pivotColumnValues));
+
+        DfIndexKeeper index = new DfIndexKeeper(pivoted, columnsToGroupByNames);
+
+        int[] inputRowCountPerAggregateRow = new int[this.rowCount()]; // sizing for the worst case scenario: no aggregation
+
+        for (int rowIndex = 0; rowIndex < this.rowCount; rowIndex++)
+        {
+            String targetColumName = pivotColumn.getValueAsString(rowIndex);
+
+            ListIterable<Object> keyValueForGrouBy = index.computeKeyFrom(this, rowIndex);
+
+            int accumulatorRowIndex;
+
+            if (index.doesNotContain(keyValueForGrouBy))
+            {
+                // new entry in the pivot data frame - need to initialize accumulators
+                accumulatorRowIndex = index.getRowIndexAtKeyIfAbsentAdd(keyValueForGrouBy);
+
+//                aggregators.forEachInBoth(pivotColumns,
+//                        (aggregateFunction, accumulatorColumn) -> aggregateFunction.initializeValue(accumulatorColumn, accumulatorRowIndex));
+                pivotColumns.forEach(accumulatorColumn -> aggregators.get(0).initializeValue(accumulatorColumn, accumulatorRowIndex));
+            }
+            else
+            {
+                // an existing entry so just a lookup
+                accumulatorRowIndex = index.getRowIndexAtKeyIfAbsentAdd(keyValueForGrouBy);
+            }
+
+            inputRowCountPerAggregateRow[accumulatorRowIndex]++;
+
+            pivoted.getColumnNamed(targetColumName).applyAggregator(accumulatorRowIndex, valueColum, rowIndex, aggregators.get(0));
+
+//            for (int colIndex = 0; colIndex < columnsToAggregate.size(); colIndex++)
+//            {
+//                pivotColumns.get(colIndex).applyAggregator(accumulatorRowIndex, columnsToAggregate.get(colIndex), rowIndex, aggregators.get(colIndex));
+//            }
+
+        }
+
+        aggregators.forEach(agg -> agg.finishAggregating(pivoted, inputRowCountPerAggregateRow));
+
+        return pivoted;
     }
 
     /**

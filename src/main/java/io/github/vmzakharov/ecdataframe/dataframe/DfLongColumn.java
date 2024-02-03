@@ -67,7 +67,7 @@ extends DfColumnAbstract
 
     public DfColumn copyTo(DataFrame target)
     {
-        DfLongColumn targetCol = (DfLongColumn)  this.copyColumnSchema(target);
+        DfLongColumn targetCol = (DfLongColumn)  this.copyColumnSchemaAndEnsureCapacity(target);
 
         targetCol.addAllItemsFrom(this);
         return targetCol;

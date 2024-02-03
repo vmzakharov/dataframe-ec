@@ -36,6 +36,7 @@ public class DfIndexKeeper
      */
     public int getRowIndexAtKeyIfAbsentAdd(ListIterable<Object> key)
     {
+        // TODO: support initializer code block for the indexed data frame to be executed if a new row is added
         int rowIndex = this.getRowIndexAtKey(key);
         if (rowIndex == -1)
         {
@@ -75,6 +76,7 @@ public class DfIndexKeeper
 
     public ListIterable<Object> computeKeyFrom(DataFrame aDataFrame, int rowIndex)
     {
+        // TODO: avoid recreating the list
         MutableList<Object> key = Lists.fixedSize.of(new Object[this.columnsToIndexBy.size()]);
 
         this.columnsToIndexBy.forEachWithIndex(
