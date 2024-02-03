@@ -1,5 +1,6 @@
 package io.github.vmzakharov.ecdataframe.dataframe;
 
+import org.eclipse.collections.api.block.procedure.primitive.IntProcedure;
 import org.eclipse.collections.api.list.ListIterable;
 import org.eclipse.collections.api.list.MutableList;
 import org.eclipse.collections.api.map.primitive.MutableObjectIntMap;
@@ -31,13 +32,28 @@ public class DfIndexKeeper
     /**
      * Returns the value in the index that matches the index key. If no matching key exists in the index, a new entry
      * for this key is added to the indexed data frame and its index is returned.
-     * @param key the to look up the matching row in the indexed dataframe by
+     * @param key the key to look up the matching row in the indexed dataframe by
      * @return row id in the <b>the indexed data frame</b>  corresponding to the computed key
      */
     public int getRowIndexAtKeyIfAbsentAdd(ListIterable<Object> key)
     {
-        // TODO: support initializer code block for the indexed data frame to be executed if a new row is added
+        return this.getRowIndexAtKeyIfAbsentAddAndEvaluate(key, i -> { });
+    }
+
+    /**
+     * Returns the value in the index that matches the index key. If no matching key exists in the index, a new entry
+     * for this key is added to the indexed data frame and the procedure passed into this method is evaluated with the
+     * newly added row index as its parameter.
+     * @param key the key to look up the matching row in the indexed dataframe by
+     * @param evaluateIfAbsent the procedure that will be executed if no index at this key is found and the new entry
+     *                         needs to be created. This can be used to initialize the just added row in the indexed
+     *                         data frame.
+     * @return row id in the <b>the indexed data frame</b>  corresponding to the computed key
+     */
+    public int getRowIndexAtKeyIfAbsentAddAndEvaluate(ListIterable<Object> key, IntProcedure evaluateIfAbsent)
+    {
         int rowIndex = this.getRowIndexAtKey(key);
+
         if (rowIndex == -1)
         {
             this.indexedDataFrame.addRow();
@@ -49,6 +65,8 @@ public class DfIndexKeeper
             this.columnsToIndexBy.forEachWithIndex((col, i) -> col.setObject(lastRowIndex, key.get(i)));
 
             rowIndex = lastRowIndex;
+
+            evaluateIfAbsent.value(rowIndex);
         }
 
         return rowIndex;

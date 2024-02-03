@@ -717,24 +717,12 @@ implements DfIterate
         {
             String targetColumName = pivotColumn.getValueAsString(rowIndex);
 
-            ListIterable<Object> keyValueForGrouBy = index.computeKeyFrom(this, rowIndex);
+            ListIterable<Object> keyValueForGroupBy = index.computeKeyFrom(this, rowIndex);
 
-            int accumulatorRowIndex;
-
-            if (index.doesNotContain(keyValueForGrouBy))
-            {
-                // new entry in the pivot data frame - need to initialize accumulators
-                accumulatorRowIndex = index.getRowIndexAtKeyIfAbsentAdd(keyValueForGrouBy);
-
-//                aggregators.forEachInBoth(pivotColumns,
-//                        (aggregateFunction, accumulatorColumn) -> aggregateFunction.initializeValue(accumulatorColumn, accumulatorRowIndex));
-                pivotColumns.forEach(accumulatorColumn -> aggregators.get(0).initializeValue(accumulatorColumn, accumulatorRowIndex));
-            }
-            else
-            {
-                // an existing entry so just a lookup
-                accumulatorRowIndex = index.getRowIndexAtKeyIfAbsentAdd(keyValueForGrouBy);
-            }
+            int accumulatorRowIndex = index.getRowIndexAtKeyIfAbsentAddAndEvaluate(
+                keyValueForGroupBy,
+                newRowIndex -> pivotColumns.forEach(accumulatorColumn -> aggregators.get(0).initializeValue(accumulatorColumn, newRowIndex))
+            );
 
             inputRowCountPerAggregateRow[accumulatorRowIndex]++;
 
@@ -744,7 +732,6 @@ implements DfIterate
 //            {
 //                pivotColumns.get(colIndex).applyAggregator(accumulatorRowIndex, columnsToAggregate.get(colIndex), rowIndex, aggregators.get(colIndex));
 //            }
-
         }
 
         aggregators.forEach(agg -> agg.finishAggregating(pivoted, inputRowCountPerAggregateRow));
@@ -852,21 +839,11 @@ implements DfIterate
         {
             ListIterable<Object> keyValue = index.computeKeyFrom(this, rowIndex);
 
-            int accumulatorRowIndex;
-
-            if (index.doesNotContain(keyValue))
-            {
-                // new entry in the aggregated data frame - need to initialize accumulators
-                accumulatorRowIndex = index.getRowIndexAtKeyIfAbsentAdd(keyValue);
-
-                aggregators.forEachInBoth(accumulatorColumns,
-                        (aggregateFunction, accumulatorColumn) -> aggregateFunction.initializeValue(accumulatorColumn, accumulatorRowIndex));
-            }
-            else
-            {
-                // an existing entry so just a lookup
-                accumulatorRowIndex = index.getRowIndexAtKeyIfAbsentAdd(keyValue);
-            }
+            int accumulatorRowIndex = index.getRowIndexAtKeyIfAbsentAddAndEvaluate(
+                    keyValue,
+                    newRowIndex -> aggregators.forEachInBoth(accumulatorColumns,
+                                            (aggregateFunction, accumulatorColumn) -> aggregateFunction.initializeValue(accumulatorColumn, newRowIndex))
+            );
 
             if (createSourceRowIdIndex)
             {
