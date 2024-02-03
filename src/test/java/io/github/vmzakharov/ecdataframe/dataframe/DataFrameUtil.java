@@ -19,4 +19,14 @@ final public class DataFrameUtil
             Assert.fail(comparer.reason());
         }
     }
+
+    static public void assertEquals(DataFrame expected, DataFrame actual, double tolerance)
+    {
+        DataFrameCompare comparer = new DataFrameCompare();
+
+        if (!comparer.equal(expected, actual, tolerance))
+        {
+            Assert.fail(comparer.reason());
+        }
+    }
 }

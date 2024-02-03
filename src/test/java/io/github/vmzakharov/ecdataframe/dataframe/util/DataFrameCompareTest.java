@@ -43,9 +43,65 @@ public class DataFrameCompareTest
                 .addRow("Carl", 12, 103.03, BigDecimal.valueOf(127, 2))
                 ;
 
-        Assert.assertTrue(new DataFrameCompare().equal(df1, df2));
-        Assert.assertTrue(new DataFrameCompare().equal(df2, df1));
-        Assert.assertTrue(new DataFrameCompare().equal(df1, df1));
+        Assert.assertTrue(this.comparer.equal(df1, df2));
+        Assert.assertTrue(this.comparer.equal(df2, df1));
+        Assert.assertTrue(this.comparer.equal(df1, df1));
+    }
+
+    @Test
+    public void matchWithToleranceForDouble()
+    {
+        DataFrame df1 = new DataFrame("DF1")
+                .addStringColumn("Foo").addLongColumn("Bar").addDoubleColumn("Baz")
+                .addRow("Alice", 10, 101.01)
+                .addRow("Bob",   11, 102.0200001)
+                .addRow("Carl",  12, 103.02999999)
+                ;
+
+        DataFrame df2 = new DataFrame("DF2")
+                .addStringColumn("Foo").addLongColumn("Bar").addDoubleColumn("Baz")
+                .addRow("Alice", 10, 101.010000001)
+                .addRow("Bob",   11, 102.02)
+                .addRow("Carl",  12, 103.03000001)
+                ;
+
+        Assert.assertTrue(this.comparer.equal(df1, df2, 0.00001));
+        Assert.assertTrue(this.comparer.equal(df2, df1, 0.00001));
+        Assert.assertTrue(this.comparer.equal(df1, df1, 0.00001));
+    }
+
+    @Test
+    public void mismatchWithToleranceForDouble()
+    {
+        DataFrame df1 = new DataFrame("DF1")
+                .addStringColumn("Foo").addLongColumn("Bar").addDoubleColumn("Baz")
+                .addRow("Alice", 10, 101.01)
+                .addRow("Bob",   11, 102.0201)
+                .addRow("Carl",  12, 103.02999999)
+                ;
+
+        DataFrame df2 = new DataFrame("DF2")
+                .addStringColumn("Foo").addLongColumn("Bar").addDoubleColumn("Baz")
+                .addRow("Alice", 10, 101.010000001)
+                .addRow("Bob",   11, 102.02)
+                .addRow("Carl",  12, 103.03000001)
+                ;
+
+        Assert.assertFalse(this.comparer.equal(df1, df2, 0.00001));
+        Assert.assertEquals(
+                messageFromKey("DF_EQ_CELL_VALUE_MISMATCH")
+                        .with("rowIndex", 1).with("columnIndex", 2).with("lhValue", 102.0201).with("rhValue", 102.02)
+                        .toString(),
+                this.comparer.reason()
+        );
+
+        Assert.assertFalse(this.comparer.equal(df2, df1, 0.00001));
+        Assert.assertEquals(
+                messageFromKey("DF_EQ_CELL_VALUE_MISMATCH")
+                        .with("rowIndex", 1).with("columnIndex", 2).with("lhValue", 102.02).with("rhValue", 102.0201)
+                        .toString(),
+                this.comparer.reason()
+        );
     }
 
     @Test
