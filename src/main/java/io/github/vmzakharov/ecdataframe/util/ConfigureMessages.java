@@ -18,8 +18,9 @@ final public class ConfigureMessages
         }
 
         addMessage("AGG_NOT_APPLICABLE",              "Aggregation '${operation}' (${operationDescription}) cannot be performed on ${operationScope}");
-        addMessage("AGG_NO_INITIAL_VALUE",            "Aggregation ${operation} does not have a long initial value");
-        addMessage("AGG_NO_ACCUMULATOR",              "Aggregation ${operation} does not support a ${type} accumulator");
+        addMessage("AGG_NO_INITIAL_VALUE",            "Aggregation '${operation}' does not have a long initial value");
+        addMessage("AGG_NO_ACCUMULATOR",              "Aggregation '${operation}' does not support a ${type} accumulator");
+        addMessage("AGG_CANNOT_CLONE",                "Cannot create a clone of aggregation '${operation}'");
         addMessage("DF_DUPLICATE_COLUMN",             "Column named '${columnName}' is already in data frame '${dataFrameName}'");
         addMessage("DF_COLUMN_DOES_NOT_EXIST",        "Column '${columnName}' does not exist in data frame '${dataFrameName}'");
         addMessage("DF_INDEX_DOES_NOT_EXIST",         "Column '${indexName}' does not exist in data frame '${dataFrameName}'");

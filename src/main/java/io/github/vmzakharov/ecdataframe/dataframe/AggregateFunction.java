@@ -9,6 +9,9 @@ import io.github.vmzakharov.ecdataframe.dataframe.aggregation.Sum;
 import io.github.vmzakharov.ecdataframe.dsl.value.ValueType;
 import org.eclipse.collections.api.list.ListIterable;
 
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
+
 import static io.github.vmzakharov.ecdataframe.util.ExceptionFactory.exceptionByKey;
 
 public abstract class AggregateFunction
@@ -16,75 +19,90 @@ public abstract class AggregateFunction
     private final String columnName;
     private final String targetColumnName;
 
-    public AggregateFunction(String newColumnName)
+    public AggregateFunction(String newSourceColumnName)
     {
-        this(newColumnName, newColumnName);
+        this(newSourceColumnName, newSourceColumnName);
     }
 
-    public AggregateFunction(String newColumnName, String newTargetColumnName)
+    public AggregateFunction(String newSourceColumnName, String newTargetColumnName)
     {
-        this.columnName = newColumnName;
+        this.columnName = newSourceColumnName;
         this.targetColumnName = newTargetColumnName;
     }
 
-    public static AggregateFunction sum(String newColumnName)
+    public static AggregateFunction sum(String newSourceColumnName)
     {
-        return new Sum(newColumnName);
+        return new Sum(newSourceColumnName);
     }
 
-    public static AggregateFunction sum(String newColumnName, String newTargetColumnName)
+    public static AggregateFunction sum(String newSourceColumnName, String newTargetColumnName)
     {
-        return new Sum(newColumnName, newTargetColumnName);
+        return new Sum(newSourceColumnName, newTargetColumnName);
     }
 
-    public static AggregateFunction min(String newColumnName)
+    public static AggregateFunction min(String newSourceColumnName)
     {
-        return new Min(newColumnName);
+        return new Min(newSourceColumnName);
     }
 
-    public static AggregateFunction min(String newColumnName, String newTargetColumnName)
+    public static AggregateFunction min(String newSourceColumnName, String newTargetColumnName)
     {
-        return new Min(newColumnName, newTargetColumnName);
+        return new Min(newSourceColumnName, newTargetColumnName);
     }
 
-    public static AggregateFunction max(String newColumnName)
+    public static AggregateFunction max(String newSourceColumnName)
     {
-        return new Max(newColumnName);
+        return new Max(newSourceColumnName);
     }
 
-    public static AggregateFunction max(String newColumnName, String newTargetColumnName)
+    public static AggregateFunction max(String newSourceColumnName, String newTargetColumnName)
     {
-        return new Max(newColumnName, newTargetColumnName);
+        return new Max(newSourceColumnName, newTargetColumnName);
     }
 
-    public static AggregateFunction avg(String newColumnName)
+    public static AggregateFunction avg(String newSourceColumnName)
     {
-        return new Avg(newColumnName);
+        return new Avg(newSourceColumnName);
     }
 
-    public static AggregateFunction avg(String newColumnName, String newTargetColumnName)
+    public static AggregateFunction avg(String newSourceColumnName, String newTargetColumnName)
     {
-        return new Avg(newColumnName, newTargetColumnName);
+        return new Avg(newSourceColumnName, newTargetColumnName);
     }
 
-    public static AggregateFunction count(String newColumnName)
+    public static AggregateFunction count(String newSourceColumnName)
     {
-        return new Count(newColumnName);
+        return new Count(newSourceColumnName);
     }
 
-    public static AggregateFunction count(String newColumnName, String newTargetColumnName)
+    public static AggregateFunction count(String newSourceColumnName, String newTargetColumnName)
     {
-        return new Count(newColumnName, newTargetColumnName);
+        return new Count(newSourceColumnName, newTargetColumnName);
     }
 
-    public static AggregateFunction same(String newColumnName)
+    public static AggregateFunction same(String newSourceColumnName)
     {
-        return new Same(newColumnName);
+        return new Same(newSourceColumnName);
     }
 
-    public static AggregateFunction same(String newColumnName, String newTargetColumnName)
+    public static AggregateFunction same(String newSourceColumnName, String newTargetColumnName)
     {
-        return new Same(newColumnName, newTargetColumnName);
+        return new Same(newSourceColumnName, newTargetColumnName);
+    }
+
+    public AggregateFunction cloneWith(String newSourceColumnName, String newTargetColumnName)
+    {
+        try
+        {
+            Constructor<?> ctor = this.getClass().getConstructor(String.class, String.class);
+            return (AggregateFunction) ctor.newInstance(newSourceColumnName, newTargetColumnName);
+        }
+        catch (NoSuchMethodException | InstantiationException | IllegalAccessException | InvocationTargetException e)
+        {
+            throw exceptionByKey("AGG_CANNOT_CLONE")
+                    .with("operation", this.getName())
+                    .get(e);
+        }
     }
 
     public String getColumnName()
@@ -274,7 +292,7 @@ public abstract class AggregateFunction
      * by default aggregators treat null values as "poisonous" - that is any null value passed in the aggregator will
      * cause the result of the entire aggregation to be null, which is a sensible behavior for most aggregation
      * functions.
-     * Override this method to return <code>false</code> if this aggregation function can handle null value.
+     * Override this method to return <code>false</code> if this aggregation function can handle a null value.
      *
      * @return <code>true</code> if nulls are poisonous, <code>false</code> if nulls can be handled
      */
