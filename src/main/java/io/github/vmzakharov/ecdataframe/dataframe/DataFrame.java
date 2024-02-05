@@ -27,11 +27,13 @@ import org.eclipse.collections.api.list.primitive.MutableBooleanList;
 import org.eclipse.collections.api.list.primitive.MutableIntList;
 import org.eclipse.collections.api.map.MapIterable;
 import org.eclipse.collections.api.map.MutableMap;
+import org.eclipse.collections.api.multimap.list.MutableListMultimap;
 import org.eclipse.collections.api.set.MutableSet;
 import org.eclipse.collections.api.tuple.Triplet;
 import org.eclipse.collections.api.tuple.Twin;
 import org.eclipse.collections.impl.factory.Lists;
 import org.eclipse.collections.impl.factory.Maps;
+import org.eclipse.collections.impl.factory.Multimaps;
 import org.eclipse.collections.impl.factory.primitive.IntLists;
 import org.eclipse.collections.impl.list.mutable.primitive.BooleanArrayList;
 import org.eclipse.collections.impl.tuple.Tuples;
@@ -48,7 +50,7 @@ import static io.github.vmzakharov.ecdataframe.dataframe.DfColumnSortOrder.ASC;
 import static io.github.vmzakharov.ecdataframe.util.ExceptionFactory.exceptionByKey;
 
 public class DataFrame
-implements DfIterate
+        implements DfIterate
 {
     private final String name;
     private final MutableMap<String, DfColumn> columnsByName = Maps.mutable.of();
@@ -190,7 +192,9 @@ implements DfIterate
     {
         StringBuilder sb = new StringBuilder()
                 .append(this.getName())
-                .append(" [").append(this.rowCount).append(" rows]")
+                .append(" [")
+                .append(this.rowCount)
+                .append(" rows]")
                 .append('\n')
                 .append(this.asCsvString(10));
 
@@ -207,8 +211,9 @@ implements DfIterate
         if (this.hasColumn(newColumn.getName()))
         {
             exceptionByKey("DF_DUPLICATE_COLUMN")
-                .with("columnName", newColumn.getName()).with("dataFrameName", this.getName())
-                .fire();
+                    .with("columnName", newColumn.getName())
+                    .with("dataFrameName", this.getName())
+                    .fire();
         }
 
         this.columnsByName.put(newColumn.getName(), newColumn);
@@ -243,8 +248,9 @@ implements DfIterate
         if (column == null)
         {
             exceptionByKey("DF_COLUMN_DOES_NOT_EXIST")
-                .with("columnName", columnName).with("dataFrameName", this.getName())
-                .fire();
+                    .with("columnName", columnName)
+                    .with("dataFrameName", this.getName())
+                    .fire();
         }
 
         return column;
@@ -360,7 +366,9 @@ implements DfIterate
                     .with("columnName", columnName)
                     .with("dataFrameName", this.getName())
                     .with("expression", expressionAsString)
-                    .with("errorList", visitor.getErrors().collect(err -> err.getOne() + ": " + err.getTwo()).makeString("\n"))
+                    .with("errorList", visitor.getErrors()
+                                              .collect(err -> err.getOne() + ": " + err.getTwo())
+                                              .makeString("\n"))
                     .fire();
         }
         return this.addColumn(columnName, expressionType, expressionAsString);
@@ -368,8 +376,9 @@ implements DfIterate
 
     /**
      * creates a stored column with the specified name of the specified type and attaches it to this dataframe.
+     *
      * @param columnName the name of the column to be created
-     * @param type the type of the new column
+     * @param type       the type of the new column
      * @return this data frame
      */
     public DataFrame addColumn(String columnName, ValueType type)
@@ -380,8 +389,9 @@ implements DfIterate
 
     /**
      * creates a stored column with the specified name of the specified type and attaches it to this dataframe.
+     *
      * @param columnName the name of the column to be created
-     * @param type the type of the new column
+     * @param type       the type of the new column
      * @return the newly created columns
      */
     public DfColumnStored newColumn(String columnName, ValueType type)
@@ -409,15 +419,17 @@ implements DfIterate
                 return new DfDecimalColumnStored(this, columnName);
             default:
                 throw exceptionByKey("DF_ADD_COL_UNKNOWN_TYPE")
-                        .with("columnName", columnName).with("type", type)
+                        .with("columnName", columnName)
+                        .with("type", type)
                         .get();
         }
     }
 
     /**
      * creates a calculated column with the specified name of the specified type and attaches it to this dataframe.
-     * @param columnName the name of the column to be created
-     * @param type the type of the new column
+     *
+     * @param columnName         the name of the column to be created
+     * @param type               the type of the new column
      * @param expressionAsString the expression
      * @return the newly created columns
      */
@@ -430,8 +442,9 @@ implements DfIterate
 
     /**
      * creates a calculated column with the specified name of the specified type and attaches it to this dataframe.
-     * @param columnName the name of the column to be created
-     * @param type the type of the new column
+     *
+     * @param columnName         the name of the column to be created
+     * @param type               the type of the new column
      * @param expressionAsString the expression
      * @return this data frame
      */
@@ -458,7 +471,9 @@ implements DfIterate
             case DECIMAL:
                 return new DfDecimalColumnComputed(this, columnName, expressionAsString);
             default:
-                throw exceptionByKey("DF_ADD_COL_UNKNOWN_TYPE").with("columnName", columnName).with("type", type).get();
+                throw exceptionByKey("DF_ADD_COL_UNKNOWN_TYPE").with("columnName", columnName)
+                                                               .with("type", type)
+                                                               .get();
         }
     }
 
@@ -665,18 +680,27 @@ implements DfIterate
      * Pivot the data frame. This operation produces another data frame, with the columns that correspond to the values
      * of the key column, populated with the values from the values columns. THe values are aggregated by one or more
      * aggregation function.
+     * <br>
+     * NOTE: If more than one aggregator is provided, the column names for the aggregate values will be made up of
+     * pairs of all the values of the pivot column and the column names specified in aggregators.
+     * So if a pivot values are for example "2001" and "2002" and the only aggregator provided is {@code sum("X")} the
+     * columns with aggregated values will have names "2001" and "2002". If there are two aggregator functions,
+     * sum("X") and avg("Y"), there will be four columns for aggregated values in the resulting table with the names
+     * "2001:X", "2001:Y", "2002:X", "2002:Y". It will also respect the column name overrides in the aggregator
+     * function, that is in the example above we have sum("X", "Foo") and avg("Y", "Bar") instead, the resulting column
+     * names will be "2001:Foo", "2001:Bar", "2002:Foo", "2002:Bar".
      *
      * @param columnsToGroupByNames the columns to group by the resulting pivot table
-     * @param pivotColumnName the column the values of which will become columns for the pivoted data frame
-     * @param aggregators the aggregate functions to aggregate values in the value columns specified in
-     *                    their parameters
-     * @return a new data frame representing a pivot table view of this data frame
+     * @param pivotColumnName       the column the values of which will become columns for the pivoted data frame.
+     * @param aggregators           the aggregate functions to aggregate values in the value columns specified in
+     *                              their parameters
+     * @return a new data frame representing a pivot table view of this data frame.
      */
     public DataFrame pivot(
             ListIterable<String> columnsToGroupByNames,
             String pivotColumnName,
             ListIterable<AggregateFunction> aggregators
-            )
+    )
     {
         DataFrame pivoted = new DataFrame(this.getName() + "-pivoted");
 
@@ -687,54 +711,78 @@ implements DfIterate
 
         // then columns derived from pivot dimension values
         // first, find distinct pivot dimension values
-        DfColumn pivotColumn = this.getColumnNamed(pivotColumnName);
+        DfColumn columnToPivot = this.getColumnNamed(pivotColumnName);
 
-        LinkedHashSet<String> pivotColumnValues = new LinkedHashSet<>();
-//        MutableSortedSet<String> pivotColumnValues = SortedSets.mutable.of();
+        LinkedHashSet<String> pivotColumnValues = new LinkedHashSet<>(); // to maintain insertion order
 
-        for (int i = 0; i < pivotColumn.getSize(); i++)
+        for (int i = 0; i < columnToPivot.getSize(); i++)
         {
-            pivotColumnValues.add(pivotColumn.getValueAsString(i));
+            pivotColumnValues.add(columnToPivot.getValueAsString(i));
         }
 
-        AggregateFunction aggregator = aggregators.get(0);
+        MutableList<String> pivotColumnNames = Lists.mutable.of();
+        MutableListMultimap<String, AggregateFunction> aggregatorsByPivotValue = Multimaps.mutable.list.of();
 
-        DfColumn valueColum = this.getColumnNamed(aggregator.getColumnName());
+        // aggregators passed into the method multiplied for each pivot value
+        MutableList<AggregateFunction> aggregatorsForPivot = Lists.mutable.of();
 
-        ValueType targetType = aggregators.get(0).targetColumnType(valueColum.getType());
+        boolean singleAggregator = aggregators.size() == 1;
 
-        // then add columns for each aggregation corresponding to each pivot value
-        pivotColumnValues.forEach(pivotColumnValue -> pivoted.addColumn(pivotColumnValue, targetType));
+        // add aggregation columns for each pivot value for each aggregation function
+        pivotColumnValues.forEach(
+            pivotColumnValue -> {
+                aggregators.forEach(
+                    aggregator -> {
+                        DfColumn valueColum = this.getColumnNamed(aggregator.getColumnName());
+                        ValueType targetType = aggregator.targetColumnType(valueColum.getType());
+                        String targetColumnName = singleAggregator ? pivotColumnValue : pivotColumnValue + ":" + aggregator.getTargetColumnName();
 
-//        ListIterable<DfColumn> pivotColumns = pivoted.columnsNamed(pivotColumnValues.toList());
-        ListIterable<DfColumn> pivotColumns = pivoted.columnsNamed(Lists.immutable.withAll(pivotColumnValues));
+                        pivoted.addColumn(targetColumnName, targetType);
 
-        DfIndexKeeper index = new DfIndexKeeper(pivoted, columnsToGroupByNames);
+                        AggregateFunction aggregatorForPivotValue = aggregator.cloneWith(aggregator.getColumnName(), targetColumnName);
 
-        int[] inputRowCountPerAggregateRow = new int[this.rowCount()]; // sizing for the worst case scenario: no aggregation
+                        pivotColumnNames.add(targetColumnName);
+                        aggregatorsForPivot.add(aggregatorForPivotValue);
+                        aggregatorsByPivotValue.put(pivotColumnValue, aggregatorForPivotValue);
+                    }
+                );
+            }
+        );
+
+        ListIterable<DfColumn> pivotColumns = pivoted.columnsNamed(Lists.immutable.withAll(pivotColumnNames));
+
+        DfIndexKeeper index = new DfIndexKeeper(pivoted, columnsToGroupByNames, this);
+
+        MapIterable<String, int[]> inputRowCountPerAggregateRow = pivotColumnNames.toMap(colName -> colName, colName -> new int[this.rowCount]);
+        // distinct row counts for each pivot column
+        // sizing for the worst case scenario (if there is no aggregation)
 
         for (int rowIndex = 0; rowIndex < this.rowCount; rowIndex++)
         {
-            String targetColumName = pivotColumn.getValueAsString(rowIndex);
+            final int finalRowIndex = rowIndex;
 
-            ListIterable<Object> keyValueForGroupBy = index.computeKeyFrom(this, rowIndex);
+            String pivotValue = columnToPivot.getValueAsString(rowIndex);
+
+            ListIterable<Object> keyValueForGroupBy = index.computeKeyFrom(rowIndex);
 
             int accumulatorRowIndex = index.getRowIndexAtKeyIfAbsentAddAndEvaluate(
-                keyValueForGroupBy,
-                newRowIndex -> pivotColumns.forEach(accumulatorColumn -> aggregators.get(0).initializeValue(accumulatorColumn, newRowIndex))
+                    keyValueForGroupBy,
+                    newRowIndex -> pivotColumns.forEachWithIndex(
+                            (accumulatorColumn, i) -> aggregatorsForPivot.get(i).initializeValue(accumulatorColumn, newRowIndex)
+                    )
             );
 
-            inputRowCountPerAggregateRow[accumulatorRowIndex]++;
-
-            pivoted.getColumnNamed(targetColumName).applyAggregator(accumulatorRowIndex, valueColum, rowIndex, aggregators.get(0));
-
-//            for (int colIndex = 0; colIndex < columnsToAggregate.size(); colIndex++)
-//            {
-//                pivotColumns.get(colIndex).applyAggregator(accumulatorRowIndex, columnsToAggregate.get(colIndex), rowIndex, aggregators.get(colIndex));
-//            }
+            aggregatorsByPivotValue
+                    .get(pivotValue)
+                    .forEach(agg -> {
+                            DfColumn valueColumn = this.getColumnNamed(agg.getColumnName());
+                            inputRowCountPerAggregateRow.get(agg.getTargetColumnName())[accumulatorRowIndex]++;
+                            pivoted.getColumnNamed(agg.getTargetColumnName())
+                                   .applyAggregator(accumulatorRowIndex, valueColumn, finalRowIndex, agg);
+                        });
         }
 
-        aggregators.forEach(agg -> agg.finishAggregating(pivoted, inputRowCountPerAggregateRow));
+        aggregatorsForPivot.forEach(agg -> agg.finishAggregating(pivoted, inputRowCountPerAggregateRow.get(agg.getTargetColumnName())));
 
         return pivoted;
     }
@@ -771,7 +819,7 @@ implements DfIterate
     /**
      * Aggregate the values in the specified columns grouped by values in the specified group by columns
      *
-     * @param aggregators the aggregate functions to be applied to columns to aggregate
+     * @param aggregators           the aggregate functions to be applied to columns to aggregate
      * @param columnsToGroupByNames the columns to group by
      * @return a data frame with a summary row for each unique combination of the values in the columns to group by,
      * containing aggregated values in the columns to aggregate
@@ -833,16 +881,16 @@ implements DfIterate
                 .collect(AggregateFunction::getTargetColumnName)
                 .collect(aggregatedDataFrame::getColumnNamed);
 
-        DfIndexKeeper index = new DfIndexKeeper(aggregatedDataFrame, columnsToGroupByNames);
+        DfIndexKeeper index = new DfIndexKeeper(aggregatedDataFrame, columnsToGroupByNames, this);
 
         for (int rowIndex = 0; rowIndex < this.rowCount; rowIndex++)
         {
-            ListIterable<Object> keyValue = index.computeKeyFrom(this, rowIndex);
+            ListIterable<Object> keyValue = index.computeKeyFrom(rowIndex);
 
             int accumulatorRowIndex = index.getRowIndexAtKeyIfAbsentAddAndEvaluate(
                     keyValue,
                     newRowIndex -> aggregators.forEachInBoth(accumulatorColumns,
-                                            (aggregateFunction, accumulatorColumn) -> aggregateFunction.initializeValue(accumulatorColumn, newRowIndex))
+                            (aggregateFunction, accumulatorColumn) -> aggregateFunction.initializeValue(accumulatorColumn, newRowIndex))
             );
 
             if (createSourceRowIdIndex)
@@ -852,7 +900,8 @@ implements DfIterate
                     sumIndex.add(IntLists.mutable.of());
                 }
 
-                sumIndex.get(accumulatorRowIndex).add(rowIndex);
+                sumIndex.get(accumulatorRowIndex)
+                        .add(rowIndex);
             }
 
             inputRowCountPerAggregateRow[accumulatorRowIndex]++;
@@ -882,6 +931,7 @@ implements DfIterate
      * Extracts distinct rows from the data frame. Returns a new data frame with the same schema as this data frame and
      * only containing distinct row values. This is the same as calling the {@link #distinct(ListIterable)} method with
      * the list of all the data frame columns as its parameter.
+     *
      * @return a new data frame with a row for each distinct (unique) combination of row values for the specified
      * columns in this dataframe
      */
@@ -893,6 +943,7 @@ implements DfIterate
     /**
      * Extracts distinct valued in rows, in multiple columns, for the specified columns. Returns a new data frame
      * containing the specified columns with distinct row values from this dataframe.
+     *
      * @param columnNames the list of columns from which to select unique row values
      * @return a new data frame with a row for each distinct (unique) combination of row values for the specified
      * columns in this dataframe
@@ -908,13 +959,13 @@ implements DfIterate
 
         DataFrame result = new DataFrame("Distinct " + this.getName());
 
-        uniqueColumns.forEach(col  -> result.addColumn(col.getName(), col.getType()));
+        uniqueColumns.forEach(col -> result.addColumn(col.getName(), col.getType()));
 
-        DfIndexKeeper index = new DfIndexKeeper(result, columnNames);
+        DfIndexKeeper index = new DfIndexKeeper(result, columnNames, this);
 
         for (int rowIndex = 0; rowIndex < this.rowCount; rowIndex++)
         {
-            ListIterable<Object> keyValue = index.computeKeyFrom(this, rowIndex);
+            ListIterable<Object> keyValue = index.computeKeyFrom(rowIndex);
             index.getRowIndexAtKeyIfAbsentAdd(keyValue);
         }
 
@@ -930,7 +981,6 @@ implements DfIterate
      * @param filterExpressionString the expression based on which the rows in this data frame will be partitioned
      * @return a {@link org.eclipse.collections.api.tuple.Twin} containing a data frame with the selected rows (matching the filter criteria) as its
      * first element and a data frame containing the rejected rows (failing the filter criteria) as its second element
-     *
      * @see DataFrame#selectBy(String)
      * @see DataFrame#rejectBy(String)
      */
@@ -967,8 +1017,7 @@ implements DfIterate
      *
      * @param filterExpressionString the expression based on which rows will be selected into the result data frame
      * @return a new data frame, which is a copy of this data frame with only the rows that satisfy the filter criteria
-     * 
-     * @see DataFrame#rejectBy(String) 
+     * @see DataFrame#rejectBy(String)
      * @see DataFrame#partition(String)
      */
     public DataFrame selectBy(String filterExpressionString)
@@ -983,7 +1032,6 @@ implements DfIterate
      *
      * @param filterExpressionString the expression based on which rows will be excluded from the result data frame
      * @return a new data frame, which is a copy of this data frame excluding the rows satisfying the filter criteria
-     *
      * @see DataFrame#selectBy(String)
      * @see DataFrame#partition(String)
      */
@@ -1080,13 +1128,13 @@ implements DfIterate
      * are converted to stored columns of the same type. Only the provided columns are copied to the new data frame.
      * If the list is set to null, all columns are copied (behaving in the same way as copy(String newName)).
      *
-     * @param newName the name for the new data frame
+     * @param newName           the name for the new data frame
      * @param columnNamesToCopy the names of the columns to be copied
      * @return a copy of the original data frame with the provided name and new schema
      */
     public DataFrame copy(String newName, ListIterable<String> columnNamesToCopy)
     {
-        DataFrame copied =  new DataFrame(newName);
+        DataFrame copied = new DataFrame(newName);
 
         ((columnNamesToCopy == null)
                 ? this.columns
@@ -1343,11 +1391,12 @@ implements DfIterate
     public DataFrame join(DataFrame other, ListIterable<String> thisJoinColumnNames, ListIterable<String> otherJoinColumnNames)
     {
         return this.join(
-                other, JoinType.INNER_JOIN,
-                thisJoinColumnNames, Lists.immutable.empty(),
-                otherJoinColumnNames, Lists.immutable.empty(),
-                Maps.mutable.of()
-        ).getTwo();
+                           other, JoinType.INNER_JOIN,
+                           thisJoinColumnNames, Lists.immutable.empty(),
+                           otherJoinColumnNames, Lists.immutable.empty(),
+                           Maps.mutable.of()
+                   )
+                   .getTwo();
     }
 
     /**
@@ -1371,11 +1420,12 @@ implements DfIterate
             MutableMap<String, String> renamedOtherColumns)
     {
         return this.join(
-                other, JoinType.INNER_JOIN,
-                thisJoinColumnNames, Lists.immutable.empty(),
-                otherJoinColumnNames, Lists.immutable.empty(),
-                renamedOtherColumns
-        ).getTwo();
+                           other, JoinType.INNER_JOIN,
+                           thisJoinColumnNames, Lists.immutable.empty(),
+                           otherJoinColumnNames, Lists.immutable.empty(),
+                           renamedOtherColumns
+                   )
+                   .getTwo();
     }
 
     /**
@@ -1408,11 +1458,12 @@ implements DfIterate
     public DataFrame outerJoin(DataFrame other, ListIterable<String> thisJoinColumnNames, ListIterable<String> otherJoinColumnNames)
     {
         return this.join(
-                other, JoinType.OUTER_JOIN,
-                thisJoinColumnNames, Lists.immutable.empty(),
-                otherJoinColumnNames, Lists.immutable.empty(),
-                Maps.mutable.of()
-        ).getTwo();
+                           other, JoinType.OUTER_JOIN,
+                           thisJoinColumnNames, Lists.immutable.empty(),
+                           otherJoinColumnNames, Lists.immutable.empty(),
+                           Maps.mutable.of()
+                   )
+                   .getTwo();
     }
 
     /**
@@ -1435,11 +1486,12 @@ implements DfIterate
             MutableMap<String, String> renamedOtherColumns)
     {
         return this.join(
-                other, JoinType.OUTER_JOIN,
-                thisJoinColumnNames, Lists.immutable.empty(),
-                otherJoinColumnNames, Lists.immutable.empty(),
-                renamedOtherColumns
-        ).getTwo();
+                           other, JoinType.OUTER_JOIN,
+                           thisJoinColumnNames, Lists.immutable.empty(),
+                           otherJoinColumnNames, Lists.immutable.empty(),
+                           renamedOtherColumns
+                   )
+                   .getTwo();
     }
 
     /**
@@ -1676,8 +1728,9 @@ implements DfIterate
                         Arrays.fill(rowData, null);
 
                         joinColumnIndices.forEachWithIndex(
-                                (joinColumnIndex, sourceKeyIndex) ->
-                                        rowData[joinColumnIndex] = otherJoinColumns.get(sourceKeyIndex).getObject(otherSortedIndex)
+                            (joinColumnIndex, sourceKeyIndex) ->
+                                rowData[joinColumnIndex] = otherJoinColumns.get(sourceKeyIndex)
+                                                                           .getObject(otherSortedIndex)
                         );
 
                         otherColumns.forEachWithIndex(
@@ -1717,7 +1770,8 @@ implements DfIterate
 
                 joinColumnIndices.forEachWithIndex(
                         (joinColumnIndex, sourceKeyIndex)
-                                -> rowData[joinColumnIndex] = otherJoinColumns.get(sourceKeyIndex).getObject(otherSortedIndex)
+                                -> rowData[joinColumnIndex] = otherJoinColumns.get(sourceKeyIndex)
+                                                                              .getObject(otherSortedIndex)
                 );
 
                 otherColumns.forEachWithIndex(
@@ -1800,7 +1854,8 @@ implements DfIterate
     {
         columnNamesToKeep.forEach(this::getColumnNamed); // will throw if a column doesn't exist
 
-        MutableList<String> columnNamesToDrop = this.columns.collect(DfColumn::getName).reject(columnNamesToKeep::contains);
+        MutableList<String> columnNamesToDrop = this.columns.collect(DfColumn::getName)
+                                                            .reject(columnNamesToKeep::contains);
 
         return this.dropColumns(columnNamesToDrop);
     }
@@ -1830,12 +1885,14 @@ implements DfIterate
                 .selectFromJoined()
                 .collect(target::getColumnNamed);
 
-        ListIterable<DfColumn> columnsToLookup = joinDescriptor.columnsToLookup().collect(this::getColumnNamed);
+        ListIterable<DfColumn> columnsToLookup = joinDescriptor.columnsToLookup()
+                                                               .collect(this::getColumnNamed);
 
         columnsToSelectFrom.forEachInBoth(joinDescriptor.columnNameAliases(),
                 (col, alias) -> this.addColumn(alias, col.getType()));
 
-        ListIterable<DfColumn> addedColumns = joinDescriptor.columnNameAliases().collect(this::getColumnNamed);
+        ListIterable<DfColumn> addedColumns = joinDescriptor.columnNameAliases()
+                                                            .collect(this::getColumnNamed);
 
         for (int rowIndex = 0; rowIndex < this.rowCount(); rowIndex++)
         {
@@ -1848,7 +1905,8 @@ implements DfIterate
             if (found.isEmpty())
             {
                 // default if specified, otherwise null
-                if (joinDescriptor.valuesIfAbsent().notEmpty())
+                if (joinDescriptor.valuesIfAbsent()
+                                  .notEmpty())
                 {
                     addedColumns.forEachInBoth(joinDescriptor.valuesIfAbsent(), DfColumn::addObject);
                 }
@@ -1899,7 +1957,9 @@ implements DfIterate
         DfIndex found = this.indices.get(indexName);
         if (found == null)
         {
-            exceptionByKey("DF_INDEX_DOES_NOT_EXIST").with("indexName", indexName).with("dataFrameName", this.getName()).fire();
+            exceptionByKey("DF_INDEX_DOES_NOT_EXIST").with("indexName", indexName)
+                                                     .with("dataFrameName", this.getName())
+                                                     .fire();
         }
 
         return found;
@@ -1919,16 +1979,20 @@ implements DfIterate
     public DataFrame schema()
     {
         DataFrame columnDescriptors = new DataFrame("Columns of " + this.getName())
-                .addStringColumn("Name").addStringColumn("Type").addStringColumn("Stored").addStringColumn("Expression");
+                .addStringColumn("Name")
+                .addStringColumn("Type")
+                .addStringColumn("Stored")
+                .addStringColumn("Expression");
 
-        this.getColumns().forEach(
-            col -> columnDescriptors.addRow(
-                col.getName(),
-                col.getType().toString(),
-                col.isStored() ? "Y" : "N",
-                col.isComputed() ? ((DfColumnComputed) col).getExpressionAsString() : ""
-            )
-        );
+        this.getColumns()
+            .forEach(
+                    col -> columnDescriptors.addRow(
+                            col.getName(),
+                            col.getType().toString(),
+                            col.isStored() ? "Y" : "N",
+                            col.isComputed() ? ((DfColumnComputed) col).getExpressionAsString() : ""
+                    )
+            );
 
         columnDescriptors.seal();
         return columnDescriptors;
@@ -2035,7 +2099,7 @@ implements DfIterate
         @Override
         public FunctionScript getDeclaredFunction(String functionName)
         {
-            FunctionScript functionScript =  super.getDeclaredFunction(functionName);
+            FunctionScript functionScript = super.getDeclaredFunction(functionName);
             if (functionScript == null)
             {
                 functionScript = this.getNestedContext().getDeclaredFunction(functionName);

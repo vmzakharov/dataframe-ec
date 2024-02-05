@@ -17,11 +17,16 @@ public class DfIndexKeeper
     private final MutableObjectIntMap<ListIterable<Object>> rowIndexByKey = ObjectIntMaps.mutable.of();
     private final ListIterable<DfColumn> columnsToIndexBy;
     private final DataFrame indexedDataFrame;
+    private final ListIterable<DfColumn> sourceColumns;
 
-    public DfIndexKeeper(DataFrame newIndexedDataFrame, ListIterable<String> indexByColumnNames)
+    public DfIndexKeeper(
+            DataFrame newIndexedDataFrame,
+            ListIterable<String> indexByColumnNames,
+            DataFrame newSourceDataFrame)
     {
         this.indexedDataFrame = newIndexedDataFrame;
         this.columnsToIndexBy = indexByColumnNames.collect(this.indexedDataFrame::getColumnNamed);
+        this.sourceColumns = indexByColumnNames.collect(newSourceDataFrame::getColumnNamed);
     }
 
     private int getRowIndexAtKey(ListIterable<Object> key)
@@ -92,13 +97,15 @@ public class DfIndexKeeper
         return this.getRowIndexAtKey(key) == -1;
     }
 
-    public ListIterable<Object> computeKeyFrom(DataFrame aDataFrame, int rowIndex)
+    public ListIterable<Object> computeKeyFrom(int rowIndex)
     {
-        // TODO: avoid recreating the list
+        // TODO: avoid recreating the list - perhaps have a separate lookup key (reusable) vs stored key
         MutableList<Object> key = Lists.fixedSize.of(new Object[this.columnsToIndexBy.size()]);
 
-        this.columnsToIndexBy.forEachWithIndex(
-                (col, index) -> key.set(index, aDataFrame.getColumnNamed(col.getName()).getObject(rowIndex)));
+        this.sourceColumns.forEachWithIndex(
+            (col, index) -> key.set(index, col.getObject(rowIndex))
+        );
+
         return key;
     }
 

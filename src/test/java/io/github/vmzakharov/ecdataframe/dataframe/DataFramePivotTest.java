@@ -4,6 +4,7 @@ import org.eclipse.collections.impl.factory.Lists;
 import org.junit.Before;
 import org.junit.Test;
 
+import static io.github.vmzakharov.ecdataframe.dataframe.AggregateFunction.avg;
 import static io.github.vmzakharov.ecdataframe.dataframe.AggregateFunction.sum;
 
 public class DataFramePivotTest
@@ -98,7 +99,49 @@ public class DataFramePivotTest
     }
 
     @Test
-    public void pivotMonthByMonthAggQty()
+    public void pivotCustomerByMonthAggCharge()
+    {
+        DataFrame pivoted = this.donutSales.pivot(
+                Lists.immutable.of("Customer"),
+                "Month",
+                Lists.immutable.of(sum("Charge"))
+        );
+
+        DataFrame expected = new DataFrame("pivoted")
+                .addStringColumn("Customer")
+                .addDoubleColumn("Jan").addDoubleColumn("Feb").addDoubleColumn("Mar")
+                .addRow("Alice", 20.0, 20.0,  0.0)
+                .addRow("Bob",   19.4,  0.0,  8.8)
+                .addRow("Dave",  26.0,  0.0,  0.0)
+                .addRow("Carol", 19.2,  9.6, 15.0)
+                ;
+
+        DataFrameUtil.assertEquals(expected, pivoted);
+    }
+
+    @Test
+    public void pivotCustomerByMonthAvgCharge()
+    {
+        DataFrame pivoted = this.donutSales.pivot(
+                Lists.immutable.of("Customer"),
+                "Month",
+                Lists.immutable.of(avg("Charge"))
+        );
+
+        DataFrame expected = new DataFrame("pivoted")
+                .addStringColumn("Customer")
+                .addDoubleColumn("Jan").addDoubleColumn("Feb").addDoubleColumn("Mar")
+                .addRow("Alice",     10.0,   10.0,  0.0)
+                .addRow("Bob",   19.4 / 3,    0.0,  8.8)
+                .addRow("Dave",      13.0,    0.0,  0.0)
+                .addRow("Carol",      9.6,    9.6, 15.0)
+                ;
+
+        DataFrameUtil.assertEquals(expected, pivoted);
+    }
+
+    @Test
+    public void pivotMonthByMonthSumQty()
     {
         DataFrame pivoted = this.donutSales.pivot(
                 Lists.immutable.of("Month"),
@@ -136,6 +179,50 @@ public class DataFramePivotTest
                 .addRow("Carol", "Jan",  6,  0,  0, 0, 12,  0)
                 .addRow("Carol", "Feb",  0,  0, 12, 0,  0,  0)
                 .addRow("Carol", "Mar",  0,  0,  0, 0,  0, 10)
+                ;
+
+        DataFrameUtil.assertEquals(expected, pivoted);
+    }
+
+    @Test
+    public void pivotCustomerByMonthAggQtyAndCharge()
+    {
+        DataFrame pivoted = this.donutSales.pivot(
+                Lists.immutable.of("Customer"),
+                "Month",
+                Lists.immutable.of(sum("Qty"), sum("Charge"))
+        );
+
+        DataFrame expected = new DataFrame("pivoted")
+                .addStringColumn("Customer")
+                .addLongColumn("Jan:Qty").addDoubleColumn("Jan:Charge").addLongColumn("Feb:Qty").addDoubleColumn("Feb:Charge")
+                .addLongColumn("Mar:Qty").addDoubleColumn("Mar:Charge")
+                .addRow("Alice", 20, 20.0, 20, 20.0,  0,  0.0)
+                .addRow("Bob",   14, 19.4,  0,  0.0,  8,  8.8)
+                .addRow("Dave",  30, 26.0,  0,  0.0,  0,  0.0)
+                .addRow("Carol", 18, 19.2, 12,  9.6, 10, 15.0)
+                ;
+
+        DataFrameUtil.assertEquals(expected, pivoted);
+    }
+
+    @Test
+    public void pivotCustomerByMonthSumQtyAvgCharge()
+    {
+        DataFrame pivoted = this.donutSales.pivot(
+                Lists.immutable.of("Customer"),
+                "Month",
+                Lists.immutable.of(sum("Qty"), avg("Charge"))
+        );
+
+        DataFrame expected = new DataFrame("pivoted")
+                .addStringColumn("Customer")
+                .addLongColumn("Jan:Qty").addDoubleColumn("Jan:Charge").addLongColumn("Feb:Qty").addDoubleColumn("Feb:Charge")
+                .addLongColumn("Mar:Qty").addDoubleColumn("Mar:Charge")
+                .addRow("Alice", 20,       10.0, 20, 10.0,  0,  0.0)
+                .addRow("Bob",   14, 19.4 / 3.0,  0,  0.0,  8,  8.8)
+                .addRow("Dave",  30,       13.0,  0,  0.0,  0,  0.0)
+                .addRow("Carol", 18,        9.6, 12,  9.6, 10, 15.0)
                 ;
 
         DataFrameUtil.assertEquals(expected, pivoted);

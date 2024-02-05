@@ -11,6 +11,7 @@ import io.github.vmzakharov.ecdataframe.dataframe.DfLongColumn;
 import io.github.vmzakharov.ecdataframe.dataframe.DfLongColumnStored;
 import io.github.vmzakharov.ecdataframe.dataframe.DfObjectColumn;
 import io.github.vmzakharov.ecdataframe.dsl.value.ValueType;
+import io.github.vmzakharov.ecdataframe.util.ExceptionFactory;
 import org.eclipse.collections.api.list.ListIterable;
 import org.eclipse.collections.impl.factory.Lists;
 
@@ -122,7 +123,12 @@ extends AggregateFunction
             {
                 if (!longColumn.isNull(rowIndex))
                 {
-                    longColumn.setLong(rowIndex, longColumn.getLong(rowIndex) / countsByRow[rowIndex]);
+                    long aggregateValue = longColumn.getLong(rowIndex);
+
+                    if (this.zeroContributorCheck(countsByRow[rowIndex], aggregateValue != 0, rowIndex))
+                    {
+                        longColumn.setLong(rowIndex, aggregateValue / countsByRow[rowIndex]);
+                    }
                 }
             }
         }
@@ -134,7 +140,12 @@ extends AggregateFunction
             {
                 if (!doubleColumn.isNull(rowIndex))
                 {
-                    doubleColumn.setDouble(rowIndex, doubleColumn.getDouble(rowIndex) / countsByRow[rowIndex]);
+                    double aggregateValue = doubleColumn.getDouble(rowIndex);
+
+                    if (this.zeroContributorCheck(countsByRow[rowIndex], aggregateValue != 0, rowIndex))
+                    {
+                        doubleColumn.setDouble(rowIndex, aggregateValue / countsByRow[rowIndex]);
+                    }
                 }
             }
         }
@@ -146,10 +157,33 @@ extends AggregateFunction
             {
                 if (!decimalColumn.isNull(rowIndex))
                 {
-                    decimalColumn.setObject(rowIndex,
-                            decimalColumn.getTypedObject(rowIndex).divide(BigDecimal.valueOf(countsByRow[rowIndex]), MathContext.DECIMAL128));
+                    BigDecimal aggregateValue = decimalColumn.getTypedObject(rowIndex);
+
+                    if (this.zeroContributorCheck(countsByRow[rowIndex], aggregateValue.signum() != 0, rowIndex))
+                    {
+                        decimalColumn.setObject(rowIndex,
+                                aggregateValue.divide(BigDecimal.valueOf(countsByRow[rowIndex]), MathContext.DECIMAL128));
+                    }
                 }
             }
         }
+    }
+
+    private boolean zeroContributorCheck(int contributorCount, boolean aggregateIsNotZero, int rowIndex)
+    {
+        if (contributorCount == 0)
+        {
+            if (aggregateIsNotZero) // zero contributors ended up with a non-zero average value - looks like a bug
+            {
+                throw ExceptionFactory.exceptionByKey("AGG_ZERO_COUNT")
+                                      .with("columnName", this.getTargetColumnName())
+                                      .with("rowIndex", rowIndex)
+                                      .get();
+            }
+
+            return false; // zeros make sense, but don't divide by zero
+        }
+
+        return true; // no danger of zero division
     }
 }
