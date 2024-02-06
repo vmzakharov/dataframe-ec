@@ -4,8 +4,7 @@ import org.eclipse.collections.impl.factory.Lists;
 import org.junit.Before;
 import org.junit.Test;
 
-import static io.github.vmzakharov.ecdataframe.dataframe.AggregateFunction.avg;
-import static io.github.vmzakharov.ecdataframe.dataframe.AggregateFunction.sum;
+import static io.github.vmzakharov.ecdataframe.dataframe.AggregateFunction.*;
 
 public class DataFramePivotTest
 {
@@ -223,6 +222,29 @@ public class DataFramePivotTest
                 .addRow("Bob",   14, 19.4 / 3.0,  0,  0.0,  8,  8.8)
                 .addRow("Dave",  30,       13.0,  0,  0.0,  0,  0.0)
                 .addRow("Carol", 18,        9.6, 12,  9.6, 10, 15.0)
+                ;
+
+        DataFrameUtil.assertEquals(expected, pivoted);
+    }
+
+    @Test
+    public void pivotMonthByCustomerMaxQtyCountPurchasesAvgCharge()
+    {
+        DataFrame pivoted = this.donutSales.pivot(
+                Lists.immutable.of("Customer"),
+                "Month",
+                Lists.immutable.of(sum("Qty", "Total Quantity"), count("Qty", "Number of Purchases"), avg("Charge", "Average Charge"))
+        );
+
+        DataFrame expected = new DataFrame("pivoted")
+                .addStringColumn("Customer")
+                .addLongColumn("Jan:Total Quantity").addLongColumn("Jan:Number of Purchases").addDoubleColumn("Jan:Average Charge")
+                .addLongColumn("Feb:Total Quantity").addLongColumn("Feb:Number of Purchases").addDoubleColumn("Feb:Average Charge")
+                .addLongColumn("Mar:Total Quantity").addLongColumn("Mar:Number of Purchases").addDoubleColumn("Mar:Average Charge")
+                .addRow("Alice", 20, 2,       10.0, 20, 2, 10.0,  0, 0,  0.0)
+                .addRow("Bob",   14, 3, 19.4 / 3.0,  0, 0,  0.0,  8, 1,  8.8)
+                .addRow("Dave",  30, 2,       13.0,  0, 0,  0.0,  0, 0,  0.0)
+                .addRow("Carol", 18, 2,        9.6, 12, 1,  9.6, 10, 1, 15.0)
                 ;
 
         DataFrameUtil.assertEquals(expected, pivoted);
