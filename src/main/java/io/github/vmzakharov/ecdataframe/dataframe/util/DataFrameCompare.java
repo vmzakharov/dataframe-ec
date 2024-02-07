@@ -76,6 +76,7 @@ public class DataFrameCompare
      * Note: this method has a side effect of sorting dataframes.
      * @param thisDf the first data frame to be compared
      * @param thatDf the second data frame to be compared
+     * @param tolerance the tolerance to be used when comparing double cell values
      * @return true if the data frames are equal, false otherwise
      */
     public boolean equalIgnoreOrder(DataFrame thisDf, DataFrame thatDf, double tolerance)
