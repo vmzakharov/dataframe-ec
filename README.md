@@ -10,7 +10,7 @@ For more on Eclipse Collections see: https://www.eclipse.org/collections/.
 <dependency>
   <groupId>io.github.vmzakharov</groupId>
   <artifactId>dataframe-ec</artifactId>
-  <version>0.19.5</version>
+  <version>0.19.6</version>
 </dependency>
 ```
 ## Code Kata
@@ -19,21 +19,23 @@ Learn dataframe-ec with Kata! Check out [dataframe-ec kata](https://github.com/v
 
 ## Data Frame Operations
 
-- create a data frame programmatically or load from a csv file
-- add a column to a data frame, columns can be
+- **create** a data frame programmatically or load from a csv file
+- **add a column** to a data frame, columns can be
     - stored or computed
     - of type: string, integer (long), double, date, date/time
-- drop one or more columns
-- select a subset of rows based on a criteria
-- sort by one or more columns or by an expression
-- select distinct rows based on all column values or a subset of columns
-- union - concatenating data frames with the same schemas
-- join with another data frame, based on the specified column values, inner and outer joins are supported
-- join with complements, a single operation that returns three data frames - a complement of this data frame in another one, an inner join of the data frames, and a complement of the other data frame in this one
-- lookup join - enrich a data frame by adding one or more columns based on value lookup in another data frame
-- find relative complements (set differences) of two data frames based on the specified column values
-- aggregation - aggregating the entire data frame or grouping by the specified column values and aggregating within a group
-- flag rows - individually or matching a criteria <br>...and more!
+- **drop** one or more **columns**
+- **select** a subset of rows based on a criteria
+- **sort** by one or more columns or by an expression
+- select **distinct** rows based on all column values or a subset of columns
+- **union** - concatenating data frames with the same schemas
+- **join** with another data frame, based on the specified column values, inner and outer joins are supported
+- **join with complements**, a single operation that returns three data frames - a complement of this data frame in another one, an inner join of the data frames, and a complement of the other data frame in this one
+- **lookup join** - enrich a data frame by adding one or more columns based on value lookup in another data frame
+- **pivot** - similar to pivot in a spreadsheet where the distinct values in a column become columns in the pivot table and the row values in the table are grouped and aggregated based on the aggregation functions provided
+- find relative complements (**set differences**) of two data frames based on the specified column values
+- **aggregation** - aggregating the entire data frame or grouping by the specified column values and aggregating within a group
+- **flag rows** - individually or matching a criteria
+<br>...and more!
 
 ### Examples
 
@@ -376,6 +378,23 @@ DataFrame joining2 = new DataFrame("df2")
 
 DataFrame joined = joining1.outerJoin(joining2, Lists.immutable.of("Bar", "Letter"), Lists.immutable.of("Color", "Code"));
 ```
+
+`joining1`
+
+|Foo | Bar | Letter | Baz|
+|---|---|---|---:|
+|"Pinky" | "pink" | "B" | 8|
+|"Inky" | "cyan" | "C" | 9|
+|"Clyde" | "orange" | "D" | 10|
+
+`joining2`
+
+|Name | Color | Code | Number|
+|---|---|---|---:|
+|"Grapefruit" | "pink" | "B" | 2|
+|"Orange" | "orange" | "D" | 4|
+|"Apple" | "red" | "A" | 1|
+
 `joined`
 
 |Foo | Bar | Letter | Baz | Name | Number|
@@ -403,6 +422,22 @@ DataFrame sideB = new DataFrame("Side B")
 
 Triplet<DataFrame> result = sideA.joinWithComplements(sideB, Lists.immutable.of("Key"), Lists.immutable.of("Id"));
 ```
+`sideA`
+
+|Key | Value|
+|---|---:|
+|"A" | 1|
+|"B" | 2|
+|"X" | 3|
+
+`sideB`
+
+|Id | Count|
+|---|---:|
+|"X" | 30|
+|"B" | 10|
+|"C" | 20|
+
 Complement of B in A:
 
 `result.getOne()`
@@ -428,7 +463,7 @@ Complement of A in B:
 |---|---:|
 |"C" | 20|
 
-#### Lookup
+#### Lookup Join
 
 ```Java
 DataFrame pets = new DataFrame("Pets")
@@ -461,6 +496,96 @@ pets.lookup(DfJoin.to(codes)
 |"Spot" | 1 | "Dog"|
 |"Eagly" | 5 | "Eagle"|
 |"Grzgxxch" | 99 | "Unclear"|
+
+There is another option to do lookup using a more fluent API directly on the `DataFrame` class:
+
+```Java
+pets.lookupIn(codes)
+    .match("Pet Kind Code", "Code")
+    .select("Description")
+    .ifAbsent("Unclear")
+    .resolveLookup();
+```
+
+Note that if using this approach, once the all the lookup parameters are specified you need to call the `resolveLookup()` methof to actually execute the lookup.
+
+#### Pivot
+
+Say we have a data frame of individual donut sales like this:
+
+```Java
+  DataFrame donutSales = new DataFrame("Donut Shop Purchases")
+          .addStringColumn("Customer").addStringColumn("Month").addStringColumn("Donut Type")
+          .addLongColumn("Qty").addDoubleColumn("Amount")
+          .addRow("Alice", "Jan", "Blueberry", 10, 10.00)
+          .addRow("Alice", "Feb", "Glazed", 10, 12.00)
+          .addRow("Alice", "Feb", "Old Fashioned", 10, 8.00)
+          .addRow("Alice", "Jan", "Blueberry", 10, 10.00)
+          .addRow("Bob", "Jan", "Blueberry", 5, 5.00)
+          .addRow("Bob", "Jan", "Pumpkin Spice", 5, 10.00)
+          .addRow("Bob", "Jan", "Apple Cider", 4, 4.40)
+          .addRow("Bob", "Mar", "Apple Cider", 8, 8.80)
+          .addRow("Dave", "Jan", "Blueberry", 10, 10.00)
+          .addRow("Dave", "Jan", "Old Fashioned", 20, 16.00)
+          .addRow("Carol", "Jan", "Blueberry", 6, 6.00)
+          .addRow("Carol", "Feb", "Old Fashioned", 12, 9.60)
+          .addRow("Carol", "Mar", "Jelly", 10, 15.00)
+          .addRow("Carol", "Jan", "Apple Cider", 12, 13.20)
+          ;
+```
+
+`donutSales`
+
+|Customer | Month | Donut Type | Qty | Amount|
+|---|---|---|---:|---:|
+|"Alice" | "Jan" | "Blueberry" | 10 | 10.0000|
+|"Alice" | "Feb" | "Glazed" | 10 | 12.0000|
+|"Alice" | "Feb" | "Old Fashioned" | 10 | 8.0000|
+|"Alice" | "Jan" | "Blueberry" | 10 | 10.0000|
+|"Bob" | "Jan" | "Blueberry" | 5 | 5.0000|
+|"Bob" | "Jan" | "Pumpkin Spice" | 5 | 10.0000|
+|"Bob" | "Jan" | "Apple Cider" | 4 | 4.4000|
+|"Bob" | "Mar" | "Apple Cider" | 8 | 8.8000|
+|"Dave" | "Jan" | "Blueberry" | 10 | 10.0000|
+|"Dave" | "Jan" | "Old Fashioned" | 20 | 16.0000|
+|"Carol" | "Jan" | "Blueberry" | 6 | 6.0000|
+|"Carol" | "Feb" | "Old Fashioned" | 12 | 9.6000|
+|"Carol" | "Mar" | "Jelly" | 10 | 15.0000|
+|"Carol" | "Jan" | "Apple Cider" | 12 | 13.2000|
+
+Now we want to see total number of donuts purchased by each customer in each month. So the month when the sale happen becomes a column in the pivot table, the customer is the grouping criteria and the aggregate value is the number of donuts sold to this customer in this month.
+
+```Java
+DataFrame qtyByCustomerAndMonth = donutSales.pivot(
+        Lists.immutable.of("Customer"),
+        "Month",
+        Lists.immutable.of(sum("Qty")));
+```
+`qtyByCustomerAndMonth`
+
+|Customer | Jan | Feb | Mar|
+|---|---:|---:|---:|
+|"Alice" | 20 | 20 | 0|
+|"Bob" | 14 | 0 | 8|
+|"Dave" | 30 | 0 | 0|
+|"Carol" | 18 | 12 | 10|
+
+It is possible to aggregate more than one value in a pivot table, then the pivot table will contain as many columns per each pivot column value as there are aggregations (in this case for each month there will be two columns):
+```Java
+DataFrame qtyAndAmountByCustomerAndMonth = donutSales.pivot(
+        Lists.immutable.of("Customer"),
+        "Month",
+        Lists.immutable.of(sum("Qty"), sum("Amount")));
+```
+
+`qtyAndAmountByCustomerAndMonth`
+
+|Customer | Jan:Qty | Jan:Amount | Feb:Qty | Feb:Amount | Mar:Qty | Mar:Amount|
+|---|---:|---:|---:|---:|---:|---:|
+|"Alice" | 20 | 20.0000 | 20 | 20.0000 | 0 | 0.0000|
+|"Bob" | 14 | 19.4000 | 0 | 0.0000 | 8 | 8.8000|
+|"Dave" | 30 | 26.0000 | 0 | 0.0000 | 0 | 0.0000|
+|"Carol" | 18 | 19.2000 | 12 | 9.6000 | 10 | 15.0000|
 
 ## Domain Specific Language
 

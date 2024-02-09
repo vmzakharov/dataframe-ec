@@ -1,4 +1,7 @@
 # Releases
+### 0.19.6
+* adds `pivot()` method to support spreadsheet-like pivot functionality
+* adds a data frame pretty print utility
 ### 0.19.5
 * adds `rejectBy()` method to data frame (a companion to `selectBy()`)
 * adds a friendly `toString()` implementation to data frame
