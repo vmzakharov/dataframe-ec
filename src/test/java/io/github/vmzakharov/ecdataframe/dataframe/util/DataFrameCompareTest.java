@@ -322,7 +322,7 @@ public class DataFrameCompareTest
     }
 
     @Test
-    public void simpleMatchIgnoringOrder()
+    public void simpleMatchIgnoringRowOrder()
     {
         DataFrame df1 = new DataFrame("DF1")
                 .addStringColumn("Foo").addLongColumn("Bar").addDoubleColumn("Baz").addDecimalColumn("Qux")
@@ -341,9 +341,62 @@ public class DataFrameCompareTest
         Assert.assertFalse(this.comparer.equal(df1, df2));
         Assert.assertFalse(this.comparer.equal(df2, df1));
 
-        Assert.assertTrue(this.comparer.equalIgnoreOrder(df1, df2));
-        Assert.assertTrue(this.comparer.equalIgnoreOrder(df2, df1));
+        Assert.assertTrue(this.comparer.equalIgnoreRowOrder(df1, df2));
+        Assert.assertTrue(this.comparer.equalIgnoreRowOrder(df2, df1));
 
-        Assert.assertTrue(this.comparer.equalIgnoreOrder(df1, df1));
+        Assert.assertTrue(this.comparer.equalIgnoreRowOrder(df1, df1));
+    }
+
+    @Test
+    public void matchIgnoringRowAndColumnOrder()
+    {
+        DataFrame df1 = new DataFrame("DF1")
+                .addStringColumn("Foo").addLongColumn("Bar").addDoubleColumn("Baz").addDecimalColumn("Qux")
+                .addRow("Bob",   11, 102.02, BigDecimal.valueOf(125, 2))
+                .addRow("Alice", 10, 101.01, BigDecimal.valueOf(123, 2))
+                .addRow("Carl",  12, 103.03, BigDecimal.valueOf(127, 2))
+                ;
+
+        DataFrame df2 = new DataFrame("DF2")
+                .addDecimalColumn("Qux").addStringColumn("Foo").addDoubleColumn("Baz").addLongColumn("Bar")
+                .addRow(BigDecimal.valueOf(127, 2), "Carl",  103.03, 12)
+                .addRow(BigDecimal.valueOf(125, 2), "Bob",   102.02, 11)
+                .addRow(BigDecimal.valueOf(123, 2), "Alice", 101.01, 10)
+                ;
+
+        Assert.assertFalse(this.comparer.equal(df1, df2));
+        Assert.assertFalse(this.comparer.equal(df2, df1));
+
+        Assert.assertFalse(this.comparer.equalIgnoreRowOrder(df1, df2));
+        Assert.assertFalse(this.comparer.equalIgnoreRowOrder(df2, df1));
+
+        Assert.assertTrue(this.comparer.equalIgnoreRowAndColumnOrder(df1, df2));
+        Assert.assertTrue(this.comparer.equalIgnoreRowAndColumnOrder(df2, df1));
+        Assert.assertTrue(this.comparer.equalIgnoreRowAndColumnOrder(df1, df1));
+    }
+
+    @Test
+    public void matchWithToleranceIgnoringRowAndColumnOrder()
+    {
+        DataFrame df1 = new DataFrame("DF1")
+                .addStringColumn("Foo").addLongColumn("Bar").addDoubleColumn("Baz").addDecimalColumn("Qux")
+                .addRow("Bob", 11, 102.02, BigDecimal.valueOf(125, 2))
+                .addRow("Alice", 10, 101.01, BigDecimal.valueOf(123, 2))
+                .addRow("Carl", 12, 103.03, BigDecimal.valueOf(127, 2))
+                ;
+
+        DataFrame df2 = new DataFrame("DF2")
+                .addDecimalColumn("Qux").addStringColumn("Foo").addDoubleColumn("Baz").addLongColumn("Bar")
+                .addRow(BigDecimal.valueOf(127, 2), "Carl",  103.03,    12)
+                .addRow(BigDecimal.valueOf(125, 2), "Bob",   102.02001, 11)
+                .addRow(BigDecimal.valueOf(123, 2), "Alice", 101.01,    10)
+                ;
+
+        Assert.assertFalse(this.comparer.equalIgnoreRowAndColumnOrder(df1, df2));
+
+        Assert.assertFalse(this.comparer.equalIgnoreRowAndColumnOrder(df1, df2, 0.000001));
+
+        Assert.assertTrue(this.comparer.equalIgnoreRowAndColumnOrder(df1, df2, 0.001));
+        Assert.assertTrue(this.comparer.equalIgnoreRowAndColumnOrder(df2, df1, 0.001));
     }
 }

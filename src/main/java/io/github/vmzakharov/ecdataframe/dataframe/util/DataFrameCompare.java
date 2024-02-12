@@ -6,6 +6,7 @@ import io.github.vmzakharov.ecdataframe.dsl.value.ValueType;
 import io.github.vmzakharov.ecdataframe.util.ConfigureMessages;
 import io.github.vmzakharov.ecdataframe.util.FormatWithPlaceholders;
 import org.eclipse.collections.api.list.ImmutableList;
+import org.eclipse.collections.api.list.ListIterable;
 
 import java.math.BigDecimal;
 
@@ -38,8 +39,8 @@ public class DataFrameCompare
     public boolean equal(DataFrame thisDf, DataFrame thatDf, double tolerance)
     {
         if (this.dimensionsDoNotMatch(thisDf, thatDf)
-            || this.headersDoNotMatch(thisDf, thatDf)
-            || this.columnTypesDoNotMatch(thisDf, thatDf))
+            || this.headersDoNotMatch(thisDf, thatDf, false)
+            || this.columnTypesDoNotMatch(thisDf, thatDf, false))
         {
             return false;
         }
@@ -66,9 +67,42 @@ public class DataFrameCompare
      * @param thatDf the second data frame to be compared
      * @return true if the data frames are equal, false otherwise
      */
+    public boolean equalIgnoreRowOrder(DataFrame thisDf, DataFrame thatDf)
+    {
+        return this.equalIgnoreRowOrder(thisDf, thatDf, 0.0);
+    }
+
+    /**
+     * Compares two data frames ignoring the order of rows. The data frames are sorted and then compared.
+     * Note: this method has a side effect of sorting dataframes.
+     *
+     * @deprecated
+     * <p>use {@link DataFrameCompare#equalIgnoreRowOrder(DataFrame, DataFrame)} instead
+     *
+     * @param thisDf the first data frame to be compared
+     * @param thatDf the second data frame to be compared
+     * @return true if the data frames are equal, false otherwise
+     */
     public boolean equalIgnoreOrder(DataFrame thisDf, DataFrame thatDf)
     {
-        return this.equalIgnoreOrder(thisDf, thatDf, 0.0);
+        return this.equalIgnoreRowOrder(thisDf, thatDf, 0.0);
+    }
+
+    /**
+     * Compares two data frames ignoring the order of rows. The data frames are sorted and then compared.
+     * Note: this method has a side effect of sorting dataframes.
+     *
+     * @deprecated
+     * <p>use {@link DataFrameCompare#equalIgnoreRowOrder(DataFrame, DataFrame, double)} instead
+     *
+     * @param thisDf the first data frame to be compared
+     * @param thatDf the second data frame to be compared
+     * @param tolerance the tolerance to be used when comparing double cell values
+     * @return true if the data frames are equal, false otherwise
+     */
+    public boolean equalIgnoreOrder(DataFrame thisDf, DataFrame thatDf, double tolerance)
+    {
+        return this.equalIgnoreRowOrder(thisDf, thatDf, tolerance);
     }
 
     /**
@@ -79,11 +113,11 @@ public class DataFrameCompare
      * @param tolerance the tolerance to be used when comparing double cell values
      * @return true if the data frames are equal, false otherwise
      */
-    public boolean equalIgnoreOrder(DataFrame thisDf, DataFrame thatDf, double tolerance)
+    public boolean equalIgnoreRowOrder(DataFrame thisDf, DataFrame thatDf, double tolerance)
     {
         if (this.dimensionsDoNotMatch(thisDf, thatDf)
-                || this.headersDoNotMatch(thisDf, thatDf)
-                || this.columnTypesDoNotMatch(thisDf, thatDf))
+                || this.headersDoNotMatch(thisDf, thatDf, false)
+                || this.columnTypesDoNotMatch(thisDf, thatDf, false))
         {
             return false;
         }
@@ -95,12 +129,31 @@ public class DataFrameCompare
         );
     }
 
+    public boolean equalIgnoreRowAndColumnOrder(DataFrame thisDf, DataFrame thatDf)
+    {
+        return this.equalIgnoreRowAndColumnOrder(thisDf, thatDf, 0.0);
+    }
+
+    public boolean equalIgnoreRowAndColumnOrder(DataFrame thisDf, DataFrame thatDf, double tolerance)
+    {
+        if (this.dimensionsDoNotMatch(thisDf, thatDf)
+                || this.headersDoNotMatch(thisDf, thatDf, true)
+                || this.columnTypesDoNotMatch(thisDf, thatDf, true))
+        {
+            return false;
+        }
+
+        return this.cellValuesMatchIgnoreColumnOrder(
+                thisDf.sortBy(thisDf.getColumns().collect(DfColumn::getName)),
+                thatDf.sortBy(thisDf.getColumns().collect(DfColumn::getName)),
+                tolerance
+        );
+    }
+
     private boolean cellValuesMatch(DataFrame thisDf, DataFrame thatDf, double tolerance)
     {
         int colCount = thisDf.columnCount();
         int rowCount = thisDf.rowCount();
-
-        boolean failed = false;
 
         for (int rowIndex = 0; rowIndex < rowCount; rowIndex++)
         {
@@ -109,29 +162,15 @@ public class DataFrameCompare
                 Object thisValue = thisDf.getObject(rowIndex, colIndex);
                 Object thatValue = thatDf.getObject(rowIndex, colIndex);
 
-                if ((thisValue instanceof BigDecimal) && (thatValue != null))
-                {
-                    failed = !(thatValue instanceof BigDecimal) || (((BigDecimal) thisValue).compareTo((BigDecimal) thatValue) != 0);
-                }
-                else if (thisValue instanceof Double && thatValue instanceof Double)
-                {
-                    double thisDouble = (Double) thisValue;
-                    double thatDouble = (Double) thatValue;
-
-                    failed = tolerance == 0.0
-                            ? (Double.compare(thisDouble, thatDouble) != 0) : (Math.abs(thisDouble - thatDouble) > tolerance);
-                }
-                else
-                {
-                    failed = (thisValue == null && thatValue != null) || (thisValue != null && !thisValue.equals(thatValue));
-                }
-
-                if (failed)
+                if (this.cellValuesNotEqual(thisValue, thatValue, tolerance))
                 {
                     this.reason(messageFromKey("DF_EQ_CELL_VALUE_MISMATCH")
-                            .with("rowIndex", rowIndex).with("columnIndex", colIndex)
-                            .with("lhValue", String.valueOf(thisValue)).with("rhValue", String.valueOf(thatValue))
+                                .with("rowIndex", rowIndex)
+                                .with("columnIndex", colIndex)
+                                .with("lhValue", String.valueOf(thisValue))
+                                .with("rhValue", String.valueOf(thatValue))
                     );
+
                     return false;
                 }
             }
@@ -140,12 +179,67 @@ public class DataFrameCompare
         return true;
     }
 
-    private boolean columnTypesDoNotMatch(DataFrame thisDf, DataFrame thatDf)
+    private boolean cellValuesMatchIgnoreColumnOrder(DataFrame thisDf, DataFrame thatDf, double tolerance)
+    {
+        ListIterable<String> theseColumnNames = thisDf.getColumns().collect(DfColumn::getName);
+        int rowCount = thisDf.rowCount();
+
+        for (int rowIndex = 0; rowIndex < rowCount; rowIndex++)
+        {
+            for (int colIndex = 0; colIndex < theseColumnNames.size(); colIndex++)
+            {
+                Object thisValue = thisDf.getObject(theseColumnNames.get(colIndex), rowIndex);
+                Object thatValue = thatDf.getObject(theseColumnNames.get(colIndex), rowIndex);
+
+                if (this.cellValuesNotEqual(thisValue, thatValue, tolerance))
+                {
+                    this.reason(messageFromKey("DF_EQ_CELL_VALUE_MISMATCH")
+                                .with("rowIndex", rowIndex)
+                                .with("columnIndex", colIndex)
+                                .with("lhValue", String.valueOf(thisValue))
+                                .with("rhValue", String.valueOf(thatValue))
+                    );
+
+                    return false;
+                }
+            }
+        }
+
+        return true;
+    }
+
+    private boolean cellValuesNotEqual(Object thisValue, Object thatValue, double tolerance)
+    {
+        boolean failed;
+
+        if ((thisValue instanceof BigDecimal) && (thatValue != null))
+        {
+            failed = !(thatValue instanceof BigDecimal) || (((BigDecimal) thisValue).compareTo((BigDecimal) thatValue) != 0);
+        }
+        else if (thisValue instanceof Double && thatValue instanceof Double)
+        {
+            double thisDouble = (Double) thisValue;
+            double thatDouble = (Double) thatValue;
+
+            failed = tolerance == 0.0
+                    ? (Double.compare(thisDouble, thatDouble) != 0) : (Math.abs(thisDouble - thatDouble) > tolerance);
+        }
+        else
+        {
+            failed = (thisValue == null && thatValue != null) || (thisValue != null && !thisValue.equals(thatValue));
+        }
+
+        return failed;
+    }
+
+    private boolean columnTypesDoNotMatch(DataFrame thisDf, DataFrame thatDf, boolean ignoreColumnOrder)
     {
         ImmutableList<ValueType> thisColumnTypes = thisDf.getColumns().collect(DfColumn::getType);
         ImmutableList<ValueType> thatColumnTypes = thatDf.getColumns().collect(DfColumn::getType);
 
-        if (thisColumnTypes.equals(thatColumnTypes))
+        if (ignoreColumnOrder
+                ? thisColumnTypes.toSet().equals(thatColumnTypes.toSet())
+                : thisColumnTypes.equals(thatColumnTypes))
         {
             return false;
         }
@@ -155,12 +249,14 @@ public class DataFrameCompare
         return true;
     }
 
-    private boolean headersDoNotMatch(DataFrame thisDf, DataFrame thatDf)
+    private boolean headersDoNotMatch(DataFrame thisDf, DataFrame thatDf, boolean ignoreColumnOrder)
     {
         ImmutableList<String> thisColumnNames = thisDf.getColumns().collect(DfColumn::getName);
         ImmutableList<String> thatColumnNames = thatDf.getColumns().collect(DfColumn::getName);
 
-        if (thisColumnNames.equals(thatColumnNames))
+        if (ignoreColumnOrder
+                ? thisColumnNames.toSet().equals(thatColumnNames.toSet())
+                : thisColumnNames.equals(thatColumnNames))
         {
             return false;
         }
