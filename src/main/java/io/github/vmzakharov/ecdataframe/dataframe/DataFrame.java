@@ -36,6 +36,7 @@ import org.eclipse.collections.impl.factory.Maps;
 import org.eclipse.collections.impl.factory.Multimaps;
 import org.eclipse.collections.impl.factory.primitive.IntLists;
 import org.eclipse.collections.impl.list.mutable.primitive.BooleanArrayList;
+import org.eclipse.collections.impl.set.sorted.mutable.TreeSortedSet;
 import org.eclipse.collections.impl.tuple.Tuples;
 import org.eclipse.collections.impl.utility.ArrayIterate;
 
@@ -43,7 +44,9 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.LinkedHashSet;
+import java.util.Set;
 import java.util.function.Supplier;
 
 import static io.github.vmzakharov.ecdataframe.dataframe.DfColumnSortOrder.ASC;
@@ -702,6 +705,38 @@ public class DataFrame
             ListIterable<AggregateFunction> aggregators
     )
     {
+        return this.pivot(columnsToGroupByNames, pivotColumnName, null, aggregators);
+    }
+
+    /**
+     * Pivot the data frame. This operation produces another data frame, with the columns that correspond to the values
+     * of the key column, populated with the values from the values columns. THe values are aggregated by one or more
+     * aggregation function.
+     * <br>
+     * NOTE: If more than one aggregator is provided, the column names for the aggregate values will be made up of
+     * pairs of all the values of the pivot column and the column names specified in aggregators.
+     * So if a pivot values are for example "2001" and "2002" and the only aggregator provided is {@code sum("X")} the
+     * columns with aggregated values will have names "2001" and "2002". If there are two aggregator functions,
+     * sum("X") and avg("Y"), there will be four columns for aggregated values in the resulting table with the names
+     * "2001:X", "2001:Y", "2002:X", "2002:Y". It will also respect the column name overrides in the aggregator
+     * function, that is in the example above we have sum("X", "Foo") and avg("Y", "Bar") instead, the resulting column
+     * names will be "2001:Foo", "2001:Bar", "2002:Foo", "2002:Bar".
+     *
+     * @param columnsToGroupByNames the columns to group by the resulting pivot table
+     * @param pivotColumnName       the column the values of which will become columns for the pivoted data frame.
+     * @param pivotColumnOrder      the order in which the pivot columns will appear in the returned data frame (based
+     *                              on the ordering of the values of column headers)
+     * @param aggregators           the aggregate functions to aggregate values in the value columns specified in
+     *                              their parameters
+     * @return a new data frame representing a pivot table view of this data frame.
+     */
+    public DataFrame pivot(
+            ListIterable<String> columnsToGroupByNames,
+            String pivotColumnName,
+            DfColumnSortOrder pivotColumnOrder,
+            ListIterable<AggregateFunction> aggregators
+    )
+    {
         DataFrame pivoted = new DataFrame(this.getName() + "-pivoted");
 
         // index columns first
@@ -713,12 +748,26 @@ public class DataFrame
         // first, find distinct pivot dimension values
         DfColumn columnToPivot = this.getColumnNamed(pivotColumnName);
 
-        LinkedHashSet<String> pivotColumnValues = new LinkedHashSet<>(); // to maintain insertion order
+        Set<Comparable<Object>> pivotColumnValues;
+
+        if (pivotColumnOrder == null)
+        {
+            pivotColumnValues = new LinkedHashSet<>(); // to maintain insertion order
+        }
+        else
+        {
+            pivotColumnValues = new TreeSortedSet<Comparable<Object>>(
+                    (pivotColumnOrder == ASC) ? Comparator.naturalOrder() : Comparator.reverseOrder()
+            );
+        }
 
         for (int i = 0; i < columnToPivot.getSize(); i++)
         {
-            pivotColumnValues.add(columnToPivot.getValueAsString(i));
+            pivotColumnValues.add((Comparable<Object>) columnToPivot.getObject(i));
         }
+
+        ListIterable<String> pivotColumnValuesToStrings =
+                Lists.mutable.fromStream(pivotColumnValues.stream()).collect(String::valueOf);
 
         MutableList<String> pivotColumnNames = Lists.mutable.of();
         MutableListMultimap<String, AggregateFunction> aggregatorsByPivotValue = Multimaps.mutable.list.of();
@@ -729,7 +778,7 @@ public class DataFrame
         boolean singleAggregator = aggregators.size() == 1;
 
         // add aggregation columns for each pivot value for each aggregation function
-        pivotColumnValues.forEach(
+        pivotColumnValuesToStrings.forEach(
             pivotColumnValue -> {
                 aggregators.forEach(
                     aggregator -> {

@@ -4,7 +4,9 @@ import org.eclipse.collections.impl.factory.Lists;
 import org.junit.Before;
 import org.junit.Test;
 
-import static io.github.vmzakharov.ecdataframe.dataframe.AggregateFunction.*;
+import static io.github.vmzakharov.ecdataframe.dataframe.AggregateFunction.avg;
+import static io.github.vmzakharov.ecdataframe.dataframe.AggregateFunction.count;
+import static io.github.vmzakharov.ecdataframe.dataframe.AggregateFunction.sum;
 
 public class DataFramePivotTest
 {
