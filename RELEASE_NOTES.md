@@ -1,4 +1,7 @@
 # Releases
+### 0.19.7
+* adds support for sorting the order of value columns by their header values when pivoting a data frame 
+* add an option to the data frame compare utility to ignore the column order
 ### 0.19.6
 * adds `pivot()` method to support spreadsheet-like pivot functionality
 * adds a data frame pretty print utility
