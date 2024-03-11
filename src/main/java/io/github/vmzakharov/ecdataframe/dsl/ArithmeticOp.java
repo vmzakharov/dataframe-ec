@@ -33,6 +33,12 @@ public interface ArithmeticOp
         }
 
         @Override
+        public LongValue applyInt(int operand1, int operand2)
+        {
+            return new LongValue((long) operand1 + (long) operand2);
+        }
+
+        @Override
         public DoubleValue applyDouble(double operand1, double operand2)
         {
             return new DoubleValue(operand1 + operand2);
@@ -57,6 +63,12 @@ public interface ArithmeticOp
         public LongValue applyLong(long operand1, long operand2)
         {
             return new LongValue(operand1 * operand2);
+        }
+
+        @Override
+        public LongValue applyInt(int operand1, int operand2)
+        {
+            return new LongValue((long) operand1 * operand2);
         }
 
         @Override
@@ -87,6 +99,12 @@ public interface ArithmeticOp
         }
 
         @Override
+        public LongValue applyInt(int operand1, int operand2)
+        {
+            return new LongValue((long) operand1 - (long) operand2);
+        }
+
+        @Override
         public DoubleValue applyDouble(double operand1, double operand2)
         {
             return new DoubleValue(operand1 - operand2);
@@ -111,6 +129,12 @@ public interface ArithmeticOp
         public LongValue applyLong(long operand1, long operand2)
         {
             return new LongValue(operand1 / operand2);
+        }
+
+        @Override
+        public LongValue applyInt(int operand1, int operand2)
+        {
+            return new LongValue((long) operand1 / (long) operand2);
         }
 
         @Override
@@ -151,6 +175,8 @@ public interface ArithmeticOp
     }
 
     Value applyLong(long operand1, long operand2);
+
+    Value applyInt(int operand1, int operand2);
 
     Value applyDouble(double operand1, double operand2);
 

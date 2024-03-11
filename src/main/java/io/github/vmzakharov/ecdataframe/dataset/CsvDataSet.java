@@ -5,6 +5,7 @@ import io.github.vmzakharov.ecdataframe.dataframe.DfColumn;
 import io.github.vmzakharov.ecdataframe.dataframe.DfDateColumn;
 import io.github.vmzakharov.ecdataframe.dataframe.DfDateTimeColumn;
 import io.github.vmzakharov.ecdataframe.dataframe.DfDoubleColumn;
+import io.github.vmzakharov.ecdataframe.dataframe.DfIntColumn;
 import io.github.vmzakharov.ecdataframe.dataframe.DfLongColumn;
 import io.github.vmzakharov.ecdataframe.dsl.value.ValueType;
 import org.eclipse.collections.api.block.procedure.Procedure;
@@ -35,6 +36,7 @@ import java.util.zip.ZipInputStream;
 import static io.github.vmzakharov.ecdataframe.dsl.value.ValueType.DATE;
 import static io.github.vmzakharov.ecdataframe.dsl.value.ValueType.DATE_TIME;
 import static io.github.vmzakharov.ecdataframe.dsl.value.ValueType.DOUBLE;
+import static io.github.vmzakharov.ecdataframe.dsl.value.ValueType.INT;
 import static io.github.vmzakharov.ecdataframe.dsl.value.ValueType.LONG;
 import static io.github.vmzakharov.ecdataframe.dsl.value.ValueType.STRING;
 import static io.github.vmzakharov.ecdataframe.util.ExceptionFactory.exceptionByKey;
@@ -205,6 +207,10 @@ extends DataSetAbstract
                 case DOUBLE:
                     double doubleValue = ((DfDoubleColumn) dfColumn).getDouble(rowIndex);
                     valueAsLiteral = schemaColumn.getDoubleFormatter().format(doubleValue);
+                    break;
+                case INT:
+                    int intValue = ((DfIntColumn) dfColumn).getInt(rowIndex);
+                    valueAsLiteral = schemaColumn.getIntFormatter().format(intValue);
                     break;
                 case STRING:
                     String stringValue = dfColumn.getValueAsString(rowIndex);
@@ -489,6 +495,9 @@ extends DataSetAbstract
             case DOUBLE:
                 columnPopulators.add(s -> schemaCol.parseAsDoubleAndAdd(s, lastColumn));
                 break;
+            case INT:
+                columnPopulators.add(s -> schemaCol.parseAsIntAndAdd(s, lastColumn));
+                break;
             case STRING:
                 columnPopulators.add(s -> lastColumn.addObject(schemaCol.parseAsString(s)));
                 break;
@@ -649,6 +658,19 @@ extends DataSetAbstract
         try
         {
             Long.parseLong(aString);
+            return true;
+        }
+        catch (NumberFormatException e)
+        {
+            return false;
+        }
+    }
+
+    private boolean canParseAsInt(String aString)
+    {
+        try
+        {
+            Integer.parseInt(aString);
             return true;
         }
         catch (NumberFormatException e)

@@ -2,6 +2,7 @@ package io.github.vmzakharov.ecdataframe.dsl;
 
 import io.github.vmzakharov.ecdataframe.dsl.value.BooleanValue;
 import io.github.vmzakharov.ecdataframe.dsl.value.DoubleValue;
+import io.github.vmzakharov.ecdataframe.dsl.value.IntValue;
 import io.github.vmzakharov.ecdataframe.dsl.value.LongValue;
 import io.github.vmzakharov.ecdataframe.dsl.value.Value;
 import org.eclipse.collections.api.list.ListIterable;
@@ -20,6 +21,12 @@ public interface UnaryOp
         public LongValue applyLong(long operand)
         {
             return new LongValue(-operand);
+        }
+
+        @Override
+        public IntValue applyInt(int operand)
+        {
+            return new IntValue(-operand);
         }
 
         @Override
@@ -167,6 +174,11 @@ public interface UnaryOp
     default LongValue applyLong(long operand)
     {
         throw this.unsupportedOn("long");
+    }
+
+    default IntValue applyInt(int operand)
+    {
+        throw this.unsupportedOn("int");
     }
 
     default DoubleValue applyDouble(double operand)

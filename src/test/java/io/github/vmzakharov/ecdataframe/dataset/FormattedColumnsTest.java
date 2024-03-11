@@ -9,6 +9,7 @@ import java.text.DecimalFormat;
 import java.text.ParseException;
 
 import static io.github.vmzakharov.ecdataframe.dsl.value.ValueType.DOUBLE;
+import static io.github.vmzakharov.ecdataframe.dsl.value.ValueType.INT;
 import static io.github.vmzakharov.ecdataframe.dsl.value.ValueType.LONG;
 import static io.github.vmzakharov.ecdataframe.dsl.value.ValueType.STRING;
 
@@ -38,6 +39,41 @@ public class FormattedColumnsTest
         DataFrameUtil.assertEquals(
                 new DataFrame("expected")
                         .addStringColumn("Name").addDoubleColumn("Amount").addLongColumn("Quantity").addStringColumn("Letter")
+                        .addRow("Alice",     0.12,  1_234, "A")
+                        .addRow("Bob",       0.0,  -2_345, "A")
+                        .addRow("Carl",    101.01,      0, "A")
+                        .addRow("Diane",   100.0,       0, "A")
+                        .addRow("Ed",     -100.15,      0, "A")
+                        .addRow("Frank", 1_100.15,      0, "A")
+                ,
+                loaded
+        );
+    }
+
+    @Test
+    public void loadDecimalFormatInt()
+    {
+        CsvSchema schema = new CsvSchema();
+        schema.addColumn("Name", STRING);
+        schema.addColumn("Amount", DOUBLE, "\"$#,##0.0#\";\"($#)\"");
+        schema.addColumn("Quantity", INT, "\"#,###\";\"(#)\"");
+        schema.addColumn("Letter", STRING);
+
+        CsvDataSet dataSet = new StringBasedCsvDataSet("Foo", "Numbers", schema,
+                "Name,Amount,Quantity,Letter\n"
+                        + "\"Alice\", \"$0.12\",\"1,234\", \"A\"\n"
+                        + "\"Bob\",   \"$0.0\"  ,\"(2,345)\", \"A\"\n"
+                        + "\"Carl\",  \"$0101.01\", \"0\", \"A\"\n"
+                        + "\"Diane\", \"$100.00\", \"0\", \"A\"\n"
+                        + "\"Ed\",    \"($100.15)\",  \"000\", \"A\"\n"
+                        + "\"Frank\", \"$1,100.15\", \"(0)\",  \"A\""
+        );
+
+        DataFrame loaded = dataSet.loadAsDataFrame();
+
+        DataFrameUtil.assertEquals(
+                new DataFrame("expected")
+                        .addStringColumn("Name").addDoubleColumn("Amount").addIntColumn("Quantity").addStringColumn("Letter")
                         .addRow("Alice",     0.12,  1_234, "A")
                         .addRow("Bob",       0.0,  -2_345, "A")
                         .addRow("Carl",    101.01,      0, "A")
@@ -80,6 +116,42 @@ public class FormattedColumnsTest
                 + "\"Diane\",\"$100.00\",\"0\",\"A\"\n"
                 + "\"Ed\",\"($100.15)\",\"0\",\"A\"\n"
                 + "\"Frank\",\"$1,100.15\",\"0\",\"A\"\n"
+                ,
+                dataSet.getWrittenData()
+        );
+    }
+
+    @Test
+    public void printDecimalFormatInt()
+    {
+        DataFrame df = new DataFrame("Frame Of Data")
+                .addStringColumn("Name").addDoubleColumn("Amount").addIntColumn("Quantity").addStringColumn("Letter")
+                .addRow("Alice",     0.12,  1_234, "A")
+                .addRow("Bob",       0.0,  -2_345, "A")
+                .addRow("Carl",    101.01,      0, "A")
+                .addRow("Diane",   100.0,      -0, "A")
+                .addRow("Ed",     -100.15,      0, "A")
+                .addRow("Frank", 1_100.15,      0, "A")
+                ;
+
+        CsvSchema schema = new CsvSchema();
+        schema.addColumn("Name", STRING);
+        schema.addColumn("Amount", DOUBLE, "\"$#,##0.00\";\"($#,##0.0#)\"");
+        schema.addColumn("Quantity", INT, "\"#,##0\";\"(#,##0)\"");
+        schema.addColumn("Letter", STRING);
+
+        StringBasedCsvDataSet dataSet = new StringBasedCsvDataSet("Foo", "Numbers", schema, "");
+
+        dataSet.write(df);
+
+        Assert.assertEquals(
+                "Name,Amount,Quantity,Letter\n"
+                        + "\"Alice\",\"$0.12\",\"1,234\",\"A\"\n"
+                        + "\"Bob\",\"$0.00\",\"(2,345)\",\"A\"\n"
+                        + "\"Carl\",\"$101.01\",\"0\",\"A\"\n"
+                        + "\"Diane\",\"$100.00\",\"0\",\"A\"\n"
+                        + "\"Ed\",\"($100.15)\",\"0\",\"A\"\n"
+                        + "\"Frank\",\"$1,100.15\",\"0\",\"A\"\n"
                 ,
                 dataSet.getWrittenData()
         );

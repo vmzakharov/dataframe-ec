@@ -137,6 +137,11 @@ public abstract class AggregateFunction
         throw this.notApplicable("long values");
     }
 
+    public Object applyToIntColumn(DfIntColumn longColumn)
+    {
+        throw this.notApplicable("int values");
+    }
+
     public Object applyToObjectColumn(DfObjectColumn<?> objectColumn)
     {
         throw this.notApplicable("non-numeric values");
@@ -180,6 +185,14 @@ public abstract class AggregateFunction
         throw exceptionByKey("AGG_NO_ACCUMULATOR")
                 .with("operation", this.getName())
                 .with("type", "long")
+                .getUnsupported();
+    }
+
+    protected long intAccumulator(long currentAggregate, int newValue)
+    {
+        throw exceptionByKey("AGG_NO_ACCUMULATOR")
+                .with("operation", this.getName())
+                .with("type", "int")
                 .getUnsupported();
     }
 
@@ -228,6 +241,11 @@ public abstract class AggregateFunction
         throw this.notApplicable("empty lists");
     }
 
+    public int defaultIntIfEmpty()
+    {
+        throw this.notApplicable("empty lists");
+    }
+
     public double defaultDoubleIfEmpty()
     {
         throw this.notApplicable("empty lists");
@@ -236,6 +254,11 @@ public abstract class AggregateFunction
     public long getLongValue(DfColumn sourceColumn, int sourceRowIndex)
     {
         return ((DfLongColumn) sourceColumn).getLong(sourceRowIndex);
+    }
+
+    public int getIntValue(DfColumn sourceColumn, int sourceRowIndex)
+    {
+        return ((DfIntColumn) sourceColumn).getInt(sourceRowIndex);
     }
 
     public double getDoubleValue(DfColumn sourceColumn, int sourceRowIndex)
@@ -262,6 +285,10 @@ public abstract class AggregateFunction
         {
             ((DfLongColumnStored) accumulatorColumn).setLong(accumulatorRowIndex, this.longInitialValue());
         }
+        else if (accumulatorColumn.getType().isInt())
+        {
+            throw new UnsupportedOperationException("Int values not supported in AggregateFunction");
+        }
         else
         {
             accumulatorColumn.setObject(accumulatorRowIndex, this.objectInitialValue());
@@ -276,6 +303,16 @@ public abstract class AggregateFunction
         targetColumn.setLong(
                 targetRowIndex,
                 this.longAccumulator(currentAggregatedValue, this.getLongValue(sourceColumn, sourceRowIndex)));
+    }
+
+    public void aggregateValueIntoInt(
+            DfLongColumnStored targetColumn, int targetRowIndex,
+            DfColumn sourceColumn, int sourceRowIndex)
+    {
+        long currentAggregatedValue = targetColumn.getLong(targetRowIndex);
+        targetColumn.setLong(
+                targetRowIndex,
+                this.intAccumulator(currentAggregatedValue, this.getIntValue(sourceColumn, sourceRowIndex)));
     }
 
     public void aggregateValueIntoDouble(

@@ -4,6 +4,7 @@ import io.github.vmzakharov.ecdataframe.dataframe.AggregateFunction;
 import io.github.vmzakharov.ecdataframe.dataframe.DfColumn;
 import io.github.vmzakharov.ecdataframe.dataframe.DfDoubleColumn;
 import io.github.vmzakharov.ecdataframe.dataframe.DfDoubleColumnStored;
+import io.github.vmzakharov.ecdataframe.dataframe.DfIntColumn;
 import io.github.vmzakharov.ecdataframe.dataframe.DfLongColumn;
 import io.github.vmzakharov.ecdataframe.dataframe.DfLongColumnStored;
 import io.github.vmzakharov.ecdataframe.dataframe.DfObjectColumn;
@@ -19,6 +20,7 @@ extends AggregateFunction
     private static final ListIterable<ValueType> SUPPORTED_TYPES = Lists.immutable.of(LONG, DOUBLE, STRING, DATE, DATE_TIME, DECIMAL);
     private static final long INITIAL_VALUE_LONG = System.nanoTime();
     private static final double INITIAL_VALUE_DOUBLE = INITIAL_VALUE_LONG;
+    private static final int INITIAL_VALUE_INT = Integer.MIN_VALUE;
     private static final Object INITIAL_VALUE_OBJECT = new Object();
 
     public Same(String newColumnName)
@@ -114,6 +116,18 @@ extends AggregateFunction
     {
         long first = longColumn.getLong(0);
         if (longColumn.toLongList().allSatisfy(each -> each == first))
+        {
+            return first;
+        }
+
+        return null;
+    }
+
+    @Override
+    public Object applyToIntColumn(DfIntColumn intColumn)
+    {
+        long first = intColumn.getInt(0);
+        if (intColumn.toIntList().allSatisfy(each -> each == first))
         {
             return first;
         }

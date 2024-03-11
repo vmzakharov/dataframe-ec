@@ -17,18 +17,18 @@ public class DfColumnCompareTest
     {
         DataFrame df1 = new DataFrame("DF1")
                 .addStringColumn("col1").addStringColumn("col2").addLongColumn("col3").addDateColumn("col4")
-                .addDoubleColumn("col5").addDecimalColumn("col6")
-                .addRow("A", "B", 3, LocalDate.of(2020, 10, 23), 103.03, BigDecimal.valueOf(10303, 2))
-                .addRow("B", "B", 1, LocalDate.of(2020, 10, 21), 100.01, BigDecimal.valueOf(10001, 2))
-                .addRow("C", "B", 2, LocalDate.of(2020, 10, 22), 101.01, BigDecimal.valueOf(10101, 2))
+                .addDoubleColumn("col5").addDecimalColumn("col6").addIntColumn("col7")
+                .addRow("A", "B", 3, LocalDate.of(2020, 10, 23), 103.03, BigDecimal.valueOf(10303, 2), 3)
+                .addRow("B", "B", 1, LocalDate.of(2020, 10, 21), 100.01, BigDecimal.valueOf(10001, 2), 1)
+                .addRow("C", "B", 2, LocalDate.of(2020, 10, 22), 101.01, BigDecimal.valueOf(10101, 2), 2)
                 ;
 
         DataFrame df2 = new DataFrame("DF2")
                 .addStringColumn("col1").addStringColumn("column2").addLongColumn("number").addDateColumn("date")
-                .addDoubleColumn("amount").addDecimalColumn("decimal")
-                .addRow("A", "C", 2, LocalDate.of(2020, 10, 22), 101.01, BigDecimal.valueOf(10101, 2))
-                .addRow("X", "B", 1, LocalDate.of(2020, 10, 21), 100.01, BigDecimal.valueOf(10001, 2))
-                .addRow("A", "A", 3, LocalDate.of(2020, 10, 23), 105.05, BigDecimal.valueOf(10505, 2))
+                .addDoubleColumn("amount").addDecimalColumn("decimal").addIntColumn("int")
+                .addRow("A", "C", 2, LocalDate.of(2020, 10, 22), 101.01, BigDecimal.valueOf(10101, 2), 2)
+                .addRow("X", "B", 1, LocalDate.of(2020, 10, 21), 100.01, BigDecimal.valueOf(10001, 2), 1)
+                .addRow("A", "A", 3, LocalDate.of(2020, 10, 23), 105.05, BigDecimal.valueOf(10505, 2), 3)
                 ;
 
         DfCellComparator col1Comparator = df1.columnComparator(df2, "col1", "col1");
@@ -88,6 +88,19 @@ public class DfColumnCompareTest
         Assert.assertEquals(0.0, col6Comparator.compare(1, 1).dDelta(), TOLERANCE);
         Assert.assertEquals(-4.04, col6Comparator.compare(2, 2).dDelta(), TOLERANCE);
         Assert.assertEquals(BigDecimal.valueOf(-404, 2), ((DecimalComparisonResult) col6Comparator.compare(2, 2)).decDelta());
+
+        DfCellComparator col7Comparator = df1.columnComparator(df2, "col7", "int");
+        Assert.assertTrue(col7Comparator.compare(0, 0).compared() > 0);
+        Assert.assertTrue(col7Comparator.compare(1, 1).compared() == 0);
+        Assert.assertTrue(col7Comparator.compare(2, 2).compared() < 0);
+
+        Assert.assertTrue(col7Comparator.compare(2, 0).compared() == 0);
+        Assert.assertTrue(col7Comparator.compare(2, 1).compared() > 0);
+
+        Assert.assertEquals(1L, col7Comparator.compare(0, 0).delta());
+        Assert.assertEquals(0L, col7Comparator.compare(1, 1).delta());
+        Assert.assertEquals(-1L, col7Comparator.compare(2, 2).delta());
+
     }
 
     @Test

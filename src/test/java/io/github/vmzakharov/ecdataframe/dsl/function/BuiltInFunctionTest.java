@@ -2,6 +2,7 @@ package io.github.vmzakharov.ecdataframe.dsl.function;
 
 import io.github.vmzakharov.ecdataframe.dsl.Script;
 import io.github.vmzakharov.ecdataframe.dsl.SimpleEvalContext;
+import io.github.vmzakharov.ecdataframe.dsl.value.IntValue;
 import io.github.vmzakharov.ecdataframe.dsl.value.LongValue;
 import io.github.vmzakharov.ecdataframe.dsl.value.Value;
 import io.github.vmzakharov.ecdataframe.dsl.visitor.InMemoryEvaluationVisitor;
@@ -164,6 +165,29 @@ public class BuiltInFunctionTest
     }
 
     @Test
+    public void absForInt()
+    {
+        SimpleEvalContext context = new SimpleEvalContext();
+        context.setVariable("y", new IntValue(-5));
+        IntValue result1 = (IntValue) evaluateScriptWithContext("abs(y)", context);
+        Assert.assertEquals(5, result1.intValue());
+        IntValue result2 = (IntValue) evaluateScriptWithContext("abs(-y)", context);
+        Assert.assertEquals(5, result2.intValue());
+    }
+
+    @Test
+    public void toStringForInt()
+    {
+        SimpleEvalContext context = new SimpleEvalContext();
+        context.setVariable("y", new IntValue(123));
+        context.setVariable("z", new IntValue(-456));
+        Value result1 = evaluateScriptWithContext("toString(y)", context);
+        Assert.assertEquals("123", result1.stringValue());
+        Value result2 = evaluateScriptWithContext("toString(z)", context);
+        Assert.assertEquals("-456", result2.stringValue());
+    }
+
+    @Test
     public void toStringFunction()
     {
         Assert.assertEquals("12345", evaluateToString("toString(12345)"));
@@ -174,7 +198,7 @@ public class BuiltInFunctionTest
         Assert.assertEquals("Boo", evaluateToString("toString('Boo')"));
 
         Assert.assertEquals("2020-10-06", evaluateToString("toString(toDate('2020-10-06'))"));
-        
+
         Assert.assertEquals(LocalDate.of(2020, 10, 6), evaluateToDate("toDate(toString(toDate('2020-10-06')))"));
     }
 

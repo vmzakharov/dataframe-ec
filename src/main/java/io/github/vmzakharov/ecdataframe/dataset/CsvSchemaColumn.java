@@ -2,6 +2,7 @@ package io.github.vmzakharov.ecdataframe.dataset;
 
 import io.github.vmzakharov.ecdataframe.dataframe.DfColumn;
 import io.github.vmzakharov.ecdataframe.dataframe.DfDoubleColumnStored;
+import io.github.vmzakharov.ecdataframe.dataframe.DfIntColumnStored;
 import io.github.vmzakharov.ecdataframe.dataframe.DfLongColumnStored;
 import io.github.vmzakharov.ecdataframe.dsl.value.ValueType;
 
@@ -21,6 +22,7 @@ public class CsvSchemaColumn
     transient private DateTimeFormatter dateTimeFormatter;
     transient private DoubleFormatter doubleFormatter;
     transient private LongFormatter longFormatter;
+    transient private IntFormatter intFormatter;
 
     public CsvSchemaColumn(CsvSchema newCsvSchema, String newName, ValueType newType, String newPattern)
     {
@@ -55,6 +57,10 @@ public class CsvSchemaColumn
         else if (this.type.isLong())
         {
             this.longFormatter = new LongFormatter(this.pattern);
+        }
+        else if (this.type.isInt())
+        {
+            this.intFormatter = new IntFormatter(this.pattern);
         }
     }
 
@@ -131,6 +137,17 @@ public class CsvSchemaColumn
         ((DfLongColumnStored) dfColumn).addLong(this.longFormatter.parseAsLong(aString), false);
     }
 
+    public void parseAsIntAndAdd(String aString, DfColumn dfColumn)
+    {
+        if (aString == null)
+        {
+            dfColumn.addEmptyValue();
+            return;
+        }
+
+        ((DfIntColumnStored) dfColumn).addInt(this.intFormatter.parseAsInt(aString), false);
+    }
+
     public String parseAsString(String aString)
     {
         return this.csvSchema.stripQuotesIfAny(aString);
@@ -144,5 +161,10 @@ public class CsvSchemaColumn
     public LongFormatter getLongFormatter()
     {
         return this.longFormatter;
+    }
+
+    public IntFormatter getIntFormatter()
+    {
+        return this.intFormatter;
     }
 }

@@ -16,17 +16,17 @@ public class DataFrameDistinctTest
     public void setupDataFrame()
     {
         this.df = new DataFrame("Data Frame")
-            .addLongColumn("Id").addStringColumn("Name").addDoubleColumn("Foo").addDateColumn("Bar").addDateTimeColumn("Baz").addDecimalColumn("Qux")
-            .addRow(3, "Carl", 789.001, LocalDate.of(2022, 11, 15), LocalDateTime.of(2023, 11, 22, 20, 45, 55), BigDecimal.valueOf(456, 2))
-            .addRow(1, "Alice", 123.456, LocalDate.of(2022, 12, 15), LocalDateTime.of(2023, 11, 22, 20, 45, 55), BigDecimal.valueOf(123, 2))
-            .addRow(2, "Bob", 123.456, LocalDate.of(2022, 12, 15), LocalDateTime.of(2023, 11, 22, 20, 45, 55), BigDecimal.valueOf(123, 2))
-            .addRow(1, "Alice", 123.456, LocalDate.of(2022, 12, 15), LocalDateTime.of(2023, 11, 22, 20, 45, 55), BigDecimal.valueOf(123, 2))
-            .addRow(1, "Alice", 123.456, LocalDate.of(2022, 12, 15), LocalDateTime.of(2023, 11, 22, 20, 45, 55), BigDecimal.valueOf(123, 2))
-            .addRow(2, "Bob", 123.456, LocalDate.of(2022, 11, 15), LocalDateTime.of(2023, 11, 22, 20, 45, 55), BigDecimal.valueOf(456, 2))
-            .addRow(3, "Carl", 789.001, LocalDate.of(2022, 11, 15), LocalDateTime.of(2023, 11, 22, 20, 45, 55), BigDecimal.valueOf(456, 2))
-            .addRow(1, "Alice", 123.456, LocalDate.of(2022, 12, 15), LocalDateTime.of(2023, 11, 22, 20, 45, 55), BigDecimal.valueOf(567, 1))
-            .addRow(3, "Carl", 789.001, LocalDate.of(2022, 11, 15), LocalDateTime.of(2023, 11, 22, 20, 45, 55), BigDecimal.valueOf(456, 2))
-            .addRow(1, "Alice", 123.456, LocalDate.of(2022, 12, 15), LocalDateTime.of(2023, 11, 22, 20, 45, 55), BigDecimal.valueOf(123, 2))
+            .addLongColumn("Id").addStringColumn("Name").addDoubleColumn("Foo").addDateColumn("Bar").addDateTimeColumn("Baz").addDecimalColumn("Qux").addIntColumn("Fred")
+            .addRow(3, "Carl", 789.001, LocalDate.of(2022, 11, 15), LocalDateTime.of(2023, 11, 22, 20, 45, 55), BigDecimal.valueOf(456, 2), 3)
+            .addRow(1, "Alice", 123.456, LocalDate.of(2022, 12, 15), LocalDateTime.of(2023, 11, 22, 20, 45, 55), BigDecimal.valueOf(123, 2), 1)
+            .addRow(2, "Bob", 123.456, LocalDate.of(2022, 12, 15), LocalDateTime.of(2023, 11, 22, 20, 45, 55), BigDecimal.valueOf(123, 2), 2)
+            .addRow(1, "Alice", 123.456, LocalDate.of(2022, 12, 15), LocalDateTime.of(2023, 11, 22, 20, 45, 55), BigDecimal.valueOf(123, 2), 1)
+            .addRow(1, "Alice", 123.456, LocalDate.of(2022, 12, 15), LocalDateTime.of(2023, 11, 22, 20, 45, 55), BigDecimal.valueOf(123, 2), 1)
+            .addRow(2, "Bob", 123.456, LocalDate.of(2022, 11, 15), LocalDateTime.of(2023, 11, 22, 20, 45, 55), BigDecimal.valueOf(456, 2), 2)
+            .addRow(3, "Carl", 789.001, LocalDate.of(2022, 11, 15), LocalDateTime.of(2023, 11, 22, 20, 45, 55), BigDecimal.valueOf(456, 2), 3)
+            .addRow(1, "Alice", 123.456, LocalDate.of(2022, 12, 15), LocalDateTime.of(2023, 11, 22, 20, 45, 55), BigDecimal.valueOf(567, 1), 1)
+            .addRow(3, "Carl", 789.001, LocalDate.of(2022, 11, 15), LocalDateTime.of(2023, 11, 22, 20, 45, 55), BigDecimal.valueOf(456, 2), 3)
+            .addRow(1, "Alice", 123.456, LocalDate.of(2022, 12, 15), LocalDateTime.of(2023, 11, 22, 20, 45, 55), BigDecimal.valueOf(123, 2), 1)
             ;
     }
 
@@ -35,12 +35,12 @@ public class DataFrameDistinctTest
     {
         DataFrameUtil.assertEquals(
             new DataFrame("expected")
-                .addLongColumn("Id").addStringColumn("Name").addDoubleColumn("Foo").addDateColumn("Bar").addDateTimeColumn("Baz").addDecimalColumn("Qux")
-                .addRow(3, "Carl", 789.001, LocalDate.of(2022, 11, 15), LocalDateTime.of(2023, 11, 22, 20, 45, 55), BigDecimal.valueOf(456, 2))
-                .addRow(1, "Alice", 123.456, LocalDate.of(2022, 12, 15), LocalDateTime.of(2023, 11, 22, 20, 45, 55), BigDecimal.valueOf(123, 2))
-                .addRow(2, "Bob", 123.456, LocalDate.of(2022, 12, 15), LocalDateTime.of(2023, 11, 22, 20, 45, 55), BigDecimal.valueOf(123, 2))
-                .addRow(2, "Bob", 123.456, LocalDate.of(2022, 11, 15), LocalDateTime.of(2023, 11, 22, 20, 45, 55), BigDecimal.valueOf(456, 2))
-                .addRow(1, "Alice", 123.456, LocalDate.of(2022, 12, 15), LocalDateTime.of(2023, 11, 22, 20, 45, 55), BigDecimal.valueOf(567, 1))
+                .addLongColumn("Id").addStringColumn("Name").addDoubleColumn("Foo").addDateColumn("Bar").addDateTimeColumn("Baz").addDecimalColumn("Qux").addIntColumn("Fred")
+                .addRow(3, "Carl", 789.001, LocalDate.of(2022, 11, 15), LocalDateTime.of(2023, 11, 22, 20, 45, 55), BigDecimal.valueOf(456, 2), 3)
+                .addRow(1, "Alice", 123.456, LocalDate.of(2022, 12, 15), LocalDateTime.of(2023, 11, 22, 20, 45, 55), BigDecimal.valueOf(123, 2), 1)
+                .addRow(2, "Bob", 123.456, LocalDate.of(2022, 12, 15), LocalDateTime.of(2023, 11, 22, 20, 45, 55), BigDecimal.valueOf(123, 2), 2)
+                .addRow(2, "Bob", 123.456, LocalDate.of(2022, 11, 15), LocalDateTime.of(2023, 11, 22, 20, 45, 55), BigDecimal.valueOf(456, 2), 2)
+                .addRow(1, "Alice", 123.456, LocalDate.of(2022, 12, 15), LocalDateTime.of(2023, 11, 22, 20, 45, 55), BigDecimal.valueOf(567, 1), 1)
             ,
             this.df.distinct()
         );
@@ -65,12 +65,12 @@ public class DataFrameDistinctTest
     {
         DataFrameUtil.assertEquals(
             new DataFrame("expected")
-                .addLongColumn("Id").addStringColumn("Name").addDoubleColumn("Foo")
-                .addRow(3, "Carl", 789.001)
-                .addRow(1, "Alice", 123.456)
-                .addRow(2, "Bob", 123.456)
+                .addLongColumn("Id").addStringColumn("Name").addDoubleColumn("Foo").addIntColumn("Fred")
+                .addRow(3, "Carl", 789.001, 3)
+                .addRow(1, "Alice", 123.456, 1)
+                .addRow(2, "Bob", 123.456, 2)
             ,
-            this.df.distinct(Lists.immutable.of("Id", "Name", "Foo"))
+            this.df.distinct(Lists.immutable.of("Id", "Name", "Foo", "Fred"))
         );
     }
 

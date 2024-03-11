@@ -16,12 +16,12 @@ public class DataFrameBitmapTest
     public void setUpDataFrame()
     {
         this.dataFrame = new DataFrame("FrameOfData")
-                .addStringColumn("Name").addStringColumn("Foo").addLongColumn("Bar").addDoubleColumn("Baz").addDoubleColumn("Qux")
-                .addRow("Alice",   "Pqr",  11L, 10.0, 20.0)
-                .addRow("Albert",  "Abc",  12L, 12.0, 10.0)
-                .addRow("Bob",     "Def",  13L, 13.0, 25.0)
-                .addRow("Carol",   "Xyz",  14L, 14.0, 40.0)
-                .addRow("Abigail", "Def",  15L, 15.0, 11.0)
+                .addStringColumn("Name").addStringColumn("Foo").addLongColumn("Bar").addDoubleColumn("Baz").addDoubleColumn("Qux").addIntColumn("Fred")
+                .addRow("Alice",   "Pqr",  11L, 10.0, 20.0, 110)
+                .addRow("Albert",  "Abc",  12L, 12.0, 10.0, 120)
+                .addRow("Bob",     "Def",  13L, 13.0, 25.0, 130)
+                .addRow("Carol",   "Xyz",  14L, 14.0, 40.0, 140)
+                .addRow("Abigail", "Def",  15L, 15.0, 11.0, 150)
         ;
     }
 
@@ -35,10 +35,10 @@ public class DataFrameBitmapTest
         DataFrame filtered = this.dataFrame.selectFlagged();
 
         DataFrame expected = new DataFrame("Expected FrameOfData")
-                .addStringColumn("Name").addStringColumn("Foo").addLongColumn("Bar").addDoubleColumn("Baz").addDoubleColumn("Qux")
-                .addRow("Alice",   "Pqr",  11L, 10.0, 20.0)
-                .addRow("Bob",     "Def",  13L, 13.0, 25.0)
-                .addRow("Carol",   "Xyz",  14L, 14.0, 40.0)
+                .addStringColumn("Name").addStringColumn("Foo").addLongColumn("Bar").addDoubleColumn("Baz").addDoubleColumn("Qux").addIntColumn("Fred")
+                .addRow("Alice",   "Pqr",  11L, 10.0, 20.0, 110)
+                .addRow("Bob",     "Def",  13L, 13.0, 25.0, 130)
+                .addRow("Carol",   "Xyz",  14L, 14.0, 40.0, 140)
                 ;
         DataFrameUtil.assertEquals(expected, filtered);
 
@@ -47,7 +47,7 @@ public class DataFrameBitmapTest
         DataFrame moreFiltered = filtered.selectFlagged();
 
         DataFrame nothingExpected = new DataFrame("Nothing Expected FrameOfData")
-                .addStringColumn("Name").addStringColumn("Foo").addLongColumn("Bar").addDoubleColumn("Baz").addDoubleColumn("Qux")
+                .addStringColumn("Name").addStringColumn("Foo").addLongColumn("Bar").addDoubleColumn("Baz").addDoubleColumn("Qux").addIntColumn("Fred")
                 ;
 
         DataFrameUtil.assertEquals(nothingExpected, moreFiltered);
@@ -67,10 +67,10 @@ public class DataFrameBitmapTest
         DataFrame filtered = this.dataFrame.selectFlagged();
 
         DataFrame expected = new DataFrame("Expected FrameOfData")
-                .addStringColumn("Name").addStringColumn("Foo").addLongColumn("Bar").addDoubleColumn("Baz").addDoubleColumn("Qux")
-                .addRow("Albert",  "Abc",  12L, 12.0, 10.0)
-                .addRow("Abigail", "Def",  15L, 15.0, 11.0)
-                .addRow("Alice",   "Pqr",  11L, 10.0, 20.0)
+                .addStringColumn("Name").addStringColumn("Foo").addLongColumn("Bar").addDoubleColumn("Baz").addDoubleColumn("Qux").addIntColumn("Fred")
+                .addRow("Albert",  "Abc",  12L, 12.0, 10.0, 120)
+                .addRow("Abigail", "Def",  15L, 15.0, 11.0, 150)
+                .addRow("Alice",   "Pqr",  11L, 10.0, 20.0, 110)
                 ;
         DataFrameUtil.assertEquals(expected, filtered);
     }
@@ -84,10 +84,10 @@ public class DataFrameBitmapTest
         DataFrame filtered = this.dataFrame.selectNotFlagged();
 
         DataFrame expected = new DataFrame("Expected FrameOfData")
-                .addStringColumn("Name").addStringColumn("Foo").addLongColumn("Bar").addDoubleColumn("Baz").addDoubleColumn("Qux")
-                .addRow("Alice",   "Pqr",  11L, 10.0, 20.0)
-                .addRow("Bob",     "Def",  13L, 13.0, 25.0)
-                .addRow("Carol",   "Xyz",  14L, 14.0, 40.0)
+                .addStringColumn("Name").addStringColumn("Foo").addLongColumn("Bar").addDoubleColumn("Baz").addDoubleColumn("Qux").addIntColumn("Fred")
+                .addRow("Alice",   "Pqr",  11L, 10.0, 20.0, 110)
+                .addRow("Bob",     "Def",  13L, 13.0, 25.0, 130)
+                .addRow("Carol",   "Xyz",  14L, 14.0, 40.0, 140)
                 ;
         DataFrameUtil.assertEquals(expected, filtered);
 
@@ -99,7 +99,7 @@ public class DataFrameBitmapTest
         DataFrame moreFiltered = filtered.selectNotFlagged();
 
         DataFrame nothingExpected = new DataFrame("Nothing Expected FrameOfData")
-                .addStringColumn("Name").addStringColumn("Foo").addLongColumn("Bar").addDoubleColumn("Baz").addDoubleColumn("Qux")
+                .addStringColumn("Name").addStringColumn("Foo").addLongColumn("Bar").addDoubleColumn("Baz").addDoubleColumn("Qux").addIntColumn("Fred")
                 ;
 
         DataFrameUtil.assertEquals(nothingExpected, moreFiltered);
@@ -116,10 +116,10 @@ public class DataFrameBitmapTest
         DataFrame filtered = this.dataFrame.selectNotFlagged();
 
         DataFrame expected = new DataFrame("Expected FrameOfData")
-                .addStringColumn("Name").addStringColumn("Foo").addLongColumn("Bar").addDoubleColumn("Baz").addDoubleColumn("Qux")
-                .addRow("Albert",  "Abc",  12L, 12.0, 10.0)
-                .addRow("Abigail", "Def",  15L, 15.0, 11.0)
-                .addRow("Alice",   "Pqr",  11L, 10.0, 20.0)
+                .addStringColumn("Name").addStringColumn("Foo").addLongColumn("Bar").addDoubleColumn("Baz").addDoubleColumn("Qux").addIntColumn("Fred")
+                .addRow("Albert",  "Abc",  12L, 12.0, 10.0, 120)
+                .addRow("Abigail", "Def",  15L, 15.0, 11.0, 150)
+                .addRow("Alice",   "Pqr",  11L, 10.0, 20.0, 110)
                 ;
         DataFrameUtil.assertEquals(expected, filtered);
     }
@@ -143,12 +143,12 @@ public class DataFrameBitmapTest
     public void selectionWithNulls()
     {
         this.dataFrame = new DataFrame("FrameOfData")
-                .addStringColumn("Name").addStringColumn("Foo").addLongColumn("Bar").addDoubleColumn("Baz").addDoubleColumn("Qux")
-                .addRow(null,      "Pqr",  11L, 10.0, 20.0)
-                .addRow("Albert",   null,  12L, 12.0, 10.0)
-                .addRow("Bob",     "Def", null, 13.0, 25.0)
-                .addRow("Carol",   "Xyz",  14L, null, 40.0)
-                .addRow("Abigail", "Def",  15L, 15.0, null)
+                .addStringColumn("Name").addStringColumn("Foo").addLongColumn("Bar").addDoubleColumn("Baz").addDoubleColumn("Qux").addIntColumn("Fred")
+                .addRow(null,      "Pqr",  11L, 10.0, 20.0, 110)
+                .addRow("Albert",   null,  12L, 12.0, 10.0, 120)
+                .addRow("Bob",     "Def", null, 13.0, 25.0, null)
+                .addRow("Carol",   "Xyz",  14L, null, 40.0, 140)
+                .addRow("Abigail", "Def",  15L, 15.0, null, 150)
         ;
 
         this.dataFrame.flagRowsBy("Foo is not null and Foo in ('Def', 'Pqr')");
@@ -156,18 +156,18 @@ public class DataFrameBitmapTest
         DataFrame flagged = this.dataFrame.selectFlagged();
 
         DataFrameUtil.assertEquals(new DataFrame("expected flagged")
-                     .addStringColumn("Name").addStringColumn("Foo").addLongColumn("Bar").addDoubleColumn("Baz").addDoubleColumn("Qux")
-                     .addRow(null,      "Pqr",  11L, 10.0, 20.0)
-                     .addRow("Bob",     "Def", null, 13.0, 25.0)
-                     .addRow("Abigail", "Def",  15L, 15.0, null)
+                     .addStringColumn("Name").addStringColumn("Foo").addLongColumn("Bar").addDoubleColumn("Baz").addDoubleColumn("Qux").addIntColumn("Fred")
+                     .addRow(null,      "Pqr",  11L, 10.0, 20.0, 110)
+                     .addRow("Bob",     "Def", null, 13.0, 25.0, null)
+                     .addRow("Abigail", "Def",  15L, 15.0, null, 150)
                 , flagged);
 
         DataFrame notFlagged = this.dataFrame.selectNotFlagged();
 
         DataFrameUtil.assertEquals(new DataFrame("expected not flagged")
-                        .addStringColumn("Name").addStringColumn("Foo").addLongColumn("Bar").addDoubleColumn("Baz").addDoubleColumn("Qux")
-                        .addRow("Albert",   null,  12L, 12.0, 10.0)
-                        .addRow("Carol",   "Xyz",  14L, null, 40.0)
+                        .addStringColumn("Name").addStringColumn("Foo").addLongColumn("Bar").addDoubleColumn("Baz").addDoubleColumn("Qux").addIntColumn("Fred")
+                        .addRow("Albert",   null,  12L, 12.0, 10.0, 120)
+                        .addRow("Carol",   "Xyz",  14L, null, 40.0, 140)
                 , notFlagged);
     }
 
@@ -175,17 +175,17 @@ public class DataFrameBitmapTest
     public void selectWhenNothingFlagged()
     {
         DataFrame df = new DataFrame("FrameOfData")
-                .addStringColumn("Name").addStringColumn("Foo").addLongColumn("Bar").addDoubleColumn("Baz").addDoubleColumn("Qux")
-                .addRow("Alice",   "Pqr",  11L, 10.0, 20.0)
-                .addRow("Bob",     "Def",  13L, 13.0, 25.0)
-                .addRow("Carol",   "Xyz",  14L, 14.0, 40.0)
+                .addStringColumn("Name").addStringColumn("Foo").addLongColumn("Bar").addDoubleColumn("Baz").addDoubleColumn("Qux").addIntColumn("Fred")
+                .addRow("Alice",   "Pqr",  11L, 10.0, 20.0, 110)
+                .addRow("Bob",     "Def",  13L, 13.0, 25.0, 130)
+                .addRow("Carol",   "Xyz",  14L, 14.0, 40.0, 140)
         ;
 
         DataFrame flagged = df.selectFlagged();
 
         DataFrameUtil.assertEquals(
                 new DataFrame("FrameOfData")
-                        .addStringColumn("Name").addStringColumn("Foo").addLongColumn("Bar").addDoubleColumn("Baz").addDoubleColumn("Qux")
+                        .addStringColumn("Name").addStringColumn("Foo").addLongColumn("Bar").addDoubleColumn("Baz").addDoubleColumn("Qux").addIntColumn("Fred")
                 , flagged
                 );
 
@@ -193,10 +193,10 @@ public class DataFrameBitmapTest
 
         DataFrameUtil.assertEquals(
                 new DataFrame("FrameOfData")
-                        .addStringColumn("Name").addStringColumn("Foo").addLongColumn("Bar").addDoubleColumn("Baz").addDoubleColumn("Qux")
-                        .addRow("Alice",   "Pqr",  11L, 10.0, 20.0)
-                        .addRow("Bob",     "Def",  13L, 13.0, 25.0)
-                        .addRow("Carol",   "Xyz",  14L, 14.0, 40.0)
+                        .addStringColumn("Name").addStringColumn("Foo").addLongColumn("Bar").addDoubleColumn("Baz").addDoubleColumn("Qux").addIntColumn("Fred")
+                        .addRow("Alice",   "Pqr",  11L, 10.0, 20.0, 110)
+                        .addRow("Bob",     "Def",  13L, 13.0, 25.0, 130)
+                        .addRow("Carol",   "Xyz",  14L, 14.0, 40.0, 140)
                 , notFlagged
                 );
     }

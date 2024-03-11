@@ -3,6 +3,7 @@ package io.github.vmzakharov.ecdataframe.dataframe.aggregation;
 import io.github.vmzakharov.ecdataframe.dataframe.AggregateFunction;
 import io.github.vmzakharov.ecdataframe.dataframe.DfDecimalColumn;
 import io.github.vmzakharov.ecdataframe.dataframe.DfDoubleColumn;
+import io.github.vmzakharov.ecdataframe.dataframe.DfIntColumn;
 import io.github.vmzakharov.ecdataframe.dataframe.DfLongColumn;
 import io.github.vmzakharov.ecdataframe.dataframe.DfObjectColumn;
 import io.github.vmzakharov.ecdataframe.dsl.value.ValueType;
@@ -52,6 +53,12 @@ extends AggregateFunction
     public Object applyToLongColumn(DfLongColumn longColumn)
     {
         return longColumn.toLongList().max();
+    }
+
+    @Override
+    public Object applyToIntColumn(DfIntColumn intColumn)
+    {
+        return intColumn.toIntList().max();
     }
 
     @Override

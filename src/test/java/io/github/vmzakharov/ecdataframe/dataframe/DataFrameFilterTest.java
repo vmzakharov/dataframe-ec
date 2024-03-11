@@ -14,12 +14,12 @@ public class DataFrameFilterTest
     public void setUpDataFrame()
     {
         this.dataFrame = new DataFrame("FrameOfData")
-                .addStringColumn("Name").addStringColumn("Foo").addLongColumn("Bar").addDoubleColumn("Baz").addDoubleColumn("Qux")
-                .addRow("Alice",   "Pqr",  11L, 10.0, 20.0)
-                .addRow("Albert",  "Abc",  12L, 12.0, 10.0)
-                .addRow("Bob",     "Def",  13L, 13.0, 25.0)
-                .addRow("Carol",   "Xyz",  14L, 14.0, 40.0)
-                .addRow("Abigail", "Def",  15L, 15.0, 11.0)
+                .addStringColumn("Name").addStringColumn("Foo").addLongColumn("Bar").addDoubleColumn("Baz").addDoubleColumn("Qux").addIntColumn("Fred")
+                .addRow("Alice",   "Pqr",  11L, 10.0, 20.0, 110)
+                .addRow("Albert",  "Abc",  12L, 12.0, 10.0, 120)
+                .addRow("Bob",     "Def",  13L, 13.0, 25.0, 130)
+                .addRow("Carol",   "Xyz",  14L, 14.0, 40.0, 140)
+                .addRow("Abigail", "Def",  15L, 15.0, 11.0, 150)
         ;
     }
 
@@ -29,10 +29,10 @@ public class DataFrameFilterTest
         DataFrame filtered = this.dataFrame.selectBy("Foo == \"Def\" or Foo == \"Abc\"");
 
         DataFrame expected = new DataFrame("FrameOfData")
-                .addStringColumn("Name").addStringColumn("Foo").addLongColumn("Bar").addDoubleColumn("Baz").addDoubleColumn("Qux")
-                .addRow("Albert",  "Abc",  12L, 12.0, 10.0)
-                .addRow("Bob",     "Def",  13L, 13.0, 25.0)
-                .addRow("Abigail", "Def",  15L, 15.0, 11.0);
+                .addStringColumn("Name").addStringColumn("Foo").addLongColumn("Bar").addDoubleColumn("Baz").addDoubleColumn("Qux").addIntColumn("Fred")
+                .addRow("Albert",  "Abc",  12L, 12.0, 10.0, 120)
+                .addRow("Bob",     "Def",  13L, 13.0, 25.0, 130)
+                .addRow("Abigail", "Def",  15L, 15.0, 11.0, 150);
 
         DataFrameUtil.assertEquals(expected, filtered);
 
@@ -45,9 +45,9 @@ public class DataFrameFilterTest
         DataFrame filtered = this.dataFrame.rejectBy("Foo == \"Def\" or Foo == \"Abc\"");
 
         DataFrame expected = new DataFrame("FrameOfData")
-                .addStringColumn("Name").addStringColumn("Foo").addLongColumn("Bar").addDoubleColumn("Baz").addDoubleColumn("Qux")
-                .addRow("Alice",   "Pqr",  11L, 10.0, 20.0)
-                .addRow("Carol",   "Xyz",  14L, 14.0, 40.0)
+                .addStringColumn("Name").addStringColumn("Foo").addLongColumn("Bar").addDoubleColumn("Baz").addDoubleColumn("Qux").addIntColumn("Fred")
+                .addRow("Alice",   "Pqr",  11L, 10.0, 20.0, 110)
+                .addRow("Carol",   "Xyz",  14L, 14.0, 40.0, 140)
                 ;
 
         DataFrameUtil.assertEquals(expected, filtered);
@@ -74,10 +74,10 @@ public class DataFrameFilterTest
         DataFrame filtered = this.dataFrame.selectBy("(Foo == \"Def\" or Foo == \"Pqr\") and BazAndQux > 25");
 
         DataFrame expected = new DataFrame("Expected FrameOfData")
-                .addStringColumn("Name").addStringColumn("Foo").addLongColumn("Bar").addDoubleColumn("Baz").addDoubleColumn("Qux")
-                .addRow("Alice",   "Pqr",  11L, 10.0, 20.0)
-                .addRow("Bob",     "Def",  13L, 13.0, 25.0)
-                .addRow("Abigail", "Def",  15L, 15.0, 11.0);
+                .addStringColumn("Name").addStringColumn("Foo").addLongColumn("Bar").addDoubleColumn("Baz").addDoubleColumn("Qux").addIntColumn("Fred")
+                .addRow("Alice",   "Pqr",  11L, 10.0, 20.0, 110)
+                .addRow("Bob",     "Def",  13L, 13.0, 25.0, 130)
+                .addRow("Abigail", "Def",  15L, 15.0, 11.0, 150);
 
         expected.addDoubleColumn("BazAndQux", "Baz + Qux");
 
@@ -90,16 +90,16 @@ public class DataFrameFilterTest
         Twin<DataFrame> selectedAndRejected = this.dataFrame.partition("Foo == \"Def\" or Foo == \"Abc\"");
 
         DataFrame expectedSelected = new DataFrame("FrameOfData")
-                .addStringColumn("Name").addStringColumn("Foo").addLongColumn("Bar").addDoubleColumn("Baz").addDoubleColumn("Qux")
-                .addRow("Albert",  "Abc",  12L, 12.0, 10.0)
-                .addRow("Bob",     "Def",  13L, 13.0, 25.0)
-                .addRow("Abigail", "Def",  15L, 15.0, 11.0)
+                .addStringColumn("Name").addStringColumn("Foo").addLongColumn("Bar").addDoubleColumn("Baz").addDoubleColumn("Qux").addIntColumn("Fred")
+                .addRow("Albert",  "Abc",  12L, 12.0, 10.0, 120)
+                .addRow("Bob",     "Def",  13L, 13.0, 25.0, 130)
+                .addRow("Abigail", "Def",  15L, 15.0, 11.0, 150)
                 ;
 
         DataFrame expectedRejected = new DataFrame("FrameOfData")
-                .addStringColumn("Name").addStringColumn("Foo").addLongColumn("Bar").addDoubleColumn("Baz").addDoubleColumn("Qux")
-                .addRow("Alice",   "Pqr",  11L, 10.0, 20.0)
-                .addRow("Carol",   "Xyz",  14L, 14.0, 40.0)
+                .addStringColumn("Name").addStringColumn("Foo").addLongColumn("Bar").addDoubleColumn("Baz").addDoubleColumn("Qux").addIntColumn("Fred")
+                .addRow("Alice",   "Pqr",  11L, 10.0, 20.0, 110)
+                .addRow("Carol",   "Xyz",  14L, 14.0, 40.0, 140)
                 ;
 
         DataFrameUtil.assertEquals(expectedSelected, selectedAndRejected.getOne());

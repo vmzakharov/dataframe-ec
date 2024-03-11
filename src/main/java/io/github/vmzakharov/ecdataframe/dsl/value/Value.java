@@ -102,6 +102,11 @@ extends Expression, Comparable<Value>
         return this.getType().isLong();
     }
 
+    default boolean isInt()
+    {
+        return this.getType().isInt();
+    }
+
     default boolean isDouble()
     {
         return this.getType().isDouble();
