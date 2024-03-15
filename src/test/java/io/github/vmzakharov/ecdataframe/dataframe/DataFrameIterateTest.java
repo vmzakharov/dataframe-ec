@@ -25,13 +25,13 @@ public class DataFrameIterateTest
     {
         this.dataFrame = new DataFrame("FrameOfData")
             .addStringColumn("Name").addLongColumn("Bar").addDoubleColumn("Baz")
-            .addDateColumn("Date").addDateTimeColumn("DateTime").addDecimalColumn("Decimal")
-            .addRow("Alice",   11L, 20.0, LocalDate.of(2023, 10, 21), LocalDateTime.of(2023, 10, 21, 11, 11, 11), BigDecimal.valueOf(123, 2))
-            .addRow("Carol",   12L, 10.0, LocalDate.of(2023, 12, 24), LocalDateTime.of(2023, 10, 21, 11, 11, 11), BigDecimal.valueOf(124, 2))
-            .addRow("Alice",   33L, 25.0, LocalDate.of(2023, 11, 23), LocalDateTime.of(2023, 11, 23, 11, 13, 11), BigDecimal.valueOf(123, 2))
-            .addRow("Carol",   24L, 66.1, LocalDate.of(2023, 12, 24), LocalDateTime.of(2023, 12, 24, 11, 14, 11), BigDecimal.valueOf(222, 2))
-            .addRow("Carol",   24L, 41.0, LocalDate.of(2023, 12, 24), LocalDateTime.of(2023, 12, 24, 11, 15, 11), BigDecimal.valueOf(333, 2))
-            .addRow("Abigail", 33L, 11.0, LocalDate.of(2023, 11, 23), LocalDateTime.of(2023, 10, 21, 11, 11, 11), BigDecimal.valueOf(123, 2))
+            .addDateColumn("Date").addDateTimeColumn("DateTime").addDecimalColumn("Decimal").addIntColumn("Qux")
+            .addRow("Alice",   11L, 20.0, LocalDate.of(2023, 10, 21), LocalDateTime.of(2023, 10, 21, 11, 11, 11), BigDecimal.valueOf(123, 2), 110)
+            .addRow("Carol",   12L, 10.0, LocalDate.of(2023, 12, 24), LocalDateTime.of(2023, 10, 21, 11, 11, 11), BigDecimal.valueOf(124, 2), 120)
+            .addRow("Alice",   33L, 25.0, LocalDate.of(2023, 11, 23), LocalDateTime.of(2023, 11, 23, 11, 13, 11), BigDecimal.valueOf(123, 2), 330)
+            .addRow("Carol",   24L, 66.1, LocalDate.of(2023, 12, 24), LocalDateTime.of(2023, 12, 24, 11, 14, 11), BigDecimal.valueOf(222, 2), 240)
+            .addRow("Carol",   24L, 41.0, LocalDate.of(2023, 12, 24), LocalDateTime.of(2023, 12, 24, 11, 15, 11), BigDecimal.valueOf(333, 2), 240)
+            .addRow("Abigail", 33L, 11.0, LocalDate.of(2023, 11, 23), LocalDateTime.of(2023, 10, 21, 11, 11, 11), BigDecimal.valueOf(123, 2), 330)
         ;
     }
 
@@ -43,16 +43,17 @@ public class DataFrameIterateTest
         this.dataFrame.forEach(c ->
             nameBarBaz.append(c.getString("Name")).append(',')
                       .append(c.getLong("Bar")).append(',')
-                      .append(c.getDouble("Baz")).append('\n')
+                      .append(c.getDouble("Baz")).append(',')
+                      .append(c.getInt("Qux")).append('\n')
         );
 
         Assert.assertEquals(
-            "Alice,11,20.0\n"
-            + "Carol,12,10.0\n"
-            + "Alice,33,25.0\n"
-            + "Carol,24,66.1\n"
-            + "Carol,24,41.0\n"
-            + "Abigail,33,11.0\n",
+            "Alice,11,20.0,110\n"
+            + "Carol,12,10.0,120\n"
+            + "Alice,33,25.0,330\n"
+            + "Carol,24,66.1,240\n"
+            + "Carol,24,41.0,240\n"
+            + "Abigail,33,11.0,330\n",
             nameBarBaz.toString()
         );
 
@@ -93,16 +94,17 @@ public class DataFrameIterateTest
         this.dataFrame.forEach(c ->
             nameBarBaz.append(c.getString("Name")).append(',')
                       .append(c.getLong("Bar")).append(',')
-                      .append(c.getDouble("Baz")).append('\n')
+                      .append(c.getDouble("Baz")).append(',')
+                      .append(c.getInt("Qux")).append('\n')
         );
 
        Assert.assertEquals(
-            "Abigail,33,11.0\n"
-            + "Alice,33,25.0\n"
-            + "Alice,11,20.0\n"
-            + "Carol,24,66.1\n"
-            + "Carol,24,41.0\n"
-            + "Carol,12,10.0\n"
+            "Abigail,33,11.0,330\n"
+            + "Alice,33,25.0,330\n"
+            + "Alice,11,20.0,110\n"
+            + "Carol,24,66.1,240\n"
+            + "Carol,24,41.0,240\n"
+            + "Carol,12,10.0,120\n"
             ,
             nameBarBaz.toString()
         );

@@ -1,6 +1,7 @@
 package io.github.vmzakharov.ecdataframe.dsl;
 
 import io.github.vmzakharov.ecdataframe.dsl.value.DoubleValue;
+import io.github.vmzakharov.ecdataframe.dsl.value.IntValue;
 import io.github.vmzakharov.ecdataframe.dsl.value.LongValue;
 import io.github.vmzakharov.ecdataframe.dsl.value.StringValue;
 import io.github.vmzakharov.ecdataframe.dsl.value.Value;
@@ -39,6 +40,22 @@ public class ValueCompareTest
 
         Assert.assertTrue(dv1.compareTo(Value.VOID) > 0);
         Assert.assertTrue(Value.VOID.compareTo(dv1) < 0);
+    }
+
+    @Test
+    public void intValueCompare()
+    {
+        IntValue iv1 = new IntValue(1);
+        IntValue iv2 = new IntValue(2);
+        IntValue iv1more = new IntValue(1);
+
+        Assert.assertEquals(0, iv1.compareTo(iv1more));
+        Assert.assertEquals(0, iv2.compareTo(iv2));
+        Assert.assertTrue(iv1.compareTo(iv2) < 0);
+        Assert.assertTrue(iv2.compareTo(iv1) > 0);
+
+        Assert.assertTrue(iv1.compareTo(Value.VOID) > 0);
+        Assert.assertTrue(Value.VOID.compareTo(iv1) < 0);
     }
 
     @Test

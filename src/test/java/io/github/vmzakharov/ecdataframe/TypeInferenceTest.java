@@ -3,6 +3,7 @@ package io.github.vmzakharov.ecdataframe;
 import io.github.vmzakharov.ecdataframe.dsl.EvalContext;
 import io.github.vmzakharov.ecdataframe.dsl.Script;
 import io.github.vmzakharov.ecdataframe.dsl.SimpleEvalContext;
+import io.github.vmzakharov.ecdataframe.dsl.value.IntValue;
 import io.github.vmzakharov.ecdataframe.dsl.value.LongValue;
 import io.github.vmzakharov.ecdataframe.dsl.value.StringValue;
 import io.github.vmzakharov.ecdataframe.dsl.value.ValueType;
@@ -29,7 +30,7 @@ public class TypeInferenceTest
     }
 
     @Test
-    public void intTypeInference()
+    public void longTypeInference()
     {
         assertScriptType("(1 + 2) * 3", ValueType.LONG);
         assertScriptType("x = (1 + 2) * 3", ValueType.LONG);
@@ -170,12 +171,22 @@ public class TypeInferenceTest
     }
 
     @Test
-    public void withContext()
+    public void longWithContext()
     {
         SimpleEvalContext context = new SimpleEvalContext();
         context.setVariable("a", new LongValue(5));
         context.setVariable("b", new LongValue(7));
         assertScriptType("a + b", context, ValueType.LONG);
+    }
+
+    @Test
+    public void intWithContext()
+    {
+        SimpleEvalContext context = new SimpleEvalContext();
+        context.setVariable("a", new IntValue(4));
+        context.setVariable("b", new IntValue(5));
+        assertScriptType("a + b", context, ValueType.LONG);
+        assertScriptType("-a", context, ValueType.INT);
     }
 
     @Test
@@ -193,6 +204,15 @@ public class TypeInferenceTest
         assertScriptType("toUpper('abc')", ValueType.STRING);
         assertScriptType("trim(' Hello ')", ValueType.STRING);
         assertScriptType("withinDays(toDate(2020, 11, 22), toDate(2020, 11, 20), 4)", ValueType.BOOLEAN);
+    }
+
+    @Test
+    public void builtInFunctionsForInt()
+    {
+        SimpleEvalContext context = new SimpleEvalContext();
+        context.setVariable("foo", new IntValue(5));
+        assertScriptType("abs(foo)", context, ValueType.INT);
+        assertScriptType("toString(foo)", context, ValueType.STRING);
     }
 
     @Test
@@ -395,7 +415,7 @@ public class TypeInferenceTest
 
         Assert.assertEquals("Error expression", errorDescription, visitor.getErrorExpressionString());
     }
-    
+
     private String prettyPrint(String expressionString)
     {
         return PrettyPrintVisitor.exprToString(

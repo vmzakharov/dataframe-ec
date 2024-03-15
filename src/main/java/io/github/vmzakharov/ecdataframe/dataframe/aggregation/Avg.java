@@ -7,6 +7,7 @@ import io.github.vmzakharov.ecdataframe.dataframe.DfDecimalColumn;
 import io.github.vmzakharov.ecdataframe.dataframe.DfDecimalColumnStored;
 import io.github.vmzakharov.ecdataframe.dataframe.DfDoubleColumn;
 import io.github.vmzakharov.ecdataframe.dataframe.DfDoubleColumnStored;
+import io.github.vmzakharov.ecdataframe.dataframe.DfIntColumn;
 import io.github.vmzakharov.ecdataframe.dataframe.DfLongColumn;
 import io.github.vmzakharov.ecdataframe.dataframe.DfLongColumnStored;
 import io.github.vmzakharov.ecdataframe.dataframe.DfObjectColumn;
@@ -19,9 +20,7 @@ import java.math.BigDecimal;
 import java.math.MathContext;
 import java.math.RoundingMode;
 
-import static io.github.vmzakharov.ecdataframe.dsl.value.ValueType.DECIMAL;
-import static io.github.vmzakharov.ecdataframe.dsl.value.ValueType.DOUBLE;
-import static io.github.vmzakharov.ecdataframe.dsl.value.ValueType.LONG;
+import static io.github.vmzakharov.ecdataframe.dsl.value.ValueType.*;
 
 public class Avg
 extends AggregateFunction
@@ -60,6 +59,12 @@ extends AggregateFunction
     public Object applyToLongColumn(DfLongColumn longColumn)
     {
         return Math.round(longColumn.toLongList().average());
+    }
+
+    @Override
+    public Object applyToIntColumn(DfIntColumn intColumn)
+    {
+        return Math.round(intColumn.toIntList().average());
     }
 
     @Override

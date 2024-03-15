@@ -16,31 +16,31 @@ public class DataFrameSortTest
     public void simpleOneColumnSort()
     {
         DataFrame dataFrame = new DataFrame("FrameOfData")
-                .addStringColumn("Name").addStringColumn("Foo").addLongColumn("Bar").addDoubleColumn("Baz").addDoubleColumn("Qux")
-                .addRow("Alice",   "Abc",  11L, 10.0, 20.0)
-                .addRow("Carol",   "Xyz",  14L, 14.0, 40.0)
-                .addRow("Albert",  "Def",  12L, 12.0, 10.0)
-                .addRow("Bob",     "Def",  13L, 13.0, 25.0)
-                .addRow("Abigail", "Def",  15L, 15.0, 11.0);
+                .addStringColumn("Name").addStringColumn("Foo").addLongColumn("Bar").addDoubleColumn("Baz").addDoubleColumn("Qux").addIntColumn("Fred")
+                .addRow("Alice",   "Abc",  11L, 10.0, 20.0, 110)
+                .addRow("Carol",   "Xyz",  14L, 14.0, 40.0, 140)
+                .addRow("Albert",  "Def",  12L, 12.0, 10.0, 120)
+                .addRow("Bob",     "Def",  13L, 13.0, 25.0, 130)
+                .addRow("Abigail", "Def",  15L, 15.0, 11.0, 150);
 
         DataFrame expected = new DataFrame("Expected FrameOfData")
-                .addStringColumn("Name").addStringColumn("Foo").addLongColumn("Bar").addDoubleColumn("Baz").addDoubleColumn("Qux")
-                .addRow("Abigail", "Def",  15L, 15.0, 11.0)
-                .addRow("Albert",  "Def",  12L, 12.0, 10.0)
-                .addRow("Alice",   "Abc",  11L, 10.0, 20.0)
-                .addRow("Bob",     "Def",  13L, 13.0, 25.0)
-                .addRow("Carol",   "Xyz",  14L, 14.0, 40.0)
+                .addStringColumn("Name").addStringColumn("Foo").addLongColumn("Bar").addDoubleColumn("Baz").addDoubleColumn("Qux").addIntColumn("Fred")
+                .addRow("Abigail", "Def",  15L, 15.0, 11.0, 150)
+                .addRow("Albert",  "Def",  12L, 12.0, 10.0, 120)
+                .addRow("Alice",   "Abc",  11L, 10.0, 20.0, 110)
+                .addRow("Bob",     "Def",  13L, 13.0, 25.0, 130)
+                .addRow("Carol",   "Xyz",  14L, 14.0, 40.0, 140)
                 ;
 
         DataFrameUtil.assertEquals(expected, dataFrame.sortBy(Lists.immutable.of("Name")));
 
         expected = new DataFrame("Expected FrameOfData")
-                .addStringColumn("Name").addStringColumn("Foo").addLongColumn("Bar").addDoubleColumn("Baz").addDoubleColumn("Qux")
-                .addRow("Alice",   "Abc",  11L, 10.0, 20.0)
-                .addRow("Albert",  "Def",  12L, 12.0, 10.0)
-                .addRow("Bob",     "Def",  13L, 13.0, 25.0)
-                .addRow("Abigail", "Def",  15L, 15.0, 11.0)
-                .addRow("Carol",   "Xyz",  14L, 14.0, 40.0)
+                .addStringColumn("Name").addStringColumn("Foo").addLongColumn("Bar").addDoubleColumn("Baz").addDoubleColumn("Qux").addIntColumn("Fred")
+                .addRow("Alice",   "Abc",  11L, 10.0, 20.0, 110)
+                .addRow("Albert",  "Def",  12L, 12.0, 10.0, 120)
+                .addRow("Bob",     "Def",  13L, 13.0, 25.0, 130)
+                .addRow("Abigail", "Def",  15L, 15.0, 11.0, 150)
+                .addRow("Carol",   "Xyz",  14L, 14.0, 40.0, 140)
                 ;
 
         DataFrameUtil.assertEquals(expected, dataFrame.sortBy(Lists.immutable.of("Foo")));
@@ -48,12 +48,12 @@ public class DataFrameSortTest
         dataFrame.unsort();
 
         DataFrame expectedUnsorted = new DataFrame("FrameOfData")
-                .addStringColumn("Name").addStringColumn("Foo").addLongColumn("Bar").addDoubleColumn("Baz").addDoubleColumn("Qux")
-                .addRow("Alice",   "Abc",  11L, 10.0, 20.0)
-                .addRow("Carol",   "Xyz",  14L, 14.0, 40.0)
-                .addRow("Albert",  "Def",  12L, 12.0, 10.0)
-                .addRow("Bob",     "Def",  13L, 13.0, 25.0)
-                .addRow("Abigail", "Def",  15L, 15.0, 11.0);
+                .addStringColumn("Name").addStringColumn("Foo").addLongColumn("Bar").addDoubleColumn("Baz").addDoubleColumn("Qux").addIntColumn("Fred")
+                .addRow("Alice",   "Abc",  11L, 10.0, 20.0, 110)
+                .addRow("Carol",   "Xyz",  14L, 14.0, 40.0, 140)
+                .addRow("Albert",  "Def",  12L, 12.0, 10.0, 120)
+                .addRow("Bob",     "Def",  13L, 13.0, 25.0, 130)
+                .addRow("Abigail", "Def",  15L, 15.0, 11.0, 150);
 
         DataFrameUtil.assertEquals(expectedUnsorted, dataFrame);
     }

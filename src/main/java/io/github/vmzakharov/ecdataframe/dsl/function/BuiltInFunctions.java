@@ -6,6 +6,7 @@ import io.github.vmzakharov.ecdataframe.dsl.value.DateTimeValue;
 import io.github.vmzakharov.ecdataframe.dsl.value.DateValue;
 import io.github.vmzakharov.ecdataframe.dsl.value.DecimalValue;
 import io.github.vmzakharov.ecdataframe.dsl.value.DoubleValue;
+import io.github.vmzakharov.ecdataframe.dsl.value.IntValue;
 import io.github.vmzakharov.ecdataframe.dsl.value.LongValue;
 import io.github.vmzakharov.ecdataframe.dsl.value.StringValue;
 import io.github.vmzakharov.ecdataframe.dsl.value.Value;
@@ -32,6 +33,7 @@ import static io.github.vmzakharov.ecdataframe.dsl.value.ValueType.DATE;
 import static io.github.vmzakharov.ecdataframe.dsl.value.ValueType.DATE_TIME;
 import static io.github.vmzakharov.ecdataframe.dsl.value.ValueType.DECIMAL;
 import static io.github.vmzakharov.ecdataframe.dsl.value.ValueType.DOUBLE;
+import static io.github.vmzakharov.ecdataframe.dsl.value.ValueType.INT;
 import static io.github.vmzakharov.ecdataframe.dsl.value.ValueType.LONG;
 import static io.github.vmzakharov.ecdataframe.dsl.value.ValueType.STRING;
 import static io.github.vmzakharov.ecdataframe.dsl.value.ValueType.VECTOR;
@@ -177,7 +179,7 @@ final public class BuiltInFunctions
 
                 if (!parameter.isNumber())
                 {
-                    this.assertParameterType(Lists.immutable.of(DOUBLE, LONG), parameter.getType());
+                    this.assertParameterType(Lists.immutable.of(DOUBLE, LONG, INT), parameter.getType());
                 }
 
                 if (parameter.isDouble())
@@ -185,7 +187,12 @@ final public class BuiltInFunctions
                     return new DoubleValue(Math.abs(((DoubleValue) parameter).doubleValue()));
                 }
 
-                return new LongValue(Math.abs(((LongValue) parameter).longValue()));
+                if (parameter.isLong())
+                {
+                    return new LongValue(Math.abs(((LongValue) parameter).longValue()));
+                }
+
+                return new IntValue(Math.abs(((IntValue) parameter).intValue()));
             }
 
             @Override

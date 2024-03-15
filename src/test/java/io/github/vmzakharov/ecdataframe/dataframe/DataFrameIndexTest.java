@@ -13,13 +13,13 @@ public class DataFrameIndexTest
     public void oneColumnIndex()
     {
         DataFrame dataFrame = new DataFrame("FrameOfData")
-                .addStringColumn("Name").addStringColumn("Foo").addLongColumn("Bar").addDoubleColumn("Baz")
-                .addRow("Alice",   "Pqr",  11L, 20.0)
-                .addRow("Carol",   "Abc",  12L, 10.0)
-                .addRow("Alice",   "Def",  13L, 25.0)
-                .addRow("Carol",   "Xyz",  14L, 40.0)
-                .addRow("Carol",   "Xyz",  15L, 40.0)
-                .addRow("Abigail", "Def",  16L, 11.0)
+                .addStringColumn("Name").addStringColumn("Foo").addLongColumn("Bar").addDoubleColumn("Baz").addIntColumn("Qux")
+                .addRow("Alice",   "Pqr",  11L, 20.0, 110)
+                .addRow("Carol",   "Abc",  12L, 10.0, 120)
+                .addRow("Alice",   "Def",  13L, 25.0, 130)
+                .addRow("Carol",   "Xyz",  14L, 40.0, 140)
+                .addRow("Carol",   "Xyz",  15L, 40.0, 150)
+                .addRow("Abigail", "Def",  16L, 11.0, 160)
                 ;
 
         DfIndex index = new DfIndex(dataFrame, Lists.immutable.of("Name"));
@@ -89,6 +89,31 @@ public class DataFrameIndexTest
         Assert.assertEquals(IntLists.immutable.of(5), index.getRowIndicesAtKey(Lists.immutable.of("Carol", 10L)));
 
         Assert.assertEquals(IntLists.immutable.of(2), index.getRowIndicesAtKey(Lists.immutable.of("Abigail", 10L)));
+    }
+
+    @Test
+    public void multiColumnDifferentTypesIndexInt()
+    {
+        DataFrame dataFrame = new DataFrame("FrameOfData")
+                .addStringColumn("Name").addIntColumn("Quux").addIntColumn("Bar")
+                .addRow("Alice",   10, 1)
+                .addRow("Carol",   20, 2)
+                .addRow("Abigail", 10, 3)
+                .addRow("Alice",   10, 4)
+                .addRow("Carol",   20, 5)
+                .addRow("Carol",   10, 6)
+                ;
+
+        DfIndex index = new DfIndex(dataFrame, Lists.immutable.of("Name", "Quux"));
+
+        Assert.assertEquals(IntLists.immutable.of(0, 3), index.getRowIndicesAtKey(Lists.immutable.of("Alice", 10)));
+        Assert.assertEquals(IntLists.immutable.of(), index.getRowIndicesAtKey(Lists.immutable.of("Alice", 11)));
+        Assert.assertEquals(IntLists.immutable.of(), index.getRowIndicesAtKey(Lists.immutable.of("Alice")));
+
+        Assert.assertEquals(IntLists.immutable.of(1, 4), index.getRowIndicesAtKey(Lists.immutable.of("Carol", 20)));
+        Assert.assertEquals(IntLists.immutable.of(5), index.getRowIndicesAtKey(Lists.immutable.of("Carol", 10)));
+
+        Assert.assertEquals(IntLists.immutable.of(2), index.getRowIndicesAtKey(Lists.immutable.of("Abigail", 10)));
     }
 
     @Test

@@ -179,14 +179,14 @@ implements ExpressionVisitor
 
     private ValueType arithmeticTypeCompatibleWith(ValueType type1, ValueType type2)
     {
-        if (type1.equals(type2))
-        {
-            return type1;
-        }
-
         if (type1.isNumber() && type2.isNumber())
         {
             return (type1.isDouble() || type2.isDouble()) ? ValueType.DOUBLE : ValueType.LONG;
+        }
+
+        if (type1.equals(type2))
+        {
+            return type1;
         }
 
         return ValueType.VOID;

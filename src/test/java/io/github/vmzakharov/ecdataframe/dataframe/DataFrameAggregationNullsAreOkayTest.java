@@ -201,6 +201,20 @@ public class DataFrameAggregationNullsAreOkayTest
         }
 
         @Override
+        public Object applyToIntColumn(DfIntColumn intColumn)
+        {
+            int count = 0;
+            for (int rowIndex = 0; rowIndex < intColumn.getSize(); rowIndex++)
+            {
+                if (intColumn.isNull(rowIndex))
+                {
+                    count++;
+                }
+            }
+            return count;
+        }
+
+        @Override
         public String getDescription()
         {
             return "Count of null values";
@@ -272,6 +286,23 @@ public class DataFrameAggregationNullsAreOkayTest
                 {
                     allNulls = false;
                     sum += longColumn.getLong(rowIndex);
+                }
+            }
+
+            return allNulls ? null : sum;
+        }
+
+        @Override
+        public Object applyToIntColumn(DfIntColumn intColumn)
+        {
+            boolean allNulls = true;
+            long sum = 0;
+            for (int rowIndex = 0; rowIndex < intColumn.getSize(); rowIndex++)
+            {
+                if (!intColumn.isNull(rowIndex))
+                {
+                    allNulls = false;
+                    sum += intColumn.getInt(rowIndex);
                 }
             }
 

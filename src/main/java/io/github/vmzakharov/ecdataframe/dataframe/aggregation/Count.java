@@ -3,6 +3,7 @@ package io.github.vmzakharov.ecdataframe.dataframe.aggregation;
 import io.github.vmzakharov.ecdataframe.dataframe.AggregateFunction;
 import io.github.vmzakharov.ecdataframe.dataframe.DfColumn;
 import io.github.vmzakharov.ecdataframe.dataframe.DfDoubleColumn;
+import io.github.vmzakharov.ecdataframe.dataframe.DfIntColumn;
 import io.github.vmzakharov.ecdataframe.dataframe.DfLongColumn;
 import io.github.vmzakharov.ecdataframe.dataframe.DfObjectColumn;
 import io.github.vmzakharov.ecdataframe.dsl.value.ValueType;
@@ -68,6 +69,12 @@ extends AggregateFunction
     }
 
     @Override
+    public Object applyToIntColumn(DfIntColumn intColumn)
+    {
+        return intColumn.getSize();
+    }
+
+    @Override
     public Object applyToObjectColumn(DfObjectColumn<?> objectColumn)
     {
         return objectColumn.getSize();
@@ -113,6 +120,12 @@ extends AggregateFunction
     public long defaultLongIfEmpty()
     {
         return 0L;
+    }
+
+    @Override
+    public int defaultIntIfEmpty()
+    {
+        return 0;
     }
 
     @Override

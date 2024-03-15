@@ -6,13 +6,13 @@ import io.github.vmzakharov.ecdataframe.dsl.UnaryOp;
 
 import java.math.BigDecimal;
 
-public class LongValue
+public class IntValue
 extends AbstractValue
 implements NumberValue
 {
-    private final long value;
+    private final int value;
 
-    public LongValue(long newValue)
+    public IntValue(int newValue)
     {
         this.value = newValue;
     }
@@ -20,10 +20,10 @@ implements NumberValue
     @Override
     public String asStringLiteral()
     {
-        return Long.toString(this.value);
+        return Integer.toString(this.value);
     }
 
-    public long longValue()
+    public int intValue()
     {
         return this.value;
     }
@@ -49,16 +49,16 @@ implements NumberValue
 
         if (another.isLong())
         {
-            return operation.applyLong(this.longValue(), ((LongValue) another).longValue());
+            return operation.applyLong(this.intValue(), ((LongValue) another).longValue());
         }
 
-        return operation.applyLong(this.longValue(), ((IntValue) another).intValue());
+        return operation.applyLong(this.intValue(), ((IntValue) another).intValue());
     }
 
     @Override
     public Value apply(UnaryOp operation)
     {
-        return operation.applyLong(this.value);
+        return operation.applyInt(this.value);
     }
 
     @Override
@@ -68,19 +68,24 @@ implements NumberValue
         {
             return operation.applyDouble(this.doubleValue(), ((DoubleValue) another).doubleValue());
         }
-        return operation.applyLong(this.longValue(), ((LongValue) another).longValue());
+
+        if (another.isLong())
+        {
+            return operation.applyLong(this.intValue(), ((LongValue) another).longValue());
+        }
+        return operation.applyLong(this.intValue(), ((IntValue) another).intValue());
     }
 
     @Override
     public ValueType getType()
     {
-        return ValueType.LONG;
+        return ValueType.INT;
     }
 
     @Override
     public int compareTo(Value other)
     {
         this.checkSameTypeForComparison(other);
-        return other.isVoid() ? 1 : Long.compare(this.longValue(), ((LongValue) other).longValue());
+        return other.isVoid() ? 1 : Integer.compare(this.intValue(), ((IntValue) other).intValue());
     }
 }

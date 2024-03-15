@@ -41,6 +41,31 @@ public class DataFrameWriteTest
     }
 
     @Test
+    public void writeNoSchemaIntEmployeeId()
+    {
+        DataFrame dataFrame = new DataFrame("source")
+                .addStringColumn("Name").addIntColumn("EmployeeId").addDateColumn("HireDate").addStringColumn("Dept").addDoubleColumn("Salary")
+                .addRow("Alice", 1234, LocalDate.of(2020, 1, 1), "Accounting", 110000.0)
+                .addRow("Bob", 1233, LocalDate.of(2010, 1, 1), "Bee-bee-boo-boo", 100000.0)
+                .addRow("Carl", 10000, LocalDate.of(2005, 11, 21), "Controllers", 130000.0)
+                .addRow("Diane", 10001, LocalDate.of(2012, 9, 20), "", null)
+                .addRow("Ed", 10002, null, null, 0.0)
+                ;
+
+        StringBasedCsvDataSet dataSet = new StringBasedCsvDataSet("Foo", "Employees", "");
+        dataSet.write(dataFrame);
+
+        String expected = "Name,EmployeeId,HireDate,Dept,Salary\n"
+                + "\"Alice\",1234,2020-1-1,\"Accounting\",110000.0\n"
+                + "\"Bob\",1233,2010-1-1,\"Bee-bee-boo-boo\",100000.0\n"
+                + "\"Carl\",10000,2005-11-21,\"Controllers\",130000.0\n"
+                + "\"Diane\",10001,2012-9-20,\"\",\n"
+                + "\"Ed\",10002,,,0.0\n";
+
+        Assert.assertEquals(expected, dataSet.getWrittenData());
+    }
+
+    @Test
     public void writeWithSchema()
     {
         CsvSchema schema = new CsvSchema();

@@ -14,6 +14,7 @@ import io.github.vmzakharov.ecdataframe.dsl.visitor.InMemoryEvaluationVisitor;
 import io.github.vmzakharov.ecdataframe.dsl.visitor.TypeInferenceVisitor;
 import io.github.vmzakharov.ecdataframe.util.ExpressionParserHelper;
 import org.eclipse.collections.api.DoubleIterable;
+import org.eclipse.collections.api.IntIterable;
 import org.eclipse.collections.api.LongIterable;
 import org.eclipse.collections.api.RichIterable;
 import org.eclipse.collections.api.block.function.primitive.IntIntToIntFunction;
@@ -116,6 +117,22 @@ public class DataFrame
     public DataFrame addLongColumn(String newColumnName, LongIterable values)
     {
         this.attachColumn(new DfLongColumnStored(this, newColumnName, values));
+        return this;
+    }
+
+    public DataFrame addIntColumn(String newColumnName)
+    {
+        return this.addColumn(newColumnName, ValueType.INT);
+    }
+
+    public DataFrame addIntColumn(String newColumnName, String expressionAsString)
+    {
+        return this.addColumn(newColumnName, ValueType.INT, expressionAsString);
+    }
+
+    public DataFrame addIntColumn(String newColumnName, IntIterable values)
+    {
+        this.attachColumn(new DfIntColumnStored(this, newColumnName, values));
         return this;
     }
 
@@ -420,6 +437,8 @@ public class DataFrame
                 return new DfDateTimeColumnStored(this, columnName);
             case DECIMAL:
                 return new DfDecimalColumnStored(this, columnName);
+            case INT:
+                return new DfIntColumnStored(this, columnName);
             default:
                 throw exceptionByKey("DF_ADD_COL_UNKNOWN_TYPE")
                         .with("columnName", columnName)
@@ -473,6 +492,8 @@ public class DataFrame
                 return new DfDateTimeColumnComputed(this, columnName, expressionAsString);
             case DECIMAL:
                 return new DfDecimalColumnComputed(this, columnName, expressionAsString);
+            case INT:
+                return new DfIntColumnComputed(this, columnName, expressionAsString);
             default:
                 throw exceptionByKey("DF_ADD_COL_UNKNOWN_TYPE").with("columnName", columnName)
                                                                .with("type", type)
@@ -549,6 +570,11 @@ public class DataFrame
         return this.getLongColumn(columnName).getLong(this.rowIndexMap(rowIndex));
     }
 
+    public long getInt(String columnName, int rowIndex)
+    {
+        return this.getIntColumn(columnName).getInt(this.rowIndexMap(rowIndex));
+    }
+
     public String getString(String columnName, int rowIndex)
     {
         return this.getStringColumn(columnName).getTypedObject(this.rowIndexMap(rowIndex));
@@ -577,6 +603,11 @@ public class DataFrame
     public DfLongColumn getLongColumn(String columnName)
     {
         return (DfLongColumn) this.getColumnNamed(columnName);
+    }
+
+    public DfIntColumn getIntColumn(String columnName)
+    {
+        return (DfIntColumn) this.getColumnNamed(columnName);
     }
 
     public DfDoubleColumn getDoubleColumn(String columnName)

@@ -55,6 +55,29 @@ public class DataFrameComputedWithInferredTypeTest
     }
 
     @Test
+    public void computedInt()
+    {
+        DataFrame df = new DataFrame("Frame")
+                .addStringColumn("Foo").addStringColumn("Bar").addIntColumn("Baz")
+                .addRow("Alice", "10",  12)
+                .addRow("Bob",   "10",  14)
+                .addRow("Carl",   null, 16)
+                .addRow("Doris", "10",  18)
+                ;
+
+        df.addColumn("Waldo", "toLong(Bar) + Baz");
+
+        DataFrameUtil.assertEquals(new DataFrame("Frame")
+                        .addStringColumn("Foo").addStringColumn("Bar").addIntColumn("Baz").addLongColumn("Waldo")
+                        .addRow("Alice", "10",  12, 22)
+                        .addRow("Bob",   "10",  14, 24)
+                        .addRow("Carl",   null, 16, null)
+                        .addRow("Doris", "10",  18, 28)
+                ,
+                df);
+    }
+
+    @Test
     public void computedDouble()
     {
         DataFrame df = new DataFrame("Frame")

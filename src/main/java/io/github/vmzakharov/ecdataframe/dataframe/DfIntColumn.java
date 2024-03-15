@@ -2,43 +2,43 @@ package io.github.vmzakharov.ecdataframe.dataframe;
 
 import io.github.vmzakharov.ecdataframe.dataframe.compare.LongComparisonResult;
 import io.github.vmzakharov.ecdataframe.dsl.value.ValueType;
-import org.eclipse.collections.api.list.primitive.ImmutableLongList;
-import org.eclipse.collections.impl.factory.primitive.LongLists;
+import org.eclipse.collections.api.list.primitive.ImmutableIntList;
+import org.eclipse.collections.impl.factory.primitive.IntLists;
 import org.eclipse.collections.impl.list.primitive.IntInterval;
 
-abstract public class DfLongColumn
+abstract public class DfIntColumn
 extends DfColumnAbstract
 {
-    public DfLongColumn(DataFrame newDataFrame, String newName)
+    public DfIntColumn(DataFrame newDataFrame, String newName)
     {
         super(newDataFrame, newName);
     }
 
-    abstract public long getLong(int rowIndex);
+    abstract public int getInt(int rowIndex);
 
     @Override
     public String getValueAsString(int rowIndex)
     {
-        return Long.toString(this.getLong(rowIndex));
+        return Integer.toString(this.getInt(rowIndex));
     }
 
-    public ImmutableLongList toLongList()
+    public ImmutableIntList toIntList()
     {
         int rowCount = this.getDataFrame().rowCount();
         if (rowCount == 0)
         {
-            return LongLists.immutable.empty();
+            return IntLists.immutable.empty();
         }
 
         return IntInterval
                 .zeroTo(rowCount - 1)
-                .collectLong(this::getLong, LongLists.mutable.withInitialCapacity(rowCount))
+                .collectInt(this::getInt, IntLists.mutable.withInitialCapacity(rowCount))
                 .toImmutable();
     }
 
     public ValueType getType()
     {
-        return ValueType.LONG;
+        return ValueType.INT;
     }
 
     @Override
@@ -50,42 +50,42 @@ extends DfColumnAbstract
         }
         else
         {
-            ((DfLongColumnStored) target).addLong(this.getLong(rowIndex), false);
+            ((DfIntColumnStored) target).addInt(this.getInt(rowIndex), false);
         }
     }
 
     @Override
     public DfColumn mergeWithInto(DfColumn other, DataFrame target)
     {
-        DfLongColumn mergedCol = (DfLongColumn) this.validateAndCreateTargetColumn(other, target);
+        DfIntColumn mergedCol = (DfIntColumn) this.validateAndCreateTargetColumn(other, target);
 
         mergedCol.addAllItemsFrom(this);
-        mergedCol.addAllItemsFrom((DfLongColumn) other);
+        mergedCol.addAllItemsFrom((DfIntColumn) other);
 
         return mergedCol;
     }
 
     public DfColumn copyTo(DataFrame target)
     {
-        DfLongColumn targetCol = (DfLongColumn)  this.copyColumnSchemaAndEnsureCapacity(target);
+        DfIntColumn targetCol = (DfIntColumn)  this.copyColumnSchemaAndEnsureCapacity(target);
 
         targetCol.addAllItemsFrom(this);
         return targetCol;
     }
 
-    protected abstract void addAllItemsFrom(DfLongColumn items);
+    protected abstract void addAllItemsFrom(DfIntColumn items);
 
     @Override
     public Object aggregate(AggregateFunction aggregateFunction)
     {
         if (this.getSize() == 0)
         {
-            return aggregateFunction.defaultLongIfEmpty();
+            return aggregateFunction.defaultIntIfEmpty();
         }
 
         try
         {
-            return aggregateFunction.applyToLongColumn(this);
+            return aggregateFunction.applyToIntColumn(this);
         }
         catch (NullPointerException npe)
         {
@@ -96,17 +96,17 @@ extends DfColumnAbstract
     @Override
     public DfCellComparator columnComparator(DfColumn otherColumn)
     {
-        DfLongColumn otherLongColumn = (DfLongColumn) otherColumn;
+        DfIntColumn otherIntColumn = (DfIntColumn) otherColumn;
 
         return (thisRowIndex, otherRowIndex) -> {
             int thisMappedIndex = this.dataFrameRowIndex(thisRowIndex);
-            int otherMappedIndex = otherLongColumn.dataFrameRowIndex(otherRowIndex);
+            int otherMappedIndex = otherIntColumn.dataFrameRowIndex(otherRowIndex);
 
             return new LongComparisonResult(
-                () -> this.getLong(thisMappedIndex),
-                () -> otherLongColumn.getLong(otherMappedIndex),
+                () -> this.getInt(thisMappedIndex),
+                () -> otherIntColumn.getInt(otherMappedIndex),
                 this.isNull(thisMappedIndex),
-                otherLongColumn.isNull(otherMappedIndex)
+                otherIntColumn.isNull(otherMappedIndex)
             );
         };
     }
