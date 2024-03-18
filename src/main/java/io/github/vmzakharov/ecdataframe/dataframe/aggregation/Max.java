@@ -12,14 +12,12 @@ import org.eclipse.collections.impl.factory.Lists;
 
 import java.math.BigDecimal;
 
-import static io.github.vmzakharov.ecdataframe.dsl.value.ValueType.DECIMAL;
-import static io.github.vmzakharov.ecdataframe.dsl.value.ValueType.DOUBLE;
-import static io.github.vmzakharov.ecdataframe.dsl.value.ValueType.LONG;
+import static io.github.vmzakharov.ecdataframe.dsl.value.ValueType.*;
 
 public class Max
 extends AggregateFunction
 {
-    private static final ListIterable<ValueType> SUPPORTED_TYPES = Lists.immutable.of(LONG, DOUBLE, DECIMAL);
+    private static final ListIterable<ValueType> SUPPORTED_TYPES = Lists.immutable.of(INT, LONG, DOUBLE, DECIMAL);
 
     public Max(String newColumnName)
     {

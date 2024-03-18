@@ -46,7 +46,7 @@ extends AggregateFunction
     @Override
     public String getDescription()
     {
-        return "Average, or mean of numeric values";
+        return "Average, or mean of numeric values, the result retains the original value type";
     }
 
     @Override

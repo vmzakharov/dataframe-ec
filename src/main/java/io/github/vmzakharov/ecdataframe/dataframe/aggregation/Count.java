@@ -10,17 +10,12 @@ import io.github.vmzakharov.ecdataframe.dsl.value.ValueType;
 import org.eclipse.collections.api.list.ListIterable;
 import org.eclipse.collections.impl.factory.Lists;
 
-import static io.github.vmzakharov.ecdataframe.dsl.value.ValueType.DATE;
-import static io.github.vmzakharov.ecdataframe.dsl.value.ValueType.DATE_TIME;
-import static io.github.vmzakharov.ecdataframe.dsl.value.ValueType.DECIMAL;
-import static io.github.vmzakharov.ecdataframe.dsl.value.ValueType.DOUBLE;
-import static io.github.vmzakharov.ecdataframe.dsl.value.ValueType.LONG;
-import static io.github.vmzakharov.ecdataframe.dsl.value.ValueType.STRING;
+import static io.github.vmzakharov.ecdataframe.dsl.value.ValueType.*;
 
 public class Count
 extends AggregateFunction
 {
-    private static final ListIterable<ValueType> SUPPORTED_TYPES = Lists.immutable.of(LONG, DOUBLE, STRING, DATE, DATE_TIME, DECIMAL);
+    private static final ListIterable<ValueType> SUPPORTED_TYPES = Lists.immutable.of(INT, LONG, DOUBLE, STRING, DATE, DATE_TIME, DECIMAL);
 
     public Count(String newColumnName)
     {
@@ -87,31 +82,13 @@ extends AggregateFunction
     }
 
     @Override
-    public double getDoubleValue(DfColumn sourceColumn, int sourceRowIndex)
-    {
-        return 0.0;
-    }
-
-    @Override
     protected long longAccumulator(long currentAggregate, long newValue)
     {
         return currentAggregate + 1;
     }
 
     @Override
-    protected double doubleAccumulator(double currentAggregate, double newValue)
-    {
-        return currentAggregate + 1;
-    }
-
-    @Override
     public long longInitialValue()
-    {
-        return 0;
-    }
-
-    @Override
-    public double doubleInitialValue()
     {
         return 0;
     }
@@ -132,5 +109,11 @@ extends AggregateFunction
     public double defaultDoubleIfEmpty()
     {
         return 0.0;
+    }
+
+    @Override
+    public Object defaultObjectIfEmpty()
+    {
+        return 0;
     }
 }

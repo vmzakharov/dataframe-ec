@@ -124,8 +124,7 @@ implements DfColumnStored
     @Override
     public void aggregateValueInto(int rowIndex, DfColumn sourceColumn, int sourceRowIndex, AggregateFunction aggregator)
     {
-        throw new RuntimeException("Integer column cannot be an aggregation target");
-//        aggregator.aggregateValueIntoInt(this, rowIndex, sourceColumn,  sourceRowIndex);
+        aggregator.aggregateValueIntoInt(this, rowIndex, sourceColumn,  sourceRowIndex);
     }
 
     private void clearNull(int rowIndex)

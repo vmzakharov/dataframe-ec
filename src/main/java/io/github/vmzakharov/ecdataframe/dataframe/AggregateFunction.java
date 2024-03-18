@@ -156,6 +156,14 @@ public abstract class AggregateFunction
                 .getUnsupported();
     }
 
+    public int intInitialValue()
+    {
+        throw exceptionByKey("AGG_NO_INITIAL_VALUE")
+                .with("operation", this.getName())
+                .with("type", "int")
+                .getUnsupported();
+    }
+
     public long longInitialValue()
     {
         throw exceptionByKey("AGG_NO_INITIAL_VALUE")
@@ -188,7 +196,7 @@ public abstract class AggregateFunction
                 .getUnsupported();
     }
 
-    protected long intAccumulator(long currentAggregate, int newValue)
+    protected int intAccumulator(int currentAggregate, int newValue)
     {
         throw exceptionByKey("AGG_NO_ACCUMULATOR")
                 .with("operation", this.getName())
@@ -231,6 +239,7 @@ public abstract class AggregateFunction
         return this.getName();
     }
 
+    // TODO - refactor default*IfEmpty to have a single method
     public Object defaultObjectIfEmpty()
     {
         throw this.notApplicable("empty lists");
@@ -287,7 +296,7 @@ public abstract class AggregateFunction
         }
         else if (accumulatorColumn.getType().isInt())
         {
-            throw new UnsupportedOperationException("Int values not supported in AggregateFunction");
+            ((DfIntColumnStored) accumulatorColumn).setInt(accumulatorRowIndex, this.intInitialValue());
         }
         else
         {
@@ -306,11 +315,11 @@ public abstract class AggregateFunction
     }
 
     public void aggregateValueIntoInt(
-            DfLongColumnStored targetColumn, int targetRowIndex,
+            DfIntColumnStored targetColumn, int targetRowIndex,
             DfColumn sourceColumn, int sourceRowIndex)
     {
-        long currentAggregatedValue = targetColumn.getLong(targetRowIndex);
-        targetColumn.setLong(
+        int currentAggregatedValue = targetColumn.getInt(targetRowIndex);
+        targetColumn.setInt(
                 targetRowIndex,
                 this.intAccumulator(currentAggregatedValue, this.getIntValue(sourceColumn, sourceRowIndex)));
     }
