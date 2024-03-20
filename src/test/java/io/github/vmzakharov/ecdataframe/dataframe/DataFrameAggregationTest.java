@@ -228,7 +228,7 @@ public class DataFrameAggregationTest
     @Test
     public void builtInAggregationSupportedTypes()
     {
-        Assert.assertEquals(Lists.immutable.of(LONG, DOUBLE, DECIMAL), avg("NA").supportedSourceTypes());
+        Assert.assertEquals(Lists.immutable.of(INT, LONG, DOUBLE, DECIMAL), avg("NA").supportedSourceTypes());
         Assert.assertEquals(Lists.immutable.of(INT, LONG, DOUBLE, STRING, DATE, DATE_TIME, DECIMAL), count("NA").supportedSourceTypes());
         Assert.assertEquals(Lists.immutable.of(INT, LONG, DOUBLE, DECIMAL), max("NA").supportedSourceTypes());
         Assert.assertEquals(Lists.immutable.of(INT, LONG, DOUBLE, DECIMAL), min("NA").supportedSourceTypes());

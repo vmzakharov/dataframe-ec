@@ -60,6 +60,12 @@ extends AggregateFunction
     }
 
     @Override
+    public int intInitialValue()
+    {
+        return Integer.MIN_VALUE;
+    }
+
+    @Override
     public long longInitialValue()
     {
         return Long.MIN_VALUE;
@@ -93,6 +99,12 @@ extends AggregateFunction
 
     @Override
     protected double doubleAccumulator(double currentAggregate, double newValue)
+    {
+        return Math.max(currentAggregate, newValue);
+    }
+
+    @Override
+    protected int intAccumulator(int currentAggregate, int newValue)
     {
         return Math.max(currentAggregate, newValue);
     }

@@ -8,6 +8,7 @@ import io.github.vmzakharov.ecdataframe.dataframe.DfDecimalColumnStored;
 import io.github.vmzakharov.ecdataframe.dataframe.DfDoubleColumn;
 import io.github.vmzakharov.ecdataframe.dataframe.DfDoubleColumnStored;
 import io.github.vmzakharov.ecdataframe.dataframe.DfIntColumn;
+import io.github.vmzakharov.ecdataframe.dataframe.DfIntColumnStored;
 import io.github.vmzakharov.ecdataframe.dataframe.DfLongColumn;
 import io.github.vmzakharov.ecdataframe.dataframe.DfLongColumnStored;
 import io.github.vmzakharov.ecdataframe.dataframe.DfObjectColumn;
@@ -22,10 +23,11 @@ import java.math.RoundingMode;
 
 import static io.github.vmzakharov.ecdataframe.dsl.value.ValueType.*;
 
+// TODO - avoid overflows
 public class Avg
 extends AggregateFunction
 {
-    private static final ListIterable<ValueType> SUPPORTED_TYPES = Lists.immutable.of(LONG, DOUBLE, DECIMAL);
+    private static final ListIterable<ValueType> SUPPORTED_TYPES = Lists.immutable.of(INT, LONG, DOUBLE, DECIMAL);
 
     public Avg(String newColumnName)
     {
@@ -79,6 +81,12 @@ extends AggregateFunction
     }
 
     @Override
+    protected int intAccumulator(int currentAggregate, int newValue)
+    {
+        return currentAggregate + newValue;
+    }
+
+    @Override
     protected long longAccumulator(long currentAggregate, long newValue)
     {
         return currentAggregate + newValue;
@@ -94,6 +102,12 @@ extends AggregateFunction
     protected Object objectAccumulator(Object currentAggregate, Object newValue)
     {
         return ((BigDecimal) currentAggregate).add((BigDecimal) newValue);
+    }
+
+    @Override
+    public int intInitialValue()
+    {
+        return 0;
     }
 
     @Override
@@ -133,6 +147,23 @@ extends AggregateFunction
                     if (this.zeroContributorCheck(countsByRow[rowIndex], aggregateValue != 0, rowIndex))
                     {
                         longColumn.setLong(rowIndex, aggregateValue / countsByRow[rowIndex]);
+                    }
+                }
+            }
+        }
+        else if (aggregatedColumn.getType().isInt())
+        {
+            DfIntColumnStored longColumn = (DfIntColumnStored) aggregatedColumn;
+
+            for (int rowIndex = 0; rowIndex < columnSize; rowIndex++)
+            {
+                if (!longColumn.isNull(rowIndex))
+                {
+                    int aggregateValue = longColumn.getInt(rowIndex);
+
+                    if (this.zeroContributorCheck(countsByRow[rowIndex], aggregateValue != 0, rowIndex))
+                    {
+                        longColumn.setInt(rowIndex, aggregateValue / countsByRow[rowIndex]);
                     }
                 }
             }

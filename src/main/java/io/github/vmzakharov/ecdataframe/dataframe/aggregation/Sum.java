@@ -1,6 +1,7 @@
 package io.github.vmzakharov.ecdataframe.dataframe.aggregation;
 
 import io.github.vmzakharov.ecdataframe.dataframe.AggregateFunction;
+import io.github.vmzakharov.ecdataframe.dataframe.DfColumn;
 import io.github.vmzakharov.ecdataframe.dataframe.DfDecimalColumn;
 import io.github.vmzakharov.ecdataframe.dataframe.DfDoubleColumn;
 import io.github.vmzakharov.ecdataframe.dataframe.DfIntColumn;
@@ -89,6 +90,14 @@ extends AggregateFunction
     public BigDecimal objectInitialValue()
     {
         return BigDecimal.ZERO;
+    }
+
+    @Override
+    public long getLongValue(DfColumn sourceColumn, int sourceRowIndex)
+    {
+        return sourceColumn.getType().isLong()
+                ? ((DfLongColumn) sourceColumn).getLong(sourceRowIndex)
+                : ((DfIntColumn) sourceColumn).getInt(sourceRowIndex);
     }
 
     @Override
