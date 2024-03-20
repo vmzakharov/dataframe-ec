@@ -19,24 +19,6 @@ extends DfColumn
         return this.getTypedObject(rowIndex);
     }
 
-    @Override
-    default Object aggregate(AggregateFunction aggregateFunction)
-    {
-        if (aggregateFunction.supportsSourceType(this.getType()))
-        {
-            if (this.getSize() == 0)
-            {
-                return aggregateFunction.defaultObjectIfEmpty();
-            }
-
-            return aggregateFunction.applyToObjectColumn(this);
-        }
-        else
-        {
-            throw aggregateFunction.notApplicable("values of type " + this.getType());
-        }
-    }
-
     default <IV> IV injectIntoBreakOnNulls(
             IV injectedValue,
             Function2<IV, T, IV> function

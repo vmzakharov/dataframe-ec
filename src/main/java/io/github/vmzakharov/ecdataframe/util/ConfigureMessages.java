@@ -17,7 +17,7 @@ final public class ConfigureMessages
             return;
         }
 
-        addMessage("AGG_NOT_APPLICABLE",              "Aggregation '${operation}' (${operationDescription}) cannot be performed on ${operationScope}");
+        addMessage("AGG_COL_TYPE_UNSUPPORTED",        "Aggregation '${operation}' (${operationDescription}) cannot be performed on column ${columnName} of type ${columnType}");
         addMessage("AGG_NO_INITIAL_VALUE",            "Aggregation '${operation}' does not have a ${type} initial value");
         addMessage("AGG_NO_ACCUMULATOR",              "Aggregation '${operation}' does not support a ${type} accumulator");
         addMessage("AGG_CANNOT_CLONE",                "Cannot create a clone of aggregation '${operation}'");
@@ -38,7 +38,7 @@ final public class ConfigureMessages
         addMessage("DF_CALC_COL_MODIFICATION",        "Cannot directly modify computed column '${columnName}'");
         addMessage("DF_CALC_COL_INFER_TYPE",          "Cannot add calculated column ${columnName} to data frame ${dataFrameName}: failed to infer the expression type of '${expression}'\n${errorList}");
         addMessage("DF_MERGE_COL_DIFF_TYPES",         "Attempting to merge columns of different types: ${firstColumnName} (${firstColumnType}) and ${secondColumnName} (${secondColumnType})");
-        addMessage("DF_COL_UNSUPPORTED_AGG",          "Aggregation ${aggregatorName} (${aggregationDescription}) cannot be performed on column ${columnName} of type ${columnType}");
+        addMessage("DF_COL_CONTAINS_NULL",            "Column '${columnName}' contains null value in row ${rowIndex}");
         addMessage("CSV_FILE_WRITE_FAIL",             "Failed to write data frame to '${fileName}'");
         addMessage("CSV_UNSUPPORTED_VAL_TO_STR",      "Do not know how to convert value of type ${valueType} to a string");
         addMessage("CSV_INFER_SCHEMA_FAIL",           "Failed to infer schema from  '${fileName}'");

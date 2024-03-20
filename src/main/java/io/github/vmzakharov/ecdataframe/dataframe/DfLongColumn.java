@@ -76,24 +76,6 @@ extends DfColumnAbstract
     protected abstract void addAllItemsFrom(DfLongColumn items);
 
     @Override
-    public Object aggregate(AggregateFunction aggregateFunction)
-    {
-        if (this.getSize() == 0)
-        {
-            return aggregateFunction.defaultLongIfEmpty();
-        }
-
-        try
-        {
-            return aggregateFunction.applyToLongColumn(this);
-        }
-        catch (NullPointerException npe)
-        {
-            return null;
-        }
-    }
-
-    @Override
     public DfCellComparator columnComparator(DfColumn otherColumn)
     {
         DfLongColumn otherLongColumn = (DfLongColumn) otherColumn;

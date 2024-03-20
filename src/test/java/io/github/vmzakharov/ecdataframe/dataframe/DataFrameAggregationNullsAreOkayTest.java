@@ -16,24 +16,25 @@ public class DataFrameAggregationNullsAreOkayTest
     {
           DataFrame dataFrame = new DataFrame("FrameOfData")
             .addStringColumn("Name").addStringColumn("Color").addLongColumn("Bar").addDoubleColumn("Baz")
-            .addDateColumn("Date")
-            .addRow("Alice",    "Blue",  123L, null, LocalDate.of(2021, 11, 21))
-            .addRow(null,     "Orange",  456L, 12.0, null)
-            .addRow("Bob",    "Violet",  457L, 16.0, LocalDate.of(2021, 11, 23))
-            .addRow("Carol",   "Green",  null, 17.0, null)
-            .addRow(null,     "Purple",  null, 17.0, LocalDate.of(2021, 12, 22));
+            .addIntColumn("Waldo").addDateColumn("Date")
+            .addRow("Alice",    "Blue",  123L, null, null, LocalDate.of(2021, 11, 21))
+            .addRow(null,     "Orange",  456L, 12.0,   10, null)
+            .addRow("Bob",    "Violet",  457L, 16.0, null, LocalDate.of(2021, 11, 23))
+            .addRow("Carol",   "Green",  null, 17.0,   11, null)
+            .addRow(null,     "Purple",  null, 17.0, null, LocalDate.of(2021, 12, 22));
 
         DataFrameUtil.assertEquals(
                 new DataFrame("aggregated")
                         .addLongColumn("Null Color Count").addLongColumn("Null Name Count")
-                        .addLongColumn("Bar").addLongColumn("Baz").addLongColumn("Date")
-                        .addRow(0, 2, 2, 1, 2),
+                        .addLongColumn("Bar").addLongColumn("Baz").addLongColumn("Waldo").addLongColumn("Date")
+                        .addRow(0, 2, 2, 1, 3, 2),
                 dataFrame.aggregate(
                         Lists.immutable.of(
                                 new CountNulls("Color", "Null Color Count"),
                                 new CountNulls("Name", "Null Name Count"),
                                 new CountNulls("Bar"),
                                 new CountNulls("Baz"),
+                                new CountNulls("Waldo"),
                                 new CountNulls("Date")
                         ))
         );
@@ -44,26 +45,27 @@ public class DataFrameAggregationNullsAreOkayTest
     {
         DataFrame dataFrame = new DataFrame("FrameOfData")
             .addStringColumn("Name").addStringColumn("Color").addLongColumn("Bar").addDoubleColumn("Baz")
-            .addDateColumn("Date")
-            .addRow("Alice",   "Blue",  123L, null, LocalDate.of(2021, 11, 21))
-            .addRow("Alice", "Orange",  456L, 12.0, null)
-            .addRow("Bob",   "Violet",  457L, 16.0, LocalDate.of(2021, 11, 23))
-            .addRow("Carol",  "Green",  null, 17.0, null)
-            .addRow("Carol", "Purple",  null, 17.0, LocalDate.of(2021, 12, 22));
+            .addIntColumn("Waldo").addDateColumn("Date")
+            .addRow("Alice",   "Blue",  123L, null, null, LocalDate.of(2021, 11, 21))
+            .addRow("Alice", "Orange",  456L, 12.0,   10, null)
+            .addRow("Bob",   "Violet",  457L, 16.0, null, LocalDate.of(2021, 11, 23))
+            .addRow("Carol",  "Green",  null, 17.0,   11, null)
+            .addRow("Carol", "Purple",  null, 17.0,   12, LocalDate.of(2021, 12, 22));
 
         DataFrameUtil.assertEquals(
                 new DataFrame("aggregated")
                         .addStringColumn("Name").addLongColumn("Null Color Count").addLongColumn("Null Name Count")
-                        .addLongColumn("Bar").addLongColumn("Baz").addLongColumn("Date")
-                        .addRow("Alice", 0, 0, 0, 1, 1)
-                        .addRow("Bob",   0, 0, 0, 0, 0)
-                        .addRow("Carol", 0, 0, 2, 0, 1),
+                        .addLongColumn("Bar").addLongColumn("Baz").addLongColumn("Waldo").addLongColumn("Date")
+                        .addRow("Alice", 0, 0, 0, 1, 1, 1)
+                        .addRow("Bob",   0, 0, 0, 0, 1, 0)
+                        .addRow("Carol", 0, 0, 2, 0, 0, 1),
                 dataFrame.aggregateBy(
                         Lists.immutable.of(
                                 new CountNulls("Color", "Null Color Count"),
                                 new CountNulls("Name", "Null Name Count"),
                                 new CountNulls("Bar"),
                                 new CountNulls("Baz"),
+                                new CountNulls("Waldo"),
                                 new CountNulls("Date")
                         ),
                         Lists.immutable.of("Name")));
@@ -74,23 +76,23 @@ public class DataFrameAggregationNullsAreOkayTest
     {
         DataFrame dataFrame = new DataFrame("FrameOfData")
                 .addStringColumn("Name").addLongColumn("Bar").addDoubleColumn("Baz")
-                .addLongColumn("Waldo").addDoubleColumn("Qux")
+                .addIntColumn("Waldo").addDoubleColumn("Qux")
                 .addRow("Alice", 123L, null, null, null)
-                .addRow("Alice", 456L, 12.0, null, null)
+                .addRow("Alice", 456L, 12.0,    1, null)
                 .addRow("Bob",   457L, null, null, null)
-                .addRow("Bob",   111L, null, null, null)
+                .addRow("Bob",   111L, null,    2, null)
                 .addRow("Carol", null, 17.0, null, null)
-                .addRow("Carol", null, 18.0, null, null);
+                .addRow("Carol", null, 18.0,    3, null);
 
         DataFrameUtil.assertEquals(
                 new DataFrame("aggregated")
                         .addLongColumn("Bar").addDoubleColumn("Baz")
-                        .addLongColumn("Waldo").addDoubleColumn("Qux")
-                        .addRow(1147L, 47.0, null, null),
+                        .addLongColumn("Total Waldos").addDoubleColumn("Qux")
+                        .addRow(1147L, 47.0, 6, null),
                 dataFrame.aggregate(Lists.immutable.of(
                         new SumIgnoreNulls("Bar"),
                         new SumIgnoreNulls("Baz"),
-                        new SumIgnoreNulls("Waldo"),
+                        new SumIgnoreNulls("Waldo", "Total Waldos"),
                         new SumIgnoreNulls("Qux")
                     ))
         );
@@ -100,24 +102,25 @@ public class DataFrameAggregationNullsAreOkayTest
     public void sumIgnoringNullsWithGrouping()
     {
         DataFrame dataFrame = new DataFrame("FrameOfData")
-                .addStringColumn("Name").addLongColumn("Bar").addDoubleColumn("Baz")
-                .addRow("Alice", 123L, null)
-                .addRow("Alice", 456L, 12.0)
-                .addRow("Bob",   457L, null)
-                .addRow("Bob",   111L, null)
-                .addRow("Carol", null, 17.0)
-                .addRow("Carol", null, 18.0);
+                .addStringColumn("Name").addLongColumn("Bar").addDoubleColumn("Baz").addIntColumn("Waldo")
+                .addRow("Alice", 123L, null,   10)
+                .addRow("Alice", 456L, 12.0, null)
+                .addRow("Bob",   457L, null, null)
+                .addRow("Bob",   111L, null, null)
+                .addRow("Carol", null, 17.0,   -5)
+                .addRow("Carol", null, 18.0,    6);
 
         DataFrameUtil.assertEquals(
-                new DataFrame("aggregated")
-                        .addStringColumn("Name").addLongColumn("Bar").addDoubleColumn("Baz")
-                        .addRow("Alice", 579L, 12.0)
-                        .addRow("Bob",   568L, null)
-                        .addRow("Carol", null, 35.0),
+                new DataFrame("expected")
+                        .addStringColumn("Name").addLongColumn("Bar").addDoubleColumn("Baz").addLongColumn("Waldo")
+                        .addRow("Alice", 579L, 12.0,   10)
+                        .addRow("Bob",   568L, null, null)
+                        .addRow("Carol", null, 35.0,    1),
                 dataFrame.aggregateBy(
                         Lists.immutable.of(
                                 new SumIgnoreNulls("Bar"),
-                                new SumIgnoreNulls("Baz")
+                                new SumIgnoreNulls("Baz"),
+                                new SumIgnoreNulls("Waldo")
                         ),
                         Lists.immutable.of("Name")));
     }
@@ -138,7 +141,7 @@ public class DataFrameAggregationNullsAreOkayTest
         @Override
         public ListIterable<ValueType> supportedSourceTypes()
         {
-            return Lists.immutable.of(LONG, DOUBLE, STRING, DATE, DATE_TIME);
+            return Lists.immutable.of(INT, LONG, DOUBLE, STRING, DATE, DATE_TIME);
         }
 
         @Override
@@ -255,7 +258,13 @@ public class DataFrameAggregationNullsAreOkayTest
         @Override
         public ListIterable<ValueType> supportedSourceTypes()
         {
-            return Lists.immutable.of(LONG, DOUBLE);
+            return Lists.immutable.of(INT, LONG, DOUBLE);
+        }
+
+        @Override
+        public ValueType targetColumnType(ValueType sourceColumnType)
+        {
+            return sourceColumnType.isInt() ? LONG : sourceColumnType;
         }
 
         @Override
@@ -323,7 +332,9 @@ public class DataFrameAggregationNullsAreOkayTest
                 return;
             }
 
-            long nextValue = this.getLongValue(sourceColumn, sourceRowIndex);
+            long nextValue = sourceColumn.getType().isInt()
+                    ? this.getIntValue(sourceColumn, sourceRowIndex)
+                    : this.getLongValue(sourceColumn, sourceRowIndex);
 
             if (!targetColumn.isNull(targetRowIndex)) // otherwise we have the first not-null value
             {
@@ -361,18 +372,6 @@ public class DataFrameAggregationNullsAreOkayTest
         protected double doubleAccumulator(double currentAggregate, double newValue)
         {
             return currentAggregate + newValue;
-        }
-
-        @Override
-        public long defaultLongIfEmpty()
-        {
-            return 0L;
-        }
-
-        @Override
-        public double defaultDoubleIfEmpty()
-        {
-            return 0.0;
         }
 
         @Override

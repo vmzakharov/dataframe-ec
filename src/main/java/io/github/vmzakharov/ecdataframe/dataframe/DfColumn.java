@@ -43,14 +43,30 @@ public interface DfColumn
 
     void addEmptyValue();
 
-    default Object aggregate(AggregateFunction aggregator)
+    default Object aggregate(AggregateFunction aggregateFunction)
     {
-        throw exceptionByKey("DF_COL_UNSUPPORTED_AGG")
-                .with("aggregationName", aggregator.getName())
-                .with("aggregationDescription", aggregator.getDescription())
-                .with("columnName", this.getName())
-                .with("columnType", this.getType())
-                .get();
+        if (aggregateFunction.supportsSourceType(this.getType()))
+        {
+            if (this.getSize() == 0)
+            {
+                return aggregateFunction.valueForEmptyColumn(this);
+            }
+
+            try
+            {
+                return aggregateFunction.applyToColumn(this);
+            }
+            catch (NullPointerException npe)
+            {
+                // npe can be thrown if there is a null value stored in a column of primitive type, this can happen when
+                // converting column values to a list.
+                return null;
+            }
+        }
+        else
+        {
+            throw aggregateFunction.notApplicable(this);
+        }
     }
 
     void applyAggregator(int targetRowIndex, DfColumn sourceColumn, int sourceRowIndex, AggregateFunction aggregateFunction);

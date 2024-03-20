@@ -16,7 +16,7 @@ import static io.github.vmzakharov.ecdataframe.util.ExceptionFactory.exceptionBy
 
 public abstract class AggregateFunction
 {
-    private final String columnName;
+    private final String sourceColumnName;
     private final String targetColumnName;
 
     public AggregateFunction(String newSourceColumnName)
@@ -26,7 +26,7 @@ public abstract class AggregateFunction
 
     public AggregateFunction(String newSourceColumnName, String newTargetColumnName)
     {
-        this.columnName = newSourceColumnName;
+        this.sourceColumnName = newSourceColumnName;
         this.targetColumnName = newTargetColumnName;
     }
 
@@ -105,9 +105,21 @@ public abstract class AggregateFunction
         }
     }
 
+    /**
+     * @deprecated use <code>getSourceColumnName()</code> instead
+     * @return the name of the aggregation source column, i.e. the column the values of which will be aggregated
+     */
     public String getColumnName()
     {
-        return this.columnName;
+        return this.sourceColumnName;
+    }
+
+    /**
+     * @return the name of the aggregation source column, i.e. the column the values of which will be aggregated
+     */
+    public String getSourceColumnName()
+    {
+        return this.sourceColumnName;
     }
 
     public String getTargetColumnName()
@@ -127,33 +139,49 @@ public abstract class AggregateFunction
         return this.supportedSourceTypes().contains(type);
     }
 
+    public Object applyToColumn(DfColumn column)
+    {
+        switch (column.getType())
+        {
+            case LONG:
+                return this.applyToLongColumn((DfLongColumn) column);
+            case DOUBLE:
+                return this.applyToDoubleColumn((DfDoubleColumn) column);
+            case INT:
+                return this.applyToIntColumn((DfIntColumn) column);
+            default:
+                return this.applyToObjectColumn((DfObjectColumn<?>) column);
+        }
+    }
+
     public Object applyToDoubleColumn(DfDoubleColumn doubleColumn)
     {
-        throw this.notApplicable("double values");
+        throw this.notApplicable(doubleColumn);
     }
 
     public Object applyToLongColumn(DfLongColumn longColumn)
     {
-        throw this.notApplicable("long values");
+        throw this.notApplicable(longColumn);
     }
 
-    public Object applyToIntColumn(DfIntColumn longColumn)
+    public Object applyToIntColumn(DfIntColumn intColumn)
     {
-        throw this.notApplicable("int values");
+        throw this.notApplicable(intColumn);
     }
 
     public Object applyToObjectColumn(DfObjectColumn<?> objectColumn)
     {
-        throw this.notApplicable("non-numeric values");
+        throw this.notApplicable(objectColumn);
     }
 
-    protected RuntimeException notApplicable(String scope)
+    protected RuntimeException notApplicable(DfColumn column)
     {
-        return exceptionByKey("AGG_NOT_APPLICABLE")
+        return exceptionByKey("AGG_COL_TYPE_UNSUPPORTED")
                 .with("operation", this.getName())
                 .with("operationDescription", this.getDescription())
-                .with("operationScope", scope)
-                .getUnsupported();
+                .with("columnName", column.getName())
+                .with("columnType", column.getType().toString().toLowerCase())
+                .get();
     }
 
     public int intInitialValue()
@@ -239,25 +267,9 @@ public abstract class AggregateFunction
         return this.getName();
     }
 
-    // TODO - refactor default*IfEmpty to have a single method
-    public Object defaultObjectIfEmpty()
+    public Object valueForEmptyColumn(DfColumn column)
     {
-        throw this.notApplicable("empty lists");
-    }
-
-    public long defaultLongIfEmpty()
-    {
-        throw this.notApplicable("empty lists");
-    }
-
-    public int defaultIntIfEmpty()
-    {
-        throw this.notApplicable("empty lists");
-    }
-
-    public double defaultDoubleIfEmpty()
-    {
-        throw this.notApplicable("empty lists");
+        throw this.notApplicable(column);
     }
 
     public long getLongValue(DfColumn sourceColumn, int sourceRowIndex)

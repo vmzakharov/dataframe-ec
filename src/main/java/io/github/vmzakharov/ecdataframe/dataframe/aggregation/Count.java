@@ -94,25 +94,7 @@ extends AggregateFunction
     }
 
     @Override
-    public long defaultLongIfEmpty()
-    {
-        return 0L;
-    }
-
-    @Override
-    public int defaultIntIfEmpty()
-    {
-        return 0;
-    }
-
-    @Override
-    public double defaultDoubleIfEmpty()
-    {
-        return 0.0;
-    }
-
-    @Override
-    public Object defaultObjectIfEmpty()
+    public Object valueForEmptyColumn(DfColumn column)
     {
         return 0;
     }

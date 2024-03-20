@@ -8,6 +8,8 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.time.LocalDate;
+
 public class DataFrameAggregationErrorMessageTest
 {
     private DataFrame dataFrame;
@@ -16,35 +18,47 @@ public class DataFrameAggregationErrorMessageTest
     public void initialiseDataFrame()
     {
         this.dataFrame = new DataFrame("FrameOfData")
-                .addStringColumn("Name").addStringColumn("Foo").addLongColumn("Bar").addDoubleColumn("Baz").addDoubleColumn("Qux")
-                .addRow("Alice", "Abc", 123L, 10.0, 100.0)
-                .addRow("Bob", "Def", 456L, 12.0, -25.0)
-                .addRow("Carol", "Xyz", -789L, 17.0, 42.0);
+                .addStringColumn("Name").addStringColumn("Foo").addLongColumn("Bar").addDoubleColumn("Baz")
+                .addIntColumn("Waldo").addDateColumn("Corge")
+                .addRow("Alice", "Abc",  123L, 10.0, 100, LocalDate.of(2023, 10, 21))
+                .addRow("Bob",   "Def",  456L, 12.0, -25, LocalDate.of(2024, 11, 22))
+                .addRow("Carol", "Xyz", -789L, 17.0,  42, LocalDate.of(2025, 12, 23));
     }
 
     @Test
     public void aggString()
     {
-        AggregateFunction aggregator = new BadAggregation("Name");
-        this.checkAggMessage(aggregator, "non-numeric values");
+        this.checkAggMessage("Name", "string");
     }
 
     @Test
     public void aggLong()
     {
-        AggregateFunction aggregator = new BadAggregation("Bar");
-        this.checkAggMessage(aggregator, "long values");
+        this.checkAggMessage("Bar", "long");
     }
 
     @Test
     public void aggDouble()
     {
-        AggregateFunction aggregator = new BadAggregation("Baz");
-        this.checkAggMessage(aggregator, "double values");
+        this.checkAggMessage("Baz", "double");
     }
 
-    public void checkAggMessage(AggregateFunction aggregator, String valueType)
+    @Test
+    public void aggInt()
     {
+        this.checkAggMessage("Waldo", "int");
+    }
+
+    @Test
+    public void aggDate()
+    {
+        this.checkAggMessage("Corge", "date");
+    }
+
+    public void checkAggMessage(String columnName, String columnType)
+    {
+        AggregateFunction aggregator = new BadAggregation(columnName);
+
         try
         {
             this.dataFrame.aggregate(Lists.immutable.of(aggregator));
@@ -52,10 +66,12 @@ public class DataFrameAggregationErrorMessageTest
         catch (Exception e)
         {
             Assert.assertEquals(
-                    FormatWithPlaceholders.messageFromKey("AGG_NOT_APPLICABLE")
+                    FormatWithPlaceholders.messageFromKey("AGG_COL_TYPE_UNSUPPORTED")
                             .with("operation", aggregator.getName())
                             .with("operationDescription", aggregator.getDescription())
-                            .with("operationScope", valueType).toString(),
+                            .with("columnName", columnName)
+                            .with("columnType", columnType)
+                            .toString(),
                     e.getMessage());
         }
     }

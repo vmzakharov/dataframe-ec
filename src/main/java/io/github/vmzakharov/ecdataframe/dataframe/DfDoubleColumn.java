@@ -76,24 +76,6 @@ extends DfColumnAbstract
     protected abstract void addAllItemsFrom(DfDoubleColumn doubleColumn);
 
     @Override
-    public Object aggregate(AggregateFunction aggregateFunction)
-    {
-        if (this.getSize() == 0)
-        {
-            return aggregateFunction.defaultDoubleIfEmpty();
-        }
-
-        try
-        {
-            return aggregateFunction.applyToDoubleColumn(this);
-        }
-        catch (NullPointerException npe)
-        {
-            return null;
-        }
-    }
-
-    @Override
     public DfCellComparator columnComparator(DfColumn otherColumn)
     {
         DfDoubleColumn otherDoubleColumn = (DfDoubleColumn) otherColumn;

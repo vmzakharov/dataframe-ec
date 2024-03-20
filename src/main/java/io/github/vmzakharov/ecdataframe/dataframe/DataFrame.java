@@ -813,13 +813,13 @@ public class DataFrame
             pivotColumnValue -> {
                 aggregators.forEach(
                     aggregator -> {
-                        DfColumn valueColum = this.getColumnNamed(aggregator.getColumnName());
+                        DfColumn valueColum = this.getColumnNamed(aggregator.getSourceColumnName());
                         ValueType targetType = aggregator.targetColumnType(valueColum.getType());
                         String targetColumnName = singleAggregator ? pivotColumnValue : pivotColumnValue + ":" + aggregator.getTargetColumnName();
 
                         pivoted.addColumn(targetColumnName, targetType);
 
-                        AggregateFunction aggregatorForPivotValue = aggregator.cloneWith(aggregator.getColumnName(), targetColumnName);
+                        AggregateFunction aggregatorForPivotValue = aggregator.cloneWith(aggregator.getSourceColumnName(), targetColumnName);
 
                         pivotColumnNames.add(targetColumnName);
                         aggregatorsForPivot.add(aggregatorForPivotValue);
@@ -855,7 +855,7 @@ public class DataFrame
             aggregatorsByPivotValue
                     .get(pivotValue)
                     .forEach(agg -> {
-                            DfColumn valueColumn = this.getColumnNamed(agg.getColumnName());
+                            DfColumn valueColumn = this.getColumnNamed(agg.getSourceColumnName());
                             inputRowCountPerAggregateRow.get(agg.getTargetColumnName())[accumulatorRowIndex]++;
                             pivoted.getColumnNamed(agg.getTargetColumnName())
                                    .applyAggregator(accumulatorRowIndex, valueColumn, finalRowIndex, agg);
@@ -875,7 +875,7 @@ public class DataFrame
      */
     public DataFrame aggregate(ListIterable<AggregateFunction> aggregators)
     {
-        ListIterable<DfColumn> columnsToAggregate = this.getColumnsToAggregate(aggregators.collect(AggregateFunction::getColumnName));
+        ListIterable<DfColumn> columnsToAggregate = this.getColumnsToAggregate(aggregators.collect(AggregateFunction::getSourceColumnName));
 
         DataFrame summedDataFrame = new DataFrame("Aggregate Of " + this.getName());
 
@@ -944,7 +944,7 @@ public class DataFrame
 
         int[] inputRowCountPerAggregateRow = new int[this.rowCount()]; // sizing for the worst case scenario: no aggregation
 
-        ListIterable<String> columnsToAggregateNames = aggregators.collect(AggregateFunction::getColumnName);
+        ListIterable<String> columnsToAggregateNames = aggregators.collect(AggregateFunction::getSourceColumnName);
         ListIterable<DfColumn> columnsToAggregate = this.getColumnsToAggregate(columnsToAggregateNames);
 
         DataFrame aggregatedDataFrame = new DataFrame("Aggregate Of " + this.getName());

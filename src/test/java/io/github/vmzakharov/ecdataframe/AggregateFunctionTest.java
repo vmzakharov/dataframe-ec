@@ -18,7 +18,7 @@ public class AggregateFunctionTest
         AggregateFunction sum = AggregateFunction.sum("Foo", "Bar");
         AggregateFunction cloned = sum.cloneWith("Baz", "Qux");
 
-        assertEquals("Baz", cloned.getColumnName());
+        assertEquals("Baz", cloned.getSourceColumnName());
         assertEquals("Qux", cloned.getTargetColumnName());
         assertEquals(sum.getClass(), cloned.getClass());
     }

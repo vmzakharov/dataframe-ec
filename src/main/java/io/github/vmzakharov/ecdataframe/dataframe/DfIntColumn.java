@@ -76,24 +76,6 @@ extends DfColumnAbstract
     protected abstract void addAllItemsFrom(DfIntColumn items);
 
     @Override
-    public Object aggregate(AggregateFunction aggregateFunction)
-    {
-        if (this.getSize() == 0)
-        {
-            return aggregateFunction.defaultIntIfEmpty();
-        }
-
-        try
-        {
-            return aggregateFunction.applyToIntColumn(this);
-        }
-        catch (NullPointerException npe)
-        {
-            return null;
-        }
-    }
-
-    @Override
     public DfCellComparator columnComparator(DfColumn otherColumn)
     {
         DfIntColumn otherIntColumn = (DfIntColumn) otherColumn;
