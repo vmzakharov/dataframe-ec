@@ -174,33 +174,35 @@ public class DataFrameLoadTest
     }
 
     @Test
-    public void loadDataWithSchema()
+    public void loadDataWithSchemaNullsConvertedToValues()
     {
-        CsvSchema schema = new CsvSchema();
-        schema.addColumn("Name", STRING);
-        schema.addColumn("EmployeeId", LONG);
-        schema.addColumn("HireDate", DATE, "uuuu-M-d");
-        schema.addColumn("Dept", STRING);
-        schema.addColumn("Salary", DOUBLE);
+        CsvSchema schema = new CsvSchema()
+                .addColumn("Name", STRING)
+                .addColumn("EmployeeId", LONG)
+                .addColumn("HireDate", DATE, "uuuu-M-d")
+                .addColumn("Dept", STRING)
+                .addColumn("Salary", DOUBLE)
+                .addColumn("PetCount", INT);
 
         CsvDataSet dataSet = new StringBasedCsvDataSet("Foo", "Employees", schema,
-                "Name,EmployeeId,HireDate,Dept,Salary\n"
-                        + "\"Alice\",1234,2020-01-01,\"Accounting\",110000.00\n"
-                        + "\"Bob\",1233,2010-01-01,\"Bee-bee-boo-boo\",100000.00\n"
-                        + "\"Carl\",10000,2005-11-21,\"Controllers\",130000.00\n"
-                        + "\"Diane\",10001,2012-09-20,\"\",130000.00\n"
-                        + "\"Ed\",10002,,,0.00"
+                "Name,EmployeeId,HireDate,Dept,Salary,PetCount\n"
+                        + "\"Alice\",1234,2020-01-01,\"Accounting\",110000.00,2\n"
+                        + "\"Bob\",1233,2010-01-01,\"Bee-bee-boo-boo\",100000.00,0\n"
+                        + "\"Carl\",10000,2005-11-21,\"Controllers\",130000.00,1\n"
+                        + "\"Diane\",10001,2012-09-20,\"\",130000.00,8\n"
+                        + "\"Ed\",10002,,,0.00,"
         );
 
         DataFrame loaded = dataSet.loadAsDataFrame();
 
         DataFrame expected = new DataFrame("Expected")
-                .addStringColumn("Name").addLongColumn("EmployeeId").addDateColumn("HireDate").addStringColumn("Dept").addDoubleColumn("Salary")
-                .addRow("Alice", 1234, LocalDate.of(2020, 1, 1), "Accounting", 110000.0)
-                .addRow("Bob", 1233, LocalDate.of(2010, 1, 1), "Bee-bee-boo-boo", 100000.0)
-                .addRow("Carl", 10000, LocalDate.of(2005, 11, 21), "Controllers", 130000.0)
-                .addRow("Diane", 10001, LocalDate.of(2012, 9, 20), "", 130000.0)
-                .addRow("Ed", 10002, null, "", 0.0);
+                .addStringColumn("Name").addLongColumn("EmployeeId").addDateColumn("HireDate").addStringColumn("Dept")
+                .addDoubleColumn("Salary").addIntColumn("PetCount")
+                .addRow("Alice", 1234, LocalDate.of(2020, 1, 1), "Accounting", 110000.0, 2)
+                .addRow("Bob", 1233, LocalDate.of(2010, 1, 1), "Bee-bee-boo-boo", 100000.0, 0)
+                .addRow("Carl", 10000, LocalDate.of(2005, 11, 21), "Controllers", 130000.0, 1)
+                .addRow("Diane", 10001, LocalDate.of(2012, 9, 20), "", 130000.0, 8)
+                .addRow("Ed", 10002, null, "", 0.0, 0);
 
         DataFrameUtil.assertEquals(expected, loaded);
     }
@@ -779,23 +781,24 @@ public class DataFrameLoadTest
     }
 
     @Test
-    public void loadNulls()
+    public void loadWithNulls()
     {
-        CsvSchema schema = new CsvSchema();
-        schema.addColumn("Name", STRING);
-        schema.addColumn("EmployeeId", LONG);
-        schema.addColumn("HireDate", DATE, "uuuu-M-d");
-        schema.addColumn("Dept", STRING);
-        schema.addColumn("Salary", DOUBLE);
-        schema.addColumn("Abc", STRING);
+        CsvSchema schema = new CsvSchema()
+            .addColumn("Name", STRING)
+            .addColumn("EmployeeId", LONG)
+            .addColumn("HireDate", DATE, "uuuu-M-d")
+            .addColumn("Dept", STRING)
+            .addColumn("Salary", DOUBLE)
+            .addColumn("Abc", STRING)
+            .addColumn("PetCount", INT);
 
         CsvDataSet dataSet = new StringBasedCsvDataSet("Foo", "Employees", schema,
-                "Name,EmployeeId,HireDate,Dept,Salary,Abc\n"
-                        + "\"Diane\",10001,2012-09-20,\"\",,\"ABC\"\n"
-                        + "\"Alice\",1234,2020-01-01,\"Accounting\",110000.00,\n"
-                        + "\"Bob\",1233,2010-01-01,\"Bee-bee-boo-boo\",100000.00,\"ABC\"\n"
-                        + "\"Carl\",,2005-11-21,\"Controllers\",130000.00,\"ABC\"\n"
-                        + "\"Ed\",10002,,,0.00,"
+                "Name,EmployeeId,HireDate,Dept,Salary,Abc,PetCount\n"
+                        + "\"Diane\",10001,2012-09-20,\"\",,\"ABC\",8\n"
+                        + "\"Alice\",1234,2020-01-01,\"Accounting\",110000.00,,0\n"
+                        + "\"Bob\",1233,2010-01-01,\"Bee-bee-boo-boo\",100000.00,\"ABC\",1\n"
+                        + "\"Carl\",,2005-11-21,\"Controllers\",130000.00,\"ABC\",\n"
+                        + "\"Ed\",10002,,,0.00,,2"
         );
 
         dataSet.convertEmptyElementsToNulls();
@@ -804,12 +807,12 @@ public class DataFrameLoadTest
 
         DataFrame expected = new DataFrame("Expected")
                 .addStringColumn("Name").addLongColumn("EmployeeId").addDateColumn("HireDate").addStringColumn("Dept")
-                .addDoubleColumn("Salary").addStringColumn("Abc")
-                .addRow("Diane", 10001, LocalDate.of(2012, 9, 20), "", null, "ABC")
-                .addRow("Alice", 1234, LocalDate.of(2020, 1, 1), "Accounting", 110000.0, null)
-                .addRow("Bob", 1233, LocalDate.of(2010, 1, 1), "Bee-bee-boo-boo", 100000.0, "ABC")
-                .addRow("Carl", null, LocalDate.of(2005, 11, 21), "Controllers", 130000.0, "ABC")
-                .addRow("Ed", 10002, null, null, 0.0, null);
+                .addDoubleColumn("Salary").addStringColumn("Abc").addIntColumn("PetCount")
+                .addRow("Diane", 10001, LocalDate.of(2012, 9, 20), "", null, "ABC", 8)
+                .addRow("Alice", 1234, LocalDate.of(2020, 1, 1), "Accounting", 110000.0, null, 0)
+                .addRow("Bob", 1233, LocalDate.of(2010, 1, 1), "Bee-bee-boo-boo", 100000.0, "ABC", 1)
+                .addRow("Carl", null, LocalDate.of(2005, 11, 21), "Controllers", 130000.0, "ABC", null)
+                .addRow("Ed", 10002, null, null, 0.0, null, 2);
 
         DataFrameUtil.assertEquals(expected, loaded);
     }
