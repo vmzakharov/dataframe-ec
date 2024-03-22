@@ -1,12 +1,20 @@
 package io.github.vmzakharov.ecdataframe.dsl;
 
+import io.github.vmzakharov.ecdataframe.dsl.value.DateTimeValue;
+import io.github.vmzakharov.ecdataframe.dsl.value.DateValue;
+import io.github.vmzakharov.ecdataframe.dsl.value.DecimalValue;
 import io.github.vmzakharov.ecdataframe.dsl.value.DoubleValue;
+import io.github.vmzakharov.ecdataframe.dsl.value.FloatValue;
 import io.github.vmzakharov.ecdataframe.dsl.value.IntValue;
 import io.github.vmzakharov.ecdataframe.dsl.value.LongValue;
 import io.github.vmzakharov.ecdataframe.dsl.value.StringValue;
 import io.github.vmzakharov.ecdataframe.dsl.value.Value;
 import org.junit.Assert;
 import org.junit.Test;
+
+import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 public class ValueCompareTest
 {
@@ -59,6 +67,22 @@ public class ValueCompareTest
     }
 
     @Test
+    public void floatValueCompare()
+    {
+        FloatValue iv1 = new FloatValue(1.0f);
+        FloatValue iv2 = new FloatValue(2.0f);
+        FloatValue iv1more = new FloatValue(1.0f);
+
+        Assert.assertEquals(0, iv1.compareTo(iv1more));
+        Assert.assertEquals(0, iv2.compareTo(iv2));
+        Assert.assertTrue(iv1.compareTo(iv2) < 0);
+        Assert.assertTrue(iv2.compareTo(iv1) > 0);
+
+        Assert.assertTrue(iv1.compareTo(Value.VOID) > 0);
+        Assert.assertTrue(Value.VOID.compareTo(iv1) < 0);
+    }
+
+    @Test
     public void stringValueCompare()
     {
         StringValue abc = new StringValue("abc");
@@ -74,10 +98,71 @@ public class ValueCompareTest
         Assert.assertTrue(Value.VOID.compareTo(abc) < 0);
     }
 
+    @Test
+    public void dateValueCompare()
+    {
+        DateValue abc = new DateValue(LocalDate.of(2024, 3, 22));
+        DateValue def = new DateValue(LocalDate.of(2025, 12, 23));
+        DateValue abcMore = new DateValue(LocalDate.of(2024, 3, 22));
+
+        Assert.assertEquals(0, abc.compareTo(abcMore));
+        Assert.assertEquals(0, def.compareTo(def));
+        Assert.assertTrue(abc.compareTo(def) < 0);
+        Assert.assertTrue(def.compareTo(abc) > 0);
+
+        Assert.assertTrue(abc.compareTo(Value.VOID) > 0);
+        Assert.assertTrue(Value.VOID.compareTo(abc) < 0);
+    }
+
+    @Test
+    public void dateTimeValueCompare()
+    {
+        DateTimeValue abc = new DateTimeValue(LocalDateTime.of(2024, 3, 22, 14, 25, 46));
+        DateTimeValue def = new DateTimeValue(LocalDateTime.of(2025, 12, 25, 23, 10, 12));
+        DateTimeValue abcMore = new DateTimeValue(LocalDateTime.of(2024, 3, 22, 14, 25, 46));
+
+        Assert.assertEquals(0, abc.compareTo(abcMore));
+        Assert.assertEquals(0, def.compareTo(def));
+        Assert.assertTrue(abc.compareTo(def) < 0);
+        Assert.assertTrue(def.compareTo(abc) > 0);
+
+        Assert.assertTrue(abc.compareTo(Value.VOID) > 0);
+        Assert.assertTrue(Value.VOID.compareTo(abc) < 0);
+    }
+
+    @Test
+    public void decimalValueCompare()
+    {
+        DecimalValue abc = new DecimalValue(BigDecimal.valueOf(1234, 2));
+        DecimalValue def = new DecimalValue(BigDecimal.valueOf(4567, 1));
+        DecimalValue abcMore = new DecimalValue(BigDecimal.valueOf(1234, 2));
+
+        Assert.assertEquals(0, abc.compareTo(abcMore));
+        Assert.assertEquals(0, def.compareTo(def));
+        Assert.assertTrue(abc.compareTo(def) < 0);
+        Assert.assertTrue(def.compareTo(abc) > 0);
+
+        Assert.assertTrue(abc.compareTo(Value.VOID) > 0);
+        Assert.assertTrue(Value.VOID.compareTo(abc) < 0);
+    }
+
+    @Test
+    public void compareVoids()
+    {
+        Assert.assertEquals(0, Value.VOID.compareTo(Value.VOID));
+    }
+
     @Test(expected = RuntimeException.class)
     public void compareToNull()
     {
         new StringValue("abc").compareTo(null);
+        Assert.fail("Shouldn't get here");
+    }
+
+    @Test(expected = RuntimeException.class)
+    public void compareDifferentTypes()
+    {
+        new StringValue("abc").compareTo(new LongValue(123));
         Assert.fail("Shouldn't get here");
     }
 }

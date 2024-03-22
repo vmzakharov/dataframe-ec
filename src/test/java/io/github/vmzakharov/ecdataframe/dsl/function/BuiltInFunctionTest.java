@@ -2,6 +2,7 @@ package io.github.vmzakharov.ecdataframe.dsl.function;
 
 import io.github.vmzakharov.ecdataframe.dsl.Script;
 import io.github.vmzakharov.ecdataframe.dsl.SimpleEvalContext;
+import io.github.vmzakharov.ecdataframe.dsl.value.FloatValue;
 import io.github.vmzakharov.ecdataframe.dsl.value.IntValue;
 import io.github.vmzakharov.ecdataframe.dsl.value.LongValue;
 import io.github.vmzakharov.ecdataframe.dsl.value.Value;
@@ -19,16 +20,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
-import static io.github.vmzakharov.ecdataframe.ExpressionTestUtil.evaluateScriptWithContext;
-import static io.github.vmzakharov.ecdataframe.ExpressionTestUtil.evaluateToBoolean;
-import static io.github.vmzakharov.ecdataframe.ExpressionTestUtil.evaluateToDate;
-import static io.github.vmzakharov.ecdataframe.ExpressionTestUtil.evaluateToDateTime;
-import static io.github.vmzakharov.ecdataframe.ExpressionTestUtil.evaluateToDecimal;
-import static io.github.vmzakharov.ecdataframe.ExpressionTestUtil.evaluateToDouble;
-import static io.github.vmzakharov.ecdataframe.ExpressionTestUtil.evaluateToLong;
-import static io.github.vmzakharov.ecdataframe.ExpressionTestUtil.evaluateToString;
-import static io.github.vmzakharov.ecdataframe.ExpressionTestUtil.evaluateToVector;
-import static io.github.vmzakharov.ecdataframe.ExpressionTestUtil.toScript;
+import static io.github.vmzakharov.ecdataframe.ExpressionTestUtil.*;
 
 public class BuiltInFunctionTest
 {
@@ -185,6 +177,38 @@ public class BuiltInFunctionTest
         Assert.assertEquals("123", result1.stringValue());
         Value result2 = evaluateScriptWithContext("toString(z)", context);
         Assert.assertEquals("-456", result2.stringValue());
+    }
+
+    @Test(expected = RuntimeException.class)
+    public void absForString()
+    {
+        evaluateExpression("abs('Hello')");
+    }
+
+    @Test
+    public void absForFloat()
+    {
+        SimpleEvalContext context = new SimpleEvalContext();
+        context.setVariable("y", new FloatValue(-5.25f));
+        FloatValue result1 = (FloatValue) evaluateScriptWithContext("abs(y)", context);
+        Assert.assertEquals(5.25f, result1.floatValue(), TOLERANCE);
+        FloatValue result2 = (FloatValue) evaluateScriptWithContext("abs(-y)", context);
+        Assert.assertEquals(5.25f, result2.floatValue(), TOLERANCE);
+    }
+
+    @Test
+    public void toStringForFloat()
+    {
+        SimpleEvalContext context = new SimpleEvalContext();
+
+        context.setVariable("y", new FloatValue(123.125f)); // keeping the fractions binary friendly to avoid noise
+        context.setVariable("z", new FloatValue(-456.25f));
+
+        Value result1 = evaluateScriptWithContext("toString(y)", context);
+        Assert.assertEquals("123.125", result1.stringValue());
+
+        Value result2 = evaluateScriptWithContext("toString(z)", context);
+        Assert.assertEquals("-456.25", result2.stringValue());
     }
 
     @Test

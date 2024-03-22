@@ -6,6 +6,7 @@ import io.github.vmzakharov.ecdataframe.dsl.value.DateTimeValue;
 import io.github.vmzakharov.ecdataframe.dsl.value.DateValue;
 import io.github.vmzakharov.ecdataframe.dsl.value.DecimalValue;
 import io.github.vmzakharov.ecdataframe.dsl.value.DoubleValue;
+import io.github.vmzakharov.ecdataframe.dsl.value.FloatValue;
 import io.github.vmzakharov.ecdataframe.dsl.value.IntValue;
 import io.github.vmzakharov.ecdataframe.dsl.value.LongValue;
 import io.github.vmzakharov.ecdataframe.dsl.value.StringValue;
@@ -33,7 +34,6 @@ import static io.github.vmzakharov.ecdataframe.dsl.value.ValueType.DATE;
 import static io.github.vmzakharov.ecdataframe.dsl.value.ValueType.DATE_TIME;
 import static io.github.vmzakharov.ecdataframe.dsl.value.ValueType.DECIMAL;
 import static io.github.vmzakharov.ecdataframe.dsl.value.ValueType.DOUBLE;
-import static io.github.vmzakharov.ecdataframe.dsl.value.ValueType.INT;
 import static io.github.vmzakharov.ecdataframe.dsl.value.ValueType.LONG;
 import static io.github.vmzakharov.ecdataframe.dsl.value.ValueType.STRING;
 import static io.github.vmzakharov.ecdataframe.dsl.value.ValueType.VECTOR;
@@ -179,12 +179,17 @@ final public class BuiltInFunctions
 
                 if (!parameter.isNumber())
                 {
-                    this.assertParameterType(Lists.immutable.of(DOUBLE, LONG, INT), parameter.getType());
+                    this.throwInvalidParameterException();
                 }
 
                 if (parameter.isDouble())
                 {
                     return new DoubleValue(Math.abs(((DoubleValue) parameter).doubleValue()));
+                }
+
+                if (parameter.isFloat())
+                {
+                    return new FloatValue(Math.abs(((FloatValue) parameter).floatValue()));
                 }
 
                 if (parameter.isLong())

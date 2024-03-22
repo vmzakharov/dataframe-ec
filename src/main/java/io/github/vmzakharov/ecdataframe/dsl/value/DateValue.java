@@ -57,19 +57,6 @@ extends AbstractValue
     public int compareTo(Value other)
     {
         this.checkSameTypeForComparison(other);
-
-        DateValue otherDate = (DateValue) other;
-
-        if (this.dateValue() == null)
-        {
-            return otherDate.dateValue() == null ? 0 : -1;
-        }
-
-        if (otherDate.dateValue() == null)
-        {
-            return 1;
-        }
-
-        return other.isVoid() ? 1 : this.dateValue().compareTo(otherDate.dateValue());
+        return other.isVoid() ? 1 : this.dateValue().compareTo(((DateValue) other).dateValue());
     }
 }

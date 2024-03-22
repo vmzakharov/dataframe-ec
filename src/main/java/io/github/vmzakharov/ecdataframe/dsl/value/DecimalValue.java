@@ -71,18 +71,6 @@ implements NumberValue
     {
         this.checkSameTypeForComparison(other);
 
-        DecimalValue otherDate = (DecimalValue) other;
-
-        if (this.decimalValue() == null)
-        {
-            return otherDate.decimalValue() == null ? 0 : -1;
-        }
-
-        if (otherDate.decimalValue() == null)
-        {
-            return 1;
-        }
-
-        return other.isVoid() ? 1 : this.decimalValue().compareTo(otherDate.decimalValue());
+        return other.isVoid() ? 1 : this.decimalValue().compareTo(((DecimalValue) other).decimalValue());
     }
 }

@@ -2,6 +2,7 @@ package io.github.vmzakharov.ecdataframe.dsl;
 
 import io.github.vmzakharov.ecdataframe.dsl.value.BooleanValue;
 import io.github.vmzakharov.ecdataframe.dsl.value.DoubleValue;
+import io.github.vmzakharov.ecdataframe.dsl.value.FloatValue;
 import io.github.vmzakharov.ecdataframe.dsl.value.IntValue;
 import io.github.vmzakharov.ecdataframe.dsl.value.LongValue;
 import io.github.vmzakharov.ecdataframe.dsl.value.Value;
@@ -33,6 +34,12 @@ public interface UnaryOp
         public DoubleValue applyDouble(double operand)
         {
             return new DoubleValue(-operand);
+        }
+
+        @Override
+        public FloatValue applyFloat(float operand)
+        {
+            return new FloatValue(-operand);
         }
 
         @Override
@@ -184,6 +191,11 @@ public interface UnaryOp
     default DoubleValue applyDouble(double operand)
     {
         throw this.unsupportedOn("double");
+    }
+
+    default FloatValue applyFloat(float operand)
+    {
+        throw this.unsupportedOn("float");
     }
 
     default BooleanValue applyDate(LocalDate operand)

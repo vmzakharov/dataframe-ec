@@ -31,7 +31,7 @@ implements Value
         if (!other.isVoid() && (this.getClass() != other.getClass()))
         {
             throw exceptionByKey("DSL_COMPARE_INCOMPATIBLE")
-                    .with("thisClassName",  this.getClass().getSimpleName())
+                    .with("className",  this.getClass().getSimpleName())
                     .with("otherClassName", other.getClass().getSimpleName())
                     .getUnsupported();
         }

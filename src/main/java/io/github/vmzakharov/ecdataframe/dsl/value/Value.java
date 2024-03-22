@@ -12,32 +12,7 @@ import static io.github.vmzakharov.ecdataframe.util.ExceptionFactory.exceptionBy
 public interface Value
 extends Expression, Comparable<Value>
 {
-    Value VOID = new Value()
-    {
-        @Override
-        public String asStringLiteral()
-        {
-            return "VOID";
-        }
-
-        @Override
-        public ValueType getType()
-        {
-            return ValueType.VOID;
-        }
-
-        @Override
-        public boolean isVoid()
-        {
-            return true;
-        }
-
-        @Override
-        public int compareTo(Value other)
-        {
-            return this == other ? 0 : -1;
-        }
-    };
+    Value VOID = new VoidValue();
 
     default String stringValue()
     {
@@ -112,6 +87,11 @@ extends Expression, Comparable<Value>
         return this.getType().isDouble();
     }
 
+    default boolean isFloat()
+    {
+        return this.getType().isFloat();
+    }
+
     default boolean isDecimal()
     {
         return this.getType().isDecimal();
@@ -150,6 +130,37 @@ extends Expression, Comparable<Value>
     default boolean isDataFrame()
     {
         return this.getType().isString();
+    }
+
+    final class VoidValue implements Value
+    {
+        private VoidValue()
+        {
+        }
+
+        @Override
+        public String asStringLiteral()
+        {
+            return "VOID";
+        }
+
+        @Override
+        public ValueType getType()
+        {
+            return ValueType.VOID;
+        }
+
+        @Override
+        public boolean isVoid()
+        {
+            return true;
+        }
+
+        @Override
+        public int compareTo(Value other)
+        {
+            return this == other ? 0 : -1;
+        }
     }
 }
 
