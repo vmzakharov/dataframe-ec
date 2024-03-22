@@ -9,8 +9,8 @@ import io.github.vmzakharov.ecdataframe.dsl.value.Value;
 import io.github.vmzakharov.ecdataframe.dsl.visitor.InMemoryEvaluationVisitor;
 import io.github.vmzakharov.ecdataframe.util.CollectingPrinter;
 import io.github.vmzakharov.ecdataframe.util.PrinterFactory;
-import org.eclipse.collections.api.list.MutableList;
-import org.eclipse.collections.api.map.MapIterable;
+import org.eclipse.collections.api.factory.Sets;
+import org.eclipse.collections.api.set.ImmutableSet;
 import org.eclipse.collections.impl.factory.Lists;
 import org.eclipse.collections.impl.factory.primitive.LongLists;
 import org.junit.Assert;
@@ -252,10 +252,24 @@ public class BuiltInFunctionTest
     }
 
     @Test
+    public void toInt()
+    {
+        Assert.assertEquals(123, evaluateToInt("toInt('123')"));
+        Assert.assertEquals(-567, evaluateToInt("toInt(\"-567\")"));
+    }
+
+    @Test
     public void toDouble()
     {
         Assert.assertEquals(123.0, evaluateToDouble("toDouble('123')"), TOLERANCE);
         Assert.assertEquals(-456.789, evaluateToDouble("toDouble('-456.789')"), TOLERANCE);
+    }
+
+    @Test
+    public void toFloat()
+    {
+        Assert.assertEquals(123.0f, evaluateToFloat("toFloat('123')"), TOLERANCE);
+        Assert.assertEquals(-456.789f, evaluateToFloat("toFloat('-456.789')"), TOLERANCE);
     }
 
     @Test
@@ -270,15 +284,13 @@ public class BuiltInFunctionTest
     {
         BuiltInFunctions.resetFunctionList();
 
-        MapIterable<String, IntrinsicFunctionDescriptor> functionsByName = BuiltInFunctions.getFunctionsByName();
+        ImmutableSet<String> actualFunctionNames = BuiltInFunctions.getFunctionsByName().keysView().toImmutableSet();
 
-        MutableList<String> expectedFunctionNames = Lists.mutable.of(
-            "abs", "contains", "print", "println", "startsWith", "substr", "toDate", "toDateTime", "toDouble", "toLong",
-            "toString", "toUpper", "trim", "withinDays", "format", "toDecimal", "v"
+        ImmutableSet<String> expectedFunctionNames = Sets.immutable.of(
+                "abs", "contains", "print", "println", "startsWith", "substr", "toDate", "toDateTime", "toDouble",
+                "toFloat",  "toLong", "toInt", "toString", "toUpper", "trim", "withinDays", "format", "toDecimal", "v"
         );
 
-        Assert.assertEquals(expectedFunctionNames.size(), functionsByName.size());
-
-        Assert.assertTrue(expectedFunctionNames.collect(String::toUpperCase).allSatisfy(functionsByName::containsKey));
+        Assert.assertEquals(expectedFunctionNames.collect(String::toUpperCase), actualFunctionNames);
     }
 }

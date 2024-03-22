@@ -8,7 +8,7 @@ import java.math.BigDecimal;
 
 public class LongValue
 extends AbstractValue
-implements NumberValue
+implements WholeNumberValue
 {
     private final long value;
 
@@ -23,6 +23,7 @@ implements NumberValue
         return Long.toString(this.value);
     }
 
+    @Override
     public long longValue()
     {
         return this.value;

@@ -8,7 +8,7 @@ import java.math.BigDecimal;
 
 public class DoubleValue
 extends AbstractValue
-implements NumberValue
+implements DecimalNumberValue
 {
     private final double value;
 

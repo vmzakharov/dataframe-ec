@@ -90,7 +90,7 @@ implements FunctionDescriptor
     {
         if (expected != actual)
         {
-            this.throwInvalidParameterException();
+            this.throwInvalidParameterException(actual);
         }
     }
 
@@ -98,14 +98,16 @@ implements FunctionDescriptor
     {
         if (!expected.contains(actual))
         {
-            this.throwInvalidParameterException();
+            this.throwInvalidParameterException(actual);
         }
     }
 
-    protected void throwInvalidParameterException()
+    protected void throwInvalidParameterException(ValueType actualType)
     {
         exceptionByKey("DSL_INVALID_PARAM_TYPE")
-                .with("functionName", this.getName()).with("usageString", this.usageString())
+                .with("type", actualType.toString())
+                .with("functionName", this.getName())
+                .with("usageString", this.usageString())
                 .fire();
     }
 }

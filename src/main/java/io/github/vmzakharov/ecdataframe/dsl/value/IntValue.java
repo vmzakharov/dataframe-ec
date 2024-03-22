@@ -8,7 +8,7 @@ import java.math.BigDecimal;
 
 public class IntValue
 extends AbstractValue
-implements NumberValue
+implements WholeNumberValue
 {
     private final int value;
 
@@ -30,6 +30,12 @@ implements NumberValue
 
     @Override
     public double doubleValue()
+    {
+        return this.value;
+    }
+
+    @Override
+    public long longValue()
     {
         return this.value;
     }

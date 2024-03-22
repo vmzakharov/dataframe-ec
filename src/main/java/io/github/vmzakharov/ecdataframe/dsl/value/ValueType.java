@@ -44,6 +44,16 @@ public enum ValueType
         return this == LONG || this == DOUBLE || this == INT || this == FLOAT;
     }
 
+    public boolean isWholeNumber()
+    {
+        return this == LONG || this == INT;
+    }
+
+    public boolean isDecimalNumber()
+    {
+        return this == LONG || this == INT;
+    }
+
     public boolean isDate()
     {
         return this == DATE;

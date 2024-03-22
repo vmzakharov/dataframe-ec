@@ -8,7 +8,7 @@ import java.math.BigDecimal;
 
 public class FloatValue
 extends AbstractValue
-implements NumberValue
+implements DecimalNumberValue
 {
     private final float value;
 

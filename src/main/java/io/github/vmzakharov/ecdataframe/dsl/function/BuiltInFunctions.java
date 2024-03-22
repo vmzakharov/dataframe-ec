@@ -4,6 +4,7 @@ import io.github.vmzakharov.ecdataframe.dsl.EvalContext;
 import io.github.vmzakharov.ecdataframe.dsl.value.BooleanValue;
 import io.github.vmzakharov.ecdataframe.dsl.value.DateTimeValue;
 import io.github.vmzakharov.ecdataframe.dsl.value.DateValue;
+import io.github.vmzakharov.ecdataframe.dsl.value.DecimalNumberValue;
 import io.github.vmzakharov.ecdataframe.dsl.value.DecimalValue;
 import io.github.vmzakharov.ecdataframe.dsl.value.DoubleValue;
 import io.github.vmzakharov.ecdataframe.dsl.value.FloatValue;
@@ -13,6 +14,7 @@ import io.github.vmzakharov.ecdataframe.dsl.value.StringValue;
 import io.github.vmzakharov.ecdataframe.dsl.value.Value;
 import io.github.vmzakharov.ecdataframe.dsl.value.ValueType;
 import io.github.vmzakharov.ecdataframe.dsl.value.VectorValue;
+import io.github.vmzakharov.ecdataframe.dsl.value.WholeNumberValue;
 import io.github.vmzakharov.ecdataframe.util.Printer;
 import io.github.vmzakharov.ecdataframe.util.PrinterFactory;
 import org.eclipse.collections.api.list.ListIterable;
@@ -29,14 +31,7 @@ import java.time.Period;
 import java.time.format.DateTimeFormatter;
 
 import static io.github.vmzakharov.ecdataframe.dsl.value.Value.VOID;
-import static io.github.vmzakharov.ecdataframe.dsl.value.ValueType.BOOLEAN;
-import static io.github.vmzakharov.ecdataframe.dsl.value.ValueType.DATE;
-import static io.github.vmzakharov.ecdataframe.dsl.value.ValueType.DATE_TIME;
-import static io.github.vmzakharov.ecdataframe.dsl.value.ValueType.DECIMAL;
-import static io.github.vmzakharov.ecdataframe.dsl.value.ValueType.DOUBLE;
-import static io.github.vmzakharov.ecdataframe.dsl.value.ValueType.LONG;
-import static io.github.vmzakharov.ecdataframe.dsl.value.ValueType.STRING;
-import static io.github.vmzakharov.ecdataframe.dsl.value.ValueType.VECTOR;
+import static io.github.vmzakharov.ecdataframe.dsl.value.ValueType.*;
 import static io.github.vmzakharov.ecdataframe.util.ExceptionFactory.exceptionByKey;
 
 final public class BuiltInFunctions
@@ -141,13 +136,13 @@ final public class BuiltInFunctions
 
                 String aString = stringParam.stringValue();
 
-                int beginIndex = (int) ((LongValue) parameters.get(1)).longValue();
+                int beginIndex = (int) ((WholeNumberValue) parameters.get(1)).longValue();
 
                 String substring = (parameterCount == 2)
                         ?
                         aString.substring(beginIndex)
                         :
-                        aString.substring(beginIndex, (int) ((LongValue) parameters.get(2)).longValue());
+                        aString.substring(beginIndex, (int) ((WholeNumberValue) parameters.get(2)).longValue());
 
                 return new StringValue(substring);
             }
@@ -179,7 +174,7 @@ final public class BuiltInFunctions
 
                 if (!parameter.isNumber())
                 {
-                    this.throwInvalidParameterException();
+                    this.throwInvalidParameterException(parameter.getType());
                 }
 
                 if (parameter.isDouble())
@@ -242,23 +237,25 @@ final public class BuiltInFunctions
                 String result = "not used";
                 if (value.isNumber())
                 {
-                    result = this.decimalFormats
-                            .computeIfAbsent(pattern, DecimalFormat::new)
-                            .format(
-                                value.isLong() ? ((LongValue) value).longValue() : ((DoubleValue) value).doubleValue()
-                            );
+                    result = this.decimalFormats.computeIfAbsent(pattern, DecimalFormat::new)
+                                .format(
+                                    value.isWholeNumber()
+                                            ? ((WholeNumberValue) value).longValue()
+                                            : ((DecimalNumberValue) value).doubleValue()
+                                );
                 }
                 else if (value.isTemporal())
                 {
-                    result = this.dateTimeFormatters
-                            .computeIfAbsent(pattern, DateTimeFormatter::ofPattern)
-                            .format(
-                                value.isDate() ? ((DateValue) value).dateValue() : ((DateTimeValue) value).dateTimeValue()
-                            );
+                    result = this.dateTimeFormatters.computeIfAbsent(pattern, DateTimeFormatter::ofPattern)
+                                .format(
+                                    value.isDate()
+                                            ? ((DateValue) value).dateValue()
+                                            : ((DateTimeValue) value).dateTimeValue()
+                                );
                 }
                 else
                 {
-                    this.assertParameterType(Lists.immutable.of(LONG, DOUBLE, DATE, DATE_TIME), value.getType());
+                    this.throwInvalidParameterException(value.getType());
                 }
 
                 return new StringValue(result);
@@ -297,9 +294,9 @@ final public class BuiltInFunctions
                     }
 
                     date = LocalDate.of(
-                            (int) ((LongValue) yearValue).longValue(),
-                            (int) ((LongValue) monthValue).longValue(),
-                            (int) ((LongValue) dayValue).longValue());
+                            (int) ((WholeNumberValue) yearValue).longValue(),
+                            (int) ((WholeNumberValue) monthValue).longValue(),
+                            (int) ((WholeNumberValue) dayValue).longValue());
                 }
                 else if (parameters.size() == 1)
                 {
@@ -353,7 +350,7 @@ final public class BuiltInFunctions
                             return VOID;
                         }
 
-                        params[i] = (int) ((LongValue) parameter).longValue();
+                        params[i] = (int) ((WholeNumberValue) parameter).longValue();
                     }
 
                     switch (paramCount)
@@ -428,6 +425,30 @@ final public class BuiltInFunctions
             }
         });
 
+        addFunctionDescriptor(new IntrinsicFunctionDescriptor("toInt", Lists.immutable.of("string"))
+        {
+            @Override
+            public Value evaluate(EvalContext context)
+            {
+                Value parameter = context.getVariable("string");
+                if (parameter.isVoid())
+                {
+                    return VOID;
+                }
+
+                this.assertParameterType(STRING, parameter.getType());
+                String aString = parameter.stringValue();
+
+                return new IntValue(Integer.parseInt(aString));
+            }
+
+            @Override
+            public ValueType returnType(ListIterable<ValueType> parameterTypes)
+            {
+                return INT;
+            }
+        });
+
         addFunctionDescriptor(new IntrinsicFunctionDescriptor("toDouble", Lists.immutable.of("string"))
         {
             @Override
@@ -452,8 +473,34 @@ final public class BuiltInFunctions
             }
         });
 
+        addFunctionDescriptor(new IntrinsicFunctionDescriptor("toFloat", Lists.immutable.of("string"))
+        {
+            @Override
+            public Value evaluate(EvalContext context)
+            {
+                Value parameter = context.getVariable("string");
+                if (parameter.isVoid())
+                {
+                    return VOID;
+                }
+
+                this.assertParameterType(STRING, parameter.getType());
+                String aString = parameter.stringValue();
+
+                return new FloatValue(Float.parseFloat(aString));
+            }
+
+            @Override
+            public ValueType returnType(ListIterable<ValueType> paraValueTypes)
+            {
+                return FLOAT;
+            }
+        });
+
         addFunctionDescriptor(new IntrinsicFunctionDescriptor("toDecimal", Lists.immutable.of("unscaledValue", "scale"))
         {
+            final ListIterable<ValueType> allowedParameterTypes = Lists.immutable.of(INT, LONG);
+
             @Override
             public Value evaluate(EvalContext context)
             {
@@ -469,12 +516,12 @@ final public class BuiltInFunctions
                     return VOID;
                 }
 
-                this.assertParameterType(LONG, unscaled.getType());
-                this.assertParameterType(LONG, scale.getType());
+                this.assertParameterType(this.allowedParameterTypes, unscaled.getType());
+                this.assertParameterType(this.allowedParameterTypes, scale.getType());
 
                 return new DecimalValue(BigDecimal.valueOf(
-                        ((LongValue) unscaled).longValue(),
-                        (int) ((LongValue) scale).longValue()
+                        ((WholeNumberValue) unscaled).longValue(),
+                        (int) ((WholeNumberValue) scale).longValue()
                 ));
             }
 

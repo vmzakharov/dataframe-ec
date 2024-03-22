@@ -102,6 +102,16 @@ extends Expression, Comparable<Value>
         return this.getType().isNumber();
     }
 
+    default boolean isWholeNumber()
+    {
+        return this.getType().isWholeNumber();
+    }
+
+    default boolean isDecimalNumber()
+    {
+        return this.getType().isDecimalNumber();
+    }
+
     default boolean isString()
     {
         return this.getType().isString();

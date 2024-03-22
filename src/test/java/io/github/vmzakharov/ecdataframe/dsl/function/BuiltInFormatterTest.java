@@ -4,6 +4,8 @@ import io.github.vmzakharov.ecdataframe.dsl.SimpleEvalContext;
 import io.github.vmzakharov.ecdataframe.dsl.value.DateTimeValue;
 import io.github.vmzakharov.ecdataframe.dsl.value.DateValue;
 import io.github.vmzakharov.ecdataframe.dsl.value.DoubleValue;
+import io.github.vmzakharov.ecdataframe.dsl.value.FloatValue;
+import io.github.vmzakharov.ecdataframe.dsl.value.IntValue;
 import io.github.vmzakharov.ecdataframe.dsl.value.LongValue;
 import io.github.vmzakharov.ecdataframe.dsl.value.StringValue;
 import org.junit.Assert;
@@ -36,8 +38,10 @@ public class BuiltInFormatterTest
     {
         SimpleEvalContext context = new SimpleEvalContext();
         context.setVariable("whole", new LongValue(12_345));
+        context.setVariable("wholeInt", new IntValue(2_345));
         context.setVariable("negWhole", new LongValue(-12_345));
         context.setVariable("decimal", new DoubleValue(12345.456));
+        context.setVariable("decimalFloat", new FloatValue(345.456f));
         context.setVariable("negDecimal", new DoubleValue(-12345.456));
         context.setVariable("formatWithDecimal", new StringValue("#,##0.0##;(#,##0.0##)"));
         context.setVariable("formatWhole", new StringValue("#,##0;(#,##0)"));
@@ -50,10 +54,18 @@ public class BuiltInFormatterTest
 
         Assert.assertEquals("12,345.456", evaluateScriptWithContext("format(decimal, formatWithDecimal)", context).stringValue());
         Assert.assertEquals("(12,345.456)", evaluateScriptWithContext("format(negDecimal, formatWithDecimal)", context).stringValue());
+
         Assert.assertEquals("0.0", evaluateScriptWithContext("format(0.0, formatWithDecimal)", context).stringValue());
         Assert.assertEquals("0", evaluateScriptWithContext("format(0.0, formatWhole)", context).stringValue());
+
         Assert.assertEquals("12,345", evaluateScriptWithContext("format(decimal, formatWhole)", context).stringValue());
         Assert.assertEquals("(12,345)", evaluateScriptWithContext("format(negDecimal, formatWhole)", context).stringValue());
+
+        Assert.assertEquals("2,345", evaluateScriptWithContext("format(wholeInt, formatWhole)", context).stringValue());
+        Assert.assertEquals("(2,345)", evaluateScriptWithContext("format(-wholeInt, formatWhole)", context).stringValue());
+
+        Assert.assertEquals("345.456", evaluateScriptWithContext("format(decimalFloat, formatWithDecimal)", context).stringValue());
+        Assert.assertEquals("(345.456)", evaluateScriptWithContext("format(-decimalFloat, formatWithDecimal)", context).stringValue());
     }
 
     @Test(expected = RuntimeException.class)

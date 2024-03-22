@@ -10,6 +10,8 @@ import io.github.vmzakharov.ecdataframe.dsl.value.DateTimeValue;
 import io.github.vmzakharov.ecdataframe.dsl.value.DateValue;
 import io.github.vmzakharov.ecdataframe.dsl.value.DecimalValue;
 import io.github.vmzakharov.ecdataframe.dsl.value.DoubleValue;
+import io.github.vmzakharov.ecdataframe.dsl.value.FloatValue;
+import io.github.vmzakharov.ecdataframe.dsl.value.IntValue;
 import io.github.vmzakharov.ecdataframe.dsl.value.LongValue;
 import io.github.vmzakharov.ecdataframe.dsl.value.Value;
 import io.github.vmzakharov.ecdataframe.dsl.value.VectorValue;
@@ -32,6 +34,11 @@ final public class ExpressionTestUtil
     static public long evaluateToLong(String s)
     {
         return ((LongValue) evaluateExpression(s)).longValue();
+    }
+
+    static public int evaluateToInt(String s)
+    {
+        return ((IntValue) evaluateExpression(s)).intValue();
     }
 
     static public ListIterable<Value> evaluateToVector(String s)
@@ -57,6 +64,11 @@ final public class ExpressionTestUtil
     static public double evaluateToDouble(String s)
     {
         return ((DoubleValue) evaluateExpression(s)).doubleValue();
+    }
+
+    static public double evaluateToFloat(String s)
+    {
+        return ((FloatValue) evaluateExpression(s)).floatValue();
     }
 
     static public boolean evaluateToBoolean(String s)
@@ -101,9 +113,21 @@ final public class ExpressionTestUtil
         assertTrueValue(result);
     }
 
+    public static void scriptEvaluatesToTrue(String scriptAsString)
+    {
+        Value result = evaluateScript(scriptAsString);
+        assertTrueValue(result);
+    }
+
     public static void scriptEvaluatesToFalse(String scriptAsString, EvalContext context)
     {
         Value result = evaluateScriptWithContext(scriptAsString, context);
+        assertFalseValue(result);
+    }
+
+    public static void scriptEvaluatesToFalse(String scriptAsString)
+    {
+        Value result = evaluateScript(scriptAsString);
         assertFalseValue(result);
     }
 
@@ -111,6 +135,12 @@ final public class ExpressionTestUtil
     {
         AnonymousScript script = ExpressionTestUtil.toScript(scriptAsString);
         return script.evaluate(new InMemoryEvaluationVisitor(context));
+    }
+
+    public static Value evaluateScript(String scriptAsString)
+    {
+        AnonymousScript script = ExpressionTestUtil.toScript(scriptAsString);
+        return script.evaluate(new InMemoryEvaluationVisitor());
     }
 
     private static void assertTrueValue(Value aValue)

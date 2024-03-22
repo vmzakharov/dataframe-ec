@@ -60,7 +60,7 @@ final public class ConfigureMessages
         addMessage("DSL_VAR_IMMUTABLE",               "Attempting to change immutable variable '${variableName}'");
         addMessage("DSL_FUN_NOT_IMPLEMENTED",         "Function ${functionName} is not implemented");
         addMessage("DSL_INVALID_PARAM_COUNT",         "Invalid number of parameters in a call to '${functionName}'. ${usageString}");
-        addMessage("DSL_INVALID_PARAM_TYPE",          "Invalid parameter type in a call to '${functionName}'. ${usageString}");
+        addMessage("DSL_INVALID_PARAM_TYPE",          "Invalid parameter type '${type}' in a call to '${functionName}'. ${usageString}");
         addMessage("DSL_OP_NOT_SUPPORTED",            "Cannot apply '${operation}' to ${type}");
         addMessage("DSL_VAR_UNINITIALIZED",           "Uninitialized variable: ${variableName}");
         addMessage("DSL_NULL_VALUE_NOT_ALLOWED",      "${type} value cannot contain null, a void value should be used instead");
