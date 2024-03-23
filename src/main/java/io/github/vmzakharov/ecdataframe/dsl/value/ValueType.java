@@ -49,9 +49,9 @@ public enum ValueType
         return this == LONG || this == INT;
     }
 
-    public boolean isDecimalNumber()
+    public boolean isRealNumber()
     {
-        return this == LONG || this == INT;
+        return this == DOUBLE || this == FLOAT || this == DECIMAL;
     }
 
     public boolean isDate()

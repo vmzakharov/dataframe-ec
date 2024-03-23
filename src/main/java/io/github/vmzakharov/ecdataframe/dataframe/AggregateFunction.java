@@ -186,65 +186,67 @@ public abstract class AggregateFunction
 
     public int intInitialValue()
     {
-        throw exceptionByKey("AGG_NO_INITIAL_VALUE")
-                .with("operation", this.getName())
-                .with("type", "int")
-                .getUnsupported();
+        throw this.noInitialValueException(ValueType.INT.toString());
+    }
+
+    public int floatInitialValue()
+    {
+        throw this.noInitialValueException(ValueType.FLOAT.toString());
     }
 
     public long longInitialValue()
     {
-        throw exceptionByKey("AGG_NO_INITIAL_VALUE")
-                .with("operation", this.getName())
-                .with("type", "long")
-                .getUnsupported();
+        throw this.noInitialValueException(ValueType.LONG.toString());
     }
 
     public double doubleInitialValue()
     {
-        throw exceptionByKey("AGG_NO_INITIAL_VALUE")
-                .with("operation", this.getName())
-                .with("type", "double")
-                .getUnsupported();
+        throw this.noInitialValueException(ValueType.DOUBLE.toString());
     }
 
     public Object objectInitialValue()
     {
-        throw exceptionByKey("AGG_NO_INITIAL_VALUE")
-                .with("operation", this.getName())
-                .with("type", "non-numeric")
-                .getUnsupported();
+        throw this.noInitialValueException("non-numeric");
     }
 
     protected long longAccumulator(long currentAggregate, long newValue)
     {
-        throw exceptionByKey("AGG_NO_ACCUMULATOR")
-                .with("operation", this.getName())
-                .with("type", "long")
-                .getUnsupported();
+        throw this.unsupportedAccumulatorException(ValueType.LONG.toString());
     }
 
     protected int intAccumulator(int currentAggregate, int newValue)
     {
-        throw exceptionByKey("AGG_NO_ACCUMULATOR")
-                .with("operation", this.getName())
-                .with("type", "int")
-                .getUnsupported();
+        throw this.unsupportedAccumulatorException(ValueType.INT.toString());
     }
 
     protected double doubleAccumulator(double currentAggregate, double newValue)
     {
-        throw exceptionByKey("AGG_NO_ACCUMULATOR")
-                .with("operation", this.getName())
-                .with("type", "double")
-                .getUnsupported();
+        throw this.unsupportedAccumulatorException(ValueType.DOUBLE.toString());
+    }
+
+    protected int floatAccumulator(float currentAggregate, float newValue)
+    {
+        throw this.unsupportedAccumulatorException(ValueType.FLOAT.toString());
     }
 
     protected Object objectAccumulator(Object currentAggregate, Object newValue)
     {
-        throw exceptionByKey("AGG_NO_ACCUMULATOR")
+        throw this.unsupportedAccumulatorException("object");
+    }
+
+    protected RuntimeException unsupportedAccumulatorException(String typeName)
+    {
+        return exceptionByKey("AGG_NO_ACCUMULATOR")
                 .with("operation", this.getName())
-                .with("non-numeric", "long")
+                .with("type", typeName)
+                .getUnsupported();
+    }
+
+    protected RuntimeException noInitialValueException(String typeName)
+    {
+        throw exceptionByKey("AGG_NO_INITIAL_VALUE")
+                .with("operation", this.getName())
+                .with("type", typeName)
                 .getUnsupported();
     }
 
@@ -344,6 +346,16 @@ public abstract class AggregateFunction
         targetColumn.setDouble(
                 targetRowIndex,
                 this.doubleAccumulator(currentAggregatedValue, this.getDoubleValue(sourceColumn, sourceRowIndex)));
+    }
+
+    public void aggregateValueIntoFloat(
+            DfFloatColumnStored targetColumn, int targetRowIndex,
+            DfColumn sourceColumn, int sourceRowIndex)
+    {
+        float currentAggregatedValue = targetColumn.getFloat(targetRowIndex);
+        targetColumn.setFloat(
+                targetRowIndex,
+                this.floatAccumulator(currentAggregatedValue, this.getIntValue(sourceColumn, sourceRowIndex)));
     }
 
     /**

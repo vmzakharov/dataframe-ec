@@ -39,6 +39,8 @@ import org.eclipse.collections.impl.factory.Maps;
 import org.eclipse.collections.impl.factory.Stacks;
 import org.eclipse.collections.impl.tuple.Tuples;
 
+import static io.github.vmzakharov.ecdataframe.dsl.value.ValueType.*;
+import static io.github.vmzakharov.ecdataframe.dsl.value.ValueType.DECIMAL;
 import static io.github.vmzakharov.ecdataframe.util.FormatWithPlaceholders.messageFromKey;
 
 public class TypeInferenceVisitor
@@ -95,7 +97,7 @@ implements ExpressionVisitor
 
         ValueType type2 = this.processAndPopResult(expr.getOperand2());
 
-        resultType = ValueType.VOID;
+        resultType = VOID;
 
         if (expr.getOperation() instanceof ArithmeticOp)
         {
@@ -105,21 +107,21 @@ implements ExpressionVisitor
         {
             if (type1.isBoolean() && type2.isBoolean())
             {
-                resultType = ValueType.BOOLEAN;
+                resultType = BOOLEAN;
             }
         }
         else if (expr.getOperation() instanceof ContainsOp)
         {
             if (type2.isVector() || (type1.isString() && type2.isString()))
             {
-                resultType = ValueType.BOOLEAN;
+                resultType = BOOLEAN;
             }
         }
         else if (expr.getOperation() instanceof ComparisonOp)
         {
             if ((type1.isNumber() && type2.isNumber()) || (type1 == type2))
             {
-                resultType = ValueType.BOOLEAN;
+                resultType = BOOLEAN;
             }
         }
         else
@@ -181,7 +183,22 @@ implements ExpressionVisitor
     {
         if (type1.isNumber() && type2.isNumber())
         {
-            return (type1.isDouble() || type2.isDouble()) ? ValueType.DOUBLE : ValueType.LONG;
+            if (type1.isDecimal() || type2.isDecimal())
+            {
+                return DECIMAL;
+            }
+
+            if (type1.isDouble() || type2.isDouble())
+            {
+                return DOUBLE;
+            }
+
+            if (type1.isRealNumber() || type2.isRealNumber())
+            {
+                return DOUBLE;
+            }
+
+            return LONG;
         }
 
         if (type1.equals(type2))
@@ -189,7 +206,7 @@ implements ExpressionVisitor
             return type1;
         }
 
-        return ValueType.VOID;
+        return VOID;
     }
 
     @Override
@@ -204,20 +221,20 @@ implements ExpressionVisitor
         }
         else if (operation == UnaryOp.NOT && operandType.isBoolean())
         {
-            this.store(ValueType.BOOLEAN);
+            this.store(BOOLEAN);
         }
         else if (operation == UnaryOp.IS_NULL || operation == UnaryOp.IS_NOT_NULL)
         {
-            this.store(ValueType.BOOLEAN);
+            this.store(BOOLEAN);
         }
         else if ((operation == UnaryOp.IS_EMPTY || operation == UnaryOp.IS_NOT_EMPTY)
                 && (operandType.isString() || operandType.isVector()))
         {
-            this.store(ValueType.BOOLEAN);
+            this.store(BOOLEAN);
         }
         else
         {
-            this.store(ValueType.VOID);
+            this.store(VOID);
             this.recordError(messageFromKey("TYPE_INFER_TYPES_IN_EXPRESSION").toString(), PrettyPrintVisitor.exprToString(expr));
         }
     }
@@ -334,7 +351,7 @@ implements ExpressionVisitor
             }
             else
             {
-                variableType = ValueType.VOID;
+                variableType = VOID;
                 this.recordError(messageFromKey("TYPE_INFER_UNDEFINED_VARIABLE").toString(), PrettyPrintVisitor.exprToString(expr));
             }
         }
@@ -345,14 +362,14 @@ implements ExpressionVisitor
     @Override
     public void visitProjectionExpr(ProjectionExpr expr)
     {
-        this.store(ValueType.DATA_FRAME);
+        this.store(DATA_FRAME);
     }
 
     @Override
     public void visitVectorExpr(VectorExpr expr)
     {
         // todo: support vectors of types, perhaps?
-        this.store(ValueType.VECTOR);
+        this.store(VECTOR);
     }
 
     @Override
@@ -395,7 +412,7 @@ implements ExpressionVisitor
         }
 
         // all types appear valid, but we can't infer the type at the specific index
-        this.store(ValueType.VOID);
+        this.store(VOID);
     }
 
     @Override
@@ -406,7 +423,7 @@ implements ExpressionVisitor
         if (!unscaledValueType.isLong() && !unscaledValueType.isVoid())
         {
             this.recordError(
-                    this.unexpectedTypeMessage(ValueType.LONG, unscaledValueType),
+                    this.unexpectedTypeMessage(LONG, unscaledValueType),
                     PrettyPrintVisitor.exprToString(expr.unscaledValueExpr()));
         }
 
@@ -415,11 +432,11 @@ implements ExpressionVisitor
         if (!scaleType.isLong() && !scaleType.isVoid())
         {
             this.recordError(
-                    this.unexpectedTypeMessage(ValueType.LONG, scaleType),
+                    this.unexpectedTypeMessage(LONG, scaleType),
                     PrettyPrintVisitor.exprToString(expr.scaleExpr()));
         }
 
-        this.store(ValueType.DECIMAL);
+        this.store(DECIMAL);
     }
 
     @Override

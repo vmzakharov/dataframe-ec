@@ -7,6 +7,7 @@ import io.github.vmzakharov.ecdataframe.dsl.value.LongValue;
 import io.github.vmzakharov.ecdataframe.util.ExpressionParserHelper;
 import org.eclipse.collections.api.factory.Lists;
 import org.eclipse.collections.impl.factory.primitive.DoubleLists;
+import org.eclipse.collections.impl.factory.primitive.FloatLists;
 import org.eclipse.collections.impl.factory.primitive.IntLists;
 import org.eclipse.collections.impl.factory.primitive.LongLists;
 import org.junit.Assert;
@@ -23,11 +24,12 @@ public class DataFrameComputedColumnsTest
     public void initializeDataFrame()
     {
         this.df = new DataFrame("this.df1")
-                .addStringColumn("Name").addLongColumn("Count").addDoubleColumn("Value").addIntColumn("PetCount")
-                .addRow("Alice",  5, 23.45, 2)
-                .addRow("Bob",   10, 12.34, 1)
-                .addRow("Carol", 11, 56.78, 0)
-                .addRow("Dan",    0,  7.89, 6);
+                .addStringColumn("Name").addLongColumn("Count").addDoubleColumn("Value")
+                .addIntColumn("PetCount").addFloatColumn("Floatie")
+                .addRow("Alice",  5, 23.45, 2, 1.25f)
+                .addRow("Bob",   10, 12.34, 1, 2.5f)
+                .addRow("Carol", 11, 56.78, 0, 4.75f)
+                .addRow("Dan",    0,  7.89, 6, 1.0f);
     }
 
     @Test
@@ -35,7 +37,7 @@ public class DataFrameComputedColumnsTest
     {
         this.df.addLongColumn("Number Two", "2");
 
-        Assert.assertEquals(5, this.df.columnCount());
+        Assert.assertEquals(6, this.df.columnCount());
         Assert.assertEquals(4, this.df.rowCount());
 
         for (int i = 0; i < 4; i++)
@@ -49,7 +51,7 @@ public class DataFrameComputedColumnsTest
     {
         this.df.addLongColumn("Double Count", "Count * 2").addLongColumn("Two More", "Count + 2");
 
-        Assert.assertEquals(6, this.df.columnCount());
+        Assert.assertEquals(7, this.df.columnCount());
         Assert.assertEquals(4, this.df.rowCount());
 
         Assert.assertEquals(LongLists.immutable.of(10L, 20L, 22L, 0L), this.df.getLongColumn("Double Count").toLongList());
@@ -102,6 +104,20 @@ public class DataFrameComputedColumnsTest
         Assert.assertEquals(LongLists.immutable.of(3L, 2L, 1L, 7L), this.df.getLongColumn("PetCountPlusOne").toLongList());
         Assert.assertEquals(IntLists.immutable.of(-2, -1, 0, -6), this.df.getIntColumn("NegativePetCount").toIntList());
         Assert.assertEquals(DoubleLists.immutable.of(3.1, 2.1, 1.1, 7.1), this.df.getDoubleColumn("PetCountPlusDouble").toDoubleList());
+    }
+
+    @Test
+    public void floatComputedColumn()
+    {
+        this.df.addColumn("NegativeFloatie", "-Floatie");
+        this.df.addColumn("FloatieAndLong", "Floatie + Count");
+        this.df.addColumn("FloatieAndDouble", "Floatie + Value");
+
+        System.out.println(this.df.asCsvString());
+
+        Assert.assertEquals(FloatLists.immutable.of(-1.25f, -2.5f, -4.75f, -1.0f), this.df.getFloatColumn("NegativeFloatie").toFloatList());
+        Assert.assertEquals(DoubleLists.immutable.of(6.25, 12.5, 15.75, 1.0), this.df.getDoubleColumn("FloatieAndLong").toDoubleList());
+        Assert.assertEquals(DoubleLists.immutable.of(24.7, 14.84, 61.53, 8.89), this.df.getDoubleColumn("FloatieAndDouble").toDoubleList());
     }
 
     @Test

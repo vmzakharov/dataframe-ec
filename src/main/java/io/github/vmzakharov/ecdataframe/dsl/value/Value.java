@@ -109,7 +109,7 @@ extends Expression, Comparable<Value>
 
     default boolean isDecimalNumber()
     {
-        return this.getType().isDecimalNumber();
+        return this.getType().isRealNumber();
     }
 
     default boolean isString()

@@ -14,6 +14,7 @@ import io.github.vmzakharov.ecdataframe.dsl.visitor.InMemoryEvaluationVisitor;
 import io.github.vmzakharov.ecdataframe.dsl.visitor.TypeInferenceVisitor;
 import io.github.vmzakharov.ecdataframe.util.ExpressionParserHelper;
 import org.eclipse.collections.api.DoubleIterable;
+import org.eclipse.collections.api.FloatIterable;
 import org.eclipse.collections.api.IntIterable;
 import org.eclipse.collections.api.LongIterable;
 import org.eclipse.collections.api.RichIterable;
@@ -54,7 +55,7 @@ import static io.github.vmzakharov.ecdataframe.dataframe.DfColumnSortOrder.ASC;
 import static io.github.vmzakharov.ecdataframe.util.ExceptionFactory.exceptionByKey;
 
 public class DataFrame
-        implements DfIterate
+implements DfIterate
 {
     private final String name;
     private final MutableMap<String, DfColumn> columnsByName = Maps.mutable.of();
@@ -133,6 +134,22 @@ public class DataFrame
     public DataFrame addIntColumn(String newColumnName, IntIterable values)
     {
         this.attachColumn(new DfIntColumnStored(this, newColumnName, values));
+        return this;
+    }
+
+    public DataFrame addFloatColumn(String newColumnName)
+    {
+        return this.addColumn(newColumnName, ValueType.FLOAT);
+    }
+
+    public DataFrame addFloatColumn(String newColumnName, String expressionAsString)
+    {
+        return this.addColumn(newColumnName, ValueType.FLOAT, expressionAsString);
+    }
+
+    public DataFrame addFloatColumn(String newColumnName, FloatIterable values)
+    {
+        this.attachColumn(new DfFloatColumnStored(this, newColumnName, values));
         return this;
     }
 
@@ -439,6 +456,8 @@ public class DataFrame
                 return new DfDecimalColumnStored(this, columnName);
             case INT:
                 return new DfIntColumnStored(this, columnName);
+            case FLOAT:
+                return new DfFloatColumnStored(this, columnName);
             default:
                 throw exceptionByKey("DF_ADD_COL_UNKNOWN_TYPE")
                         .with("columnName", columnName)
@@ -494,6 +513,8 @@ public class DataFrame
                 return new DfDecimalColumnComputed(this, columnName, expressionAsString);
             case INT:
                 return new DfIntColumnComputed(this, columnName, expressionAsString);
+            case FLOAT:
+                return new DfFloatColumnComputed(this, columnName, expressionAsString);
             default:
                 throw exceptionByKey("DF_ADD_COL_UNKNOWN_TYPE").with("columnName", columnName)
                                                                .with("type", type)
@@ -613,6 +634,11 @@ public class DataFrame
     public DfDoubleColumn getDoubleColumn(String columnName)
     {
         return (DfDoubleColumn) this.getColumnNamed(columnName);
+    }
+
+    public DfFloatColumn getFloatColumn(String columnName)
+    {
+        return (DfFloatColumn) this.getColumnNamed(columnName);
     }
 
     public DfDateColumn getDateColumn(String columnName)
