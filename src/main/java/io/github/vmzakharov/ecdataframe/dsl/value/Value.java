@@ -107,7 +107,7 @@ extends Expression, Comparable<Value>
         return this.getType().isWholeNumber();
     }
 
-    default boolean isDecimalNumber()
+    default boolean isRealNumber()
     {
         return this.getType().isRealNumber();
     }

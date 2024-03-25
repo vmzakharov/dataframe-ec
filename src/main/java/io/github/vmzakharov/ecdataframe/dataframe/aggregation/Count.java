@@ -2,20 +2,23 @@ package io.github.vmzakharov.ecdataframe.dataframe.aggregation;
 
 import io.github.vmzakharov.ecdataframe.dataframe.AggregateFunction;
 import io.github.vmzakharov.ecdataframe.dataframe.DfColumn;
-import io.github.vmzakharov.ecdataframe.dataframe.DfDoubleColumn;
-import io.github.vmzakharov.ecdataframe.dataframe.DfIntColumn;
-import io.github.vmzakharov.ecdataframe.dataframe.DfLongColumn;
-import io.github.vmzakharov.ecdataframe.dataframe.DfObjectColumn;
 import io.github.vmzakharov.ecdataframe.dsl.value.ValueType;
 import org.eclipse.collections.api.list.ListIterable;
 import org.eclipse.collections.impl.factory.Lists;
 
-import static io.github.vmzakharov.ecdataframe.dsl.value.ValueType.*;
+import static io.github.vmzakharov.ecdataframe.dsl.value.ValueType.DATE;
+import static io.github.vmzakharov.ecdataframe.dsl.value.ValueType.DATE_TIME;
+import static io.github.vmzakharov.ecdataframe.dsl.value.ValueType.DECIMAL;
+import static io.github.vmzakharov.ecdataframe.dsl.value.ValueType.DOUBLE;
+import static io.github.vmzakharov.ecdataframe.dsl.value.ValueType.FLOAT;
+import static io.github.vmzakharov.ecdataframe.dsl.value.ValueType.INT;
+import static io.github.vmzakharov.ecdataframe.dsl.value.ValueType.LONG;
+import static io.github.vmzakharov.ecdataframe.dsl.value.ValueType.STRING;
 
 public class Count
 extends AggregateFunction
 {
-    private static final ListIterable<ValueType> SUPPORTED_TYPES = Lists.immutable.of(INT, LONG, DOUBLE, STRING, DATE, DATE_TIME, DECIMAL);
+    private static final ListIterable<ValueType> SUPPORTED_TYPES = Lists.immutable.of(INT, LONG, DOUBLE, FLOAT, STRING, DATE, DATE_TIME, DECIMAL);
 
     public Count(String newColumnName)
     {
@@ -52,27 +55,9 @@ extends AggregateFunction
     }
 
     @Override
-    public Object applyToDoubleColumn(DfDoubleColumn doubleColumn)
+    public Object applyToColumn(DfColumn column)
     {
-        return doubleColumn.getSize();
-    }
-
-    @Override
-    public Object applyToLongColumn(DfLongColumn longColumn)
-    {
-        return longColumn.getSize();
-    }
-
-    @Override
-    public Object applyToIntColumn(DfIntColumn intColumn)
-    {
-        return intColumn.getSize();
-    }
-
-    @Override
-    public Object applyToObjectColumn(DfObjectColumn<?> objectColumn)
-    {
-        return objectColumn.getSize();
+        return column.getSize();
     }
 
     @Override

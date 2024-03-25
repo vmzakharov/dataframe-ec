@@ -30,10 +30,42 @@ public class ExpressionIntValueTest
     }
 
     @Test
-    public void addIntToLong()
+    public void intAndLong()
     {
         this.assertLongResult(5L, "x + 1");
+        this.assertLongResult(5L, "1 + x");
         this.assertLongResult(6L, "2 + x");
+        this.assertLongResult(-2L, "2 - x");
+        this.assertLongResult(8L, "2 * x");
+        this.assertLongResult(8L, "x * 2");
+        this.assertLongResult(2L, "x / 2");
+        this.assertLongResult(2L, "8 / x");
+
+        scriptEvaluatesToTrue("x > 3", this.context);
+        scriptEvaluatesToFalse("x < 3", this.context);
+        scriptEvaluatesToTrue("x >= 4", this.context);
+        scriptEvaluatesToTrue("x < 5", this.context);
+        scriptEvaluatesToFalse("x > 5", this.context);
+    }
+
+    @Test
+    public void intAndDouble()
+    {
+        assertDoubleResult(5.0, "x + 1.0", this.context);
+        assertDoubleResult(5.0, "1.0 + x", this.context);
+        assertDoubleResult(6.0, "2.0 + x", this.context);
+        assertDoubleResult(-2.0, "2.0 - x", this.context);
+        assertDoubleResult(8.0, "2.0 * x", this.context);
+        assertDoubleResult(8.0, "x * 2.0", this.context);
+        assertDoubleResult(2.0, "x / 2.0", this.context);
+        assertDoubleResult(2.0, "8.0 / x", this.context);
+
+        scriptEvaluatesToTrue("x > 3.0", this.context);
+        scriptEvaluatesToFalse("3.0 > x", this.context);
+        scriptEvaluatesToFalse("x < 3.0", this.context);
+        scriptEvaluatesToTrue("x >= 4.0", this.context);
+        scriptEvaluatesToTrue("x < 5.0", this.context);
+        scriptEvaluatesToFalse("5.0 < x", this.context);
     }
 
     @Test
@@ -73,6 +105,18 @@ public class ExpressionIntValueTest
         scriptEvaluatesToTrue("x is not null", this.context);
     }
 
+    @Test
+    public void intContains()
+    {
+        this.context.setVariable("z", new IntValue(25));
+
+        scriptEvaluatesToTrue("x in (x, y, z)", this.context);
+        scriptEvaluatesToFalse("x in (y, z)", this.context);
+
+        scriptEvaluatesToTrue("x not in (y, z)", this.context);
+        scriptEvaluatesToFalse("x not in (y, x, z)", this.context);
+    }
+
     private void assertLongResult(long expected, String scriptString)
     {
         Value value = evaluateScriptWithContext(scriptString, this.context);
@@ -88,5 +132,4 @@ public class ExpressionIntValueTest
         Assert.assertTrue(value.isInt());
         Assert.assertEquals(expected, ((IntValue) value).intValue());
     }
-
 }

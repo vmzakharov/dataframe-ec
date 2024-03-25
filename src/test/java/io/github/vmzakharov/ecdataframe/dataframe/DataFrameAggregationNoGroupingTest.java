@@ -16,72 +16,72 @@ public class DataFrameAggregationNoGroupingTest
     {
         this.dataFrame = new DataFrame("FrameOfData")
                 .addStringColumn("Name").addStringColumn("Foo").addLongColumn("Bar").addDoubleColumn("Baz")
-                .addDoubleColumn("Qux").addIntColumn("Waldo")
-                .addRow("Alice", "Abc",  123L, 10.0, 100.0,  1)
-                .addRow("Bob",   "Def",  456L, 12.0, -25.0, -2)
-                .addRow("Carol", "Xyz", -789L, 17.0,  42.0,  5);
+                .addDoubleColumn("Qux").addIntColumn("Waldo").addFloatColumn("Thud")
+                .addRow("Alice", "Abc",  123L, 10.0, 100.0,  1, -10.5f)
+                .addRow("Bob",   "Def",  456L, 12.0, -25.0, -2,  20.5f)
+                .addRow("Carol", "Xyz", -789L, 17.0,  42.0,  5,  12.5f);
     }
 
     @Test
     public void sumAll()
     {
         DataFrame expected = new DataFrame("sum")
-                .addLongColumn("Bar").addDoubleColumn("Baz").addDoubleColumn("Qux").addLongColumn("Waldo")
-                .addRow(-210L, 39.0, 117.0, 4L);
+                .addLongColumn("Bar").addDoubleColumn("Baz").addDoubleColumn("Qux").addLongColumn("Waldo").addDoubleColumn("Thud")
+                .addRow(-210L, 39.0, 117.0, 4L, 22.5);
 
         DataFrameUtil.assertEquals(expected,
-                this.dataFrame.sum(Lists.immutable.of("Bar", "Baz", "Qux", "Waldo")));
+                this.dataFrame.sum(Lists.immutable.of("Bar", "Baz", "Qux", "Waldo", "Thud")));
 
         DataFrameUtil.assertEquals(expected,
-                this.dataFrame.aggregate(Lists.immutable.of(sum("Bar"), sum("Baz"), sum("Qux"), sum("Waldo"))));
+                this.dataFrame.aggregate(Lists.immutable.of(sum("Bar"), sum("Baz"), sum("Qux"), sum("Waldo"), sum("Thud"))));
     }
 
     @Test
     public void minAll()
     {
         DataFrame expected = new DataFrame("min")
-                .addLongColumn("Bar").addDoubleColumn("Baz").addDoubleColumn("Qux").addIntColumn("Waldo")
-                .addRow(-789L, 10.0, -25.0, -2);
+                .addLongColumn("Bar").addDoubleColumn("Baz").addDoubleColumn("Qux").addIntColumn("Waldo").addFloatColumn("Thud")
+                .addRow(-789L, 10.0, -25.0, -2, -10.5f);
 
         DataFrameUtil.assertEquals(
                 expected,
-                this.dataFrame.aggregate(Lists.immutable.of(min("Bar"), min("Baz"), min("Qux"), min("Waldo"))));
+                this.dataFrame.aggregate(Lists.immutable.of(min("Bar"), min("Baz"), min("Qux"), min("Waldo"), min("Thud"))));
     }
 
     @Test
     public void maxAll()
     {
         DataFrame expected = new DataFrame("max")
-                .addLongColumn("Bar").addDoubleColumn("Baz").addDoubleColumn("Qux").addIntColumn("Waldo")
-                .addRow(456L, 17.0, 100.0, 5);
+                .addLongColumn("Bar").addDoubleColumn("Baz").addDoubleColumn("Qux").addIntColumn("Waldo").addFloatColumn("Thud")
+                .addRow(456L, 17.0, 100.0, 5, 20.5f);
 
         DataFrameUtil.assertEquals(
                 expected,
-                this.dataFrame.aggregate(Lists.immutable.of(max("Bar"), max("Baz"), max("Qux"), max("Waldo"))));
+                this.dataFrame.aggregate(Lists.immutable.of(max("Bar"), max("Baz"), max("Qux"), max("Waldo"), max("Thud"))));
     }
 
     @Test
     public void averageAll()
     {
         DataFrame expected = new DataFrame("sum")
-                .addLongColumn("Bar").addDoubleColumn("Baz").addDoubleColumn("Qux").addIntColumn("Waldo")
-                .addRow(-70L, 13.0, 39.0, 1);
+                .addLongColumn("Bar").addDoubleColumn("Baz").addDoubleColumn("Qux").addIntColumn("Waldo").addFloatColumn("Thud")
+                .addRow(-70L, 13.0, 39.0, 1, 7.5f);
 
         DataFrameUtil.assertEquals(
                 expected,
-                this.dataFrame.aggregate(Lists.immutable.of(avg("Bar"), avg("Baz"), avg("Qux"), avg("Waldo"))));
+                this.dataFrame.aggregate(Lists.immutable.of(avg("Bar"), avg("Baz"), avg("Qux"), avg("Waldo"), avg("Thud"))));
     }
 
     @Test
     public void countAll()
     {
         DataFrame expected = new DataFrame("sum")
-                .addLongColumn("Name").addLongColumn("Bar").addLongColumn("Baz").addLongColumn("Qux").addLongColumn("Waldo")
-                .addRow(3L, 3L, 3L, 3L, 3L);
+                .addLongColumn("Name").addLongColumn("Bar").addLongColumn("Baz").addLongColumn("Qux").addLongColumn("Waldo").addLongColumn("Thud")
+                .addRow(3L, 3L, 3L, 3L, 3L, 3L);
 
         DataFrameUtil.assertEquals(
                 expected,
-                this.dataFrame.aggregate(Lists.immutable.of(count("Name"), count("Bar"), count("Baz"), count("Qux"), count("Waldo"))));
+                this.dataFrame.aggregate(Lists.immutable.of(count("Name"), count("Bar"), count("Baz"), count("Qux"), count("Waldo"), count("Thud"))));
     }
 
     @Test

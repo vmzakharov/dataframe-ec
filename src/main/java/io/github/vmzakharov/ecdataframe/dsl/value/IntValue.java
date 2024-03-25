@@ -48,17 +48,12 @@ implements WholeNumberValue
     @Override
     public Value apply(Value another, ArithmeticOp operation)
     {
-        if (another.isDouble())
+        if (another.isWholeNumber())
         {
-            return operation.applyDouble(this.doubleValue(), ((DoubleValue) another).doubleValue());
+            return operation.applyLong(this.longValue(), ((WholeNumberValue) another).longValue());
         }
 
-        if (another.isLong())
-        {
-            return operation.applyLong(this.intValue(), ((LongValue) another).longValue());
-        }
-
-        return operation.applyLong(this.intValue(), ((IntValue) another).intValue());
+        return operation.applyDouble(this.doubleValue(), ((NumberValue) another).doubleValue());
     }
 
     @Override
@@ -70,16 +65,12 @@ implements WholeNumberValue
     @Override
     public BooleanValue applyPredicate(Value another, PredicateOp operation)
     {
-        if (another.isDouble())
+        if (another.isWholeNumber())
         {
-            return operation.applyDouble(this.doubleValue(), ((DoubleValue) another).doubleValue());
+            return operation.applyLong(this.longValue(), ((WholeNumberValue) another).longValue());
         }
 
-        if (another.isLong())
-        {
-            return operation.applyLong(this.intValue(), ((LongValue) another).longValue());
-        }
-        return operation.applyLong(this.intValue(), ((IntValue) another).intValue());
+        return operation.applyDouble(this.doubleValue(), ((NumberValue) another).doubleValue());
     }
 
     @Override

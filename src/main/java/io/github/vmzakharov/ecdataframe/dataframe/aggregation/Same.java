@@ -4,6 +4,8 @@ import io.github.vmzakharov.ecdataframe.dataframe.AggregateFunction;
 import io.github.vmzakharov.ecdataframe.dataframe.DfColumn;
 import io.github.vmzakharov.ecdataframe.dataframe.DfDoubleColumn;
 import io.github.vmzakharov.ecdataframe.dataframe.DfDoubleColumnStored;
+import io.github.vmzakharov.ecdataframe.dataframe.DfFloatColumn;
+import io.github.vmzakharov.ecdataframe.dataframe.DfFloatColumnStored;
 import io.github.vmzakharov.ecdataframe.dataframe.DfIntColumn;
 import io.github.vmzakharov.ecdataframe.dataframe.DfIntColumnStored;
 import io.github.vmzakharov.ecdataframe.dataframe.DfLongColumn;
@@ -13,15 +15,24 @@ import io.github.vmzakharov.ecdataframe.dsl.value.ValueType;
 import org.eclipse.collections.api.list.ListIterable;
 import org.eclipse.collections.impl.factory.Lists;
 
-import static io.github.vmzakharov.ecdataframe.dsl.value.ValueType.*;
+import static io.github.vmzakharov.ecdataframe.dsl.value.ValueType.DATE;
+import static io.github.vmzakharov.ecdataframe.dsl.value.ValueType.DATE_TIME;
+import static io.github.vmzakharov.ecdataframe.dsl.value.ValueType.DECIMAL;
+import static io.github.vmzakharov.ecdataframe.dsl.value.ValueType.DOUBLE;
+import static io.github.vmzakharov.ecdataframe.dsl.value.ValueType.FLOAT;
+import static io.github.vmzakharov.ecdataframe.dsl.value.ValueType.INT;
+import static io.github.vmzakharov.ecdataframe.dsl.value.ValueType.LONG;
+import static io.github.vmzakharov.ecdataframe.dsl.value.ValueType.STRING;
 
 public class Same
 extends AggregateFunction
 {
-    private static final ListIterable<ValueType> SUPPORTED_TYPES = Lists.immutable.of(INT, LONG, DOUBLE, STRING, DATE, DATE_TIME, DECIMAL);
+    private static final ListIterable<ValueType> SUPPORTED_TYPES = Lists.fixedSize.of(INT, LONG, DOUBLE, FLOAT, STRING, DATE, DATE_TIME, DECIMAL);
+
     private static final long INITIAL_VALUE_LONG = System.nanoTime();
     private static final double INITIAL_VALUE_DOUBLE = INITIAL_VALUE_LONG;
     private static final int INITIAL_VALUE_INT = Integer.MIN_VALUE;
+    private static final float INITIAL_VALUE_FLOAT =  INITIAL_VALUE_INT;
     private static final Object INITIAL_VALUE_OBJECT = new Object();
 
     public Same(String newColumnName)
@@ -53,6 +64,12 @@ extends AggregateFunction
     }
 
     @Override
+    public float floatInitialValue()
+    {
+        return INITIAL_VALUE_FLOAT;
+    }
+
+    @Override
     public Object objectInitialValue()
     {
         return INITIAL_VALUE_OBJECT;
@@ -66,7 +83,7 @@ extends AggregateFunction
 
         if (currentAggregatedValue == INITIAL_VALUE_INT)
         {
-            targetColumn.setObject(targetRowIndex, nextValue);
+            targetColumn.setInt(targetRowIndex, nextValue);
         }
         else if (currentAggregatedValue != nextValue)
         {
@@ -82,7 +99,7 @@ extends AggregateFunction
 
         if (currentAggregatedValue == INITIAL_VALUE_LONG)
         {
-            targetColumn.setObject(targetRowIndex, nextValue);
+            targetColumn.setLong(targetRowIndex, nextValue);
         }
         else if (currentAggregatedValue != nextValue)
         {
@@ -98,7 +115,23 @@ extends AggregateFunction
 
         if (currentAggregatedValue == INITIAL_VALUE_DOUBLE)
         {
-            targetColumn.setObject(targetRowIndex, nextValue);
+            targetColumn.setDouble(targetRowIndex, nextValue);
+        }
+        else if (currentAggregatedValue != nextValue)
+        {
+            targetColumn.setObject(targetRowIndex, null);
+        }
+    }
+
+    @Override
+    public void aggregateValueIntoFloat(DfFloatColumnStored targetColumn, int targetRowIndex, DfColumn sourceColumn, int sourceRowIndex)
+    {
+        float currentAggregatedValue = targetColumn.getFloat(targetRowIndex);
+        float nextValue = this.getFloatValue(sourceColumn, sourceRowIndex);
+
+        if (currentAggregatedValue == INITIAL_VALUE_FLOAT)
+        {
+            targetColumn.setFloat(targetRowIndex, nextValue);
         }
         else if (currentAggregatedValue != nextValue)
         {
@@ -127,6 +160,18 @@ extends AggregateFunction
     {
         double first = doubleColumn.getDouble(0);
         if (doubleColumn.toDoubleList().allSatisfy(each -> each == first))
+        {
+            return first;
+        }
+
+        return null;
+    }
+
+    @Override
+    public Object applyToFloatColumn(DfFloatColumn floatColumn)
+    {
+        float first = floatColumn.getFloat(0);
+        if (floatColumn.toFloatList().allSatisfy(each -> each == first))
         {
             return first;
         }

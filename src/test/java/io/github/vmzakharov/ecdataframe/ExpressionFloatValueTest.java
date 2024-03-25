@@ -2,8 +2,8 @@ package io.github.vmzakharov.ecdataframe;
 
 import io.github.vmzakharov.ecdataframe.dsl.EvalContext;
 import io.github.vmzakharov.ecdataframe.dsl.SimpleEvalContext;
-import io.github.vmzakharov.ecdataframe.dsl.value.DoubleValue;
 import io.github.vmzakharov.ecdataframe.dsl.value.FloatValue;
+import io.github.vmzakharov.ecdataframe.dsl.value.IntValue;
 import io.github.vmzakharov.ecdataframe.dsl.value.Value;
 import org.junit.Assert;
 import org.junit.Before;
@@ -27,20 +27,56 @@ public class ExpressionFloatValueTest
     @Test
     public void addFloats()
     {
-        this.assertDoubleResult(9.75, "x + y");
+        assertDoubleResult(9.75, "x + y", this.context);
     }
 
     @Test
-    public void addFloatToDouble()
+    public void floatAndDouble()
     {
-        this.assertDoubleResult(5.75, "x + 1.5");
-        this.assertDoubleResult(6.375, "2.125 + x");
+        assertDoubleResult(5.75, "x + 1.5", this.context);
+        assertDoubleResult(6.375, "2.125 + x", this.context);
+
+        scriptEvaluatesToTrue("x > 4.0", this.context);
+        scriptEvaluatesToFalse("x < 4.0", this.context);
+    }
+
+    @Test
+    public void floatAndLong()
+    {
+        assertDoubleResult(8.25, "x + 4", this.context);
+        assertDoubleResult(8.25, "4 + x", this.context);
+        assertDoubleResult(-2.25, "2 - x", this.context);
+        assertDoubleResult(2.25, "x - 2", this.context);
+        assertDoubleResult(8.5, "x * 2", this.context);
+        assertDoubleResult(2.125, "x / 2", this.context);
+
+        scriptEvaluatesToTrue("x > 4", this.context);
+        scriptEvaluatesToFalse("x < 4", this.context);
+    }
+
+    @Test
+    public void floatAndInt()
+    {
+        this.context.setVariable("i", new IntValue(4));
+        this.context.setVariable("seventeen", new IntValue(17));
+
+        assertDoubleResult(8.25, "x + i", this.context);
+        assertDoubleResult(8.25, "i + x", this.context);
+        assertDoubleResult(12.75, "seventeen - x", this.context);
+        assertDoubleResult(-12.75, "x - seventeen", this.context);
+        assertDoubleResult(17.0, "x * i", this.context);
+        assertDoubleResult(17.0, "i * x", this.context);
+        assertDoubleResult(1.0625, "x / i", this.context);
+        assertDoubleResult(4.0, "seventeen / x", this.context);
+
+        scriptEvaluatesToTrue("x > i", this.context);
+        scriptEvaluatesToFalse("x < i", this.context);
     }
 
     @Test
     public void multiplyFloats()
     {
-        this.assertDoubleResult(23.375, "x * y");
+        assertDoubleResult(23.375, "x * y", this.context);
     }
 
     @Test
@@ -74,12 +110,16 @@ public class ExpressionFloatValueTest
         scriptEvaluatesToTrue("x is not null", this.context);
     }
 
-    private void assertDoubleResult(double expected, String scriptString)
+    @Test
+    public void floatContains()
     {
-        Value value = evaluateScriptWithContext(scriptString, this.context);
+        this.context.setVariable("z", new FloatValue(25.25f));
 
-        Assert.assertTrue(value.isDouble());
-        Assert.assertEquals(expected, ((DoubleValue) value).doubleValue(), TOLERANCE);
+        scriptEvaluatesToTrue("x in (x, y, z)", this.context);
+        scriptEvaluatesToFalse("x in (y, z)", this.context);
+
+        scriptEvaluatesToTrue("x not in (y, z)", this.context);
+        scriptEvaluatesToFalse("x not in (y, x, z)", this.context);
     }
 
     private void assertFloatResult(float expected, String scriptString)

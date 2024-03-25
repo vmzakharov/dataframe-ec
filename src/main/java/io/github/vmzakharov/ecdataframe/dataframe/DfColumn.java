@@ -45,27 +45,25 @@ public interface DfColumn
 
     default Object aggregate(AggregateFunction aggregateFunction)
     {
-        if (aggregateFunction.supportsSourceType(this.getType()))
-        {
-            if (this.getSize() == 0)
-            {
-                return aggregateFunction.valueForEmptyColumn(this);
-            }
-
-            try
-            {
-                return aggregateFunction.applyToColumn(this);
-            }
-            catch (NullPointerException npe)
-            {
-                // npe can be thrown if there is a null value stored in a column of primitive type, this can happen when
-                // converting column values to a list.
-                return null;
-            }
-        }
-        else
+        if (!aggregateFunction.supportsSourceType(this.getType()))
         {
             throw aggregateFunction.notApplicable(this);
+        }
+
+        if (this.getSize() == 0)
+        {
+            return aggregateFunction.valueForEmptyColumn(this);
+        }
+
+        try
+        {
+            return aggregateFunction.applyToColumn(this);
+        }
+        catch (NullPointerException npe)
+        {
+            // npe can be thrown if there is a null value stored in a column of primitive type, this can happen when
+            // converting column values to a list.
+            return null;
         }
     }
 

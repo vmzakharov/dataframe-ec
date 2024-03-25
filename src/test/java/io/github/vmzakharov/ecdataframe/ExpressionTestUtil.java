@@ -26,6 +26,8 @@ import java.time.LocalDateTime;
 
 final public class ExpressionTestUtil
 {
+    static private final double TOLERANCE = 0.00000001;
+
     private ExpressionTestUtil()
     {
         // Utility class
@@ -88,6 +90,14 @@ final public class ExpressionTestUtil
         Value result = evaluateExpression(s);
         Assert.assertTrue(result.isDecimal());
         return ((DecimalValue) result).decimalValue();
+    }
+
+    public static void assertDoubleResult(double expected, String scriptString, EvalContext context)
+    {
+        Value value = evaluateScriptWithContext(scriptString, context);
+
+        Assert.assertTrue(value.isDouble());
+        Assert.assertEquals(expected, ((DoubleValue) value).doubleValue(), TOLERANCE);
     }
 
     public static LocalDate evaluateToDate(String s)

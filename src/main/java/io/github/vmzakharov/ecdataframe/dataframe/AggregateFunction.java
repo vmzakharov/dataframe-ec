@@ -149,12 +149,19 @@ public abstract class AggregateFunction
                 return this.applyToDoubleColumn((DfDoubleColumn) column);
             case INT:
                 return this.applyToIntColumn((DfIntColumn) column);
+            case FLOAT:
+                return this.applyToFloatColumn((DfFloatColumn) column);
             default:
                 return this.applyToObjectColumn((DfObjectColumn<?>) column);
         }
     }
 
     public Object applyToDoubleColumn(DfDoubleColumn doubleColumn)
+    {
+        throw this.notApplicable(doubleColumn);
+    }
+
+    public Object applyToFloatColumn(DfFloatColumn doubleColumn)
     {
         throw this.notApplicable(doubleColumn);
     }
@@ -189,7 +196,7 @@ public abstract class AggregateFunction
         throw this.noInitialValueException(ValueType.INT.toString());
     }
 
-    public int floatInitialValue()
+    public float floatInitialValue()
     {
         throw this.noInitialValueException(ValueType.FLOAT.toString());
     }
@@ -284,6 +291,11 @@ public abstract class AggregateFunction
         return ((DfIntColumn) sourceColumn).getInt(sourceRowIndex);
     }
 
+    public float getFloatValue(DfColumn sourceColumn, int sourceRowIndex)
+    {
+        return ((DfFloatColumn) sourceColumn).getFloat(sourceRowIndex);
+    }
+
     public double getDoubleValue(DfColumn sourceColumn, int sourceRowIndex)
     {
         return ((DfDoubleColumn) sourceColumn).getDouble(sourceRowIndex);
@@ -311,6 +323,10 @@ public abstract class AggregateFunction
         else if (accumulatorColumn.getType().isInt())
         {
             ((DfIntColumnStored) accumulatorColumn).setInt(accumulatorRowIndex, this.intInitialValue());
+        }
+        else if (accumulatorColumn.getType().isFloat())
+        {
+            ((DfFloatColumnStored) accumulatorColumn).setFloat(accumulatorRowIndex, this.floatInitialValue());
         }
         else
         {
@@ -355,7 +371,7 @@ public abstract class AggregateFunction
         float currentAggregatedValue = targetColumn.getFloat(targetRowIndex);
         targetColumn.setFloat(
                 targetRowIndex,
-                this.floatAccumulator(currentAggregatedValue, this.getIntValue(sourceColumn, sourceRowIndex)));
+                this.floatAccumulator(currentAggregatedValue, this.getFloatValue(sourceColumn, sourceRowIndex)));
     }
 
     /**

@@ -18,12 +18,12 @@ public class DataFrameAggregationSameTest
         this.dataFrame = new DataFrame("FrameOfData")
                 .addStringColumn("Name").addStringColumn("Color").addLongColumn("Bar")
                 .addDoubleColumn("Baz").addDoubleColumn("Qux").addDateColumn("Date")
-                .addIntColumn("Plugh")
-                .addRow("Alice", "Blue",    123L, 10.0, 100.0, LocalDate.of(2021, 11, 21), 1)
-                .addRow("Bob",   "Orange",  456L, 12.0, -25.0, LocalDate.of(2021, 11, 21), 2)
-                .addRow("Bob",   "Orange",  457L, 16.0, -25.0, LocalDate.of(2021, 11, 23), 3)
-                .addRow("Carol", "Green",  -789L, 17.0,  42.0, LocalDate.of(2021, 12, 22), 4)
-                .addRow("Carol", "Purple", -789L, 17.0,  43.0, LocalDate.of(2021, 12, 22), 4);
+                .addIntColumn("Plugh").addFloatColumn("Thud")
+                .addRow("Alice", "Blue",    123L, 10.0, 100.0, LocalDate.of(2021, 11, 21), 1, 1.25f)
+                .addRow("Bob",   "Orange",  456L, 12.0, -25.0, LocalDate.of(2021, 11, 21), 2, 2.5f)
+                .addRow("Bob",   "Orange",  457L, 16.0, -25.0, LocalDate.of(2021, 11, 23), 3, 2.75f)
+                .addRow("Carol", "Green",  -789L, 17.0,  42.0, LocalDate.of(2021, 12, 22), 4, 1.125f)
+                .addRow("Carol", "Purple", -789L, 17.0,  43.0, LocalDate.of(2021, 12, 22), 4, 1.125f);
     }
 
     @Test
@@ -69,7 +69,21 @@ public class DataFrameAggregationSameTest
     }
 
     @Test
-    public void sameValues()
+    public void sameValuesByNameWithFloat()
+    {
+        DataFrameUtil.assertEquals(
+                new DataFrame("aggregated")
+                        .addStringColumn("Name").addStringColumn("Same Color").addFloatColumn("Same Thud")
+                        .addRow("Alice", "Blue",   1.25f)
+                        .addRow("Bob",   "Orange", null)
+                        .addRow("Carol", null,     1.125f),
+                this.dataFrame.aggregateBy(
+                        Lists.immutable.of(same("Color", "Same Color"), same("Thud", "Same Thud")),
+                        Lists.immutable.of("Name")));
+    }
+
+    @Test
+    public void aggregateAllNoGrouping()
     {
         DataFrame df = new DataFrame("FrameOfData")
                 .addStringColumn("Name").addStringColumn("Color")
@@ -77,9 +91,10 @@ public class DataFrameAggregationSameTest
                 .addDoubleColumn("Qux").addDoubleColumn("Waldo")
                 .addDateColumn("DateOne").addDateColumn("DateTwo")
                 .addIntColumn("PlughOne").addIntColumn("PlughTwo")
-                .addRow("Alice", "Orange", 123L, 123L, 10.0, 100.0, LocalDate.of(2021, 12, 22), LocalDate.of(2021, 11, 21), 4, 2)
-                .addRow("Bob",   "Orange", 123L, 456L, 12.0, 100.0, LocalDate.of(2021, 12, 22), LocalDate.of(2021, 11, 22), 4, 1)
-                .addRow("Carol", "Orange", 123L, 123L, 17.0, 100.0, LocalDate.of(2021, 12, 22), LocalDate.of(2021, 11, 21), 4, 1)
+                .addFloatColumn("ThudOne").addFloatColumn("ThudTwo")
+                .addRow("Alice", "Orange", 123L, 123L, 10.0, 100.0, LocalDate.of(2021, 12, 22), LocalDate.of(2021, 11, 21), 4, 2, 1.25f, 2.5f)
+                .addRow("Bob",   "Orange", 123L, 456L, 12.0, 100.0, LocalDate.of(2021, 12, 22), LocalDate.of(2021, 11, 22), 4, 1, 1.25f, 2.5f)
+                .addRow("Carol", "Orange", 123L, 123L, 17.0, 100.0, LocalDate.of(2021, 12, 22), LocalDate.of(2021, 11, 21), 4, 1, 1.25f, 3.5f)
                 ;
 
         DataFrameUtil.assertEquals(
@@ -89,13 +104,16 @@ public class DataFrameAggregationSameTest
                         .addDoubleColumn("Qux").addDoubleColumn("Waldo")
                         .addDateColumn("DateOne").addDateColumn("DateTwo")
                         .addIntColumn("PlughOne").addIntColumn("PlughTwo")
-                        .addRow(null, "Orange", 123L, null, null, 100.0, LocalDate.of(2021, 12, 22), null, 4, null),
+                        .addFloatColumn("ThudOne").addFloatColumn("ThudTwo")
+                        .addRow(null, "Orange", 123L, null, null, 100.0, LocalDate.of(2021, 12, 22), null, 4, null, 1.25f, null),
                 df.aggregate(Lists.immutable.of(
                         same("Name"), same("Color"),
                         same("Bar"), same("Baz"),
                         same("Qux"), same("Waldo"),
                         same("DateOne"), same("DateTwo"),
-                        same("PlughOne"), same("PlughTwo"))
+                        same("PlughOne"), same("PlughTwo"),
+                        same("ThudOne"), same("ThudTwo")
+                        )
                 )
         );
     }

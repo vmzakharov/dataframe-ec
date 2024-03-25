@@ -4,6 +4,7 @@ import io.github.vmzakharov.ecdataframe.dataframe.AggregateFunction;
 import io.github.vmzakharov.ecdataframe.dataframe.DfColumn;
 import io.github.vmzakharov.ecdataframe.dataframe.DfDecimalColumn;
 import io.github.vmzakharov.ecdataframe.dataframe.DfDoubleColumn;
+import io.github.vmzakharov.ecdataframe.dataframe.DfFloatColumn;
 import io.github.vmzakharov.ecdataframe.dataframe.DfIntColumn;
 import io.github.vmzakharov.ecdataframe.dataframe.DfLongColumn;
 import io.github.vmzakharov.ecdataframe.dataframe.DfObjectColumn;
@@ -13,12 +14,16 @@ import org.eclipse.collections.impl.factory.Lists;
 
 import java.math.BigDecimal;
 
-import static io.github.vmzakharov.ecdataframe.dsl.value.ValueType.*;
+import static io.github.vmzakharov.ecdataframe.dsl.value.ValueType.DECIMAL;
+import static io.github.vmzakharov.ecdataframe.dsl.value.ValueType.DOUBLE;
+import static io.github.vmzakharov.ecdataframe.dsl.value.ValueType.FLOAT;
+import static io.github.vmzakharov.ecdataframe.dsl.value.ValueType.INT;
+import static io.github.vmzakharov.ecdataframe.dsl.value.ValueType.LONG;
 
 public class Sum
 extends AggregateFunction
 {
-    private static final ListIterable<ValueType> SUPPORTED_TYPES = Lists.immutable.of(INT, LONG, DOUBLE, DECIMAL);
+    private static final ListIterable<ValueType> SUPPORTED_TYPES = Lists.immutable.of(INT, LONG, DOUBLE, FLOAT, DECIMAL);
 
     public Sum(String newColumnName)
     {
@@ -39,7 +44,9 @@ extends AggregateFunction
     @Override
     public ValueType targetColumnType(ValueType sourceColumnType)
     {
-        return sourceColumnType.isInt() ? LONG : sourceColumnType;
+        return sourceColumnType.isWholeNumber()
+                ? LONG
+                : (sourceColumnType.isRealNumber() ? DOUBLE : sourceColumnType);
     }
 
     @Override
@@ -52,6 +59,12 @@ extends AggregateFunction
     public Object applyToDoubleColumn(DfDoubleColumn doubleColumn)
     {
         return doubleColumn.toDoubleList().sum();
+    }
+
+    @Override
+    public Object applyToFloatColumn(DfFloatColumn floatColumn)
+    {
+        return floatColumn.toFloatList().sum();
     }
 
     @Override
@@ -98,6 +111,14 @@ extends AggregateFunction
         return sourceColumn.getType().isLong()
                 ? ((DfLongColumn) sourceColumn).getLong(sourceRowIndex)
                 : ((DfIntColumn) sourceColumn).getInt(sourceRowIndex);
+    }
+
+    @Override
+    public double getDoubleValue(DfColumn sourceColumn, int sourceRowIndex)
+    {
+        return sourceColumn.getType().isDouble()
+                ? ((DfDoubleColumn) sourceColumn).getDouble(sourceRowIndex)
+                : ((DfFloatColumn) sourceColumn).getFloat(sourceRowIndex);
     }
 
     @Override

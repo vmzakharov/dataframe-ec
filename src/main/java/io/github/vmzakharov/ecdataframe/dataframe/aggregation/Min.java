@@ -3,6 +3,7 @@ package io.github.vmzakharov.ecdataframe.dataframe.aggregation;
 import io.github.vmzakharov.ecdataframe.dataframe.AggregateFunction;
 import io.github.vmzakharov.ecdataframe.dataframe.DfDecimalColumn;
 import io.github.vmzakharov.ecdataframe.dataframe.DfDoubleColumn;
+import io.github.vmzakharov.ecdataframe.dataframe.DfFloatColumn;
 import io.github.vmzakharov.ecdataframe.dataframe.DfIntColumn;
 import io.github.vmzakharov.ecdataframe.dataframe.DfLongColumn;
 import io.github.vmzakharov.ecdataframe.dataframe.DfObjectColumn;
@@ -12,12 +13,16 @@ import org.eclipse.collections.impl.factory.Lists;
 
 import java.math.BigDecimal;
 
-import static io.github.vmzakharov.ecdataframe.dsl.value.ValueType.*;
+import static io.github.vmzakharov.ecdataframe.dsl.value.ValueType.DECIMAL;
+import static io.github.vmzakharov.ecdataframe.dsl.value.ValueType.DOUBLE;
+import static io.github.vmzakharov.ecdataframe.dsl.value.ValueType.FLOAT;
+import static io.github.vmzakharov.ecdataframe.dsl.value.ValueType.INT;
+import static io.github.vmzakharov.ecdataframe.dsl.value.ValueType.LONG;
 
 public class Min
 extends AggregateFunction
 {
-    private static final ListIterable<ValueType> SUPPORTED_TYPES = Lists.immutable.of(INT, LONG, DOUBLE, DECIMAL);
+    private static final ListIterable<ValueType> SUPPORTED_TYPES = Lists.immutable.of(INT, LONG, DOUBLE, FLOAT, DECIMAL);
 
     public Min(String newColumnName)
     {
@@ -45,6 +50,12 @@ extends AggregateFunction
     public Object applyToDoubleColumn(DfDoubleColumn doubleColumn)
     {
         return doubleColumn.toDoubleList().min();
+    }
+
+    @Override
+    public Object applyToFloatColumn(DfFloatColumn floatColumn)
+    {
+        return floatColumn.toFloatList().min();
     }
 
     @Override

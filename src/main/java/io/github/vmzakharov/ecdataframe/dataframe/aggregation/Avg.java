@@ -7,6 +7,7 @@ import io.github.vmzakharov.ecdataframe.dataframe.DfDecimalColumn;
 import io.github.vmzakharov.ecdataframe.dataframe.DfDecimalColumnStored;
 import io.github.vmzakharov.ecdataframe.dataframe.DfDoubleColumn;
 import io.github.vmzakharov.ecdataframe.dataframe.DfDoubleColumnStored;
+import io.github.vmzakharov.ecdataframe.dataframe.DfFloatColumn;
 import io.github.vmzakharov.ecdataframe.dataframe.DfIntColumn;
 import io.github.vmzakharov.ecdataframe.dataframe.DfIntColumnStored;
 import io.github.vmzakharov.ecdataframe.dataframe.DfLongColumn;
@@ -27,7 +28,7 @@ import static io.github.vmzakharov.ecdataframe.dsl.value.ValueType.*;
 public class Avg
 extends AggregateFunction
 {
-    private static final ListIterable<ValueType> SUPPORTED_TYPES = Lists.immutable.of(INT, LONG, DOUBLE, DECIMAL);
+    private static final ListIterable<ValueType> SUPPORTED_TYPES = Lists.immutable.of(INT, LONG, DOUBLE, FLOAT, DECIMAL);
 
     public Avg(String newColumnName)
     {
@@ -55,6 +56,12 @@ extends AggregateFunction
     public Object applyToDoubleColumn(DfDoubleColumn doubleColumn)
     {
         return doubleColumn.toDoubleList().average();
+    }
+
+    @Override
+    public Object applyToFloatColumn(DfFloatColumn floatColumn)
+    {
+        return (float) floatColumn.toFloatList().average();
     }
 
     @Override

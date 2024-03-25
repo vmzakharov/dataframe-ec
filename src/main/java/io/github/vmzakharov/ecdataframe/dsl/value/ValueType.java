@@ -51,7 +51,7 @@ public enum ValueType
 
     public boolean isRealNumber()
     {
-        return this == DOUBLE || this == FLOAT || this == DECIMAL;
+        return this == DOUBLE || this == FLOAT;
     }
 
     public boolean isDate()
