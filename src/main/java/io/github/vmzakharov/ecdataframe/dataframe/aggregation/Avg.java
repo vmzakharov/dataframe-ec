@@ -8,6 +8,7 @@ import io.github.vmzakharov.ecdataframe.dataframe.DfDecimalColumnStored;
 import io.github.vmzakharov.ecdataframe.dataframe.DfDoubleColumn;
 import io.github.vmzakharov.ecdataframe.dataframe.DfDoubleColumnStored;
 import io.github.vmzakharov.ecdataframe.dataframe.DfFloatColumn;
+import io.github.vmzakharov.ecdataframe.dataframe.DfFloatColumnStored;
 import io.github.vmzakharov.ecdataframe.dataframe.DfIntColumn;
 import io.github.vmzakharov.ecdataframe.dataframe.DfIntColumnStored;
 import io.github.vmzakharov.ecdataframe.dataframe.DfLongColumn;
@@ -15,6 +16,7 @@ import io.github.vmzakharov.ecdataframe.dataframe.DfLongColumnStored;
 import io.github.vmzakharov.ecdataframe.dataframe.DfObjectColumn;
 import io.github.vmzakharov.ecdataframe.dsl.value.ValueType;
 import io.github.vmzakharov.ecdataframe.util.ExceptionFactory;
+import org.eclipse.collections.api.block.procedure.primitive.IntProcedure;
 import org.eclipse.collections.api.list.ListIterable;
 import org.eclipse.collections.impl.factory.Lists;
 
@@ -24,7 +26,7 @@ import java.math.RoundingMode;
 
 import static io.github.vmzakharov.ecdataframe.dsl.value.ValueType.*;
 
-// TODO - avoid overflows
+// TODO - change the agg avoid overflows
 public class Avg
 extends AggregateFunction
 {
@@ -106,6 +108,12 @@ extends AggregateFunction
     }
 
     @Override
+    protected float floatAccumulator(float currentAggregate, float newValue)
+    {
+        return currentAggregate + newValue;
+    }
+
+    @Override
     protected Object objectAccumulator(Object currentAggregate, Object newValue)
     {
         return ((BigDecimal) currentAggregate).add((BigDecimal) newValue);
@@ -130,6 +138,12 @@ extends AggregateFunction
     }
 
     @Override
+    public float floatInitialValue()
+    {
+        return 0.0f;
+    }
+
+    @Override
     public BigDecimal objectInitialValue()
     {
         return BigDecimal.ZERO;
@@ -141,73 +155,80 @@ extends AggregateFunction
         DfColumn aggregatedColumn = aggregatedDataFrame.getColumnNamed(this.getTargetColumnName());
         int columnSize = aggregatedColumn.getSize();
 
+        IntProcedure avgValueSetter = null;
+
         if (aggregatedColumn.getType().isLong())
         {
             DfLongColumnStored longColumn = (DfLongColumnStored) aggregatedColumn;
 
-            for (int rowIndex = 0; rowIndex < columnSize; rowIndex++)
-            {
-                if (!longColumn.isNull(rowIndex))
-                {
-                    long aggregateValue = longColumn.getLong(rowIndex);
+            avgValueSetter = (int rowIndex) -> {
+                long aggregateValue = longColumn.getLong(rowIndex);
 
-                    if (this.zeroContributorCheck(countsByRow[rowIndex], aggregateValue != 0, rowIndex))
-                    {
-                        longColumn.setLong(rowIndex, aggregateValue / countsByRow[rowIndex]);
-                    }
+                if (this.zeroContributorCheck(countsByRow[rowIndex], aggregateValue != 0, rowIndex))
+                {
+                    longColumn.setLong(rowIndex, aggregateValue / countsByRow[rowIndex]);
                 }
-            }
+            };
         }
         else if (aggregatedColumn.getType().isInt())
         {
-            DfIntColumnStored longColumn = (DfIntColumnStored) aggregatedColumn;
+            DfIntColumnStored intColumn = (DfIntColumnStored) aggregatedColumn;
 
-            for (int rowIndex = 0; rowIndex < columnSize; rowIndex++)
-            {
-                if (!longColumn.isNull(rowIndex))
+            avgValueSetter = (int rowIndex) -> {
+                int aggregateValue = intColumn.getInt(rowIndex);
+
+                if (this.zeroContributorCheck(countsByRow[rowIndex], aggregateValue != 0, rowIndex))
                 {
-                    int aggregateValue = longColumn.getInt(rowIndex);
-
-                    if (this.zeroContributorCheck(countsByRow[rowIndex], aggregateValue != 0, rowIndex))
-                    {
-                        longColumn.setInt(rowIndex, aggregateValue / countsByRow[rowIndex]);
-                    }
+                    intColumn.setInt(rowIndex, aggregateValue / countsByRow[rowIndex]);
                 }
-            }
+            };
         }
         else if (aggregatedColumn.getType().isDouble())
         {
             DfDoubleColumnStored doubleColumn = (DfDoubleColumnStored) aggregatedColumn;
 
-            for (int rowIndex = 0; rowIndex < columnSize; rowIndex++)
-            {
-                if (!doubleColumn.isNull(rowIndex))
-                {
-                    double aggregateValue = doubleColumn.getDouble(rowIndex);
+            avgValueSetter = (int rowIndex) -> {
+                double aggregateValue = doubleColumn.getDouble(rowIndex);
 
-                    if (this.zeroContributorCheck(countsByRow[rowIndex], aggregateValue != 0, rowIndex))
-                    {
-                        doubleColumn.setDouble(rowIndex, aggregateValue / countsByRow[rowIndex]);
-                    }
+                if (this.zeroContributorCheck(countsByRow[rowIndex], aggregateValue != 0, rowIndex))
+                {
+                    doubleColumn.setDouble(rowIndex, aggregateValue / countsByRow[rowIndex]);
                 }
-            }
+            };
+        }
+        else if (aggregatedColumn.getType().isFloat())
+        {
+            DfFloatColumnStored floatColumn = (DfFloatColumnStored) aggregatedColumn;
+
+            avgValueSetter = (int rowIndex) -> {
+                float aggregateValue = floatColumn.getFloat(rowIndex);
+
+                if (this.zeroContributorCheck(countsByRow[rowIndex], aggregateValue != 0, rowIndex))
+                {
+                    floatColumn.setFloat(rowIndex, aggregateValue / countsByRow[rowIndex]);
+                }
+            };
         }
         else if (aggregatedColumn.getType().isDecimal())
         {
             DfDecimalColumnStored decimalColumn = (DfDecimalColumnStored) aggregatedColumn;
 
-            for (int rowIndex = 0; rowIndex < columnSize; rowIndex++)
-            {
-                if (!decimalColumn.isNull(rowIndex))
-                {
-                    BigDecimal aggregateValue = decimalColumn.getTypedObject(rowIndex);
+            avgValueSetter = (int rowIndex) -> {
+                BigDecimal aggregateValue = decimalColumn.getTypedObject(rowIndex);
 
-                    if (this.zeroContributorCheck(countsByRow[rowIndex], aggregateValue.signum() != 0, rowIndex))
-                    {
-                        decimalColumn.setObject(rowIndex,
-                                aggregateValue.divide(BigDecimal.valueOf(countsByRow[rowIndex]), MathContext.DECIMAL128));
-                    }
+                if (this.zeroContributorCheck(countsByRow[rowIndex], aggregateValue.signum() != 0, rowIndex))
+                {
+                    decimalColumn.setObject(rowIndex,
+                            aggregateValue.divide(BigDecimal.valueOf(countsByRow[rowIndex]), MathContext.DECIMAL128));
                 }
+            };
+        }
+
+        for (int rowIndex = 0; rowIndex < columnSize; rowIndex++)
+        {
+            if (!aggregatedColumn.isNull(rowIndex))
+            {
+                avgValueSetter.value(rowIndex);
             }
         }
     }

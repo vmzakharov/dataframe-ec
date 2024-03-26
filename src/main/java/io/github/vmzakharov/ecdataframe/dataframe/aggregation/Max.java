@@ -89,6 +89,12 @@ extends AggregateFunction
     }
 
     @Override
+    public float floatInitialValue()
+    {
+        return -Float.MAX_VALUE;
+    }
+
+    @Override
     public Object applyToObjectColumn(DfObjectColumn<?> objectColumn)
     {
         return ((DfDecimalColumn) objectColumn).injectIntoBreakOnNulls(
@@ -110,6 +116,12 @@ extends AggregateFunction
 
     @Override
     protected double doubleAccumulator(double currentAggregate, double newValue)
+    {
+        return Math.max(currentAggregate, newValue);
+    }
+
+    @Override
+    protected float floatAccumulator(float currentAggregate, float newValue)
     {
         return Math.max(currentAggregate, newValue);
     }

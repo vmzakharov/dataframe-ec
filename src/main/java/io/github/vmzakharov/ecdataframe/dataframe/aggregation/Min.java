@@ -98,6 +98,12 @@ extends AggregateFunction
     }
 
     @Override
+    public float floatInitialValue()
+    {
+        return Float.MAX_VALUE;
+    }
+
+    @Override
     public BigDecimal objectInitialValue()
     {
         return BigDecimal.valueOf(Double.MAX_VALUE);
@@ -111,6 +117,12 @@ extends AggregateFunction
 
     @Override
     protected double doubleAccumulator(double currentAggregate, double newValue)
+    {
+        return Math.min(currentAggregate, newValue);
+    }
+
+    @Override
+    protected float floatAccumulator(float currentAggregate, float newValue)
     {
         return Math.min(currentAggregate, newValue);
     }

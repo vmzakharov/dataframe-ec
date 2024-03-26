@@ -113,8 +113,6 @@ public class DataFrameComputedColumnsTest
         this.df.addColumn("FloatieAndLong", "Floatie + Count");
         this.df.addColumn("FloatieAndDouble", "Floatie + Value");
 
-        System.out.println(this.df.asCsvString());
-
         Assert.assertEquals(FloatLists.immutable.of(-1.25f, -2.5f, -4.75f, -1.0f), this.df.getFloatColumn("NegativeFloatie").toFloatList());
         Assert.assertEquals(DoubleLists.immutable.of(6.25, 12.5, 15.75, 1.0), this.df.getDoubleColumn("FloatieAndLong").toDoubleList());
         Assert.assertEquals(DoubleLists.immutable.of(24.7, 14.84, 61.53, 8.89), this.df.getDoubleColumn("FloatieAndDouble").toDoubleList());

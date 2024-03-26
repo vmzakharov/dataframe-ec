@@ -231,7 +231,7 @@ public abstract class AggregateFunction
         throw this.unsupportedAccumulatorException(ValueType.DOUBLE.toString());
     }
 
-    protected int floatAccumulator(float currentAggregate, float newValue)
+    protected float floatAccumulator(float currentAggregate, float newValue)
     {
         throw this.unsupportedAccumulatorException(ValueType.FLOAT.toString());
     }

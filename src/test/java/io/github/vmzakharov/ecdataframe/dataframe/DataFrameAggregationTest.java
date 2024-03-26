@@ -97,7 +97,7 @@ public class DataFrameAggregationTest
     @Test(expected = RuntimeException.class)
     public void averageEmptyFloatThrowsException()
     {
-        new DataFrame("FrameOfData").addStringColumn("Name").addIntColumn("Thud")
+        new DataFrame("FrameOfData").addStringColumn("Name").addFloatColumn("Thud")
                                     .aggregate(Lists.immutable.of(avg("Thud")));
     }
 
