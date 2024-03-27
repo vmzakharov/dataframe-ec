@@ -1,6 +1,7 @@
 package io.github.vmzakharov.ecdataframe.dataframe;
 
 import io.github.vmzakharov.ecdataframe.dataframe.aggregation.Avg;
+import io.github.vmzakharov.ecdataframe.dataframe.aggregation.Avg2d;
 import io.github.vmzakharov.ecdataframe.dataframe.aggregation.Count;
 import io.github.vmzakharov.ecdataframe.dataframe.aggregation.Max;
 import io.github.vmzakharov.ecdataframe.dataframe.aggregation.Min;
@@ -68,6 +69,16 @@ public abstract class AggregateFunction
     public static AggregateFunction avg(String newSourceColumnName, String newTargetColumnName)
     {
         return new Avg(newSourceColumnName, newTargetColumnName);
+    }
+
+    public static AggregateFunction avg2d(String newSourceColumnName)
+    {
+        return new Avg2d(newSourceColumnName);
+    }
+
+    public static AggregateFunction avg2d(String newSourceColumnName, String newTargetColumnName)
+    {
+        return new Avg2d(newSourceColumnName, newTargetColumnName);
     }
 
     public static AggregateFunction count(String newSourceColumnName)

@@ -8,11 +8,8 @@ import io.github.vmzakharov.ecdataframe.dataframe.DfDecimalColumnStored;
 import io.github.vmzakharov.ecdataframe.dataframe.DfDoubleColumn;
 import io.github.vmzakharov.ecdataframe.dataframe.DfDoubleColumnStored;
 import io.github.vmzakharov.ecdataframe.dataframe.DfFloatColumn;
-import io.github.vmzakharov.ecdataframe.dataframe.DfFloatColumnStored;
 import io.github.vmzakharov.ecdataframe.dataframe.DfIntColumn;
-import io.github.vmzakharov.ecdataframe.dataframe.DfIntColumnStored;
 import io.github.vmzakharov.ecdataframe.dataframe.DfLongColumn;
-import io.github.vmzakharov.ecdataframe.dataframe.DfLongColumnStored;
 import io.github.vmzakharov.ecdataframe.dataframe.DfObjectColumn;
 import io.github.vmzakharov.ecdataframe.dsl.value.ValueType;
 import io.github.vmzakharov.ecdataframe.util.ExceptionFactory;
@@ -27,22 +24,20 @@ import java.math.RoundingMode;
 import static io.github.vmzakharov.ecdataframe.dsl.value.ValueType.*;
 
 /**
- * Average data frame aggregation function. For this aggregation for columns of primitive type the result is the source
- * column type. For more precise average calculation use the <code>Avg2d</code> aggregation function that produces <code>double</code>
- * results.
+ * Average data frame aggregation function. For this aggregation the result type is <code>double</code> for columns
+ * of primitive type.
  */
-// TODO - change the agg algorithm to avoid overflows
-public class Avg
+public class Avg2d
 extends AggregateFunction
 {
     private static final ListIterable<ValueType> SUPPORTED_TYPES = Lists.immutable.of(INT, LONG, DOUBLE, FLOAT, DECIMAL);
 
-    public Avg(String newColumnName)
+    public Avg2d(String newColumnName)
     {
         super(newColumnName);
     }
 
-    public Avg(String newColumnName, String newTargetColumnName)
+    public Avg2d(String newColumnName, String newTargetColumnName)
     {
         super(newColumnName, newTargetColumnName);
     }
@@ -60,6 +55,12 @@ extends AggregateFunction
     }
 
     @Override
+    public ValueType targetColumnType(ValueType sourceColumnType)
+    {
+        return sourceColumnType.isDecimal() ? DECIMAL : DOUBLE;
+    }
+
+    @Override
     public Object applyToDoubleColumn(DfDoubleColumn doubleColumn)
     {
         return doubleColumn.toDoubleList().average();
@@ -68,19 +69,19 @@ extends AggregateFunction
     @Override
     public Object applyToFloatColumn(DfFloatColumn floatColumn)
     {
-        return (float) floatColumn.toFloatList().average();
+        return floatColumn.toFloatList().average();
     }
 
     @Override
     public Object applyToLongColumn(DfLongColumn longColumn)
     {
-        return Math.round(longColumn.toLongList().average());
+        return longColumn.toLongList().average();
     }
 
     @Override
     public Object applyToIntColumn(DfIntColumn intColumn)
     {
-        return Math.round(intColumn.toIntList().average());
+        return intColumn.toIntList().average();
     }
 
     @Override
@@ -95,25 +96,25 @@ extends AggregateFunction
     }
 
     @Override
-    protected int intAccumulator(int currentAggregate, int newValue)
+    public double getDoubleValue(DfColumn sourceColumn, int sourceRowIndex)
     {
-        return currentAggregate + newValue;
-    }
-
-    @Override
-    protected long longAccumulator(long currentAggregate, long newValue)
-    {
-        return currentAggregate + newValue;
+        switch (sourceColumn.getType())
+        {
+            case DOUBLE:
+                return ((DfDoubleColumn) sourceColumn).getDouble(sourceRowIndex);
+            case LONG:
+                return ((DfLongColumn) sourceColumn).getLong(sourceRowIndex);
+            case FLOAT:
+                return ((DfFloatColumn) sourceColumn).getFloat(sourceRowIndex);
+            case INT:
+                return ((DfIntColumn) sourceColumn).getInt(sourceRowIndex);
+            default:
+                throw this.notApplicable(sourceColumn);
+        }
     }
 
     @Override
     protected double doubleAccumulator(double currentAggregate, double newValue)
-    {
-        return currentAggregate + newValue;
-    }
-
-    @Override
-    protected float floatAccumulator(float currentAggregate, float newValue)
     {
         return currentAggregate + newValue;
     }
@@ -162,33 +163,7 @@ extends AggregateFunction
 
         IntProcedure avgValueSetter = null;
 
-        if (aggregatedColumn.getType().isLong())
-        {
-            DfLongColumnStored longColumn = (DfLongColumnStored) aggregatedColumn;
-
-            avgValueSetter = (int rowIndex) -> {
-                long aggregateValue = longColumn.getLong(rowIndex);
-
-                if (this.zeroContributorCheck(countsByRow[rowIndex], aggregateValue != 0, rowIndex))
-                {
-                    longColumn.setLong(rowIndex, aggregateValue / countsByRow[rowIndex]);
-                }
-            };
-        }
-        else if (aggregatedColumn.getType().isInt())
-        {
-            DfIntColumnStored intColumn = (DfIntColumnStored) aggregatedColumn;
-
-            avgValueSetter = (int rowIndex) -> {
-                int aggregateValue = intColumn.getInt(rowIndex);
-
-                if (this.zeroContributorCheck(countsByRow[rowIndex], aggregateValue != 0, rowIndex))
-                {
-                    intColumn.setInt(rowIndex, aggregateValue / countsByRow[rowIndex]);
-                }
-            };
-        }
-        else if (aggregatedColumn.getType().isDouble())
+        if (aggregatedColumn.getType().isDouble())
         {
             DfDoubleColumnStored doubleColumn = (DfDoubleColumnStored) aggregatedColumn;
 
@@ -198,19 +173,6 @@ extends AggregateFunction
                 if (this.zeroContributorCheck(countsByRow[rowIndex], aggregateValue != 0, rowIndex))
                 {
                     doubleColumn.setDouble(rowIndex, aggregateValue / countsByRow[rowIndex]);
-                }
-            };
-        }
-        else if (aggregatedColumn.getType().isFloat())
-        {
-            DfFloatColumnStored floatColumn = (DfFloatColumnStored) aggregatedColumn;
-
-            avgValueSetter = (int rowIndex) -> {
-                float aggregateValue = floatColumn.getFloat(rowIndex);
-
-                if (this.zeroContributorCheck(countsByRow[rowIndex], aggregateValue != 0, rowIndex))
-                {
-                    floatColumn.setFloat(rowIndex, aggregateValue / countsByRow[rowIndex]);
                 }
             };
         }
