@@ -11,13 +11,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
-import static io.github.vmzakharov.ecdataframe.dsl.value.ValueType.DATE;
-import static io.github.vmzakharov.ecdataframe.dsl.value.ValueType.DATE_TIME;
-import static io.github.vmzakharov.ecdataframe.dsl.value.ValueType.DECIMAL;
-import static io.github.vmzakharov.ecdataframe.dsl.value.ValueType.DOUBLE;
-import static io.github.vmzakharov.ecdataframe.dsl.value.ValueType.INT;
-import static io.github.vmzakharov.ecdataframe.dsl.value.ValueType.LONG;
-import static io.github.vmzakharov.ecdataframe.dsl.value.ValueType.STRING;
+import static io.github.vmzakharov.ecdataframe.dsl.value.ValueType.*;
 
 public class DataFrameLoadTest
 {
@@ -174,7 +168,7 @@ public class DataFrameLoadTest
     }
 
     @Test
-    public void loadDataWithSchemaNullsConvertedToValues()
+    public void loadWithSchemaConvertEmptyToValues()
     {
         CsvSchema schema = new CsvSchema()
                 .addColumn("Name", STRING)
@@ -182,27 +176,29 @@ public class DataFrameLoadTest
                 .addColumn("HireDate", DATE, "uuuu-M-d")
                 .addColumn("Dept", STRING)
                 .addColumn("Salary", DOUBLE)
-                .addColumn("PetCount", INT);
+                .addColumn("PetCount", INT)
+                .addColumn("LunchAllowance", FLOAT);
 
         CsvDataSet dataSet = new StringBasedCsvDataSet("Foo", "Employees", schema,
-                "Name,EmployeeId,HireDate,Dept,Salary,PetCount\n"
-                        + "\"Alice\",1234,2020-01-01,\"Accounting\",110000.00,2\n"
-                        + "\"Bob\",1233,2010-01-01,\"Bee-bee-boo-boo\",100000.00,0\n"
-                        + "\"Carl\",10000,2005-11-21,\"Controllers\",130000.00,1\n"
-                        + "\"Diane\",10001,2012-09-20,\"\",130000.00,8\n"
-                        + "\"Ed\",10002,,,0.00,"
+                "Name,EmployeeId,HireDate,Dept,Salary,PetCount,LunchAllowance\n"
+                        + "\"Alice\",1234,2020-01-01,\"Accounting\",110000.00,2,15.25\n"
+                        + "\"Bob\",1233,2010-01-01,\"Bee-bee-boo-boo\",100000.00,0,12.50\n"
+                        + "\"Carl\",10000,2005-11-21,\"Controllers\",130000.00,1,15.75\n"
+                        + "\"Diane\",10001,2012-09-20,\"\",130000.00,8,10.50\n"
+                        + "\"Ed\",10002,,,0.00,,"
         );
 
         DataFrame loaded = dataSet.loadAsDataFrame();
 
         DataFrame expected = new DataFrame("Expected")
                 .addStringColumn("Name").addLongColumn("EmployeeId").addDateColumn("HireDate").addStringColumn("Dept")
-                .addDoubleColumn("Salary").addIntColumn("PetCount")
-                .addRow("Alice", 1234, LocalDate.of(2020, 1, 1), "Accounting", 110000.0, 2)
-                .addRow("Bob", 1233, LocalDate.of(2010, 1, 1), "Bee-bee-boo-boo", 100000.0, 0)
-                .addRow("Carl", 10000, LocalDate.of(2005, 11, 21), "Controllers", 130000.0, 1)
-                .addRow("Diane", 10001, LocalDate.of(2012, 9, 20), "", 130000.0, 8)
-                .addRow("Ed", 10002, null, "", 0.0, 0);
+                .addDoubleColumn("Salary").addIntColumn("PetCount").addFloatColumn("LunchAllowance")
+                .addRow("Alice", 1234, LocalDate.of(2020, 1, 1), "Accounting", 110000.0, 2, 15.25f)
+                .addRow("Bob", 1233, LocalDate.of(2010, 1, 1), "Bee-bee-boo-boo", 100000.0, 0, 12.50f)
+                .addRow("Carl", 10000, LocalDate.of(2005, 11, 21), "Controllers", 130000.0, 1, 15.75f)
+                .addRow("Diane", 10001, LocalDate.of(2012, 9, 20), "", 130000.0, 8, 10.50f)
+                .addRow("Ed", 10002, null, "", 0.0, 0, 0.0f)
+                ;
 
         DataFrameUtil.assertEquals(expected, loaded);
     }
@@ -330,7 +326,7 @@ public class DataFrameLoadTest
                     + "\"Ed\","
             );
 
-            DataFrame loaded = dataSet.loadAsDataFrame();
+            dataSet.loadAsDataFrame();
         }
         catch (RuntimeException re)
         {
@@ -403,7 +399,7 @@ public class DataFrameLoadTest
     }
 
     @Test
-    public void loadWithSchema()
+    public void loadWithSchemaSeparatorsAndNullMarkers()
     {
         CsvSchema schema = new CsvSchema()
                 .separator('|')
@@ -781,7 +777,7 @@ public class DataFrameLoadTest
     }
 
     @Test
-    public void loadWithNulls()
+    public void loadWithSchemaConvertEmptyToNulls()
     {
         CsvSchema schema = new CsvSchema()
             .addColumn("Name", STRING)
@@ -790,15 +786,16 @@ public class DataFrameLoadTest
             .addColumn("Dept", STRING)
             .addColumn("Salary", DOUBLE)
             .addColumn("Abc", STRING)
-            .addColumn("PetCount", INT);
+            .addColumn("PetCount", INT)
+            .addColumn("LunchAllowance", FLOAT);
 
         CsvDataSet dataSet = new StringBasedCsvDataSet("Foo", "Employees", schema,
-                "Name,EmployeeId,HireDate,Dept,Salary,Abc,PetCount\n"
-                        + "\"Diane\",10001,2012-09-20,\"\",,\"ABC\",8\n"
-                        + "\"Alice\",1234,2020-01-01,\"Accounting\",110000.00,,0\n"
-                        + "\"Bob\",1233,2010-01-01,\"Bee-bee-boo-boo\",100000.00,\"ABC\",1\n"
-                        + "\"Carl\",,2005-11-21,\"Controllers\",130000.00,\"ABC\",\n"
-                        + "\"Ed\",10002,,,0.00,,2"
+                "Name,EmployeeId,HireDate,Dept,Salary,Abc,PetCount,LunchAllowance\n"
+                        + "\"Diane\",10001,2012-09-20,\"\",,\"ABC\",8,10.50\n"
+                        + "\"Alice\",1234,2020-01-01,\"Accounting\",110000.00,,0,12.50\n"
+                        + "\"Bob\",1233,2010-01-01,\"Bee-bee-boo-boo\",100000.00,\"ABC\",1,10.25\n"
+                        + "\"Carl\",,2005-11-21,\"Controllers\",130000.00,\"ABC\",,\n"
+                        + "\"Ed\",10002,,,0.00,,2,"
         );
 
         dataSet.convertEmptyElementsToNulls();
@@ -807,12 +804,12 @@ public class DataFrameLoadTest
 
         DataFrame expected = new DataFrame("Expected")
                 .addStringColumn("Name").addLongColumn("EmployeeId").addDateColumn("HireDate").addStringColumn("Dept")
-                .addDoubleColumn("Salary").addStringColumn("Abc").addIntColumn("PetCount")
-                .addRow("Diane", 10001, LocalDate.of(2012, 9, 20), "", null, "ABC", 8)
-                .addRow("Alice", 1234, LocalDate.of(2020, 1, 1), "Accounting", 110000.0, null, 0)
-                .addRow("Bob", 1233, LocalDate.of(2010, 1, 1), "Bee-bee-boo-boo", 100000.0, "ABC", 1)
-                .addRow("Carl", null, LocalDate.of(2005, 11, 21), "Controllers", 130000.0, "ABC", null)
-                .addRow("Ed", 10002, null, null, 0.0, null, 2);
+                .addDoubleColumn("Salary").addStringColumn("Abc").addIntColumn("PetCount").addFloatColumn("LunchAllowance")
+                .addRow("Diane", 10001, LocalDate.of(2012, 9, 20), "", null, "ABC", 8, 10.50f)
+                .addRow("Alice",  1234, LocalDate.of(2020, 1, 1), "Accounting", 110000.0, null, 0, 12.50f)
+                .addRow("Bob",    1233, LocalDate.of(2010, 1, 1), "Bee-bee-boo-boo", 100000.0, "ABC", 1, 10.25f)
+                .addRow("Carl",   null, LocalDate.of(2005, 11, 21), "Controllers", 130000.0, "ABC", null, null)
+                .addRow("Ed",    10002, null, null, 0.0, null, 2, null);
 
         DataFrameUtil.assertEquals(expected, loaded);
     }

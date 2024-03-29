@@ -5,6 +5,7 @@ import io.github.vmzakharov.ecdataframe.dataframe.DfColumn;
 import io.github.vmzakharov.ecdataframe.dataframe.DfDateColumn;
 import io.github.vmzakharov.ecdataframe.dataframe.DfDateTimeColumn;
 import io.github.vmzakharov.ecdataframe.dataframe.DfDoubleColumn;
+import io.github.vmzakharov.ecdataframe.dataframe.DfFloatColumn;
 import io.github.vmzakharov.ecdataframe.dataframe.DfIntColumn;
 import io.github.vmzakharov.ecdataframe.dataframe.DfLongColumn;
 import io.github.vmzakharov.ecdataframe.dsl.value.ValueType;
@@ -36,7 +37,6 @@ import java.util.zip.ZipInputStream;
 import static io.github.vmzakharov.ecdataframe.dsl.value.ValueType.DATE;
 import static io.github.vmzakharov.ecdataframe.dsl.value.ValueType.DATE_TIME;
 import static io.github.vmzakharov.ecdataframe.dsl.value.ValueType.DOUBLE;
-import static io.github.vmzakharov.ecdataframe.dsl.value.ValueType.INT;
 import static io.github.vmzakharov.ecdataframe.dsl.value.ValueType.LONG;
 import static io.github.vmzakharov.ecdataframe.dsl.value.ValueType.STRING;
 import static io.github.vmzakharov.ecdataframe.util.ExceptionFactory.exceptionByKey;
@@ -211,6 +211,10 @@ extends DataSetAbstract
                 case INT:
                     int intValue = ((DfIntColumn) dfColumn).getInt(rowIndex);
                     valueAsLiteral = schemaColumn.getIntFormatter().format(intValue);
+                    break;
+                case FLOAT:
+                    float floatValue = ((DfFloatColumn) dfColumn).getFloat(rowIndex);
+                    valueAsLiteral = schemaColumn.getFloatFormatter().format(floatValue);
                     break;
                 case STRING:
                     String stringValue = dfColumn.getValueAsString(rowIndex);
@@ -497,6 +501,9 @@ extends DataSetAbstract
                 break;
             case INT:
                 columnPopulators.add(s -> schemaCol.parseAsIntAndAdd(s, lastColumn));
+                break;
+            case FLOAT:
+                columnPopulators.add(s -> schemaCol.parseAsFloatAndAdd(s, lastColumn));
                 break;
             case STRING:
                 columnPopulators.add(s -> lastColumn.addObject(schemaCol.parseAsString(s)));

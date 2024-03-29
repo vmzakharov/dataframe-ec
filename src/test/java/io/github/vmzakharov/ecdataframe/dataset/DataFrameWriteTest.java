@@ -20,22 +20,23 @@ public class DataFrameWriteTest
     {
         DataFrame dataFrame = new DataFrame("source")
                 .addStringColumn("Name").addLongColumn("EmployeeId").addDateColumn("HireDate").addStringColumn("Dept").addDoubleColumn("Salary")
-                .addRow("Alice", 1234, LocalDate.of(2020, 1, 1), "Accounting", 110000.0)
-                .addRow("Bob", 1233, LocalDate.of(2010, 1, 1), "Bee-bee-boo-boo", 100000.0)
-                .addRow("Carl", 10000, LocalDate.of(2005, 11, 21), "Controllers", 130000.0)
-                .addRow("Diane", 10001, LocalDate.of(2012, 9, 20), "", null)
-                .addRow("Ed", 10002, null, null, 0.0)
+                .addIntColumn("PetCount").addFloatColumn("LunchAllowance")
+                .addRow("Alice", 1234, LocalDate.of(2020, 1, 1), "Accounting", 110000.0, 12, 20.25f)
+                .addRow("Bob", 1233, LocalDate.of(2010, 1, 1), "Bee-bee-boo-boo", 100000.0, -10, -10.75f)
+                .addRow("Carl", 10000, LocalDate.of(2005, 11, 21), "Controllers", 130000.0, null, 15.25f)
+                .addRow("Diane", 10001, LocalDate.of(2012, 9, 20), "", null, 10, 4.5f)
+                .addRow("Ed", 10002, null, null, 0.0, null, null)
                 ;
 
         StringBasedCsvDataSet dataSet = new StringBasedCsvDataSet("Foo", "Employees", "");
         dataSet.write(dataFrame);
 
-        String expected = "Name,EmployeeId,HireDate,Dept,Salary\n"
-                        + "\"Alice\",1234,2020-1-1,\"Accounting\",110000.0\n"
-                        + "\"Bob\",1233,2010-1-1,\"Bee-bee-boo-boo\",100000.0\n"
-                        + "\"Carl\",10000,2005-11-21,\"Controllers\",130000.0\n"
-                        + "\"Diane\",10001,2012-9-20,\"\",\n"
-                        + "\"Ed\",10002,,,0.0\n";
+        String expected = "Name,EmployeeId,HireDate,Dept,Salary,PetCount,LunchAllowance\n"
+                        + "\"Alice\",1234,2020-1-1,\"Accounting\",110000.0,12,20.25\n"
+                        + "\"Bob\",1233,2010-1-1,\"Bee-bee-boo-boo\",100000.0,-10,-10.75\n"
+                        + "\"Carl\",10000,2005-11-21,\"Controllers\",130000.0,,15.25\n"
+                        + "\"Diane\",10001,2012-9-20,\"\",,10,4.5\n"
+                        + "\"Ed\",10002,,,0.0,,\n";
 
         Assert.assertEquals(expected, dataSet.getWrittenData());
     }
@@ -69,38 +70,43 @@ public class DataFrameWriteTest
     public void writeWithSchema()
     {
         CsvSchema schema = new CsvSchema();
-        schema.addColumn("Name",       ValueType.STRING);
-        schema.addColumn("EmployeeId", ValueType.LONG);
-        schema.addColumn("HireDate",   ValueType.DATE, "uuuu-MM-dd");
-        schema.addColumn("OtherDate",  ValueType.DATE, "M/d/uuuu");
-        schema.addColumn("Dept",       ValueType.STRING);
-        schema.addColumn("Salary",     ValueType.DOUBLE);
+        schema.addColumn("Name",           ValueType.STRING);
+        schema.addColumn("EmployeeId",     ValueType.LONG);
+        schema.addColumn("HireDate",       ValueType.DATE, "uuuu-MM-dd");
+        schema.addColumn("OtherDate",      ValueType.DATE, "M/d/uuuu");
+        schema.addColumn("Dept",           ValueType.STRING);
+        schema.addColumn("Salary",         ValueType.DOUBLE);
+        schema.addColumn("PetCount",       ValueType.INT);
+        schema.addColumn("LunchAllowance", ValueType.FLOAT);
         schema.quoteCharacter('\'');
 
         DataFrame dataFrame = new DataFrame("Employees")
-                .addStringColumn("Name").addLongColumn("EmployeeId").addDateColumn("HireDate").addDateColumn("OtherDate").addStringColumn("Dept").addDoubleColumn("Salary")
-                .addRow("Alice", 1234, LocalDate.of(2020, 1, 1), LocalDate.of(2021, 1, 1), "Accounting", 110000.0)
-                .addRow("Bob", 1233, LocalDate.of(2010, 1, 1), LocalDate.of(2021, 1, 1), "Bee-bee-boo-boo", 100000.0)
-                .addRow("Carl", null, LocalDate.of(2005, 11, 21), LocalDate.of(2021, 11, 21), "Controllers", null)
-                .addRow("Diane", 10001, LocalDate.of(2012, 9, 20), LocalDate.of(2022, 9, 20), "", 130000.0)
-                .addRow("Ed", 10002, null, null, null, 0.0)
+                .addStringColumn("Name").addLongColumn("EmployeeId").addDateColumn("HireDate").addDateColumn("OtherDate")
+                .addStringColumn("Dept").addDoubleColumn("Salary")
+                .addIntColumn("PetCount").addFloatColumn("LunchAllowance")
+                .addRow("Alice", 1234, LocalDate.of(2020, 1, 1), LocalDate.of(2021, 1, 1), "Accounting", 110000.0, 12, 20.25f)
+                .addRow("Bob", 1233, LocalDate.of(2010, 1, 1), LocalDate.of(2021, 1, 1), "Bee-bee-boo-boo", 100000.0, -10, -10.75f)
+                .addRow("Carl", null, LocalDate.of(2005, 11, 21), LocalDate.of(2021, 11, 21), "Controllers", null, null, 15.25f)
+                .addRow("Diane", 10001, LocalDate.of(2012, 9, 20), LocalDate.of(2022, 9, 20), "", 130000.0, 10, 4.5f)
+                .addRow("Ed", 10002, null, null, null, 0.0, null, null)
                 ;
 
         StringBasedCsvDataSet dataSet = new StringBasedCsvDataSet("Foo", "Employees", schema, "");
         dataSet.write(dataFrame);
 
-        String expected = "Name,EmployeeId,HireDate,OtherDate,Dept,Salary\n"
-                + "'Alice',1234,2020-01-01,1/1/2021,'Accounting',110000.0\n"
-                + "'Bob',1233,2010-01-01,1/1/2021,'Bee-bee-boo-boo',100000.0\n"
-                + "'Carl',,2005-11-21,11/21/2021,'Controllers',\n"
-                + "'Diane',10001,2012-09-20,9/20/2022,'',130000.0\n"
-                + "'Ed',10002,,,,0.0\n";
+        String expected = "Name,EmployeeId,HireDate,OtherDate,Dept,Salary,PetCount,LunchAllowance\n"
+                + "'Alice',1234,2020-01-01,1/1/2021,'Accounting',110000.0,12,20.25\n"
+                + "'Bob',1233,2010-01-01,1/1/2021,'Bee-bee-boo-boo',100000.0,-10,-10.75\n"
+                + "'Carl',,2005-11-21,11/21/2021,'Controllers',,,15.25\n"
+                + "'Diane',10001,2012-09-20,9/20/2022,'',130000.0,10,4.5\n"
+                + "'Ed',10002,,,,0.0,,\n"
+                ;
 
         Assert.assertEquals(expected, dataSet.getWrittenData());
     }
 
     @Test
-    public void writeWithSchemaPipeNullMarkers()
+    public void writeWithSchemaWithPipeAndNullMarkers()
     {
         CsvSchema schema = new CsvSchema();
         schema.addColumn("Name",       ValueType.STRING);

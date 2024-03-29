@@ -2,6 +2,7 @@ package io.github.vmzakharov.ecdataframe.dataset;
 
 import io.github.vmzakharov.ecdataframe.dataframe.DfColumn;
 import io.github.vmzakharov.ecdataframe.dataframe.DfDoubleColumnStored;
+import io.github.vmzakharov.ecdataframe.dataframe.DfFloatColumnStored;
 import io.github.vmzakharov.ecdataframe.dataframe.DfIntColumnStored;
 import io.github.vmzakharov.ecdataframe.dataframe.DfLongColumnStored;
 import io.github.vmzakharov.ecdataframe.dsl.value.ValueType;
@@ -21,6 +22,7 @@ public class CsvSchemaColumn
     transient private final CsvSchema csvSchema;
     transient private DateTimeFormatter dateTimeFormatter;
     transient private DoubleFormatter doubleFormatter;
+    transient private FloatFormatter floatFormatter;
     transient private LongFormatter longFormatter;
     transient private IntFormatter intFormatter;
 
@@ -30,7 +32,7 @@ public class CsvSchemaColumn
         this.name = newName;
         this.type = newType;
 
-        if (newPattern == null && (this.type.isDate() || this.type.isDateTime()))
+        if (newPattern == null && (this.type.isTemporal()))
         {
             if (this.type.isDate())
             {
@@ -46,7 +48,7 @@ public class CsvSchemaColumn
             this.pattern = newPattern;
         }
 
-        if (this.type.isDate() || this.type.isDateTime())
+        if (this.type.isTemporal())
         {
             this.dateTimeFormatter = DateTimeFormatter.ofPattern(this.pattern).withResolverStyle(ResolverStyle.STRICT);
         }
@@ -61,6 +63,10 @@ public class CsvSchemaColumn
         else if (this.type.isInt())
         {
             this.intFormatter = new IntFormatter(this.pattern);
+        }
+        else if (this.type.isFloat())
+        {
+            this.floatFormatter = new FloatFormatter(this.pattern);
         }
     }
 
@@ -126,6 +132,17 @@ public class CsvSchemaColumn
         ((DfDoubleColumnStored) dfColumn).addDouble(this.doubleFormatter.parseAsDouble(aString));
     }
 
+    public void parseAsFloatAndAdd(String aString, DfColumn dfColumn)
+    {
+        if (aString == null)
+        {
+            dfColumn.addEmptyValue();
+            return;
+        }
+
+        ((DfFloatColumnStored) dfColumn).addFloat(this.floatFormatter.parseAsFloat(aString));
+    }
+
     public void parseAsLongAndAdd(String aString, DfColumn dfColumn)
     {
         if (aString == null)
@@ -156,6 +173,11 @@ public class CsvSchemaColumn
     public DoubleFormatter getDoubleFormatter()
     {
         return this.doubleFormatter;
+    }
+
+    public FloatFormatter getFloatFormatter()
+    {
+        return this.floatFormatter;
     }
 
     public LongFormatter getLongFormatter()
