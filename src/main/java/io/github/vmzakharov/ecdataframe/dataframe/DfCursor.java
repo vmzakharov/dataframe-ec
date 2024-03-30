@@ -34,6 +34,11 @@ public class DfCursor
         return this.dataFrame.getDouble(columnName, this.rowIndex);
     }
 
+    public float getFloat(String columnName)
+    {
+        return this.dataFrame.getFloat(columnName, this.rowIndex);
+    }
+
     public BigDecimal getDecimal(String columnName)
     {
         return this.dataFrame.getDecimal(columnName, this.rowIndex);
@@ -47,6 +52,11 @@ public class DfCursor
     public LocalDateTime getDateTime(String columnName)
     {
         return this.dataFrame.getDateTime(columnName, this.rowIndex);
+    }
+
+    public Object getObject(String columnName)
+    {
+        return this.dataFrame.getObject(columnName, this.rowIndex);
     }
 
     public int rowIndex()

@@ -5,7 +5,9 @@ import org.eclipse.collections.api.factory.Bags;
 import org.eclipse.collections.api.factory.Lists;
 import org.eclipse.collections.api.list.ListIterable;
 import org.eclipse.collections.api.list.primitive.DoubleList;
+import org.eclipse.collections.api.list.primitive.FloatList;
 import org.eclipse.collections.impl.factory.primitive.DoubleLists;
+import org.eclipse.collections.impl.factory.primitive.FloatLists;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -25,13 +27,14 @@ public class DataFrameIterateTest
     {
         this.dataFrame = new DataFrame("FrameOfData")
             .addStringColumn("Name").addLongColumn("Bar").addDoubleColumn("Baz")
-            .addDateColumn("Date").addDateTimeColumn("DateTime").addDecimalColumn("Decimal").addIntColumn("Qux")
-            .addRow("Alice",   11L, 20.0, LocalDate.of(2023, 10, 21), LocalDateTime.of(2023, 10, 21, 11, 11, 11), BigDecimal.valueOf(123, 2), 110)
-            .addRow("Carol",   12L, 10.0, LocalDate.of(2023, 12, 24), LocalDateTime.of(2023, 10, 21, 11, 11, 11), BigDecimal.valueOf(124, 2), 120)
-            .addRow("Alice",   33L, 25.0, LocalDate.of(2023, 11, 23), LocalDateTime.of(2023, 11, 23, 11, 13, 11), BigDecimal.valueOf(123, 2), 330)
-            .addRow("Carol",   24L, 66.1, LocalDate.of(2023, 12, 24), LocalDateTime.of(2023, 12, 24, 11, 14, 11), BigDecimal.valueOf(222, 2), 240)
-            .addRow("Carol",   24L, 41.0, LocalDate.of(2023, 12, 24), LocalDateTime.of(2023, 12, 24, 11, 15, 11), BigDecimal.valueOf(333, 2), 240)
-            .addRow("Abigail", 33L, 11.0, LocalDate.of(2023, 11, 23), LocalDateTime.of(2023, 10, 21, 11, 11, 11), BigDecimal.valueOf(123, 2), 330)
+            .addDateColumn("Date").addDateTimeColumn("DateTime").addDecimalColumn("Decimal")
+            .addIntColumn("Qux").addFloatColumn("Thud")
+            .addRow("Alice",   11L, 20.0, LocalDate.of(2023, 10, 21), LocalDateTime.of(2023, 10, 21, 11, 11, 11), BigDecimal.valueOf(123, 2), 110, 10.25f)
+            .addRow("Carol",   12L, 10.0, LocalDate.of(2023, 12, 24), LocalDateTime.of(2023, 10, 21, 11, 11, 11), BigDecimal.valueOf(124, 2), 120, 12.50f)
+            .addRow("Alice",   33L, 25.0, LocalDate.of(2023, 11, 23), LocalDateTime.of(2023, 11, 23, 11, 13, 11), BigDecimal.valueOf(123, 2), 330, 14.75f)
+            .addRow("Carol",   24L, 66.1, LocalDate.of(2023, 12, 24), LocalDateTime.of(2023, 12, 24, 11, 14, 11), BigDecimal.valueOf(222, 2), 240, 16.25f)
+            .addRow("Carol",   24L, 41.0, LocalDate.of(2023, 12, 24), LocalDateTime.of(2023, 12, 24, 11, 15, 11), BigDecimal.valueOf(333, 2), 240, 18.50f)
+            .addRow("Abigail", 33L, 11.0, LocalDate.of(2023, 11, 23), LocalDateTime.of(2023, 10, 21, 11, 11, 11), BigDecimal.valueOf(123, 2), 330, 20.75f)
         ;
     }
 
@@ -44,16 +47,18 @@ public class DataFrameIterateTest
             nameBarBaz.append(c.getString("Name")).append(',')
                       .append(c.getLong("Bar")).append(',')
                       .append(c.getDouble("Baz")).append(',')
-                      .append(c.getInt("Qux")).append('\n')
+                      .append(c.getInt("Qux")).append(',')
+                      .append(c.getFloat("Thud")).append('\n')
         );
 
         Assert.assertEquals(
-            "Alice,11,20.0,110\n"
-            + "Carol,12,10.0,120\n"
-            + "Alice,33,25.0,330\n"
-            + "Carol,24,66.1,240\n"
-            + "Carol,24,41.0,240\n"
-            + "Abigail,33,11.0,330\n",
+            "Alice,11,20.0,110,10.25\n"
+            + "Carol,12,10.0,120,12.5\n"
+            + "Alice,33,25.0,330,14.75\n"
+            + "Carol,24,66.1,240,16.25\n"
+            + "Carol,24,41.0,240,18.5\n"
+            + "Abigail,33,11.0,330,20.75\n"
+            ,
             nameBarBaz.toString()
         );
 
@@ -123,17 +128,23 @@ public class DataFrameIterateTest
 
         Assert.assertEquals(2, this.dataFrame.index("anIndex").sizeAt("Carol", 24L));
 
-        ListIterable<BigDecimal> expectedLong = Lists.immutable.of(BigDecimal.valueOf(222, 2), BigDecimal.valueOf(333, 2));
+        ListIterable<BigDecimal> expectedDecimal = Lists.immutable.of(BigDecimal.valueOf(222, 2), BigDecimal.valueOf(333, 2));
 
         this.dataFrame.index("anIndex")
                  .iterateAt("Carol", 24L)
-                 .forEach(c -> Assert.assertTrue(expectedLong.contains(c.getDecimal("Decimal"))));
+                 .forEach(c -> Assert.assertTrue(expectedDecimal.contains(c.getDecimal("Decimal"))));
 
         DoubleList expectedDouble = DoubleLists.immutable.of(66.1, 41.0);
 
         this.dataFrame.index("anIndex")
                  .iterateAt("Carol", 24L)
                  .forEach(c -> Assert.assertTrue(expectedDouble.contains(c.getDouble("Baz"))));
+
+        FloatList expectedFloat = FloatLists.immutable.of(16.25f, 18.5f);
+
+        this.dataFrame.index("anIndex")
+                 .iterateAt("Carol", 24L)
+                 .forEach(c -> Assert.assertTrue(expectedFloat.contains(c.getFloat("Thud"))));
 
         ListIterable<LocalDate> expectedDates = Lists.immutable.of(LocalDate.of(2023, 12, 24));
 
@@ -153,5 +164,19 @@ public class DataFrameIterateTest
         this.dataFrame.index("anIndex")
                  .iterateAt("Dave", 48L)
                  .forEach(c -> Assert.fail());
+    }
+
+    @Test
+    public void iterateWithGetObject()
+    {
+        StringBuilder sb = new StringBuilder();
+        this.dataFrame.forEach(c -> sb.append(c.getObject("Name")).append('|').append(c.getObject("Bar")).append('\n'));
+        Assert.assertEquals(
+              "Alice|11\n"
+            + "Carol|12\n"
+            + "Alice|33\n"
+            + "Carol|24\n"
+            + "Carol|24\n"
+            + "Abigail|33\n", sb.toString());
     }
 }

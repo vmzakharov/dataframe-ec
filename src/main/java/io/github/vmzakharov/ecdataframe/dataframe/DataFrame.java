@@ -606,6 +606,11 @@ implements DfIterate
         return this.getDoubleColumn(columnName).getDouble(this.rowIndexMap(rowIndex));
     }
 
+    public float getFloat(String columnName, int rowIndex)
+    {
+        return this.getFloatColumn(columnName).getFloat(this.rowIndexMap(rowIndex));
+    }
+
     public LocalDate getDate(String columnName, int rowIndex)
     {
         return this.getDateColumn(columnName).getTypedObject(this.rowIndexMap(rowIndex));
