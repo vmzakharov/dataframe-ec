@@ -1,4 +1,7 @@
 # Releases
+### 0.19.8
+* adds support for columns of primitive int and float types
+* adds a built-in aggregation function `avg2d` that produces values of type double for all primitive column types
 ### 0.19.7
 * adds support for sorting the order of value columns by their header values when pivoting a data frame 
 * add an option to the data frame compare utility to ignore the column order

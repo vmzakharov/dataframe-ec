@@ -10,7 +10,7 @@ For more on Eclipse Collections see: https://www.eclipse.org/collections/.
 <dependency>
   <groupId>io.github.vmzakharov</groupId>
   <artifactId>dataframe-ec</artifactId>
-  <version>0.19.7</version>
+  <version>0.19.8</version>
 </dependency>
 ```
 ## Code Kata
@@ -22,7 +22,7 @@ Learn dataframe-ec with Kata! Check out [dataframe-ec kata](https://github.com/v
 - **create** a data frame programmatically or load from a csv file
 - **add a column** to a data frame, columns can be
     - stored or computed
-    - of type: string, integer (long), double, date, date/time
+    - of type: string, long, int, double, float, date, date/time
 - **drop** one or more **columns**
 - **select** a subset of rows based on a criteria
 - **sort** by one or more columns or by an expression
@@ -194,7 +194,8 @@ The following aggregation functions are supported
 - `sum`
 - `min`
 - `max`
-- `avg`
+- `avg` - average, the return value is of the same type as the input data
+- `avg2d` - average, the return value is of type double for any primitive input type
 - `count`
 - `same` - the result is `null` if the aggregated values are not the equal to each other, otherwise it equals to that value
 
