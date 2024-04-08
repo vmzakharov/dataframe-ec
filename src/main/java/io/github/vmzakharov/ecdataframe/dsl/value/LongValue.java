@@ -6,17 +6,9 @@ import io.github.vmzakharov.ecdataframe.dsl.UnaryOp;
 
 import java.math.BigDecimal;
 
-public class LongValue
-extends AbstractValue
+public record LongValue(long value)
 implements WholeNumberValue
 {
-    private final long value;
-
-    public LongValue(long newValue)
-    {
-        this.value = newValue;
-    }
-
     @Override
     public String asStringLiteral()
     {

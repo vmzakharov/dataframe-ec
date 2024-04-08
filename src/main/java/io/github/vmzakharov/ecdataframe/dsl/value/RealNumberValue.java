@@ -1,6 +1,6 @@
 package io.github.vmzakharov.ecdataframe.dsl.value;
 
-public interface DecimalNumberValue
+public interface RealNumberValue
 extends NumberValue
 {
 }

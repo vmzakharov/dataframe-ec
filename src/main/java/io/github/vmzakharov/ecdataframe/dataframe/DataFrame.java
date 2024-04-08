@@ -440,30 +440,21 @@ implements DfIterate
 
     private DfColumnStored createStoredColumn(String columnName, ValueType type)
     {
-        switch (type)
+        return switch (type)
         {
-            case LONG:
-                return new DfLongColumnStored(this, columnName);
-            case DOUBLE:
-                return new DfDoubleColumnStored(this, columnName);
-            case STRING:
-                return new DfStringColumnStored(this, columnName);
-            case DATE:
-                return new DfDateColumnStored(this, columnName);
-            case DATE_TIME:
-                return new DfDateTimeColumnStored(this, columnName);
-            case DECIMAL:
-                return new DfDecimalColumnStored(this, columnName);
-            case INT:
-                return new DfIntColumnStored(this, columnName);
-            case FLOAT:
-                return new DfFloatColumnStored(this, columnName);
-            default:
-                throw exceptionByKey("DF_ADD_COL_UNKNOWN_TYPE")
-                        .with("columnName", columnName)
-                        .with("type", type)
-                        .get();
-        }
+            case LONG -> new DfLongColumnStored(this, columnName);
+            case DOUBLE -> new DfDoubleColumnStored(this, columnName);
+            case STRING -> new DfStringColumnStored(this, columnName);
+            case DATE -> new DfDateColumnStored(this, columnName);
+            case DATE_TIME -> new DfDateTimeColumnStored(this, columnName);
+            case DECIMAL -> new DfDecimalColumnStored(this, columnName);
+            case INT -> new DfIntColumnStored(this, columnName);
+            case FLOAT -> new DfFloatColumnStored(this, columnName);
+            default -> throw exceptionByKey("DF_ADD_COL_UNKNOWN_TYPE")
+                    .with("columnName", columnName)
+                    .with("type", type)
+                    .get();
+        };
     }
 
     /**
@@ -497,29 +488,20 @@ implements DfIterate
 
     public DfColumnComputed createComputedColumn(String columnName, ValueType type, String expressionAsString)
     {
-        switch (type)
+        return switch (type)
         {
-            case LONG:
-                return new DfLongColumnComputed(this, columnName, expressionAsString);
-            case DOUBLE:
-                return new DfDoubleColumnComputed(this, columnName, expressionAsString);
-            case STRING:
-                return new DfStringColumnComputed(this, columnName, expressionAsString);
-            case DATE:
-                return new DfDateColumnComputed(this, columnName, expressionAsString);
-            case DATE_TIME:
-                return new DfDateTimeColumnComputed(this, columnName, expressionAsString);
-            case DECIMAL:
-                return new DfDecimalColumnComputed(this, columnName, expressionAsString);
-            case INT:
-                return new DfIntColumnComputed(this, columnName, expressionAsString);
-            case FLOAT:
-                return new DfFloatColumnComputed(this, columnName, expressionAsString);
-            default:
-                throw exceptionByKey("DF_ADD_COL_UNKNOWN_TYPE").with("columnName", columnName)
-                                                               .with("type", type)
-                                                               .get();
-        }
+            case LONG -> new DfLongColumnComputed(this, columnName, expressionAsString);
+            case DOUBLE -> new DfDoubleColumnComputed(this, columnName, expressionAsString);
+            case STRING -> new DfStringColumnComputed(this, columnName, expressionAsString);
+            case DATE -> new DfDateColumnComputed(this, columnName, expressionAsString);
+            case DATE_TIME -> new DfDateTimeColumnComputed(this, columnName, expressionAsString);
+            case DECIMAL -> new DfDecimalColumnComputed(this, columnName, expressionAsString);
+            case INT -> new DfIntColumnComputed(this, columnName, expressionAsString);
+            case FLOAT -> new DfFloatColumnComputed(this, columnName, expressionAsString);
+            default -> throw exceptionByKey("DF_ADD_COL_UNKNOWN_TYPE").with("columnName", columnName)
+                                                                      .with("type", type)
+                                                                      .get();
+        };
     }
 
     protected int rowIndexMap(int virtualRowIndex)

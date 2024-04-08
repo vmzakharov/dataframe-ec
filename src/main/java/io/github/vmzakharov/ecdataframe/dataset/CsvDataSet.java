@@ -198,40 +198,47 @@ extends DataSetAbstract
         }
         else
         {
-            switch (dfColumn.getType())
+            valueAsLiteral = switch (dfColumn.getType())
             {
-                case LONG:
+                case LONG ->
+                {
                     long longValue = ((DfLongColumn) dfColumn).getLong(rowIndex);
-                    valueAsLiteral = schemaColumn.getLongFormatter().format(longValue);
-                    break;
-                case DOUBLE:
+                    yield schemaColumn.getLongFormatter().format(longValue);
+                }
+                case DOUBLE ->
+                {
                     double doubleValue = ((DfDoubleColumn) dfColumn).getDouble(rowIndex);
-                    valueAsLiteral = schemaColumn.getDoubleFormatter().format(doubleValue);
-                    break;
-                case INT:
+                    yield schemaColumn.getDoubleFormatter().format(doubleValue);
+                }
+                case INT ->
+                {
                     int intValue = ((DfIntColumn) dfColumn).getInt(rowIndex);
-                    valueAsLiteral = schemaColumn.getIntFormatter().format(intValue);
-                    break;
-                case FLOAT:
+                    yield schemaColumn.getIntFormatter().format(intValue);
+                }
+                case FLOAT ->
+                {
                     float floatValue = ((DfFloatColumn) dfColumn).getFloat(rowIndex);
-                    valueAsLiteral = schemaColumn.getFloatFormatter().format(floatValue);
-                    break;
-                case STRING:
+                    yield schemaColumn.getFloatFormatter().format(floatValue);
+                }
+                case STRING ->
+                {
                     String stringValue = dfColumn.getValueAsString(rowIndex);
-                    valueAsLiteral = this.schema.getQuoteCharacter() + stringValue + this.schema.getQuoteCharacter();
-                    break;
-                case DATE:
+                    yield this.schema.getQuoteCharacter() + stringValue + this.schema.getQuoteCharacter();
+                }
+                case DATE ->
+                {
                     LocalDate dateValue = ((DfDateColumn) dfColumn).getTypedObject(rowIndex);
-                    valueAsLiteral = this.formatterForColumn(columnIndex).format(dateValue);
-                    break;
-                case DATE_TIME:
+                    yield this.formatterForColumn(columnIndex).format(dateValue);
+                }
+                case DATE_TIME ->
+                {
                     LocalDateTime dateTimeValue = ((DfDateTimeColumn) dfColumn).getTypedObject(rowIndex);
-                    valueAsLiteral = this.formatterForColumn(columnIndex).format(dateTimeValue);
-                    break;
-                default:
-                    throw exceptionByKey("CSV_UNSUPPORTED_VAL_TO_STR")
-                            .with("valueType", dfColumn.getType()).get();
-            }
+                    yield this.formatterForColumn(columnIndex).format(dateTimeValue);
+                }
+                default -> throw exceptionByKey("CSV_UNSUPPORTED_VAL_TO_STR")
+                        .with("valueType", dfColumn.getType())
+                        .get();
+            };
         }
 
         writer.write(valueAsLiteral);
@@ -491,35 +498,21 @@ extends DataSetAbstract
 
         DfColumn lastColumn = df.newColumn(schemaCol.getName(), columnType);
 
-        switch (columnType)
+        Procedure<String> populator = switch (columnType)
         {
-            case LONG:
-                columnPopulators.add(s -> schemaCol.parseAsLongAndAdd(s, lastColumn));
-                break;
-            case DOUBLE:
-                columnPopulators.add(s -> schemaCol.parseAsDoubleAndAdd(s, lastColumn));
-                break;
-            case INT:
-                columnPopulators.add(s -> schemaCol.parseAsIntAndAdd(s, lastColumn));
-                break;
-            case FLOAT:
-                columnPopulators.add(s -> schemaCol.parseAsFloatAndAdd(s, lastColumn));
-                break;
-            case STRING:
-                columnPopulators.add(s -> lastColumn.addObject(schemaCol.parseAsString(s)));
-                break;
-            case DATE:
-                columnPopulators.add(s -> lastColumn.addObject(schemaCol.parseAsLocalDate(s)));
-                break;
-            case DATE_TIME:
-                columnPopulators.add(s -> lastColumn.addObject(schemaCol.parseAsLocalDateTime(s)));
-                break;
-            case DECIMAL:
-                columnPopulators.add(s -> lastColumn.addObject(schemaCol.parseAsDecimal(s)));
-                break;
-            default:
-                throw exceptionByKey("CSV_POPULATING_BAD_COL_TYPE").with("columnType", columnType).get();
-        }
+            case LONG -> s -> schemaCol.parseAsLongAndAdd(s, lastColumn);
+            case DOUBLE -> s -> schemaCol.parseAsDoubleAndAdd(s, lastColumn);
+            case INT -> s -> schemaCol.parseAsIntAndAdd(s, lastColumn);
+            case FLOAT -> s -> schemaCol.parseAsFloatAndAdd(s, lastColumn);
+            case STRING -> s -> lastColumn.addObject(schemaCol.parseAsString(s));
+            case DATE -> s -> lastColumn.addObject(schemaCol.parseAsLocalDate(s));
+            case DATE_TIME -> s -> lastColumn.addObject(schemaCol.parseAsLocalDateTime(s));
+            case DECIMAL -> s -> lastColumn.addObject(schemaCol.parseAsDecimal(s));
+            default -> throw exceptionByKey("CSV_POPULATING_BAD_COL_TYPE").with("columnType", columnType)
+                                                                          .get();
+        };
+
+        columnPopulators.add(populator);
     }
 
     private void inferSchema(MutableList<String> headers, MutableList<String> topDataLines)
@@ -653,7 +646,9 @@ extends DataSetAbstract
             if (this.getSchema().hasNullMarker())
             {
                 if (this.getSchema().getNullMarker().equals(element))
-                element = null;
+                {
+                    element = null;
+                }
             }
 
             columnPopulators.get(i).accept(element);
@@ -665,19 +660,6 @@ extends DataSetAbstract
         try
         {
             Long.parseLong(aString);
-            return true;
-        }
-        catch (NumberFormatException e)
-        {
-            return false;
-        }
-    }
-
-    private boolean canParseAsInt(String aString)
-    {
-        try
-        {
-            Integer.parseInt(aString);
             return true;
         }
         catch (NumberFormatException e)

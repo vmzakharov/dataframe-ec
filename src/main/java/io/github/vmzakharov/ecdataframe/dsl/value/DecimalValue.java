@@ -8,21 +8,17 @@ import java.math.BigDecimal;
 
 import static io.github.vmzakharov.ecdataframe.util.ExceptionFactory.*;
 
-public class DecimalValue
-extends AbstractValue
+public record DecimalValue(BigDecimal value)
 implements NumberValue
 {
-    private final BigDecimal value;
-
-    public DecimalValue(BigDecimal newValue)
+    public DecimalValue
     {
-        this.throwExceptionIfNull(newValue);
-        this.value = newValue;
+        this.throwExceptionIfNull(value);
     }
 
     public DecimalValue(long unscaledValue, int scale)
     {
-        this.value = BigDecimal.valueOf(unscaledValue, scale);
+        this(BigDecimal.valueOf(unscaledValue, scale));
     }
 
     @Override

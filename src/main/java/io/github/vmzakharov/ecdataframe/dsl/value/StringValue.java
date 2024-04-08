@@ -4,15 +4,12 @@ import io.github.vmzakharov.ecdataframe.dsl.ArithmeticOp;
 import io.github.vmzakharov.ecdataframe.dsl.PredicateOp;
 import io.github.vmzakharov.ecdataframe.dsl.UnaryOp;
 
-public class StringValue
-extends AbstractValue
+public record StringValue(String value)
+implements Value
 {
-    private final String value;
-
-    public StringValue(String newValue)
+    public StringValue
     {
-        this.throwExceptionIfNull(newValue);
-        this.value = newValue;
+        this.throwExceptionIfNull(value);
     }
 
     @Override

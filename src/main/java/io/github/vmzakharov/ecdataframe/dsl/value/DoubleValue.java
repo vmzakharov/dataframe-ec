@@ -6,17 +6,9 @@ import io.github.vmzakharov.ecdataframe.dsl.UnaryOp;
 
 import java.math.BigDecimal;
 
-public class DoubleValue
-extends AbstractValue
-implements DecimalNumberValue
+public record DoubleValue(double value)
+implements RealNumberValue
 {
-    private final double value;
-
-    public DoubleValue(double newValue)
-    {
-        this.value = newValue;
-    }
-
     public double doubleValue()
     {
         return this.value;

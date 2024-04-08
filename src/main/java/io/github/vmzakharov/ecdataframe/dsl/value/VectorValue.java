@@ -4,17 +4,10 @@ import io.github.vmzakharov.ecdataframe.dsl.UnaryOp;
 import org.eclipse.collections.api.list.ListIterable;
 import org.eclipse.collections.impl.factory.Lists;
 
-public class VectorValue
+public record VectorValue(ListIterable<Value> elements)
 implements Value
 {
     public static final VectorValue EMPTY = new VectorValue(Lists.immutable.empty());
-
-    private final ListIterable<Value> elements;
-
-    public VectorValue(ListIterable<Value> newItems)
-    {
-        this.elements = newItems;
-    }
 
     @Override
     public String asStringLiteral()

@@ -6,17 +6,9 @@ import io.github.vmzakharov.ecdataframe.dsl.UnaryOp;
 
 import java.math.BigDecimal;
 
-public class FloatValue
-extends AbstractValue
-implements DecimalNumberValue
+public record FloatValue(float value)
+implements RealNumberValue
 {
-    private final float value;
-
-    public FloatValue(float newValue)
-    {
-        this.value = newValue;
-    }
-
     public float floatValue()
     {
         return this.value;

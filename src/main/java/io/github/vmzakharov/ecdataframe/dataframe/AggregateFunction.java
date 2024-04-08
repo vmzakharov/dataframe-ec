@@ -152,19 +152,14 @@ public abstract class AggregateFunction
 
     public Object applyToColumn(DfColumn column)
     {
-        switch (column.getType())
+        return switch (column.getType())
         {
-            case LONG:
-                return this.applyToLongColumn((DfLongColumn) column);
-            case DOUBLE:
-                return this.applyToDoubleColumn((DfDoubleColumn) column);
-            case INT:
-                return this.applyToIntColumn((DfIntColumn) column);
-            case FLOAT:
-                return this.applyToFloatColumn((DfFloatColumn) column);
-            default:
-                return this.applyToObjectColumn((DfObjectColumn<?>) column);
-        }
+            case LONG -> this.applyToLongColumn((DfLongColumn) column);
+            case DOUBLE -> this.applyToDoubleColumn((DfDoubleColumn) column);
+            case INT -> this.applyToIntColumn((DfIntColumn) column);
+            case FLOAT -> this.applyToFloatColumn((DfFloatColumn) column);
+            default -> this.applyToObjectColumn((DfObjectColumn<?>) column);
+        };
     }
 
     public Object applyToDoubleColumn(DfDoubleColumn doubleColumn)

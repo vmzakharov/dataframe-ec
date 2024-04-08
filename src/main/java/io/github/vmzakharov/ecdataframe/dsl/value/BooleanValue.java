@@ -5,11 +5,54 @@ import io.github.vmzakharov.ecdataframe.dsl.UnaryOp;
 
 import static io.github.vmzakharov.ecdataframe.util.ExceptionFactory.exceptionByKey;
 
-abstract public class BooleanValue
-extends AbstractValue
-implements Value
+public interface BooleanValue
+extends Value
 {
-    static public final BooleanValue TRUE = new BooleanValue()
+    BooleanValue TRUE = new BooleanTrue();
+
+    BooleanValue FALSE = new BooleanFalse();
+
+    static BooleanValue valueOf(boolean value)
+    {
+        return value ? TRUE : FALSE;
+    }
+
+    @Override
+    default Value apply(Value another, ArithmeticOp operation)
+    {
+        throw exceptionByKey("DSL_OP_NOT_SUPPORTED")
+                .with("operation", operation.asString())
+                .with("type", this.getType().toString())
+                .getUnsupported();
+    }
+
+    @Override
+    default Value apply(UnaryOp operation)
+    {
+        return operation.applyBoolean(this.isTrue());
+    }
+
+    boolean isTrue();
+
+    boolean isFalse();
+
+    boolean is(boolean booleanValue);
+
+    @Override
+    default ValueType getType()
+    {
+        return ValueType.BOOLEAN;
+    }
+
+    @Override
+    default int compareTo(Value other)
+    {
+        this.checkSameTypeForComparison(other);
+        return Boolean.compare(this.isTrue(), ((BooleanValue) other).isTrue());
+    }
+
+    record BooleanTrue()
+    implements BooleanValue
     {
         @Override
         public boolean isTrue()
@@ -34,9 +77,10 @@ implements Value
         {
             return "TRUE";
         }
-    };
+    }
 
-    static public final BooleanValue FALSE = new BooleanValue()
+    record BooleanFalse()
+    implements BooleanValue
     {
         @Override
         public boolean isTrue()
@@ -61,44 +105,5 @@ implements Value
         {
             return "FALSE";
         }
-    };
-
-    public static BooleanValue valueOf(boolean value)
-    {
-        return value ? TRUE : FALSE;
-    }
-
-    @Override
-    public Value apply(Value another, ArithmeticOp operation)
-    {
-        throw exceptionByKey("DSL_OP_NOT_SUPPORTED")
-                .with("operation", operation.asString())
-                .with("type", this.getType().toString())
-                .getUnsupported();
-    }
-
-    @Override
-    public Value apply(UnaryOp operation)
-    {
-        return operation.applyBoolean(this.isTrue());
-    }
-
-    public abstract boolean isTrue();
-
-    public abstract boolean isFalse();
-
-    public abstract boolean is(boolean booleanValue);
-
-    @Override
-    public ValueType getType()
-    {
-        return ValueType.BOOLEAN;
-    }
-
-    @Override
-    public int compareTo(Value other)
-    {
-        this.checkSameTypeForComparison(other);
-        return Boolean.compare(this.isTrue(), ((BooleanValue) other).isTrue());
     }
 }

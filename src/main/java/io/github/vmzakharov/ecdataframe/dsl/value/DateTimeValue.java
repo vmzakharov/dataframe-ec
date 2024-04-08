@@ -6,17 +6,14 @@ import io.github.vmzakharov.ecdataframe.dsl.UnaryOp;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
-public class DateTimeValue
-extends AbstractValue
+public record DateTimeValue(LocalDateTime value)
+implements Value
 {
     static private final DateTimeFormatter FORMATTER = DateTimeFormatter.ISO_DATE_TIME;
 
-    private final LocalDateTime value;
-
-    public DateTimeValue(LocalDateTime newValue)
+    public DateTimeValue
     {
-        this.throwExceptionIfNull(newValue);
-        this.value = newValue;
+        this.throwExceptionIfNull(value);
     }
 
     @Override

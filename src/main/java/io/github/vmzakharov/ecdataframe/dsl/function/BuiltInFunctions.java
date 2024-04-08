@@ -4,7 +4,7 @@ import io.github.vmzakharov.ecdataframe.dsl.EvalContext;
 import io.github.vmzakharov.ecdataframe.dsl.value.BooleanValue;
 import io.github.vmzakharov.ecdataframe.dsl.value.DateTimeValue;
 import io.github.vmzakharov.ecdataframe.dsl.value.DateValue;
-import io.github.vmzakharov.ecdataframe.dsl.value.DecimalNumberValue;
+import io.github.vmzakharov.ecdataframe.dsl.value.RealNumberValue;
 import io.github.vmzakharov.ecdataframe.dsl.value.DecimalValue;
 import io.github.vmzakharov.ecdataframe.dsl.value.DoubleValue;
 import io.github.vmzakharov.ecdataframe.dsl.value.FloatValue;
@@ -241,7 +241,7 @@ final public class BuiltInFunctions
                                 .format(
                                     value.isWholeNumber()
                                             ? ((WholeNumberValue) value).longValue()
-                                            : ((DecimalNumberValue) value).doubleValue()
+                                            : ((RealNumberValue) value).doubleValue()
                                 );
                 }
                 else if (value.isTemporal())
@@ -339,7 +339,8 @@ final public class BuiltInFunctions
                 VectorValue parameters = this.getParameterVectorFrom(context);
                 LocalDateTime dateTime = null;
                 int paramCount = parameters.size();
-                if (parameters.size() > 4)
+
+                if (paramCount > 4 && paramCount < 8)
                 {
                     int[] params = new int[paramCount];
                     for (int i = 0; i < paramCount; i++)
@@ -353,22 +354,16 @@ final public class BuiltInFunctions
                         params[i] = (int) ((WholeNumberValue) parameter).longValue();
                     }
 
-                    switch (paramCount)
+                    dateTime = switch (paramCount)
                     {
-                        case 5:
-                            dateTime = LocalDateTime.of(params[0], params[1], params[2], params[3], params[4]);
-                            break;
-                        case 6:
-                            dateTime = LocalDateTime.of(params[0], params[1], params[2], params[3], params[4], params[5]);
-                            break;
-                        case 7:
-                            dateTime = LocalDateTime.of(params[0], params[1], params[2], params[3], params[4], params[5], params[6]);
-                            break;
-                        default:
-                            this.assertParameterCount(1, parameters.size()); // forced fail
-                    }
+                        case 5 -> LocalDateTime.of(params[0], params[1], params[2], params[3], params[4]);
+                        case 6 -> LocalDateTime.of(params[0], params[1], params[2], params[3], params[4], params[5]);
+                        case 7 ->
+                                LocalDateTime.of(params[0], params[1], params[2], params[3], params[4], params[5], params[6]);
+                        default -> throw this.invalidParameterCountException(1, parameters.size()); // should be impossible to get here
+                    };
                 }
-                else if (parameters.size() == 1)
+                else if (paramCount == 1)
                 {
                     Value dateTimeAsString = parameters.get(0);
 
@@ -381,8 +376,7 @@ final public class BuiltInFunctions
                 }
                 else
                 {
-                    // forces to fail
-                    this.assertParameterCount(1, parameters.size());
+                    this.assertParameterCount(1, parameters.size()); // failure
                 }
 
                 return new DateTimeValue(dateTime);

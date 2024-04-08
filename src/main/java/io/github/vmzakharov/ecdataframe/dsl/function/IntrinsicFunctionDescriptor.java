@@ -80,10 +80,16 @@ implements FunctionDescriptor
     {
         if (expectedCount != actualCount)
         {
-            exceptionByKey("DSL_INVALID_PARAM_COUNT")
-                    .with("functionName", this.getName()).with("usageString", this.usageString())
-                    .fire();
+            throw this.invalidParameterCountException(expectedCount, actualCount);
         }
+    }
+
+    protected RuntimeException invalidParameterCountException(int expectedCount, int actualCount)
+    {
+        return exceptionByKey("DSL_INVALID_PARAM_COUNT")
+                .with("functionName", this.getName())
+                .with("usageString", this.usageString())
+                .get();
     }
 
     protected void assertParameterType(ValueType expected, ValueType actual)

@@ -4,15 +4,12 @@ import io.github.vmzakharov.ecdataframe.dataframe.DataFrame;
 
 import static io.github.vmzakharov.ecdataframe.util.ExceptionFactory.exceptionByKey;
 
-public class DataFrameValue
-extends AbstractValue
+public record DataFrameValue(DataFrame dataFrame)
+implements Value
 {
-    private final DataFrame dataFrame;
-
-    public DataFrameValue(DataFrame newDataFrame)
+    public DataFrameValue
     {
-        this.throwExceptionIfNull(newDataFrame);
-        this.dataFrame = newDataFrame;
+        this.throwExceptionIfNull(dataFrame);
     }
 
     public DataFrame dataFrameValue()

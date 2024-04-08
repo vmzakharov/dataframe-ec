@@ -98,19 +98,14 @@ extends AggregateFunction
     @Override
     public double getDoubleValue(DfColumn sourceColumn, int sourceRowIndex)
     {
-        switch (sourceColumn.getType())
+        return switch (sourceColumn.getType())
         {
-            case DOUBLE:
-                return ((DfDoubleColumn) sourceColumn).getDouble(sourceRowIndex);
-            case LONG:
-                return ((DfLongColumn) sourceColumn).getLong(sourceRowIndex);
-            case FLOAT:
-                return ((DfFloatColumn) sourceColumn).getFloat(sourceRowIndex);
-            case INT:
-                return ((DfIntColumn) sourceColumn).getInt(sourceRowIndex);
-            default:
-                throw this.notApplicable(sourceColumn);
-        }
+            case DOUBLE -> ((DfDoubleColumn) sourceColumn).getDouble(sourceRowIndex);
+            case LONG -> ((DfLongColumn) sourceColumn).getLong(sourceRowIndex);
+            case FLOAT -> ((DfFloatColumn) sourceColumn).getFloat(sourceRowIndex);
+            case INT -> ((DfIntColumn) sourceColumn).getInt(sourceRowIndex);
+            default -> throw this.notApplicable(sourceColumn);
+        };
     }
 
     @Override
