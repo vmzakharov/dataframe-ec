@@ -353,4 +353,32 @@ public class DataFrameSortDirectionTest
                 ,
                 df);
     }
+
+    @Test
+    public void sortByBoolean()
+    {
+        DataFrame df = new DataFrame("DF")
+                .addStringColumn("Foo").addLongColumn("Bar")
+                .addRow("2", -1)
+                .addRow("3",  2)
+                .addRow("4", -3)
+                .addRow("5",  9)
+                .addRow("6",  1)
+                .addRow("1",  0)
+                ;
+
+        df.sortByExpression("Bar > 0", DESC);
+
+        DataFrameUtil.assertEquals(new DataFrame("DF")
+                .addStringColumn("Foo").addLongColumn("Bar")
+                .addRow("3",  2)
+                .addRow("5",  9)
+                .addRow("6",  1)
+                .addRow("2", -1)
+                .addRow("4", -3)
+                .addRow("1",  0)
+                ,
+                df
+        );
+    }
 }

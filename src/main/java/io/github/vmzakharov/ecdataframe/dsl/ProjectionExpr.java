@@ -29,10 +29,10 @@ implements Expression
         for (int i = 0; i < this.projectionElements.size(); i++)
         {
             Expression element = this.projectionElements.get(i);
-            if (element instanceof AliasExpr)
+            if (element instanceof AliasExpr aliasExpr)
             {
-                this.elementNames.add(((AliasExpr) element).getAlias());
-                this.projectionExpressions.add(((AliasExpr) element).getExpression());
+                this.elementNames.add(aliasExpr.getAlias());
+                this.projectionExpressions.add(aliasExpr.getExpression());
             }
             else
             {

@@ -78,7 +78,7 @@ extends Expression, Comparable<Value>
                     .with("className",  this.getClass().getSimpleName()).getUnsupported();
         }
 
-        if (!other.isVoid() && (this.getClass() != other.getClass()))
+        if (!other.isVoid() && (this.getType() != other.getType()))
         {
             throw exceptionByKey("DSL_COMPARE_INCOMPATIBLE")
                     .with("className",  this.getClass().getSimpleName())

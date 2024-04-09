@@ -34,9 +34,8 @@ implements Comparable<DfTuple>
     @Override
     public boolean equals(Object o)
     {
-        if (o instanceof DfTuple)
+        if (o instanceof DfTuple dfTuple)
         {
-            DfTuple dfTuple = (DfTuple) o;
             return Arrays.equals(this.items, dfTuple.items);
         }
 
