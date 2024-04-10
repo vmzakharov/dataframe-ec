@@ -54,6 +54,6 @@ public class HandcraftedExpressionTreeTest
                 ArithmeticOp.ADD
         ).evaluate(this.evaluationVisitor);
 
-        Assert.assertEquals("OompaLoompa", ((StringValue) result).stringValue());
+        Assert.assertEquals("OompaLoompa", result.stringValue());
     }
 }

@@ -89,12 +89,13 @@ public class HierarchicalDataSetProjectionTest
     public void typeInference()
     {
         String scriptString =
-                "project {\n"
-                + "    Person.name,\n"
-                + "    ${Lucky Number} : Person.luckyNumber,\n"
-                + "    Temp : Person.temperature,\n"
-                + "    Abc : \"ABC\"\n"
-                + "}";
+                """
+                project {
+                    Person.name,
+                    ${Lucky Number} : Person.luckyNumber,
+                    Temp : Person.temperature,
+                    Abc : "ABC"
+                }""";
 
         EvalContext context = new SimpleEvalContext();
         context.addDataSet(this.dataSet);
@@ -111,12 +112,13 @@ public class HierarchicalDataSetProjectionTest
     public void simpleProjection()
     {
         String scriptString =
-            "project {\n"
-            + "    Person.name,\n"
-            + "    ${Lucky Number} : Person.luckyNumber,\n"
-            + "    Temp : Person.temperature,\n"
-            + "    Abc : \"ABC\"\n"
-            + "}";
+                """
+                project {
+                    Person.name,
+                    ${Lucky Number} : Person.luckyNumber,
+                    Temp : Person.temperature,
+                    Abc : "ABC"
+                }""";
 
         Script script = ExpressionParserHelper.DEFAULT.toScript(scriptString);
 
@@ -141,11 +143,12 @@ public class HierarchicalDataSetProjectionTest
     public void projectionWithBigNumbers()
     {
         String scriptString =
-                "project {\n"
-                + "    Person.name,\n"
-                + "    ${Big Lucky Number} : Person.bigLuckyNumber,\n"
-                + "    BigTemp : Person.bigTemperature\n"
-                + "}";
+                """
+                project {
+                    Person.name,
+                    ${Big Lucky Number} : Person.bigLuckyNumber,
+                    BigTemp : Person.bigTemperature
+                }""";
 
         Script script = ExpressionParserHelper.DEFAULT.toScript(scriptString);
 
@@ -170,12 +173,13 @@ public class HierarchicalDataSetProjectionTest
     public void nestedObjectProjection()
     {
         String scriptString =
-                "project {\n"
-                + "    Person.name,\n"
-                + "    ${Lucky Number} : Person.luckyNumber,\n"
-                + "    Temp : Person.temperature,\n"
-                + "    Food : Person.favoriteFood.description\n"
-                + "} where Person.luckyNumber < 200";
+                """
+                project {
+                    Person.name,
+                    ${Lucky Number} : Person.luckyNumber,
+                    Temp : Person.temperature,
+                    Food : Person.favoriteFood.description
+                } where Person.luckyNumber < 200""";
 
         Script script = ExpressionParserHelper.DEFAULT.toScript(scriptString);
 
@@ -199,14 +203,15 @@ public class HierarchicalDataSetProjectionTest
     public void nestedObjectProjectionWithDates()
     {
         String scriptString =
-                "project {\n"
-                + "    Person.name,\n"
-                + "    ${Lucky Number} : Person.luckyNumber,\n"
-                + "    Date : Person.specialDate,\n"
-                + "    FavoriteFood : Person.favoriteFood.description,\n"
-                + "    LastEaten : Person.favoriteFood.lastEaten,\n"
-                + "    LastEatenDateOnly : Person.favoriteFood.lastEaten.toLocalDate\n"
-                + "}";
+                """
+                project {
+                    Person.name,
+                    ${Lucky Number} : Person.luckyNumber,
+                    Date : Person.specialDate,
+                    FavoriteFood : Person.favoriteFood.description,
+                    LastEaten : Person.favoriteFood.lastEaten,
+                    LastEatenDateOnly : Person.favoriteFood.lastEaten.toLocalDate
+                }""";
 
         Script script = ExpressionParserHelper.DEFAULT.toScript(scriptString);
 

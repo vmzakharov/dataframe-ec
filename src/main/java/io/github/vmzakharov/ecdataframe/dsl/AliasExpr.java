@@ -7,8 +7,8 @@ import io.github.vmzakharov.ecdataframe.dsl.visitor.ExpressionVisitor;
 public class AliasExpr
 implements Expression
 {
-    private String alias;
-    private Expression expression;
+    private final String alias;
+    private final Expression expression;
 
     public AliasExpr(String newAlias, Expression newExpression)
     {

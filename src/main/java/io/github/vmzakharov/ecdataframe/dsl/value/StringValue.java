@@ -39,6 +39,7 @@ implements Value
     @Override
     public BooleanValue applyPredicate(Value another, PredicateOp operation)
     {
+        this.checkSameTypeForComparison(another);
         return operation.applyString(this.stringValue(), ((StringValue) another).stringValue());
     }
 

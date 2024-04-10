@@ -380,10 +380,8 @@ implements ExpressionVisitor
 
         Expression indexExpr = expr.getIndexExpr();
 
-        if (indexExpr instanceof Value && vectorExpr instanceof VectorExpr) // the vector and the index are both specified as literals
+        if (indexExpr instanceof Value indexVal && vectorExpr instanceof VectorExpr) // the vector and the index are both specified as literals
         {
-            Value indexVal = (Value) indexExpr;
-
             if (indexVal.isLong())
             {
                 long index = ((LongValue) indexVal).longValue();
