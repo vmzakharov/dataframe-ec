@@ -1,6 +1,5 @@
 package io.github.vmzakharov.ecdataframe.dsl;
 
-import io.github.vmzakharov.ecdataframe.ExpressionTestUtil;
 import io.github.vmzakharov.ecdataframe.dsl.value.DecimalValue;
 import org.junit.Assert;
 import org.junit.Test;
@@ -8,20 +7,23 @@ import org.junit.Test;
 import java.math.BigDecimal;
 import java.math.MathContext;
 
+import static io.github.vmzakharov.ecdataframe.ExpressionTestUtil.evaluateScriptWithContext;
+import static io.github.vmzakharov.ecdataframe.ExpressionTestUtil.evaluateToDecimal;
+
 public class DecimalExpressionTest
 {
     @Test
     public void literals()
     {
-        Assert.assertEquals(BigDecimal.valueOf(579, 4), ExpressionTestUtil.evaluateToDecimal("toDecimal(123,4) + toDecimal(456,4)"));
+        Assert.assertEquals(BigDecimal.valueOf(579, 4), evaluateToDecimal("toDecimal(123,4) + toDecimal(456,4)"));
 
-        Assert.assertEquals(BigDecimal.valueOf(-333, 4), ExpressionTestUtil.evaluateToDecimal("toDecimal(123,4) - toDecimal(456,4)"));
+        Assert.assertEquals(BigDecimal.valueOf(-333, 4), evaluateToDecimal("toDecimal(123,4) - toDecimal(456,4)"));
 
-        Assert.assertEquals(BigDecimal.valueOf(56088, 8), ExpressionTestUtil.evaluateToDecimal("toDecimal(123,4) * toDecimal(456,4)"));
+        Assert.assertEquals(BigDecimal.valueOf(56088, 8), evaluateToDecimal("toDecimal(123,4) * toDecimal(456,4)"));
 
         Assert.assertEquals(
                 BigDecimal.valueOf(123.0).divide(BigDecimal.valueOf(456.0), MathContext.DECIMAL128),
-                ExpressionTestUtil.evaluateToDecimal("toDecimal(123, 4) / toDecimal(456, 4)"));
+                evaluateToDecimal("toDecimal(123, 4) / toDecimal(456, 4)"));
     }
 
     @Test
@@ -45,8 +47,15 @@ public class DecimalExpressionTest
                  this.evaluateToDecimalWithContext("a / b", context));
     }
 
+    @Test
+    public void mixedTypes()
+    {
+        Assert.assertEquals(BigDecimal.valueOf(20123, 4), evaluateToDecimal("toDecimal(123,4) + 2"));
+        Assert.assertEquals(BigDecimal.valueOf(2623, 4), evaluateToDecimal("toDecimal(123,4) + 0.25"));
+    }
+
     private BigDecimal evaluateToDecimalWithContext(String expression, EvalContext context)
     {
-        return ((DecimalValue) ExpressionTestUtil.evaluateScriptWithContext(expression, context)).decimalValue();
+        return ((DecimalValue) evaluateScriptWithContext(expression, context)).decimalValue();
     }
 }

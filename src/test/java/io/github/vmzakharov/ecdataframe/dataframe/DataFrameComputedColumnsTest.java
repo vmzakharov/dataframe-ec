@@ -65,9 +65,10 @@ public class DataFrameComputedColumnsTest
     public void computedColumnDependentExpression()
     {
         this.df
+            .addLongColumn("CountTwice", "Count * 2")
             .addLongColumn("CountTwiceAndTwo", "CountTwice + 2")
             .addLongColumn("AllTogetherNow", "CountTwice + CountTwiceAndTwo")
-            .addLongColumn("CountTwice", "Count * 2");
+            ;
 
         Assert.assertEquals(LongLists.immutable.of(12L, 22L, 24L, 2L), this.df.getLongColumn("CountTwiceAndTwo").toLongList());
         Assert.assertEquals(LongLists.immutable.of(22L, 42L, 46L, 2L), this.df.getLongColumn("AllTogetherNow").toLongList());
@@ -78,10 +79,9 @@ public class DataFrameComputedColumnsTest
     {
         SimpleEvalContext evalContext = new SimpleEvalContext();
         evalContext.setVariable("Three", new LongValue(3));
+        this.df.setExternalEvalContext(evalContext);
 
         this.df.addLongColumn("CountMore", "Count * Three");
-
-        this.df.setExternalEvalContext(evalContext);
 
         Assert.assertEquals(LongLists.immutable.of(15L, 30L, 33L, 0L), this.df.getLongColumn("CountMore").toLongList());
     }
@@ -109,7 +109,7 @@ public class DataFrameComputedColumnsTest
     @Test
     public void floatComputedColumn()
     {
-        this.df.addColumn("NegativeFloatie", "-Floatie");
+        this.df.addFloatColumn("NegativeFloatie", "-Floatie");
         this.df.addColumn("FloatieAndLong", "Floatie + Count");
         this.df.addColumn("FloatieAndDouble", "Floatie + Value");
 
@@ -196,21 +196,12 @@ public class DataFrameComputedColumnsTest
     @Test
     public void usingScriptWithOutsideContext()
     {
-        String script =
-                  "if inTheList(Count, numbers) then\n"
-                + "  Value * 2\n"
-                + "else\n"
-                + "  Value + 2\n"
-                + "endif";
-
-        this.df.addDoubleColumn("Complication", script);
-
         String outerScriptString =
-                  "function inTheList(item, list)\n"
-                + "{\n"
-                + "  item in list\n"
-                + "}\n"
-        ;
+                "function inTheList(item, list)\n"
+                        + "{\n"
+                        + "  item in list\n"
+                        + "}\n"
+                ;
 
         AnonymousScript outerScript = ExpressionParserHelper.DEFAULT.toScript(outerScriptString);
 
@@ -219,6 +210,15 @@ public class DataFrameComputedColumnsTest
         outerContext.setVariable("numbers", ExpressionTestUtil.evaluateExpression("(5, 10)"));
 
         this.df.setExternalEvalContext(outerContext);
+
+        String script = """
+                        if inTheList(Count, numbers) then
+                          Value * 2
+                        else
+                          Value + 2
+                        endif""";
+
+        this.df.addDoubleColumn("Complication", script);
 
         Assert.assertEquals(DoubleLists.immutable.of(46.9, 24.68, 58.78, 9.89), this.df.getDoubleColumn("Complication").toDoubleList());
     }
@@ -234,7 +234,7 @@ public class DataFrameComputedColumnsTest
                 ;
 
         dataFrame.addDateColumn("fromString", "toDate(DateAsString)");
-        dataFrame.addDateColumn("fromNumbers", "toDate(Year, Month, Day)");
+        dataFrame.addColumn("fromNumbers", "toDate(Year, Month, Day)");
 
         DataFrameUtil.assertEquals(
                 new DataFrame("DataFrame")

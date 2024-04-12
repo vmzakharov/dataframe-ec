@@ -94,9 +94,17 @@ implements DfIterate
         return this.addColumn(newColumnName, ValueType.STRING);
     }
 
+    /**
+     * Add a computed column of string type to this data frame
+     * @deprecated use {@link #addColumn(String, String)} instead. The type of the column to add will be inferred from
+     * the expression
+     * @param newColumnName the name of the column to be added
+     * @param expressionAsString the expression used to compute the column values
+     * @return this data frame
+     */
     public DataFrame addStringColumn(String newColumnName, String expressionAsString)
     {
-        return this.addColumn(newColumnName, ValueType.STRING, expressionAsString);
+        return this.addColumnWithTypeValidation(newColumnName, ValueType.STRING, expressionAsString);
     }
 
     public DataFrame addStringColumn(String newColumnName, ListIterable<String> values)
@@ -110,9 +118,17 @@ implements DfIterate
         return this.addColumn(newColumnName, ValueType.LONG);
     }
 
+    /**
+     * Add a computed column of long type to this data frame
+     * @deprecated use {@link #addColumn(String, String)} instead. The type of the column to add will be inferred from
+     * the expression
+     * @param newColumnName the name of the column to be added
+     * @param expressionAsString the expression used to compute the column values
+     * @return this data frame
+     */
     public DataFrame addLongColumn(String newColumnName, String expressionAsString)
     {
-        return this.addColumn(newColumnName, ValueType.LONG, expressionAsString);
+        return this.addColumnWithTypeValidation(newColumnName, ValueType.LONG, expressionAsString);
     }
 
     public DataFrame addLongColumn(String newColumnName, LongIterable values)
@@ -126,9 +142,17 @@ implements DfIterate
         return this.addColumn(newColumnName, ValueType.INT);
     }
 
+    /**
+     * Add a computed column of int type to this data frame
+     * @deprecated use {@link #addColumn(String, String)} instead. The type of the column to add will be inferred from
+     * the expression
+     * @param newColumnName the name of the column to be added
+     * @param expressionAsString the expression used to compute the column values
+     * @return this data frame
+     */
     public DataFrame addIntColumn(String newColumnName, String expressionAsString)
     {
-        return this.addColumn(newColumnName, ValueType.INT, expressionAsString);
+        return this.addColumnWithTypeValidation(newColumnName, ValueType.INT, expressionAsString);
     }
 
     public DataFrame addIntColumn(String newColumnName, IntIterable values)
@@ -142,9 +166,17 @@ implements DfIterate
         return this.addColumn(newColumnName, ValueType.FLOAT);
     }
 
+    /**
+     * Add a computed column of float type to this data frame
+     * @deprecated use {@link #addColumn(String, String)} instead. The type of the column to add will be inferred from
+     * the expression
+     * @param newColumnName the name of the column to be added
+     * @param expressionAsString the expression used to compute the column values
+     * @return this data frame
+     */
     public DataFrame addFloatColumn(String newColumnName, String expressionAsString)
     {
-        return this.addColumn(newColumnName, ValueType.FLOAT, expressionAsString);
+        return this.addColumnWithTypeValidation(newColumnName, ValueType.FLOAT, expressionAsString);
     }
 
     public DataFrame addFloatColumn(String newColumnName, FloatIterable values)
@@ -158,9 +190,17 @@ implements DfIterate
         return this.addColumn(newColumnName, ValueType.DOUBLE);
     }
 
+    /**
+     * Add a computed column of double type to this data frame
+     * @deprecated use {@link #addColumn(String, String)} instead. The type of the column to add will be inferred from
+     * the expression
+     * @param newColumnName the name of the column to be added
+     * @param expressionAsString the expression used to compute the column values
+     * @return this data frame
+     */
     public DataFrame addDoubleColumn(String newColumnName, String expressionAsString)
     {
-        return this.addColumn(newColumnName, ValueType.DOUBLE, expressionAsString);
+        return this.addColumnWithTypeValidation(newColumnName, ValueType.DOUBLE, expressionAsString);
     }
 
     public DataFrame addDoubleColumn(String newColumnName, DoubleIterable values)
@@ -180,9 +220,17 @@ implements DfIterate
         return this;
     }
 
+    /**
+     * Add a computed column of date type to this data frame
+     * @deprecated use {@link #addColumn(String, String)} instead. The type of the column to add will be inferred from
+     * the expression
+     * @param newColumnName the name of the column to be added
+     * @param expressionAsString the expression used to compute the column values
+     * @return this data frame
+     */
     public DataFrame addDateColumn(String newColumnName, String expressionAsString)
     {
-        return this.addColumn(newColumnName, ValueType.DATE, expressionAsString);
+        return this.addColumnWithTypeValidation(newColumnName, ValueType.DATE, expressionAsString);
     }
 
     public DataFrame addDateTimeColumn(String newColumnName)
@@ -196,9 +244,17 @@ implements DfIterate
         return this;
     }
 
+    /**
+     * Add a computed column of date/time type to this data frame
+     * @deprecated use {@link #addColumn(String, String)} instead. The type of the column to add will be inferred from
+     * the expression
+     * @param newColumnName the name of the column to be added
+     * @param expressionAsString the expression used to compute the column values
+     * @return this data frame
+     */
     public DataFrame addDateTimeColumn(String newColumnName, String expressionAsString)
     {
-        return this.addColumn(newColumnName, ValueType.DATE_TIME, expressionAsString);
+        return this.addColumnWithTypeValidation(newColumnName, ValueType.DATE_TIME, expressionAsString);
     }
 
     public DataFrame addDecimalColumn(String newColumnName)
@@ -206,9 +262,17 @@ implements DfIterate
         return this.addColumn(newColumnName, ValueType.DECIMAL);
     }
 
+    /**
+     * Add a computed column of decimal type to this data frame
+     * @deprecated use {@link #addColumn(String, String)} instead. The type of the column to add will be inferred from
+     * the expression
+     * @param newColumnName the name of the column to be added
+     * @param expressionAsString the expression used to compute the column values
+     * @return this data frame
+     */
     public DataFrame addDecimalColumn(String newColumnName, String expressionAsString)
     {
-        return this.addColumn(newColumnName, ValueType.DECIMAL, expressionAsString);
+        return this.addColumnWithTypeValidation(newColumnName, ValueType.DECIMAL, expressionAsString);
     }
 
     public DataFrame addDecimalColumn(String newColumnName, ListIterable<BigDecimal> values)
@@ -388,27 +452,20 @@ implements DfIterate
         return this.name;
     }
 
+    /**
+     * Add a computed column of int type to this data frame. The column type will be inferred from the expression
+     * provided
+     *
+     * @param columnName the name of the column to be added
+     * @param expressionAsString the expression used to compute the column values
+     * @return this data frame
+     */
     public DataFrame addColumn(String columnName, String expressionAsString)
     {
-        TypeInferenceVisitor visitor = new TypeInferenceVisitor();
-
-        this.getColumns().each(col -> visitor.storeVariableType(col.getName(), col.getType()));
-
-        Expression expression = ExpressionParserHelper.DEFAULT.toExpressionOrScript(expressionAsString);
-
-        ValueType expressionType = visitor.inferExpressionType(expression);
-        if (visitor.hasErrors())
-        {
-            exceptionByKey("DF_CALC_COL_INFER_TYPE")
-                    .with("columnName", columnName)
-                    .with("dataFrameName", this.getName())
-                    .with("expression", expressionAsString)
-                    .with("errorList", visitor.getErrors()
-                                              .collect(err -> err.getOne() + ": " + err.getTwo())
-                                              .makeString("\n"))
-                    .fire();
-        }
-        return this.addColumn(columnName, expressionType, expressionAsString);
+        return this.addColumn(
+                columnName,
+                this.inferExpressionType(columnName, expressionAsString),
+                expressionAsString);
     }
 
     /**
@@ -463,6 +520,37 @@ implements DfIterate
      * @param columnName         the name of the column to be created
      * @param type               the type of the new column
      * @param expressionAsString the expression
+     * @return this data frame
+     */
+    public DataFrame addColumn(String columnName, ValueType type, String expressionAsString)
+    {
+        this.newColumn(columnName, type, expressionAsString);
+        return this;
+    }
+
+    private DataFrame addColumnWithTypeValidation(String columnName, ValueType columnType, String expressionAsString)
+    {
+        ValueType expressionType = this.inferExpressionType(columnName, expressionAsString);
+        if (expressionType != columnType)
+        {
+            throw exceptionByKey("DF_CALC_COL_TYPE_MISMATCH")
+                    .with("columnName", columnName)
+                    .with("dataFrameName", this.getName())
+                    .with("inferredType", expressionType.toString())
+                    .with("expression", expressionAsString)
+                    .with("specifiedType", columnType.toString())
+                    .get();
+        }
+        this.newColumn(columnName, columnType, expressionAsString);
+        return this;
+    }
+
+    /**
+     * creates a calculated column with the specified name of the specified type and attaches it to this dataframe.
+     *
+     * @param columnName         the name of the column to be created
+     * @param type               the type of the new column
+     * @param expressionAsString the expression used to calculate column values
      * @return the newly created columns
      */
     public DfColumnComputed newColumn(String columnName, ValueType type, String expressionAsString)
@@ -472,21 +560,31 @@ implements DfIterate
         return created;
     }
 
-    /**
-     * creates a calculated column with the specified name of the specified type and attaches it to this dataframe.
-     *
-     * @param columnName         the name of the column to be created
-     * @param type               the type of the new column
-     * @param expressionAsString the expression
-     * @return this data frame
-     */
-    public DataFrame addColumn(String columnName, ValueType type, String expressionAsString)
+    private ValueType inferExpressionType(String columnName, String expressionAsString)
     {
-        this.newColumn(columnName, type, expressionAsString);
-        return this;
+        TypeInferenceVisitor visitor = new TypeInferenceVisitor(this.getEvalContext());
+
+        this.getColumns().each(col -> visitor.storeVariableType(col.getName(), col.getType()));
+
+        Expression expression = ExpressionParserHelper.DEFAULT.toExpressionOrScript(expressionAsString);
+
+        ValueType expressionType = visitor.inferExpressionType(expression);
+        if (visitor.hasErrors())
+        {
+            exceptionByKey("DF_CALC_COL_INFER_TYPE")
+                    .with("columnName", columnName)
+                    .with("dataFrameName", this.getName())
+                    .with("expression", expressionAsString)
+                    .with("errorList", visitor.getErrors()
+                                              .collect(err -> err.getOne() + ": " + err.getTwo())
+                                              .makeString("\n"))
+                    .fire();
+        }
+
+        return expressionType;
     }
 
-    public DfColumnComputed createComputedColumn(String columnName, ValueType type, String expressionAsString)
+    private DfColumnComputed createComputedColumn(String columnName, ValueType type, String expressionAsString)
     {
         return switch (type)
         {

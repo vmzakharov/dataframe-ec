@@ -36,7 +36,8 @@ final public class ConfigureMessages
         addMessage("DF_SET_VAL_ON_COMP_COL",          "Cannot set a value on computed column '${columnName}'");
         addMessage("DF_AGG_VAL_TO_COMP_COL",          "Cannot store aggregated value into a computed column '${columnNane}'");
         addMessage("DF_CALC_COL_MODIFICATION",        "Cannot directly modify computed column '${columnName}'");
-        addMessage("DF_CALC_COL_INFER_TYPE",          "Cannot add calculated column ${columnName} to data frame ${dataFrameName}: failed to infer the expression type of '${expression}'\n${errorList}");
+        addMessage("DF_CALC_COL_INFER_TYPE",          "Cannot add calculated column ${columnName} to data frame ${dataFrameName}: failed to infer the type of expression '${expression}'\n${errorList}");
+        addMessage("DF_CALC_COL_TYPE_MISMATCH",       "Cannot add calculated column ${columnName} to data frame ${dataFrameName}: type ${inferredType} of expression '${expression}' does not match specified type ${specifiedType}");
         addMessage("DF_MERGE_COL_DIFF_TYPES",         "Attempting to merge columns of different types: ${firstColumnName} (${firstColumnType}) and ${secondColumnName} (${secondColumnType})");
         addMessage("DF_COL_CONTAINS_NULL",            "Column '${columnName}' contains null value in row ${rowIndex}");
         addMessage("CSV_FILE_WRITE_FAIL",             "Failed to write data frame to '${fileName}'");

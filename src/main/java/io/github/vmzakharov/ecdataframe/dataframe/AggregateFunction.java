@@ -117,7 +117,7 @@ public abstract class AggregateFunction
     }
 
     /**
-     * @deprecated use <code>getSourceColumnName()</code> instead
+     * @deprecated use {@link #getSourceColumnName()} instead
      * @return the name of the aggregation source column, i.e. the column the values of which will be aggregated
      */
     public String getColumnName()

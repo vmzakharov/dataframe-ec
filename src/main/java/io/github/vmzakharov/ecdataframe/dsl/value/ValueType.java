@@ -41,7 +41,7 @@ public enum ValueType
 
     public boolean isNumber()
     {
-        return this == LONG || this == DOUBLE || this == INT || this == FLOAT;
+        return this == LONG || this == DOUBLE || this == INT || this == FLOAT || this == DECIMAL;
     }
 
     public boolean isWholeNumber()

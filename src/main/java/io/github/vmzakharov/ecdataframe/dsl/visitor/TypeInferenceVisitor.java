@@ -50,7 +50,7 @@ implements ExpressionVisitor
     private final MutableMap<String, ValueType> variableTypes = Maps.mutable.of();
 
     private ValueType lastExpressionType;
-    private MutableMap<String, FunctionScript> functions;
+    private MutableMap<String, FunctionScript> functions = Maps.mutable.empty();
 
     private final EvalContext evalContext;
 
@@ -85,7 +85,13 @@ implements ExpressionVisitor
 
     private FunctionScript getFunction(String functionName)
     {
-        return this.functions.get(functionName);
+        FunctionScript functionScript = this.functions.get(functionName);
+        if (functionScript == null && this.evalContext != null)
+        {
+            functionScript = this.evalContext.getDeclaredFunction(functionName);
+        }
+
+        return functionScript;
     }
 
     @Override

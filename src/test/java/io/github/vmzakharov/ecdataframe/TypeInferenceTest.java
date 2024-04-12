@@ -3,6 +3,7 @@ package io.github.vmzakharov.ecdataframe;
 import io.github.vmzakharov.ecdataframe.dsl.EvalContext;
 import io.github.vmzakharov.ecdataframe.dsl.Script;
 import io.github.vmzakharov.ecdataframe.dsl.SimpleEvalContext;
+import io.github.vmzakharov.ecdataframe.dsl.value.FloatValue;
 import io.github.vmzakharov.ecdataframe.dsl.value.IntValue;
 import io.github.vmzakharov.ecdataframe.dsl.value.LongValue;
 import io.github.vmzakharov.ecdataframe.dsl.value.StringValue;
@@ -73,101 +74,102 @@ public class TypeInferenceTest
         assertScriptType("1.234 is null", ValueType.BOOLEAN);
         assertScriptType("toDate(2020, 12, 20) is null", ValueType.BOOLEAN);
         assertScriptType("toDate(2020, 12, 20) is not null", ValueType.BOOLEAN);
-        assertScriptType(
-                  "a = 1\n"
-                + "if a is null then\n"
-                + "  'null'\n"
-                + "else\n"
-                + "  'not null'\n"
-                + "endif", ValueType.STRING);
+        assertScriptType("""
+                a = 1
+                if a is null then
+                  'null'
+                else
+                  'not null'
+                endif""", ValueType.STRING);
     }
 
     @Test
     public void projectionInference()
     {
         assertScriptType(
-                  "project {\n"
-                + "  p.x,\n"
-                + "  p.y,\n"
-                + "  abc: 'abc'\n"
-                + "}", ValueType.DATA_FRAME);
+                """
+                project {
+                  p.x,
+                  p.y,
+                  abc: 'abc'
+                }""", ValueType.DATA_FRAME);
     }
 
     @Test
     public void scriptTypeInference()
     {
-        assertScriptType(
-                   "1\n"
-                + "2.0\n"
-                + "\"abc\"", ValueType.STRING);
+        assertScriptType("""
+                1
+                2.0
+                "abc\"""", ValueType.STRING);
 
-        assertScriptType(
-                  "a = 1\n"
-                + "b = 2.0\n"
-                + "c = a + b", ValueType.DOUBLE);
+        assertScriptType("""
+                a = 1
+                b = 2.0
+                c = a + b""", ValueType.DOUBLE);
     }
 
     @Test
     public void functionTypeInference()
     {
-        assertScriptType(
-                  "function sum(a, b)\n"
-                + "{\n"
-                + "    a + b\n"
-                + "}\n"
-                + "x = 1.0\n"
-                + "y = 2.0\n"
-                + "sum(x, y)", ValueType.DOUBLE);
+        assertScriptType("""
+                function sum(a, b)
+                {
+                    a + b
+                }
+                x = 1.0
+                y = 2.0
+                sum(x, y)""", ValueType.DOUBLE);
 
-        assertScriptType(
-                  "function sum(a, b)\n"
-                + "{\n"
-                + "    a + b\n"
-                + "}\n"
-                + "x = 1\n"
-                + "y = 2\n"
-                + "sum(x, y)", ValueType.LONG);
+        assertScriptType("""
+                function sum(a, b)
+                {
+                    a + b
+                }
+                x = 1
+                y = 2
+                sum(x, y)""", ValueType.LONG);
 
-        assertScriptType(
-                  "function sum(a, b)\n"
-                + "{\n"
-                + "    a + b\n"
-                + "}\n"
-                + "x = \"Hello, \"\n"
-                + "y = \"world!\"\n"
-                + "sum(x, y)", ValueType.STRING);
+        assertScriptType("""
+                function sum(a, b)
+                {
+                    a + b
+                }
+                x = "Hello, "
+                y = "world!"
+                sum(x, y)""", ValueType.STRING);
 
-        assertScriptType(
-                  "function sum(a, b)\n"
-                + "{\n"
-                + "    a + b\n"
-                + "}\n"
-                + "x = 1\n"
-                + "y = 2.0\n"
-                + "sum(x, y)", ValueType.DOUBLE);
+        assertScriptType("""
+                function sum(a, b)
+                {
+                    a + b
+                }
+                x = 1
+                y = 2.0
+                sum(x, y)""", ValueType.DOUBLE);
 
-        assertScriptType(
-                  "function isItBigger(a, b) { a > b }\n"
-                + "x = 1\n"
-                + "y = 2.0\n"
-                + "isItBigger(x, y)", ValueType.BOOLEAN);
+        assertScriptType("""
+                function isItBigger(a, b) { a > b }
+                x = 1
+                y = 2.0
+                isItBigger(x, y)""", ValueType.BOOLEAN);
     }
 
     @Test
     public void conditionalStatement()
     {
-        assertScriptType(" a > b ? 5 : 7", ValueType.LONG);
-        assertScriptType(" a > b ? 5.0 : 7", ValueType.DOUBLE);
-        assertScriptType(" a > b ? 'foo' : 'bar'", ValueType.STRING);
-        assertScriptType(" a > b ? 'foo' : 7", ValueType.VOID);
+        assertScriptType("a > b ? 5 : 7", ValueType.LONG);
+        assertScriptType("a > b ? 5.0 : 7", ValueType.DOUBLE);
+        assertScriptType("a > b ? 'foo' : 'bar'", ValueType.STRING);
+        assertScriptType("a > b ? 'foo' : 7", ValueType.VOID);
     }
 
     @Test
     public void conditionalOnlyIfBranch()
     {
-        assertScriptType(" if a > b then\n  5\nendif", ValueType.LONG);
-        assertScriptType(" if a > b then\n  5.5 + 1\nendif", ValueType.DOUBLE);
-        assertScriptType(" if a > b then\n  '5'\nendif", ValueType.STRING);
+        assertScriptType("if a > b then\n  5\nendif", ValueType.LONG);
+        assertScriptType("if a > b then\n  5.5 + 1\nendif", ValueType.DOUBLE);
+        assertScriptType("if a > b then\n  '5'\nendif", ValueType.STRING);
     }
 
     @Test
@@ -199,6 +201,7 @@ public class TypeInferenceTest
         assertScriptType("toDate(2020, 11, 22)", ValueType.DATE);
         assertScriptType("toDateTime(2020, 11, 22, 15, 11)", ValueType.DATE_TIME);
         assertScriptType("toDouble('12.34')", ValueType.DOUBLE);
+        assertScriptType("toDecimal('12.34')", ValueType.DECIMAL);
         assertScriptType("toLong('1234')", ValueType.LONG);
         assertScriptType("toString(123)", ValueType.STRING);
         assertScriptType("toUpper('abc')", ValueType.STRING);
@@ -213,6 +216,28 @@ public class TypeInferenceTest
         context.setVariable("foo", new IntValue(5));
         assertScriptType("abs(foo)", context, ValueType.INT);
         assertScriptType("toString(foo)", context, ValueType.STRING);
+    }
+
+    @Test
+    public void builtInFunctionsForFloat()
+    {
+        SimpleEvalContext context = new SimpleEvalContext();
+        context.setVariable("waldo", new FloatValue(5));
+        assertScriptType("abs(waldo)", context, ValueType.FLOAT);
+        assertScriptType("toString(waldo)", context, ValueType.STRING);
+    }
+
+    @Test
+    public void decimalInference()
+    {
+        SimpleEvalContext context = new SimpleEvalContext();
+        context.setVariable("foo", new IntValue(5));
+        context.setVariable("waldo", new FloatValue(5));
+
+        assertScriptType("toDecimal(123, 2) + 1", ValueType.DECIMAL);
+        assertScriptType("toDecimal(123, 2) + 1.0", ValueType.DECIMAL);
+        assertScriptType("toDecimal(123, 2) + foo", context, ValueType.DECIMAL);
+        assertScriptType("toDecimal(123, 2) + waldo", context, ValueType.DECIMAL);
     }
 
     @Test
