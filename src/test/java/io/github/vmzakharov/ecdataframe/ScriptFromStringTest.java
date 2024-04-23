@@ -31,8 +31,7 @@ public class ScriptFromStringTest
                 + "y =2\n"
                 + "z=x+ y\n"
                 + "3+1 +2";
-        AnonymousScript script = ExpressionTestUtil.toScript(scriptText);
-        Value result = script.evaluate();
+        Value result = ExpressionTestUtil.evaluateScript(scriptText);
         Assert.assertTrue(result.isLong());
         Assert.assertEquals(6, ((LongValue) result).longValue());
     }
@@ -40,28 +39,28 @@ public class ScriptFromStringTest
     @Test
     public void inOperator()
     {
-        AnonymousScript script = ExpressionTestUtil.toScript(
-                  "x = 1\n"
-                + "y = 1\n"
-                + "x in (3, 2, y)");
-        Value result = script.evaluate();
+        Value result = ExpressionTestUtil.evaluateScript(
+                """
+                x = 1
+                y = 1
+                x in (3, 2, y)""");
         Assert.assertTrue(result.isBoolean());
         Assert.assertTrue(((BooleanValue) result).isTrue());
 
-        script = ExpressionTestUtil.toScript(
-                  "x= \"a\"\n"
-                + "y= \"b\"\n"
-                + "q= \"c\"\n"
-                + "x in (\"b\", y, q)");
-        result = script.evaluate();
+        result = ExpressionTestUtil.evaluateScript(
+                """
+                x= "a"
+                y= "b"
+                q= "c"
+                x in ("b", y, q)""");
         Assert.assertTrue(result.isBoolean());
         Assert.assertFalse(((BooleanValue) result).isTrue());
 
-        script = ExpressionTestUtil.toScript(
-                  "y= \"b\"\n"
-                + "q= \"c\"\n"
-                + "\"c\" in (\"b\", y, q)");
-        result = script.evaluate();
+        result = ExpressionTestUtil.evaluateScript(
+                """
+                y= "b"
+                q= "c"
+                "c" in ("b", y, q)""");
         Assert.assertTrue(result.isBoolean());
         Assert.assertTrue(((BooleanValue) result).isTrue());
     }
@@ -69,78 +68,82 @@ public class ScriptFromStringTest
     @Test
     public void ifStatement()
     {
-        AnonymousScript script = ExpressionTestUtil.toScript(
-                  "x = \"a\"\n"
-                + "if x in (\"a\", \"b\", \"c\")\n"
-                + "then\n"
-                + "   result = \"in\"\n"
-                + "else\n"
-                + "   result = \"not in\"\n"
-                + "endif\n"
-                + "result\n"
+        Value result = ExpressionTestUtil.evaluateScript(
+                """
+                x = "a"
+                if x in ("a", "b", "c")
+                then
+                   result = "in"
+                else
+                   result = "not in"
+                endif
+                result
+                """
         );
 
-        Value result = script.evaluate();
         Assert.assertEquals("in", result.stringValue());
     }
 
     @Test
     public void nestedIfStatement()
     {
-        AnonymousScript script = ExpressionTestUtil.toScript(
-                  "x = \"a\"\n"
-                + "if x in (\"a\", \"b\", \"c\") then\n"
-                + "  2 + 2\n"
-                + "  result = \"in\"\n"
-                + "  if x == \"b\" then y = 5 else y = 6 endif\n"
-                + "else\n"
-                + "  result = \"not in\"\n"
-                + "  if x == \"q\" "
-                + "    then y = 7\n"
-                + "    else y = 8\n"
-                + "  endif\n"
-                + "endif\n"
-                + "y\n"
+        Value result = ExpressionTestUtil.evaluateScript(
+                """
+                x = "a"
+                if x in ("a", "b", "c") then
+                  2 + 2
+                  result = "in"
+                  if x == "b" then y = 5 else y = 6 endif
+                else
+                  result = "not in"
+                  if x == "q" \
+                    then y = 7
+                    else y = 8
+                  endif
+                endif
+                y
+                """
         );
 
-        Value result = script.evaluate();
         Assert.assertEquals(6, ((LongValue) result).longValue());
     }
 
     @Test
     public void ifStatementAsExpression()
     {
-        AnonymousScript script = ExpressionTestUtil.toScript(
-                  "x = \"aa\"\n"
-                + "if x in (\"a\", \"b\", \"c\")\n"
-                + "then\n"
-                + "   result = \"in\"\n"
-                + "else\n"
-                + "   result = \"not in\"\n"
-                + "endif\n"
+        Value result = ExpressionTestUtil.evaluateScript(
+                """
+                x = "aa"
+                if x in ("a", "b", "c")
+                then
+                   result = "in"
+                else
+                   result = "not in"
+                endif
+                """
         );
-        Value result = script.evaluate();
         Assert.assertEquals("not in", result.stringValue());
     }
 
     @Test
     public void nestedIfStatementAsExpression()
     {
-        AnonymousScript script = ExpressionTestUtil.toScript(
-                  "x = \"a\"\n"
-                + "if x in (\"a\", \"b\", \"c\")\n"
-                + "then\n"
-                + "  2 + 2\n"
-                + "  if x == \"b\" then 5 else 6 endif\n"
-                + "else\n"
-                + "  if x == \"q\" "
-                + "    then 7\n"
-                + "    else 8\n"
-                + "  endif\n"
-                + "endif\n"
+        Value result = ExpressionTestUtil.evaluateScript(
+                """
+                x = "a"
+                if x in ("a", "b", "c")
+                then
+                  2 + 2
+                  if x == "b" then 5 else 6 endif
+                else
+                  if x == "q" \
+                    then 7
+                    else 8
+                  endif
+                endif
+                """
         );
 
-        Value result = script.evaluate();
         Assert.assertEquals(6, ((LongValue) result).longValue());
     }
 
@@ -148,13 +151,13 @@ public class ScriptFromStringTest
     public void escapedVariableNames()
     {
         String scriptText =
-                  "${x} = 1\n"
-                + "${a-b} = 2\n"
-                + "${It was a cold day} = ${x} + ${a-b}\n"
-                + "2 * ${It was a cold day}";
+                """
+                ${x} = 1
+                ${a-b} = 2
+                ${It was a cold day} = ${x} + ${a-b}
+                2 * ${It was a cold day}""";
 
-        AnonymousScript script = ExpressionTestUtil.toScript(scriptText);
-        Value result = script.evaluate(new InMemoryEvaluationVisitor());
+        Value result = ExpressionTestUtil.evaluateScript(scriptText);
         Assert.assertTrue(result.isLong());
         Assert.assertEquals(6, ((LongValue) result).longValue());
     }
@@ -163,12 +166,13 @@ public class ScriptFromStringTest
     public void escapedVariableNamesWithQuotes()
     {
         String scriptText =
-                  "${Bob's Number} = 1\n"
-                + "${\"Alice\"} = 2\n"
-                + "${\"Alice\"} - ${Bob's Number}\n";
+                """
+                ${Bob's Number} = 1
+                ${"Alice"} = 2
+                ${"Alice"} - ${Bob's Number}
+                """;
 
-        AnonymousScript script = ExpressionTestUtil.toScript(scriptText);
-        Value result = script.evaluate(new InMemoryEvaluationVisitor());
+        Value result = ExpressionTestUtil.evaluateScript(scriptText);
         Assert.assertTrue(result.isLong());
         Assert.assertEquals(1, ((LongValue) result).longValue());
     }

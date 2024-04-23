@@ -1,7 +1,5 @@
 package io.github.vmzakharov.ecdataframe.dsl;
 
-import io.github.vmzakharov.ecdataframe.dsl.value.Value;
-import io.github.vmzakharov.ecdataframe.dsl.visitor.InMemoryEvaluationVisitor;
 import org.eclipse.collections.api.list.ListIterable;
 import org.eclipse.collections.api.list.MutableList;
 import org.eclipse.collections.impl.factory.Lists;
@@ -16,11 +14,6 @@ implements Script
     {
         this.expressions.add(anExpression);
         return anExpression;
-    }
-
-    public Value evaluate()
-    {
-        return this.evaluate(new InMemoryEvaluationVisitor());
     }
 
     @Override

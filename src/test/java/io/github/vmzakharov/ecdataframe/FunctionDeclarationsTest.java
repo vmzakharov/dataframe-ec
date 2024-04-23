@@ -1,6 +1,5 @@
 package io.github.vmzakharov.ecdataframe;
 
-import io.github.vmzakharov.ecdataframe.dsl.AnonymousScript;
 import io.github.vmzakharov.ecdataframe.dsl.value.LongValue;
 import io.github.vmzakharov.ecdataframe.dsl.value.Value;
 import org.junit.Assert;
@@ -21,8 +20,7 @@ public class FunctionDeclarationsTest
                 + "y = 2\n"
                 + "x(5, y * 7)";
 
-        AnonymousScript script = ExpressionTestUtil.toScript(scriptText);
-        Value result = script.evaluate();
+        Value result = ExpressionTestUtil.evaluateScript(scriptText);
         Assert.assertTrue(result.isLong());
         Assert.assertEquals(19, ((LongValue) result).longValue());
     }
@@ -31,22 +29,22 @@ public class FunctionDeclarationsTest
     public void manyFunctions()
     {
         String scriptText =
-                  "function sum(a, b)\n"
-                + "{\n"
-                + "   a + b\n"
-                + "}\n"
-                + "\n"
-                + "function mul(a, b)\n"
-                + "{\n"
-                + "   a * b\n"
-                + "}\n"
-                + "\n"
-                + "one = 1\n"
-                + "two = 2\n"
-                + "sum( mul(5, two), SUM(one, two) )";
+                """
+                function sum(a, b)
+                {
+                   a + b
+                }
 
-        AnonymousScript script = ExpressionTestUtil.toScript(scriptText);
-        Value result = script.evaluate();
+                function mul(a, b)
+                {
+                   a * b
+                }
+
+                one = 1
+                two = 2
+                sum( mul(5, two), SUM(one, two) )""";
+
+        Value result = ExpressionTestUtil.evaluateScript(scriptText);
         Assert.assertTrue(result.isLong());
         Assert.assertEquals(13, ((LongValue) result).longValue());
     }
@@ -67,8 +65,7 @@ public class FunctionDeclarationsTest
                 + "\n"
                 + "hello() + \" there\" + bang()";
 
-        AnonymousScript script = ExpressionTestUtil.toScript(scriptText);
-        Value result = script.evaluate();
+        Value result = ExpressionTestUtil.evaluateScript(scriptText);
         Assert.assertTrue(result.isString());
         Assert.assertEquals("hello there!", result.stringValue());
     }

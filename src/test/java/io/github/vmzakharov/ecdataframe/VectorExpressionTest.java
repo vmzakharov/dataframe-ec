@@ -1,6 +1,5 @@
 package io.github.vmzakharov.ecdataframe;
 
-import io.github.vmzakharov.ecdataframe.dsl.AnonymousScript;
 import io.github.vmzakharov.ecdataframe.dsl.value.BooleanValue;
 import io.github.vmzakharov.ecdataframe.dsl.value.LongValue;
 import io.github.vmzakharov.ecdataframe.dsl.value.Value;
@@ -12,13 +11,14 @@ public class VectorExpressionTest
     @Test
     public void vectorVariableIn()
     {
-        AnonymousScript script = ExpressionTestUtil.toScript(
-                  "x = (\"a\", \"b\", \"c\")\n"
-                + "y = \"a\"\n"
-                + "y in x\n"
+        Value result = ExpressionTestUtil.evaluateScript(
+                """
+                x = ("a", "b", "c")
+                y = "a"
+                y in x
+                """
         );
 
-        Value result = script.evaluate();
         Assert.assertTrue(((BooleanValue) result).isTrue());
     }
 
@@ -31,33 +31,34 @@ public class VectorExpressionTest
     @Test
     public void indexWithVariables()
     {
-        AnonymousScript script = ExpressionTestUtil.toScript(
-                  "x = (\"a\", \"b\", \"c\")\n"
-                + "y = 2\n"
-                + "x[y]\n"
+        Value result = ExpressionTestUtil.evaluateScript(
+                """
+                x = ("a", "b", "c")
+                y = 2
+                x[y]
+                """
         );
 
-        Value result = script.evaluate();
         Assert.assertEquals("c", result.stringValue());
     }
 
     @Test
     public void indexWithFunction()
     {
-        AnonymousScript script = ExpressionTestUtil.toScript(
-                  "function foo(switch)\n"
-                + "{\n"
-                + "  if switch == 1 then\n"
-                + "    (1, 2, 3)\n"
-                + "  else\n"
-                + "    (4, 5, 6)\n"
-                + "  endif\n"
-                + "}\n"
-                + "\n"
-                + "foo(2)[2] + foo(1)[1] "
+        Value result = ExpressionTestUtil.evaluateScript(
+                """
+                function foo(switch)
+                {
+                  if switch == 1 then
+                    (1, 2, 3)
+                  else
+                    (4, 5, 6)
+                  endif
+                }
+
+                foo(2)[2] + foo(1)[1]\s"""
         );
 
-        Value result = script.evaluate();
         Assert.assertEquals(8L, ((LongValue) result).longValue());
     }
 

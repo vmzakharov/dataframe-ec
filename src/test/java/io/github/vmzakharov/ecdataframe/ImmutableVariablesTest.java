@@ -7,8 +7,8 @@ public class ImmutableVariablesTest
     @Test(expected = RuntimeException.class)
     public void immutableVariables()
     {
-        ExpressionTestUtil.toScript(
+        ExpressionTestUtil.evaluateScript(
                   "a = 1\n"
-                + "a = 2").evaluate();
+                + "a = 2");
     }
 }
