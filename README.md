@@ -6,6 +6,18 @@ For more on Eclipse Collections see: https://www.eclipse.org/collections/.
 
 ## Where to Get It
 
+Get the latest release of `dataframe-ec` here:
+
+```xml
+<dependency>
+  <groupId>io.github.vmzakharov</groupId>
+  <artifactId>dataframe-ec</artifactId>
+  <version>0.20.0</version>
+</dependency>
+```
+
+Note that starting with the release `0.20.0`, `dataframe-ec` is compatible with JDK 17+. The last release of `dataframe-ec` to support Java 8+ is `0.19.8` which can be found at these coordinates:
+
 ```xml
 <dependency>
   <groupId>io.github.vmzakharov</groupId>
@@ -13,9 +25,10 @@ For more on Eclipse Collections see: https://www.eclipse.org/collections/.
   <version>0.19.8</version>
 </dependency>
 ```
+
 ## Code Kata
 
-Learn dataframe-ec with Kata! Check out [dataframe-ec kata](https://github.com/vmzakharov/dataframe-ec-kata), an easy and fun way to learn the basics of data frame APIs and common usage patterns through hands-on exercises.
+Learn dataframe-ec with a Kata! Check out [dataframe-ec kata](https://github.com/vmzakharov/dataframe-ec-kata), an easy and fun way to learn the basics of data frame APIs and common usage patterns through hands-on exercises.
 
 ## Data Frame Operations
 
@@ -594,7 +607,7 @@ The framework supports a simple Domain Specific Language (DSL) for computed colu
 
 ### Script
 
-A DSL script is a one or more statements (see below for the kinds of statements supported). The result of executing a script is the value of the last statement (or expression) that was executed in the script.
+A DSL script is a sequence of one or more statements (see below for the kinds of statements supported). The result of executing a script is the value of the last statement (or expression) that was executed in the script.
 
 ### Value Types
 

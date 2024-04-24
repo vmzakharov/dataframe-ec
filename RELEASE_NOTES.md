@@ -1,4 +1,7 @@
 # Releases
+### 0.20.0
+* **switches to Java 17 as minimum version**. The last release of dataframe-ec to support Java 8+ is 0.19.8
+* type inference fixes/enhancements, better type consistency validation for computed columns  
 ### 0.19.8
 * adds support for columns of primitive int and float types
 * adds a built-in aggregation function `avg2d` that produces values of type double for all primitive column types
