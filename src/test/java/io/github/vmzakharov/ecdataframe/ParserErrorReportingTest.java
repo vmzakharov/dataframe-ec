@@ -57,14 +57,16 @@ public class ParserErrorReportingTest
         CollectingErrorListener errorListener = new CollectingErrorListener();
         ExpressionParserHelper parserHelper = new ExpressionParserHelper(errorListener);
 
-        parserHelper.toScript("function boo boo()\n"
-                + "{\n"
-                + "  if a > 7\n"
-                + "    x = 'greater'\n"
-                + "  else\n"
-                + "    x = 'lesser'\n"
-                + "  endif\n"
-                + "  (x == 'greater') ? 'yes' }\n");
+        parserHelper.toScript("""
+                function boo boo()
+                {
+                  if a > 7
+                    x = 'greater'
+                  else
+                    x = 'lesser'
+                  endif
+                  (x == 'greater') ? 'yes' }
+                """);
 
         Assert.assertTrue(errorListener.hasErrors());
 
@@ -79,8 +81,7 @@ public class ParserErrorReportingTest
         });
 
         ListIterable<Integer> tokenLengths = Lists.immutable.of(3, 1, 1);
-        errorListener.getErrors().forEachInBoth(tokenLengths, (e, a) -> {
-            Assert.assertEquals((int) a, e.tokenStopIndex() - e.tokenStartIndex() + 1);
-        });
+        errorListener.getErrors().forEachInBoth(tokenLengths, (e, a) ->
+                Assert.assertEquals((int) a, e.tokenStopIndex() - e.tokenStartIndex() + 1));
     }
 }
