@@ -2,8 +2,10 @@ package io.github.vmzakharov.ecdataframe.dataframe;
 
 import org.eclipse.collections.api.factory.Lists;
 import org.eclipse.collections.api.list.ImmutableList;
-import org.junit.Assert;
-import org.junit.Test;
+
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 public class DataFrameCopyTest
 {
@@ -26,22 +28,22 @@ public class DataFrameCopyTest
 
         DataFrame clonedSchema = df.cloneStructure("Cloned");
 
-        Assert.assertEquals(0, clonedSchema.rowCount());
-        Assert.assertEquals(df.columnCount(), clonedSchema.columnCount());
+        assertEquals(0, clonedSchema.rowCount());
+        assertEquals(df.columnCount(), clonedSchema.columnCount());
         for (int i = 0; i < df.columnCount(); i++)
         {
             DfColumn sourceColumn = df.getColumnAt(i);
             DfColumn copyColumn = clonedSchema.getColumnAt(i);
 
-            Assert.assertEquals(sourceColumn.getName(), copyColumn.getName());
+            assertEquals(sourceColumn.getName(), copyColumn.getName());
             if (sourceColumn.isComputed())
             {
-                Assert.assertTrue(copyColumn.isComputed());
-                Assert.assertEquals(
+                assertTrue(copyColumn.isComputed());
+                assertEquals(
                         ((DfColumnComputed) sourceColumn).getExpressionAsString(),
                         ((DfColumnComputed) copyColumn).getExpressionAsString());
             }
-            Assert.assertSame(clonedSchema, copyColumn.getDataFrame());
+            assertSame(clonedSchema, copyColumn.getDataFrame());
         }
     }
 
@@ -64,17 +66,17 @@ public class DataFrameCopyTest
 
         DataFrame clonedSchema = df.cloneStructureAsStored("Cloned");
 
-        Assert.assertEquals(0, clonedSchema.rowCount());
-        Assert.assertEquals(df.columnCount(), clonedSchema.columnCount());
+        assertEquals(0, clonedSchema.rowCount());
+        assertEquals(df.columnCount(), clonedSchema.columnCount());
         for (int i = 0; i < df.columnCount(); i++)
         {
             DfColumn sourceColumn = df.getColumnAt(i);
             DfColumn copyColumn = clonedSchema.getColumnAt(i);
 
-            Assert.assertEquals(sourceColumn.getName(), copyColumn.getName());
-            Assert.assertEquals(sourceColumn.getType(), copyColumn.getType());
-            Assert.assertTrue(copyColumn.isStored());
-            Assert.assertSame(clonedSchema, copyColumn.getDataFrame());
+            assertEquals(sourceColumn.getName(), copyColumn.getName());
+            assertEquals(sourceColumn.getType(), copyColumn.getType());
+            assertTrue(copyColumn.isStored());
+            assertSame(clonedSchema, copyColumn.getDataFrame());
         }
     }
 

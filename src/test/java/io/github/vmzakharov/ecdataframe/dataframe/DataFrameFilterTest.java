@@ -1,16 +1,17 @@
 package io.github.vmzakharov.ecdataframe.dataframe;
 
 import org.eclipse.collections.api.tuple.Twin;
-import org.junit.Before;
-import org.junit.Test;
 
-import static org.junit.Assert.assertEquals;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 public class DataFrameFilterTest
 {
     private DataFrame dataFrame;
 
-    @Before
+    @BeforeEach
     public void setUpDataFrame()
     {
         this.dataFrame = new DataFrame("FrameOfData")

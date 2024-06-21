@@ -1,9 +1,9 @@
 package io.github.vmzakharov.ecdataframe.dataframe;
 
 import org.eclipse.collections.impl.factory.Lists;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -14,12 +14,13 @@ import static io.github.vmzakharov.ecdataframe.dataframe.AggregateFunction.max;
 import static io.github.vmzakharov.ecdataframe.dataframe.AggregateFunction.min;
 import static io.github.vmzakharov.ecdataframe.dataframe.AggregateFunction.same;
 import static io.github.vmzakharov.ecdataframe.dataframe.AggregateFunction.sum;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class DataFrameWithDecimalColumnTest
 {
     private DataFrame df;
 
-    @Before
+    @BeforeEach
     public void initializeDataFrame()
     {
         this.df = new DataFrame("Data Frame")
@@ -39,12 +40,12 @@ public class DataFrameWithDecimalColumnTest
         this.df.addDecimalColumn("Baz", "Foo + Bar");
         this.df.addDecimalColumn("Qux", "Foo + 1.23");
 
-        Assert.assertEquals(
+        assertEquals(
             Lists.immutable.of(BigDecimal.valueOf(12631, 2), BigDecimal.valueOf(112, 1), null, BigDecimal.valueOf(226, 1)),
             this.df.getDecimalColumn("Baz").toList()
         );
 
-        Assert.assertEquals(
+        assertEquals(
             Lists.immutable.of(BigDecimal.valueOf(12631, 2), BigDecimal.valueOf(112, 1), null, BigDecimal.valueOf(226, 1)),
             this.df.getDecimalColumn("Baz").toList()
         );
@@ -178,10 +179,10 @@ public class DataFrameWithDecimalColumnTest
         // forced to use compareTo to compare BigDecimals with different scales as equals returns false in this scenario
         // i.e. BigDecimal.valueOf(2468, 3).equals(BigDecimal.valueOf(24680, 4)) is false, while
         // BigDecimal.valueOf(2468, 3).compareTo(BigDecimal.valueOf(24680, 4)) == 0
-        Assert.assertNull(aggregated.getObject("Foo", 0));
-        Assert.assertNull(aggregated.getObject("Bar", 0));
-        Assert.assertEquals(0, BigDecimal.valueOf(1234, 3).compareTo(aggregated.getDecimal("Waldo", 0)));
-        Assert.assertEquals(0, BigDecimal.valueOf(2468, 3).compareTo(aggregated.getDecimal("TwoWaldo", 0)));
+        assertNull(aggregated.getObject("Foo", 0));
+        assertNull(aggregated.getObject("Bar", 0));
+        assertEquals(0, BigDecimal.valueOf(1234, 3).compareTo(aggregated.getDecimal("Waldo", 0)));
+        assertEquals(0, BigDecimal.valueOf(2468, 3).compareTo(aggregated.getDecimal("TwoWaldo", 0)));
 
         DataFrameUtil.assertEquals(
                 new DataFrame("expected")

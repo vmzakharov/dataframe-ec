@@ -8,21 +8,22 @@ import org.eclipse.collections.api.list.primitive.DoubleList;
 import org.eclipse.collections.api.list.primitive.FloatList;
 import org.eclipse.collections.impl.factory.primitive.DoubleLists;
 import org.eclipse.collections.impl.factory.primitive.FloatLists;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 import static io.github.vmzakharov.ecdataframe.dataframe.DfColumnSortOrder.DESC;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class DataFrameIterateTest
 {
     private DataFrame dataFrame;
 
-    @Before
+    @BeforeEach
     public void setUpDataFrame()
     {
         this.dataFrame = new DataFrame("FrameOfData")
@@ -51,13 +52,15 @@ public class DataFrameIterateTest
                       .append(c.getFloat("Thud")).append('\n')
         );
 
-        Assert.assertEquals(
-            "Alice,11,20.0,110,10.25\n"
-            + "Carol,12,10.0,120,12.5\n"
-            + "Alice,33,25.0,330,14.75\n"
-            + "Carol,24,66.1,240,16.25\n"
-            + "Carol,24,41.0,240,18.5\n"
-            + "Abigail,33,11.0,330,20.75\n"
+        assertEquals(
+                """
+                Alice,11,20.0,110,10.25
+                Carol,12,10.0,120,12.5
+                Alice,33,25.0,330,14.75
+                Carol,24,66.1,240,16.25
+                Carol,24,41.0,240,18.5
+                Abigail,33,11.0,330,20.75
+                """
             ,
             nameBarBaz.toString()
         );
@@ -66,27 +69,27 @@ public class DataFrameIterateTest
 
         this.dataFrame.forEach(c -> dateCount.add(c.getDate("Date")));
 
-        Assert.assertEquals(1, dateCount.occurrencesOf(LocalDate.of(2023, 10, 21)));
-        Assert.assertEquals(3, dateCount.occurrencesOf(LocalDate.of(2023, 12, 24)));
-        Assert.assertEquals(2, dateCount.occurrencesOf(LocalDate.of(2023, 11, 23)));
+        assertEquals(1, dateCount.occurrencesOf(LocalDate.of(2023, 10, 21)));
+        assertEquals(3, dateCount.occurrencesOf(LocalDate.of(2023, 12, 24)));
+        assertEquals(2, dateCount.occurrencesOf(LocalDate.of(2023, 11, 23)));
 
         MutableBag<LocalDateTime> dateTimeCount = Bags.mutable.of();
 
         this.dataFrame.forEach(c -> dateTimeCount.add(c.getDateTime("DateTime")));
 
-        Assert.assertEquals(3, dateTimeCount.occurrencesOf(LocalDateTime.of(2023, 10, 21, 11, 11, 11)));
-        Assert.assertEquals(1, dateTimeCount.occurrencesOf(LocalDateTime.of(2023, 11, 23, 11, 13, 11)));
-        Assert.assertEquals(1, dateTimeCount.occurrencesOf(LocalDateTime.of(2023, 12, 24, 11, 14, 11)));
-        Assert.assertEquals(1, dateTimeCount.occurrencesOf(LocalDateTime.of(2023, 12, 24, 11, 15, 11)));
+        assertEquals(3, dateTimeCount.occurrencesOf(LocalDateTime.of(2023, 10, 21, 11, 11, 11)));
+        assertEquals(1, dateTimeCount.occurrencesOf(LocalDateTime.of(2023, 11, 23, 11, 13, 11)));
+        assertEquals(1, dateTimeCount.occurrencesOf(LocalDateTime.of(2023, 12, 24, 11, 14, 11)));
+        assertEquals(1, dateTimeCount.occurrencesOf(LocalDateTime.of(2023, 12, 24, 11, 15, 11)));
 
         MutableBag<BigDecimal> decimalCount = Bags.mutable.of();
 
         this.dataFrame.forEach(c -> decimalCount.add(c.getDecimal("Decimal")));
 
-        Assert.assertEquals(3, decimalCount.occurrencesOf(BigDecimal.valueOf(123, 2)));
-        Assert.assertEquals(1, decimalCount.occurrencesOf(BigDecimal.valueOf(124, 2)));
-        Assert.assertEquals(1, decimalCount.occurrencesOf(BigDecimal.valueOf(222, 2)));
-        Assert.assertEquals(1, decimalCount.occurrencesOf(BigDecimal.valueOf(333, 2)));
+        assertEquals(3, decimalCount.occurrencesOf(BigDecimal.valueOf(123, 2)));
+        assertEquals(1, decimalCount.occurrencesOf(BigDecimal.valueOf(124, 2)));
+        assertEquals(1, decimalCount.occurrencesOf(BigDecimal.valueOf(222, 2)));
+        assertEquals(1, decimalCount.occurrencesOf(BigDecimal.valueOf(333, 2)));
     }
 
     @Test
@@ -103,13 +106,15 @@ public class DataFrameIterateTest
                       .append(c.getInt("Qux")).append('\n')
         );
 
-       Assert.assertEquals(
-            "Abigail,33,11.0,330\n"
-            + "Alice,33,25.0,330\n"
-            + "Alice,11,20.0,110\n"
-            + "Carol,24,66.1,240\n"
-            + "Carol,24,41.0,240\n"
-            + "Carol,12,10.0,120\n"
+       assertEquals(
+               """
+               Abigail,33,11.0,330
+               Alice,33,25.0,330
+               Alice,11,20.0,110
+               Carol,24,66.1,240
+               Carol,24,41.0,240
+               Carol,12,10.0,120
+               """
             ,
             nameBarBaz.toString()
         );
@@ -118,7 +123,7 @@ public class DataFrameIterateTest
     @Test
     public void emptyDataFrameForEach()
     {
-        this.dataFrame.cloneStructure("Empty").forEach(c -> Assert.fail());
+        this.dataFrame.cloneStructure("Empty").forEach(c -> fail());
     }
 
     @Test
@@ -126,31 +131,31 @@ public class DataFrameIterateTest
     {
         this.dataFrame.createIndex("anIndex", Lists.immutable.of("Name", "Bar"));
 
-        Assert.assertEquals(2, this.dataFrame.index("anIndex").sizeAt("Carol", 24L));
+        assertEquals(2, this.dataFrame.index("anIndex").sizeAt("Carol", 24L));
 
         ListIterable<BigDecimal> expectedDecimal = Lists.immutable.of(BigDecimal.valueOf(222, 2), BigDecimal.valueOf(333, 2));
 
         this.dataFrame.index("anIndex")
                  .iterateAt("Carol", 24L)
-                 .forEach(c -> Assert.assertTrue(expectedDecimal.contains(c.getDecimal("Decimal"))));
+                 .forEach(c -> assertTrue(expectedDecimal.contains(c.getDecimal("Decimal"))));
 
         DoubleList expectedDouble = DoubleLists.immutable.of(66.1, 41.0);
 
         this.dataFrame.index("anIndex")
                  .iterateAt("Carol", 24L)
-                 .forEach(c -> Assert.assertTrue(expectedDouble.contains(c.getDouble("Baz"))));
+                 .forEach(c -> assertTrue(expectedDouble.contains(c.getDouble("Baz"))));
 
         FloatList expectedFloat = FloatLists.immutable.of(16.25f, 18.5f);
 
         this.dataFrame.index("anIndex")
                  .iterateAt("Carol", 24L)
-                 .forEach(c -> Assert.assertTrue(expectedFloat.contains(c.getFloat("Thud"))));
+                 .forEach(c -> assertTrue(expectedFloat.contains(c.getFloat("Thud"))));
 
         ListIterable<LocalDate> expectedDates = Lists.immutable.of(LocalDate.of(2023, 12, 24));
 
         this.dataFrame.index("anIndex")
                  .iterateAt("Carol", 24L)
-                 .forEach(c -> Assert.assertTrue(expectedDates.contains(c.getDate("Date"))));
+                 .forEach(c -> assertTrue(expectedDates.contains(c.getDate("Date"))));
 
         ListIterable<LocalDateTime> expectedDateTimes =
                 Lists.immutable.of(LocalDateTime.of(2023, 12, 24, 11, 14, 11), LocalDateTime.of(2023, 12, 24, 11, 15, 11));
@@ -158,12 +163,12 @@ public class DataFrameIterateTest
         this.dataFrame.index("anIndex")
                  .iterateAt("Carol", 24L)
                  .forEach(
-                         c -> Assert.assertTrue(expectedDateTimes.contains(c.getDateTime("DateTime")))
+                         c -> assertTrue(expectedDateTimes.contains(c.getDateTime("DateTime")))
                  );
 
         this.dataFrame.index("anIndex")
                  .iterateAt("Dave", 48L)
-                 .forEach(c -> Assert.fail());
+                 .forEach(c -> fail());
     }
 
     @Test
@@ -171,12 +176,14 @@ public class DataFrameIterateTest
     {
         StringBuilder sb = new StringBuilder();
         this.dataFrame.forEach(c -> sb.append(c.getObject("Name")).append('|').append(c.getObject("Bar")).append('\n'));
-        Assert.assertEquals(
-              "Alice|11\n"
-            + "Carol|12\n"
-            + "Alice|33\n"
-            + "Carol|24\n"
-            + "Carol|24\n"
-            + "Abigail|33\n", sb.toString());
+        assertEquals(
+                """
+                Alice|11
+                Carol|12
+                Alice|33
+                Carol|24
+                Carol|24
+                Abigail|33
+                """, sb.toString());
     }
 }

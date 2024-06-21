@@ -1,7 +1,8 @@
 package io.github.vmzakharov.ecdataframe.dataframe;
 
 import org.eclipse.collections.impl.factory.Lists;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 import java.time.LocalDate;
 
@@ -256,7 +257,7 @@ public class DataFrameUnionTest
         DataFrameUtil.assertEquals(expected, union);
     }
 
-    @Test(expected = RuntimeException.class)
+    @Test
     public void unionWithMismatchedSchemasFails()
     {
         DataFrame df1 = new DataFrame("df1")
@@ -271,10 +272,10 @@ public class DataFrameUnionTest
                 .addRow("Judy", 4, 47.89)
                 ;
 
-        df1.union(df2);
+        Assertions.assertThrows(RuntimeException.class, () -> df1.union(df2));
     }
 
-    @Test(expected = RuntimeException.class)
+    @Test
     public void unionWithMismatchedSchemasFails2()
     {
         DataFrame df1 = new DataFrame("df1")
@@ -289,10 +290,10 @@ public class DataFrameUnionTest
                 .addRow("Judy", 4, 47.89, "Meh")
                 ;
 
-        df1.union(df2);
+        Assertions.assertThrows(RuntimeException.class, () -> df1.union(df2));
     }
 
-    @Test(expected = RuntimeException.class)
+    @Test
     public void unionWithMismatchedTypesFails()
     {
         DataFrame df1 = new DataFrame("df1")
@@ -307,6 +308,6 @@ public class DataFrameUnionTest
                 .addRow("Judy", "Monte Cristo", 47.89)
                 ;
 
-        df1.union(df2);
+        Assertions.assertThrows(RuntimeException.class, () -> df1.union(df2));
     }
 }

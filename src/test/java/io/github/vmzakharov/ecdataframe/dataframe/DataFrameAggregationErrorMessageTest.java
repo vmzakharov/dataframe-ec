@@ -4,17 +4,19 @@ import io.github.vmzakharov.ecdataframe.dsl.value.ValueType;
 import io.github.vmzakharov.ecdataframe.util.FormatWithPlaceholders;
 import org.eclipse.collections.api.list.ListIterable;
 import org.eclipse.collections.impl.factory.Lists;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.time.LocalDate;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 public class DataFrameAggregationErrorMessageTest
 {
     private DataFrame dataFrame;
 
-    @Before
+    @BeforeEach
     public void initialiseDataFrame()
     {
         this.dataFrame = new DataFrame("FrameOfData")
@@ -65,7 +67,7 @@ public class DataFrameAggregationErrorMessageTest
         }
         catch (Exception e)
         {
-            Assert.assertEquals(
+            assertEquals(
                     FormatWithPlaceholders.messageFromKey("AGG_COL_TYPE_UNSUPPORTED")
                             .with("operation", aggregator.getName())
                             .with("operationDescription", aggregator.getDescription())

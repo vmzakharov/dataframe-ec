@@ -1,7 +1,8 @@
 package io.github.vmzakharov.ecdataframe.dataframe;
 
 import io.github.vmzakharov.ecdataframe.dataframe.util.DataFrameCompare;
-import org.junit.Assert;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 final public class DataFrameUtil
 {
@@ -16,7 +17,7 @@ final public class DataFrameUtil
 
         if (!comparer.equal(expected, actual))
         {
-            Assert.fail(comparer.reason());
+            fail(comparer.reason());
         }
     }
 
@@ -26,7 +27,7 @@ final public class DataFrameUtil
 
         if (!comparer.equal(expected, actual, tolerance))
         {
-            Assert.fail(comparer.reason());
+            fail(comparer.reason());
         }
     }
 }

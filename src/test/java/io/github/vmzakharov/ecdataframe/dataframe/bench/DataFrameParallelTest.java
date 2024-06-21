@@ -4,12 +4,14 @@ import io.github.vmzakharov.ecdataframe.dataframe.DataFrame;
 import io.github.vmzakharov.ecdataframe.util.Stopwatch;
 import org.eclipse.collections.api.list.MutableList;
 import org.eclipse.collections.impl.factory.Lists;
-import org.junit.Assert;
-import org.junit.BeforeClass;
-import org.junit.Ignore;
-import org.junit.Test;
+
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 
 import java.util.concurrent.CountDownLatch;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 /*
  * These tests validate the thread safety of the data frame evaluation context
@@ -23,7 +25,7 @@ public class DataFrameParallelTest
     private static final long EXPECTED = (long) ROW_COUNT * (ROW_COUNT - 1);
     private static DataFrame dataFrame;
 
-    @BeforeClass
+    @BeforeAll
     public static void createDataFrame()
     {
         Stopwatch sw = new Stopwatch();
@@ -43,7 +45,7 @@ public class DataFrameParallelTest
         System.out.println("Created data frame, " + sw.elapsedTimeMillis());
     }
 
-    @Ignore
+    @Disabled
     @Test
     public void aggregateInBatchesManyTimes()
     throws InterruptedException
@@ -69,13 +71,42 @@ public class DataFrameParallelTest
 
             long result = workers.collectLong(Summinator::sum).sum();
 
-            Assert.assertEquals(EXPECTED, result);
+            assertEquals(EXPECTED, result);
         }
         sw.stop();
         System.out.println("Total time: "  + sw.elapsedTimeMillis());
     }
 
-    @Ignore
+    @Disabled
+    @Test
+    public void aggregateAllInParallel()
+    throws InterruptedException
+    {
+        Stopwatch stopwatch = new Stopwatch();
+        stopwatch.start();
+
+        CountDownLatch countDownLatch = new CountDownLatch(THREAD_COUNT);
+
+        MutableList<Summinator> workers = Lists.mutable.of();
+
+        for (int i = 0; i < THREAD_COUNT; i++)
+        {
+            Summinator worker = new Summinator(i, dataFrame, 0, ROW_COUNT, countDownLatch);
+            workers.add(worker);
+            new Thread(worker).start();
+        }
+
+        countDownLatch.await();
+
+        long result = workers.collectLong(Summinator::sum).sum();
+
+        stopwatch.stop();
+        assertEquals(EXPECTED, result / THREAD_COUNT);
+
+        System.out.println("Parallel " + result + " (" + result / THREAD_COUNT + ") "  + stopwatch.elapsedTimeMillis());
+    }
+
+    @Disabled
     @Test
     public void aggregateInBatches()
     throws InterruptedException
@@ -102,41 +133,12 @@ public class DataFrameParallelTest
 
         stopwatch.stop();
 
-        Assert.assertEquals(EXPECTED, result);
+        assertEquals(EXPECTED, result);
         System.out.println("Threaded " + result + " " + stopwatch.elapsedTimeMillis());
     }
 
-    @Ignore
-    @Test
-    public void aggregateAllInParallel()
-    throws InterruptedException
-    {
-        Stopwatch stopwatch = new Stopwatch();
-        stopwatch.start();
-
-        CountDownLatch countDownLatch = new CountDownLatch(THREAD_COUNT);
-
-        MutableList<Summinator> workers = Lists.mutable.of();
-
-        for (int i = 0; i < THREAD_COUNT; i++)
-        {
-            Summinator worker = new Summinator(i, dataFrame, 0, ROW_COUNT, countDownLatch);
-            workers.add(worker);
-            new Thread(worker).start();
-        }
-
-        countDownLatch.await();
-
-        long result = workers.collectLong(Summinator::sum).sum();
-
-        stopwatch.stop();
-        Assert.assertEquals(EXPECTED, result / THREAD_COUNT);
-
-        System.out.println("Parallel " + result + " (" + result / THREAD_COUNT + ") "  + stopwatch.elapsedTimeMillis());
-    }
-
     // aggregate single threaded for performance comparison
-    @Ignore
+    @Disabled
     @Test
     public void singleThreadAggregate()
     {
@@ -149,7 +151,7 @@ public class DataFrameParallelTest
         long result = worker.sum();
 
         stopwatch.stop();
-        Assert.assertEquals(EXPECTED, result);
+        assertEquals(EXPECTED, result);
 
         System.out.println("Regular  " + result + " " + stopwatch.elapsedTimeMillis());
     }

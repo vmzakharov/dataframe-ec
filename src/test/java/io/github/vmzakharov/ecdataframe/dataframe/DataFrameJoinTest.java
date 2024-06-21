@@ -3,10 +3,12 @@ package io.github.vmzakharov.ecdataframe.dataframe;
 import org.eclipse.collections.api.map.MutableMap;
 import org.eclipse.collections.impl.factory.Lists;
 import org.eclipse.collections.impl.factory.Maps;
-import org.junit.Assert;
-import org.junit.Test;
+
+import org.junit.jupiter.api.Test;
 
 import java.time.LocalDate;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 public class DataFrameJoinTest
 {
@@ -568,7 +570,7 @@ public class DataFrameJoinTest
                 .addRow("Pinky", "pink", 8, "Grapefruit", 2);
         DataFrameUtil.assertEquals(expected, joined);
 
-        Assert.assertEquals(
+        assertEquals(
                 Maps.mutable.of("Name", "Name_B", "Color", "Color", "Number", "Number_B"),
                 renamedSideB);
     }
@@ -623,7 +625,7 @@ public class DataFrameJoinTest
 
         DataFrameUtil.assertEquals(expected, joined);
 
-        Assert.assertEquals(
+        assertEquals(
                 Maps.mutable.of("Color", "Bar", "Baz", "Baz_B", "Name", "Name"),
                 renamedColumnsSideB);
     }

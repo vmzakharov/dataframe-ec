@@ -1,6 +1,7 @@
 package io.github.vmzakharov.ecdataframe.dataframe;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -179,7 +180,7 @@ public class DataFrameComputedWithInferredTypeTest
         DataFrameUtil.assertEquals(expected, df);
     }
 
-    @Test(expected = RuntimeException.class)
+    @Test
     public void typeMismatch()
     {
         DataFrame df = new DataFrame("Frame")
@@ -190,6 +191,6 @@ public class DataFrameComputedWithInferredTypeTest
                 .addRow("Doris", "D",   18)
                 ;
 
-        df.addColumn("Waldo", "Bar + Baz");
+        Assertions.assertThrows(RuntimeException.class, () -> df.addColumn("Waldo", "Bar + Baz"));
     }
 }

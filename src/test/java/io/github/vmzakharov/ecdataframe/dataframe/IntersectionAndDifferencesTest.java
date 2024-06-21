@@ -4,8 +4,10 @@ import org.eclipse.collections.api.factory.Lists;
 import org.eclipse.collections.api.map.MutableMap;
 import org.eclipse.collections.api.tuple.Triplet;
 import org.eclipse.collections.impl.factory.Maps;
-import org.junit.Assert;
-import org.junit.Test;
+
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 public class IntersectionAndDifferencesTest
 {
@@ -335,7 +337,7 @@ public class IntersectionAndDifferencesTest
                 result.getOne()
         );
 
-        Assert.assertEquals(
+        assertEquals(
                 Maps.mutable.of("Id", "Key", "Key2", "Key2", "Qty", "Qty_B", "Value", "Value_B"),
                 renamedColumnsSideB);
 
@@ -392,7 +394,7 @@ public class IntersectionAndDifferencesTest
                 result.getOne()
         );
 
-        Assert.assertEquals(
+        assertEquals(
                 Maps.mutable.of("Id", "Key", "Key2", "Key2", "Qty", "Qty_B", "Value", "Value_B"),
                 renamedColumnsSideB);
 
@@ -416,7 +418,7 @@ public class IntersectionAndDifferencesTest
         );
     }
 
-    @Test(expected = RuntimeException.class)
+    @Test
     public void joiningByDifferentNumberOfKeysThrows()
     {
         DataFrame sideA = new DataFrame("Side A")
@@ -431,6 +433,9 @@ public class IntersectionAndDifferencesTest
                 .addRow("C", 20)
                 ;
 
-        sideA.joinWithComplements(sideB, Lists.immutable.of("Key", "Value"), Lists.immutable.of("Id"));
+        assertThrows(
+            RuntimeException.class,
+            () -> sideA.joinWithComplements(sideB, Lists.immutable.of("Key", "Value"), Lists.immutable.of("Id"))
+        );
     }
 }

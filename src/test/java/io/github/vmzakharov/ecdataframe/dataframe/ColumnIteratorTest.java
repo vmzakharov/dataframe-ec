@@ -1,14 +1,15 @@
 package io.github.vmzakharov.ecdataframe.dataframe;
 
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 public class ColumnIteratorTest
 {
     private DataFrame dataFrame;
 
-    @Before
+    @BeforeEach
     public void setupDataFrame()
     {
         this.dataFrame = new DataFrame("Test")
@@ -29,7 +30,7 @@ public class ColumnIteratorTest
                     (len, s) -> len + s.length()
             );
 
-        Assert.assertEquals(17, totalStringLength);
+        assertEquals(17, totalStringLength);
     }
 
     @Test
@@ -41,14 +42,14 @@ public class ColumnIteratorTest
                     (len, s) -> {
                         if (s.equals("C"))
                         {
-                            Assert.fail("Shouldn't reach C");
+                            fail("Shouldn't reach C");
                         }
 
                         return s.equals("B") ? null : len + s.length();
                     }
             );
 
-        Assert.assertNull(totalStringLength);
+        assertNull(totalStringLength);
     }
 
     @Test
@@ -60,13 +61,13 @@ public class ColumnIteratorTest
                     (len, s) -> {
                         if (!s.equals("A"))
                         {
-                            Assert.fail("Shouldn't get here");
+                            fail("Shouldn't get here");
                         }
 
                         return len + s.length();
                     }
             );
 
-        Assert.assertNull(totalStringLength);
+        assertNull(totalStringLength);
     }
 }

@@ -4,11 +4,13 @@ import io.github.vmzakharov.ecdataframe.dsl.value.DoubleValue;
 import org.eclipse.collections.api.factory.Lists;
 import org.eclipse.collections.api.list.primitive.MutableLongList;
 import org.eclipse.collections.impl.factory.primitive.LongLists;
-import org.junit.Assert;
-import org.junit.Test;
+
+import org.junit.jupiter.api.Test;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 public class DataFrameSortTest
 {
@@ -139,12 +141,12 @@ public class DataFrameSortTest
 
         DataFrameUtil.assertEquals(expected, dataFrame);
 
-        Assert.assertEquals(15.0, dataFrame.getObject("Baz", 2));
-        Assert.assertEquals(15.0, dataFrame.getDouble("Baz", 2), 0.000001);
-        Assert.assertEquals(0, new DoubleValue(15.0).compareTo(dataFrame.getValue("Baz", 2)));
+        assertEquals(15.0, dataFrame.getObject("Baz", 2));
+        assertEquals(15.0, dataFrame.getDouble("Baz", 2), 0.000001);
+        assertEquals(0, new DoubleValue(15.0).compareTo(dataFrame.getValue("Baz", 2)));
 
-        Assert.assertEquals(15.0, dataFrame.getObject(2, 3));
-        Assert.assertEquals(0, new DoubleValue(15.0).compareTo(dataFrame.getValue(2, 3)));
+        assertEquals(15.0, dataFrame.getObject(2, 3));
+        assertEquals(0, new DoubleValue(15.0).compareTo(dataFrame.getValue(2, 3)));
     }
 
     @Test
@@ -173,12 +175,12 @@ public class DataFrameSortTest
 
         DataFrameUtil.assertEquals(expected, dataFrame);
 
-        Assert.assertEquals(15.0, dataFrame.getObject("Baz", 2));
-        Assert.assertEquals(15.0, dataFrame.getDouble("Baz", 2), 0.000001);
-        Assert.assertEquals(0, new DoubleValue(15.0).compareTo(dataFrame.getValue("Baz", 2)));
+        assertEquals(15.0, dataFrame.getObject("Baz", 2));
+        assertEquals(15.0, dataFrame.getDouble("Baz", 2), 0.000001);
+        assertEquals(0, new DoubleValue(15.0).compareTo(dataFrame.getValue("Baz", 2)));
 
-        Assert.assertEquals(15.0, dataFrame.getObject(2, 3));
-        Assert.assertEquals(0, new DoubleValue(15.0).compareTo(dataFrame.getValue(2, 3)));
+        assertEquals(15.0, dataFrame.getObject(2, 3));
+        assertEquals(0, new DoubleValue(15.0).compareTo(dataFrame.getValue(2, 3)));
     }
 
     @Test
@@ -217,18 +219,16 @@ public class DataFrameSortTest
 
         dataFrame.sortBy(Lists.immutable.of("Foo", "Baz"));
 
-        Assert.assertTrue("Sorted!", true);
+        assertTrue(true, "Sorted!");
     }
 
-    @Test(expected = RuntimeException.class)
+    @Test
     public void sortEmptyDataFrameByMissingColumnsNotAllowed()
     {
         DataFrame dataFrame = new DataFrame("FrameOfData")
                 .addStringColumn("Name").addStringColumn("Foo").addLongColumn("Bar").addDoubleColumn("Baz");
 
-        dataFrame.sortBy(Lists.immutable.of("Waldo"));
-
-        Assert.fail();
+        assertThrows(RuntimeException.class, () -> dataFrame.sortBy(Lists.immutable.of("Waldo")));
     }
 
     @Test
@@ -239,7 +239,7 @@ public class DataFrameSortTest
 
         dataFrame.sortByExpression("Baz * 2.5");
 
-        Assert.assertTrue("Sorted!", true);
+        assertTrue(true, "Sorted!");
     }
 
     @Test
@@ -446,11 +446,11 @@ public class DataFrameSortTest
             String curFoo = df.getString("Foo", rowIndex);
             long curBar = df.getLong("Bar", rowIndex);
 
-            Assert.assertTrue(curFoo.compareTo(prevFoo) > 0  || (curFoo.equals(prevFoo) && curBar >= prevBar));
+            assertTrue(curFoo.compareTo(prevFoo) > 0  || (curFoo.equals(prevFoo) && curBar >= prevBar));
 
             if (curFoo.equals(prevFoo) && (curBar == prevBar))
             {
-                Assert.assertTrue("row " + curId + " unstable", curId > prevId);
+                assertTrue(curId > prevId, "row " + curId + " unstable");
             }
 
             prevId = curId;

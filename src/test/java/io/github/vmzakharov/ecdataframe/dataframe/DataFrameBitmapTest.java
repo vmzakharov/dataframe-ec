@@ -4,15 +4,17 @@ import org.eclipse.collections.api.list.primitive.BooleanList;
 import org.eclipse.collections.impl.factory.Lists;
 import org.eclipse.collections.impl.factory.primitive.BooleanLists;
 import org.eclipse.collections.impl.list.primitive.IntInterval;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 public class DataFrameBitmapTest
 {
     private DataFrame dataFrame;
 
-    @Before
+    @BeforeEach
     public void setUpDataFrame()
     {
         this.dataFrame = new DataFrame("FrameOfData")
@@ -135,8 +137,8 @@ public class DataFrameBitmapTest
         BooleanList noFlags = IntInterval.zeroTo(this.dataFrame.rowCount() - 1)
                 .collectBoolean(this.dataFrame::notFlagged, BooleanLists.mutable.of());
 
-        Assert.assertEquals(BooleanLists.immutable.of(false, true, false, false, true), flags);
-        Assert.assertEquals(BooleanLists.immutable.of(true, false, true, true, false), noFlags);
+        assertEquals(BooleanLists.immutable.of(false, true, false, false, true), flags);
+        assertEquals(BooleanLists.immutable.of(true, false, true, true, false), noFlags);
     }
 
     @Test

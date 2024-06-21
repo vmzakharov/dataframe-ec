@@ -1,8 +1,9 @@
 package io.github.vmzakharov.ecdataframe.dataframe;
 
 import org.eclipse.collections.impl.factory.Lists;
-import org.junit.Before;
-import org.junit.Test;
+
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -12,7 +13,7 @@ public class DataFrameDistinctTest
 {
     private DataFrame df;
 
-    @Before
+    @BeforeEach
     public void setupDataFrame()
     {
         this.df = new DataFrame("Data Frame")

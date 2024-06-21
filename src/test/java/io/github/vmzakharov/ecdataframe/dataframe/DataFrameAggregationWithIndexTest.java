@@ -2,10 +2,11 @@ package io.github.vmzakharov.ecdataframe.dataframe;
 
 import org.eclipse.collections.impl.factory.Lists;
 import org.eclipse.collections.impl.factory.primitive.IntLists;
-import org.junit.Assert;
-import org.junit.Test;
+
+import org.junit.jupiter.api.Test;
 
 import static io.github.vmzakharov.ecdataframe.dataframe.AggregateFunction.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class DataFrameAggregationWithIndexTest
 {
@@ -30,8 +31,8 @@ public class DataFrameAggregationWithIndexTest
 
         DataFrameUtil.assertEquals(expected, summed);
 
-        Assert.assertEquals(IntLists.immutable.of(0, 2), summed.getAggregateIndex(0));
-        Assert.assertEquals(IntLists.immutable.of(1, 3), summed.getAggregateIndex(1));
+        assertEquals(IntLists.immutable.of(0, 2), summed.getAggregateIndex(0));
+        assertEquals(IntLists.immutable.of(1, 3), summed.getAggregateIndex(1));
     }
 
     @Test
@@ -55,8 +56,8 @@ public class DataFrameAggregationWithIndexTest
 
         DataFrameUtil.assertEquals(expected, summed);
 
-        Assert.assertEquals(IntLists.immutable.of(0, 2), summed.getAggregateIndex(0));
-        Assert.assertEquals(IntLists.immutable.of(1, 3), summed.getAggregateIndex(1));
+        assertEquals(IntLists.immutable.of(0, 2), summed.getAggregateIndex(0));
+        assertEquals(IntLists.immutable.of(1, 3), summed.getAggregateIndex(1));
     }
 
     @Test
@@ -82,8 +83,8 @@ public class DataFrameAggregationWithIndexTest
 
         DataFrameUtil.assertEquals(expected, summed);
 
-        Assert.assertEquals(IntLists.immutable.of(0, 2), summed.getAggregateIndex(0));
-        Assert.assertEquals(IntLists.immutable.of(1, 3), summed.getAggregateIndex(1));
+        assertEquals(IntLists.immutable.of(0, 2), summed.getAggregateIndex(0));
+        assertEquals(IntLists.immutable.of(1, 3), summed.getAggregateIndex(1));
     }
 
     @Test
@@ -108,8 +109,8 @@ public class DataFrameAggregationWithIndexTest
 
         DataFrameUtil.assertEquals(expected, summed);
 
-        Assert.assertEquals(IntLists.immutable.of(0, 2), summed.getAggregateIndex(0));
-        Assert.assertEquals(IntLists.immutable.of(1, 3), summed.getAggregateIndex(1));
+        assertEquals(IntLists.immutable.of(0, 2), summed.getAggregateIndex(0));
+        assertEquals(IntLists.immutable.of(1, 3), summed.getAggregateIndex(1));
     }
 
     @Test
@@ -135,8 +136,8 @@ public class DataFrameAggregationWithIndexTest
 
         DataFrameUtil.assertEquals(expected, summed);
 
-        Assert.assertEquals(IntLists.immutable.of(0, 2), summed.getAggregateIndex(0));
-        Assert.assertEquals(IntLists.immutable.of(1, 3), summed.getAggregateIndex(1));
+        assertEquals(IntLists.immutable.of(0, 2), summed.getAggregateIndex(0));
+        assertEquals(IntLists.immutable.of(1, 3), summed.getAggregateIndex(1));
     }
 
     @Test
@@ -160,8 +161,8 @@ public class DataFrameAggregationWithIndexTest
 
         DataFrameUtil.assertEquals(expected, summed);
 
-        Assert.assertEquals(IntLists.immutable.of(0, 2), summed.getAggregateIndex(0));
-        Assert.assertEquals(IntLists.immutable.of(1, 3), summed.getAggregateIndex(1));
+        assertEquals(IntLists.immutable.of(0, 2), summed.getAggregateIndex(0));
+        assertEquals(IntLists.immutable.of(1, 3), summed.getAggregateIndex(1));
 
         summed.sortBy(Lists.immutable.of("Name"));
 
@@ -173,8 +174,8 @@ public class DataFrameAggregationWithIndexTest
 
         DataFrameUtil.assertEquals(expectedSortedAgg, summed);
 
-        Assert.assertEquals(IntLists.immutable.of(1, 3), summed.getAggregateIndex(0));
-        Assert.assertEquals(IntLists.immutable.of(0, 2), summed.getAggregateIndex(1));
+        assertEquals(IntLists.immutable.of(1, 3), summed.getAggregateIndex(0));
+        assertEquals(IntLists.immutable.of(0, 2), summed.getAggregateIndex(1));
     }
 
     @Test
@@ -200,10 +201,10 @@ public class DataFrameAggregationWithIndexTest
 
         DataFrameUtil.assertEquals(expected, summed);
 
-        Assert.assertEquals(IntLists.immutable.of(0), summed.getAggregateIndex(0));
-        Assert.assertEquals(IntLists.immutable.of(1), summed.getAggregateIndex(1));
-        Assert.assertEquals(IntLists.immutable.of(2), summed.getAggregateIndex(2));
-        Assert.assertEquals(IntLists.immutable.of(3), summed.getAggregateIndex(3));
+        assertEquals(IntLists.immutable.of(0), summed.getAggregateIndex(0));
+        assertEquals(IntLists.immutable.of(1), summed.getAggregateIndex(1));
+        assertEquals(IntLists.immutable.of(2), summed.getAggregateIndex(2));
+        assertEquals(IntLists.immutable.of(3), summed.getAggregateIndex(3));
     }
 
     @Test
@@ -226,6 +227,6 @@ public class DataFrameAggregationWithIndexTest
 
         DataFrameUtil.assertEquals(expected, summed);
 
-        Assert.assertEquals(IntLists.immutable.of(0, 1, 2, 3), summed.getAggregateIndex(0));
+        assertEquals(IntLists.immutable.of(0, 1, 2, 3), summed.getAggregateIndex(0));
     }
 }

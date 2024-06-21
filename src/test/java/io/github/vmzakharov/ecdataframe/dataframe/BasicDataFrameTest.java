@@ -5,46 +5,48 @@ import org.eclipse.collections.api.factory.Lists;
 import org.eclipse.collections.api.list.MutableList;
 import org.eclipse.collections.impl.factory.primitive.BooleanLists;
 import org.eclipse.collections.impl.list.Interval;
-import org.junit.Assert;
-import org.junit.Test;
+
+import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 public class BasicDataFrameTest
 {
     @Test
     public void createSimpleDataFrame()
     {
-       DataFrame df = new DataFrame("df1");
-       df.addStringColumn("Name").addLongColumn("Count").addDoubleColumn("Value");
-       df
+        DataFrame df = new DataFrame("df1");
+        df.addStringColumn("Name").addLongColumn("Count").addDoubleColumn("Value");
+        df
            .addRow("Alice", 5, 23.45)
            .addRow("Bob",  10, 12.34)
            .addRow("Carl", 11, 56.78)
            .addRow("Deb",   0,  7.89);
+        
+        assertEquals("df1", df.getName());
 
-       Assert.assertEquals("df1", df.getName());
+        assertEquals(3, df.columnCount());
+        assertEquals(4, df.rowCount());
 
-        Assert.assertEquals(3, df.columnCount());
-        Assert.assertEquals(4, df.rowCount());
+        assertEquals("Alice", df.getObject(0, 0));
+        assertEquals(10L, df.getObject(1, 1));
+        assertEquals(56.78, df.getObject(2, 2));
 
-        Assert.assertEquals("Alice", df.getObject(0, 0));
-        Assert.assertEquals(10L, df.getObject(1, 1));
-        Assert.assertEquals(56.78, df.getObject(2, 2));
+        assertEquals(11L, df.getObject("Count", 2));
+        assertEquals("Alice", df.getObject("Name", 0));
 
-        Assert.assertEquals(11L, df.getObject("Count", 2));
-        Assert.assertEquals("Alice", df.getObject("Name", 0));
+        assertEquals(10L, df.getLong("Count", 1));
+        assertEquals(56.78, df.getDouble("Value", 2), 0.0);
 
-        Assert.assertEquals(10L, df.getLong("Count", 1));
-        Assert.assertEquals(56.78, df.getDouble("Value", 2), 0.0);
+        assertEquals("Alice", df.getValueAsString(0, 0));
+        assertEquals("\"Alice\"", df.getValueAsStringLiteral(0, 0));
 
-        Assert.assertEquals("Alice", df.getValueAsString(0, 0));
-        Assert.assertEquals("\"Alice\"", df.getValueAsStringLiteral(0, 0));
-
-        Assert.assertEquals("11", df.getValueAsString(2, 1));
-        Assert.assertEquals("11", df.getValueAsStringLiteral(2, 1));
+        assertEquals("11", df.getValueAsString(2, 1));
+        assertEquals("11", df.getValueAsStringLiteral(2, 1));
     }
 
     @Test
@@ -68,23 +70,23 @@ public class BasicDataFrameTest
         dataFrame.addRow("Beep", 10, 20.0, LocalDate.of(2020, 10, 20), LocalDateTime.of(2022, 8, 22, 10, 10, 10),
                 BigDecimal.valueOf(123.456));
 
-        Assert.assertEquals("Beep", dataFrame.getString("String", 0));
-        Assert.assertEquals("Beep-meep", dataFrame.getString("StringComp", 0));
+        assertEquals("Beep", dataFrame.getString("String", 0));
+        assertEquals("Beep-meep", dataFrame.getString("StringComp", 0));
 
-        Assert.assertEquals(10, dataFrame.getLong("Long", 0));
-        Assert.assertEquals(20, dataFrame.getLong("LongComp", 0));
+        assertEquals(10, dataFrame.getLong("Long", 0));
+        assertEquals(20, dataFrame.getLong("LongComp", 0));
 
-        Assert.assertEquals(20.0, dataFrame.getDouble("Double", 0), 0.000001);
-        Assert.assertEquals(30.0, dataFrame.getDouble("DoubleComp", 0), 0.000001);
+        assertEquals(20.0, dataFrame.getDouble("Double", 0), 0.000001);
+        assertEquals(30.0, dataFrame.getDouble("DoubleComp", 0), 0.000001);
 
-        Assert.assertEquals(LocalDate.of(2020, 10, 20), dataFrame.getDate("Date", 0));
-        Assert.assertEquals(LocalDateTime.of(2022, 8, 22, 10, 10, 10), dataFrame.getDateTime("DateTime", 0));
+        assertEquals(LocalDate.of(2020, 10, 20), dataFrame.getDate("Date", 0));
+        assertEquals(LocalDateTime.of(2022, 8, 22, 10, 10, 10), dataFrame.getDateTime("DateTime", 0));
 
-        Assert.assertEquals(LocalDate.of(2021, 11, 15), dataFrame.getDate("DateComp", 0));
-        Assert.assertEquals(LocalDateTime.of(2022, 12, 25, 13, 12, 10), dataFrame.getDateTime("DateTimeComp", 0));
+        assertEquals(LocalDate.of(2021, 11, 15), dataFrame.getDate("DateComp", 0));
+        assertEquals(LocalDateTime.of(2022, 12, 25, 13, 12, 10), dataFrame.getDateTime("DateTimeComp", 0));
 
-        Assert.assertEquals(BigDecimal.valueOf(123.456), dataFrame.getDecimal("Decimal", 0));
-        Assert.assertEquals(BigDecimal.valueOf(456, 5), dataFrame.getDecimal("DecimalComp", 0));
+        assertEquals(BigDecimal.valueOf(123.456), dataFrame.getDecimal("Decimal", 0));
+        assertEquals(BigDecimal.valueOf(456, 5), dataFrame.getDecimal("DecimalComp", 0));
     }
 
     @Test
@@ -115,26 +117,26 @@ public class BasicDataFrameTest
         Lists.immutable.of("String", "Long", "Double", "Date", "DateTime", "Decimal",
                            "StringComp", "LongComp", "DoubleComp", "DateComp", "DateTimeComp", "DecimalComp")
            .forEachWithIndex(
-                   (colName, index) -> Assert.assertSame(dataFrame.getColumnNamed(colName), addedColumns.get(index))
+                   (colName, index) -> assertSame(dataFrame.getColumnNamed(colName), addedColumns.get(index))
            );
 
-        Assert.assertEquals("Beep", dataFrame.getString("String", 0));
-        Assert.assertEquals("Beep-meep", dataFrame.getString("StringComp", 0));
+        assertEquals("Beep", dataFrame.getString("String", 0));
+        assertEquals("Beep-meep", dataFrame.getString("StringComp", 0));
 
-        Assert.assertEquals(10, dataFrame.getLong("Long", 0));
-        Assert.assertEquals(20, dataFrame.getLong("LongComp", 0));
+        assertEquals(10, dataFrame.getLong("Long", 0));
+        assertEquals(20, dataFrame.getLong("LongComp", 0));
 
-        Assert.assertEquals(20.0, dataFrame.getDouble("Double", 0), 0.000001);
-        Assert.assertEquals(30.0, dataFrame.getDouble("DoubleComp", 0), 0.000001);
+        assertEquals(20.0, dataFrame.getDouble("Double", 0), 0.000001);
+        assertEquals(30.0, dataFrame.getDouble("DoubleComp", 0), 0.000001);
 
-        Assert.assertEquals(LocalDate.of(2020, 10, 20), dataFrame.getDate("Date", 0));
-        Assert.assertEquals(LocalDateTime.of(2022, 8, 22, 10, 10, 10), dataFrame.getDateTime("DateTime", 0));
+        assertEquals(LocalDate.of(2020, 10, 20), dataFrame.getDate("Date", 0));
+        assertEquals(LocalDateTime.of(2022, 8, 22, 10, 10, 10), dataFrame.getDateTime("DateTime", 0));
 
-        Assert.assertEquals(LocalDate.of(2021, 11, 15), dataFrame.getDate("DateComp", 0));
-        Assert.assertEquals(LocalDateTime.of(2022, 12, 25, 13, 12, 10), dataFrame.getDateTime("DateTimeComp", 0));
+        assertEquals(LocalDate.of(2021, 11, 15), dataFrame.getDate("DateComp", 0));
+        assertEquals(LocalDateTime.of(2022, 12, 25, 13, 12, 10), dataFrame.getDateTime("DateTimeComp", 0));
 
-        Assert.assertEquals(BigDecimal.valueOf(123.456), dataFrame.getDecimal("Decimal", 0));
-        Assert.assertEquals(BigDecimal.valueOf(456, 5), dataFrame.getDecimal("DecimalComp", 0));
+        assertEquals(BigDecimal.valueOf(123.456), dataFrame.getDecimal("Decimal", 0));
+        assertEquals(BigDecimal.valueOf(456, 5), dataFrame.getDecimal("DecimalComp", 0));
     }
 
     @Test
@@ -202,7 +204,7 @@ public class BasicDataFrameTest
     {
         DataFrame df = new DataFrame("df1");
 
-        Assert.assertTrue(df.isEmpty());
+        assertTrue(df.isEmpty());
 
         df.addStringColumn("Name").addLongColumn("Count").addDoubleColumn("Value").addDateColumn("Foo")
                 .addRow("Deb",   0,  7.89, null)
@@ -211,7 +213,7 @@ public class BasicDataFrameTest
                 .addRow("Carl", 5, null, LocalDate.of(2020, 10, 20))
         ;
 
-        Assert.assertFalse(df.isEmpty());
+        assertFalse(df.isEmpty());
     }
 
     @Test
@@ -219,7 +221,7 @@ public class BasicDataFrameTest
     {
         DataFrame df = new DataFrame("df1");
 
-        Assert.assertFalse(df.isNotEmpty());
+        assertFalse(df.isNotEmpty());
 
         df.addStringColumn("Name").addLongColumn("Count").addDoubleColumn("Value").addDateColumn("Foo")
                 .addRow("Deb",   0,  7.89, null)
@@ -228,14 +230,15 @@ public class BasicDataFrameTest
                 .addRow("Carl", 5, null, LocalDate.of(2020, 10, 20))
         ;
 
-        Assert.assertTrue(df.isNotEmpty());
+        assertTrue(df.isNotEmpty());
     }
 
     private void assertNullValuesInColumn(DataFrame df, String columnName, boolean... expectedValues)
     {
-        Assert.assertEquals(columnName,
+        assertEquals(
                 BooleanLists.immutable.of(expectedValues),
-                Interval.zeroTo(df.rowCount() - 1).collectBoolean(e -> df.isNull(columnName, e)).toList()
+                Interval.zeroTo(df.rowCount() - 1).collectBoolean(e -> df.isNull(columnName, e)).toList(),
+                columnName
         );
     }
 
@@ -255,7 +258,7 @@ public class BasicDataFrameTest
             .addRow("Deb",   "xyz");
 
         DataFrameUtil.assertEquals(expected, df);
-        Assert.assertSame(result, df);
+        assertSame(result, df);
     }
 
     @Test
@@ -267,8 +270,8 @@ public class BasicDataFrameTest
             .addRow("Deb",   0,  7.89);
 
         df.dropColumn("Name").dropColumn("Value");
-        Assert.assertFalse(df.hasColumn("Name"));
-        Assert.assertFalse(df.hasColumn("Value"));
+        assertFalse(df.hasColumn("Name"));
+        assertFalse(df.hasColumn("Value"));
 
         DataFrame expected = new DataFrame("expected")
             .addLongColumn("Count")
@@ -278,7 +281,7 @@ public class BasicDataFrameTest
         DataFrameUtil.assertEquals(expected, df);
     }
 
-    @Test(expected = RuntimeException.class)
+    @Test
     public void dropNonExistingColumn()
     {
         DataFrame df = new DataFrame("df1")
@@ -286,10 +289,10 @@ public class BasicDataFrameTest
             .addRow("Alice", 5, 23.45)
             .addRow("Deb",   0,  7.89);
 
-        df.dropColumn("Giraffe");
+        assertThrows(RuntimeException.class, () -> df.dropColumn("Giraffe"));
     }
 
-    @Test(expected = RuntimeException.class)
+    @Test
     public void dropNonExistingColumn2()
     {
         DataFrame df = new DataFrame("df1")
@@ -297,10 +300,10 @@ public class BasicDataFrameTest
             .addRow("Alice", 5, 23.45)
             .addRow("Deb",   0,  7.89);
 
-        df.dropColumns(Lists.immutable.of("Name", "Giraffe"));
+        assertThrows(RuntimeException.class, () -> df.dropColumns(Lists.immutable.of("Name", "Giraffe")));
     }
 
-    @Test(expected = RuntimeException.class)
+    @Test
     public void keepNonExistingColumns()
     {
         DataFrame df = new DataFrame("df1")
@@ -308,7 +311,7 @@ public class BasicDataFrameTest
                 .addRow("Alice", 5, 23.45)
                 .addRow("Deb",   0,  7.89);
 
-        df.keepColumns(Lists.immutable.of("Name", "Giraffe"));
+        assertThrows(RuntimeException.class, () -> df.keepColumns(Lists.immutable.of("Name", "Giraffe")));
     }
 
     @Test
@@ -332,7 +335,7 @@ public class BasicDataFrameTest
 
     }
 
-    @Test(expected = RuntimeException.class)
+    @Test
     public void sealingMisshapenDataFrame()
     {
         DataFrame df = new DataFrame("df1")
@@ -345,16 +348,17 @@ public class BasicDataFrameTest
         DfStringColumn barColumn = df.getStringColumn("Bar");
         barColumn.addObject("X");
 
-        df.seal();
+        assertThrows(RuntimeException.class, df::seal);
     }
 
-    @Test(expected = RuntimeException.class)
+    @Test
     public void dataFrameRowsDifSize()
     {
-        DataFrame df = new DataFrame("df1")
-                .addStringColumn("Foo", Lists.immutable.of("A", "B", "C"))
-                .addStringColumn("Bar", Lists.immutable.of("X", "Y"));
-//        df.seal();
+        assertThrows(
+                RuntimeException.class,
+                () -> new DataFrame("df1")
+                    .addStringColumn("Foo", Lists.immutable.of("A", "B", "C"))
+                    .addStringColumn("Bar", Lists.immutable.of("X", "Y")));
     }
 
     @Test

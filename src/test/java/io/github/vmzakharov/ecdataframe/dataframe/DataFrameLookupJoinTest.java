@@ -1,14 +1,15 @@
 package io.github.vmzakharov.ecdataframe.dataframe;
 
 import org.eclipse.collections.impl.factory.Lists;
-import org.junit.BeforeClass;
-import org.junit.Test;
+
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 
 public class DataFrameLookupJoinTest
 {
     static private DataFrame countries;
 
-    @BeforeClass
+    @BeforeAll
     public static void setUpCountries()
     {
         countries = new DataFrame("countries")

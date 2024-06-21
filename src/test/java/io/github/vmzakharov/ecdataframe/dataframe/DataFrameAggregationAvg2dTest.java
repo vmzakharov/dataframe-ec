@@ -1,12 +1,14 @@
 package io.github.vmzakharov.ecdataframe.dataframe;
 
 import org.eclipse.collections.impl.factory.Lists;
-import org.junit.Before;
-import org.junit.Test;
+
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;
 
 import static io.github.vmzakharov.ecdataframe.dataframe.AggregateFunction.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class DataFrameAggregationAvg2dTest
 {
@@ -14,7 +16,7 @@ public class DataFrameAggregationAvg2dTest
 
     private DataFrame dataFrame;
 
-    @Before
+    @BeforeEach
     public void initialiseDataFrame()
     {
         this.dataFrame = new DataFrame("Data Fame")
@@ -67,13 +69,16 @@ public class DataFrameAggregationAvg2dTest
         );
     }
 
-    @Test(expected = RuntimeException.class)
+    @Test
     public void averageEmptyDataFrame()
     {
-        new DataFrame("Data Fame")
-                .addStringColumn("Name").addStringColumn("Foo")
-                .addLongColumn("Bar").addDoubleColumn("Baz").addIntColumn("Waldo").addFloatColumn("Thud")
-                .aggregate(Lists.immutable.of(avg2d("Bar"), avg2d("Waldo")));
+        assertThrows(
+            RuntimeException.class,
+            () -> new DataFrame("Data Fame")
+                    .addStringColumn("Name").addStringColumn("Foo")
+                    .addLongColumn("Bar").addDoubleColumn("Baz").addIntColumn("Waldo").addFloatColumn("Thud")
+                    .aggregate(Lists.immutable.of(avg2d("Bar"), avg2d("Waldo")))
+        );
     }
 
     @Test

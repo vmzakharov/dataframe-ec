@@ -1,11 +1,12 @@
 package io.github.vmzakharov.ecdataframe.dataframe;
 
 import org.eclipse.collections.impl.factory.Lists;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import static io.github.vmzakharov.ecdataframe.dataframe.AggregateFunction.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class DataFrameAggregationWithGroupByTest
 {
@@ -14,7 +15,7 @@ public class DataFrameAggregationWithGroupByTest
     private DataFrame dataFrame;
     private DataFrame smallDataFrame;
 
-    @Before
+    @BeforeEach
     public void initialiseDataFrame()
     {
         this.dataFrame = new DataFrame("FrameOfData")
@@ -50,14 +51,14 @@ public class DataFrameAggregationWithGroupByTest
 
         DataFrame summed = df.sumBy(Lists.immutable.of("Bar", "Baz", "Qux", "Waldo", "Thud"), Lists.immutable.of("Name"));
 
-        Assert.assertEquals(1, summed.rowCount());
+        assertEquals(1, summed.rowCount());
 
-        Assert.assertEquals("Alice", summed.getString("Name", 0));
-        Assert.assertEquals(123L, summed.getLong("Bar", 0));
-        Assert.assertEquals(10.0, summed.getDouble("Baz", 0), TOLERANCE);
-        Assert.assertEquals(20.0, summed.getDouble("Qux", 0), TOLERANCE);
-        Assert.assertEquals(48, summed.getLong("Waldo", 0));
-        Assert.assertEquals(2.25, summed.getDouble("Thud", 0), TOLERANCE);
+        assertEquals("Alice", summed.getString("Name", 0));
+        assertEquals(123L, summed.getLong("Bar", 0));
+        assertEquals(10.0, summed.getDouble("Baz", 0), TOLERANCE);
+        assertEquals(20.0, summed.getDouble("Qux", 0), TOLERANCE);
+        assertEquals(48, summed.getLong("Waldo", 0));
+        assertEquals(2.25, summed.getDouble("Thud", 0), TOLERANCE);
     }
 
     @Test
@@ -264,9 +265,9 @@ public class DataFrameAggregationWithGroupByTest
     @Test
     public void sumOfAndByCalculatedColumns()
     {
-        this.dataFrame.addStringColumn("aFoo", "'a' + Foo");
-        this.dataFrame.addLongColumn("BarBar", "Bar * 2");
-        this.dataFrame.addDoubleColumn("BazBaz", "Baz * 2");
+        this.dataFrame.addColumn("aFoo", "'a' + Foo");
+        this.dataFrame.addColumn("BarBar", "Bar * 2");
+        this.dataFrame.addColumn("BazBaz", "Baz * 2");
 
         DataFrame summed = this.dataFrame.sumBy(Lists.immutable.of("BarBar", "BazBaz"), Lists.immutable.of("Name", "aFoo"));
 

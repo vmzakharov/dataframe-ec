@@ -8,15 +8,17 @@ import org.eclipse.collections.api.list.ImmutableList;
 import org.eclipse.collections.api.list.primitive.MutableLongList;
 import org.eclipse.collections.impl.factory.primitive.LongLists;
 import org.eclipse.collections.impl.list.primitive.IntInterval;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 public class DataFrameExpressionTest
 {
     private DataFrame df;
 
-    @Before
+    @BeforeEach
     public void initializeDataFrame()
     {
         this.df = new DataFrame("this.df1")
@@ -44,7 +46,7 @@ public class DataFrameExpressionTest
                            , values
                    );
 
-        Assert.assertEquals(LongLists.immutable.of(10, 20, 22, 0), values);
+        assertEquals(LongLists.immutable.of(10, 20, 22, 0), values);
     }
 
     @Test
@@ -58,6 +60,6 @@ public class DataFrameExpressionTest
                 }
         );
 
-        Assert.assertEquals(Lists.immutable.of("iceX", "bX", "rolX", "nX"), values);
+        assertEquals(Lists.immutable.of("iceX", "bX", "rolX", "nX"), values);
     }
 }

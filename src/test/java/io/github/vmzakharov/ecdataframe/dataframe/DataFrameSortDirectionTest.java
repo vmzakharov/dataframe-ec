@@ -3,13 +3,14 @@ package io.github.vmzakharov.ecdataframe.dataframe;
 import io.github.vmzakharov.ecdataframe.dsl.value.DecimalValue;
 import io.github.vmzakharov.ecdataframe.dsl.value.DoubleValue;
 import org.eclipse.collections.api.factory.Lists;
-import org.junit.Assert;
-import org.junit.Test;
+
+import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;
 
 import static io.github.vmzakharov.ecdataframe.dataframe.DfColumnSortOrder.ASC;
 import static io.github.vmzakharov.ecdataframe.dataframe.DfColumnSortOrder.DESC;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class DataFrameSortDirectionTest
 {
@@ -138,12 +139,12 @@ public class DataFrameSortDirectionTest
                 dataFrame);
 
         // validates that different ways of cell value retrieval respects logical order
-        Assert.assertEquals(13.0, dataFrame.getObject("Baz", 2));
-        Assert.assertEquals(13.0, dataFrame.getDouble("Baz", 2), 0.000001);
-        Assert.assertEquals(0, new DoubleValue(13.0).compareTo(dataFrame.getValue("Baz", 2)));
+        assertEquals(13.0, dataFrame.getObject("Baz", 2));
+        assertEquals(13.0, dataFrame.getDouble("Baz", 2), 0.000001);
+        assertEquals(0, new DoubleValue(13.0).compareTo(dataFrame.getValue("Baz", 2)));
 
-        Assert.assertEquals(13.0, dataFrame.getObject(2, 3));
-        Assert.assertEquals(0, new DoubleValue(13.0).compareTo(dataFrame.getValue(2, 3)));
+        assertEquals(13.0, dataFrame.getObject(2, 3));
+        assertEquals(0, new DoubleValue(13.0).compareTo(dataFrame.getValue(2, 3)));
     }
 
     @Test
@@ -173,12 +174,12 @@ public class DataFrameSortDirectionTest
 
         // validates that different ways of cell value retrieval respects logical order
         BigDecimal expectedCellValue = BigDecimal.valueOf(13.0);
-        Assert.assertEquals(expectedCellValue, dataFrame.getObject("Baz", 2));
-        Assert.assertEquals(expectedCellValue, dataFrame.getDecimal("Baz", 2));
-        Assert.assertEquals(0, new DecimalValue(expectedCellValue).compareTo(dataFrame.getValue("Baz", 2)));
+        assertEquals(expectedCellValue, dataFrame.getObject("Baz", 2));
+        assertEquals(expectedCellValue, dataFrame.getDecimal("Baz", 2));
+        assertEquals(0, new DecimalValue(expectedCellValue).compareTo(dataFrame.getValue("Baz", 2)));
 
-        Assert.assertEquals(expectedCellValue, dataFrame.getObject(2, 3));
-        Assert.assertEquals(0, new DecimalValue(expectedCellValue).compareTo(dataFrame.getValue(2, 3)));
+        assertEquals(expectedCellValue, dataFrame.getObject(2, 3));
+        assertEquals(0, new DecimalValue(expectedCellValue).compareTo(dataFrame.getValue(2, 3)));
     }
 
     @Test
@@ -217,7 +218,7 @@ public class DataFrameSortDirectionTest
 
         dataFrame.sortBy(Lists.immutable.of("Foo", "Baz"), Lists.immutable.of(ASC, DESC));
 
-        Assert.assertTrue("Sorted!", true);
+        assertTrue(true, "Sorted!");
     }
 
     @Test
@@ -228,7 +229,7 @@ public class DataFrameSortDirectionTest
 
         dataFrame.sortByExpression("Baz * 2.5");
 
-        Assert.assertTrue("Sorted!", true);
+        assertTrue(true, "Sorted!");
     }
 
     @Test

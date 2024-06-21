@@ -2,11 +2,12 @@ package io.github.vmzakharov.ecdataframe.dataframe;
 
 import io.github.vmzakharov.ecdataframe.dataframe.compare.DecimalComparisonResult;
 import org.eclipse.collections.impl.factory.Lists;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 public class DfColumnCompareTest
 {
@@ -32,74 +33,74 @@ public class DfColumnCompareTest
                 ;
 
         DfCellComparator col1Comparator = df1.columnComparator(df2, "col1", "col1");
-        Assert.assertTrue(col1Comparator.compare(0, 0).compared() == 0);
-        Assert.assertTrue(col1Comparator.compare(1, 1).compared() < 0);
-        Assert.assertTrue(col1Comparator.compare(2, 2).compared() > 0);
+        assertTrue(col1Comparator.compare(0, 0).compared() == 0);
+        assertTrue(col1Comparator.compare(1, 1).compared() < 0);
+        assertTrue(col1Comparator.compare(2, 2).compared() > 0);
 
-        Assert.assertEquals(0, col1Comparator.compare(0, 0).delta());
+        assertEquals(0, col1Comparator.compare(0, 0).delta());
 
-        Assert.assertTrue(col1Comparator.compare(0, 1).compared() < 0);
-        Assert.assertTrue(col1Comparator.compare(0, 2).compared() == 0);
+        assertTrue(col1Comparator.compare(0, 1).compared() < 0);
+        assertTrue(col1Comparator.compare(0, 2).compared() == 0);
 
-        Assert.assertTrue(col1Comparator.compare(1, 0).compared() > 0);
-        Assert.assertTrue(col1Comparator.compare(1, 2).compared() > 0);
+        assertTrue(col1Comparator.compare(1, 0).compared() > 0);
+        assertTrue(col1Comparator.compare(1, 2).compared() > 0);
 
         DfCellComparator col2Comparator = df1.columnComparator(df2, "col2", "column2");
-        Assert.assertTrue(col2Comparator.compare(0, 0).compared() < 0);
-        Assert.assertTrue(col2Comparator.compare(1, 1).compared() == 0);
-        Assert.assertTrue(col2Comparator.compare(2, 2).compared() > 0);
+        assertTrue(col2Comparator.compare(0, 0).compared() < 0);
+        assertTrue(col2Comparator.compare(1, 1).compared() == 0);
+        assertTrue(col2Comparator.compare(2, 2).compared() > 0);
 
         DfCellComparator col3Comparator = df1.columnComparator(df2, "col3", "number");
-        Assert.assertTrue(col3Comparator.compare(0, 0).compared() > 0);
-        Assert.assertTrue(col3Comparator.compare(1, 1).compared() == 0);
-        Assert.assertTrue(col3Comparator.compare(2, 2).compared() < 0);
+        assertTrue(col3Comparator.compare(0, 0).compared() > 0);
+        assertTrue(col3Comparator.compare(1, 1).compared() == 0);
+        assertTrue(col3Comparator.compare(2, 2).compared() < 0);
 
-        Assert.assertTrue(col3Comparator.compare(2, 0).compared() == 0);
-        Assert.assertTrue(col3Comparator.compare(2, 1).compared() > 0);
+        assertTrue(col3Comparator.compare(2, 0).compared() == 0);
+        assertTrue(col3Comparator.compare(2, 1).compared() > 0);
 
-        Assert.assertEquals(1L, col3Comparator.compare(0, 0).delta());
-        Assert.assertEquals(0L, col3Comparator.compare(1, 1).delta());
-        Assert.assertEquals(-1L, col3Comparator.compare(2, 2).delta());
+        assertEquals(1L, col3Comparator.compare(0, 0).delta());
+        assertEquals(0L, col3Comparator.compare(1, 1).delta());
+        assertEquals(-1L, col3Comparator.compare(2, 2).delta());
 
         DfCellComparator col4Comparator = df1.columnComparator(df2, "col4", "date");
-        Assert.assertTrue(col4Comparator.compare(0, 0).compared() > 0);
-        Assert.assertTrue(col4Comparator.compare(1, 1).compared() == 0);
-        Assert.assertTrue(col4Comparator.compare(2, 2).compared() < 0);
+        assertTrue(col4Comparator.compare(0, 0).compared() > 0);
+        assertTrue(col4Comparator.compare(1, 1).compared() == 0);
+        assertTrue(col4Comparator.compare(2, 2).compared() < 0);
 
-        Assert.assertTrue(col4Comparator.compare(0, 1).compared() > 0);
-        Assert.assertTrue(col4Comparator.compare(0, 2).compared() == 0);
+        assertTrue(col4Comparator.compare(0, 1).compared() > 0);
+        assertTrue(col4Comparator.compare(0, 2).compared() == 0);
 
         DfCellComparator col5Comparator = df1.columnComparator(df2, "col5", "amount");
-        Assert.assertTrue(col5Comparator.compare(0, 0).compared() > 0);
-        Assert.assertTrue(col5Comparator.compare(1, 1).compared() == 0);
-        Assert.assertTrue(col5Comparator.compare(2, 2).compared() < 0);
+        assertTrue(col5Comparator.compare(0, 0).compared() > 0);
+        assertTrue(col5Comparator.compare(1, 1).compared() == 0);
+        assertTrue(col5Comparator.compare(2, 2).compared() < 0);
 
-        Assert.assertEquals(2.02, col5Comparator.compare(0, 0).dDelta(), TOLERANCE);
-        Assert.assertEquals(0.0, col5Comparator.compare(1, 1).dDelta(), TOLERANCE);
-        Assert.assertEquals(-4.04, col5Comparator.compare(2, 2).dDelta(), TOLERANCE);
+        assertEquals(2.02, col5Comparator.compare(0, 0).dDelta(), TOLERANCE);
+        assertEquals(0.0, col5Comparator.compare(1, 1).dDelta(), TOLERANCE);
+        assertEquals(-4.04, col5Comparator.compare(2, 2).dDelta(), TOLERANCE);
 
         DfCellComparator col6Comparator = df1.columnComparator(df2, "col6", "decimal");
-        Assert.assertTrue(col6Comparator.compare(0, 0).compared() > 0);
-        Assert.assertTrue(col6Comparator.compare(1, 1).compared() == 0);
-        Assert.assertTrue(col6Comparator.compare(2, 2).compared() < 0);
+        assertTrue(col6Comparator.compare(0, 0).compared() > 0);
+        assertTrue(col6Comparator.compare(1, 1).compared() == 0);
+        assertTrue(col6Comparator.compare(2, 2).compared() < 0);
 
-        Assert.assertEquals(2.02, col6Comparator.compare(0, 0).dDelta(), TOLERANCE);
-        Assert.assertEquals(BigDecimal.valueOf(202, 2), ((DecimalComparisonResult) col6Comparator.compare(0, 0)).decDelta());
-        Assert.assertEquals(0.0, col6Comparator.compare(1, 1).dDelta(), TOLERANCE);
-        Assert.assertEquals(-4.04, col6Comparator.compare(2, 2).dDelta(), TOLERANCE);
-        Assert.assertEquals(BigDecimal.valueOf(-404, 2), ((DecimalComparisonResult) col6Comparator.compare(2, 2)).decDelta());
+        assertEquals(2.02, col6Comparator.compare(0, 0).dDelta(), TOLERANCE);
+        assertEquals(BigDecimal.valueOf(202, 2), ((DecimalComparisonResult) col6Comparator.compare(0, 0)).decDelta());
+        assertEquals(0.0, col6Comparator.compare(1, 1).dDelta(), TOLERANCE);
+        assertEquals(-4.04, col6Comparator.compare(2, 2).dDelta(), TOLERANCE);
+        assertEquals(BigDecimal.valueOf(-404, 2), ((DecimalComparisonResult) col6Comparator.compare(2, 2)).decDelta());
 
         DfCellComparator col7Comparator = df1.columnComparator(df2, "col7", "int");
-        Assert.assertTrue(col7Comparator.compare(0, 0).compared() > 0);
-        Assert.assertTrue(col7Comparator.compare(1, 1).compared() == 0);
-        Assert.assertTrue(col7Comparator.compare(2, 2).compared() < 0);
+        assertTrue(col7Comparator.compare(0, 0).compared() > 0);
+        assertTrue(col7Comparator.compare(1, 1).compared() == 0);
+        assertTrue(col7Comparator.compare(2, 2).compared() < 0);
 
-        Assert.assertTrue(col7Comparator.compare(2, 0).compared() == 0);
-        Assert.assertTrue(col7Comparator.compare(2, 1).compared() > 0);
+        assertTrue(col7Comparator.compare(2, 0).compared() == 0);
+        assertTrue(col7Comparator.compare(2, 1).compared() > 0);
 
-        Assert.assertEquals(1L, col7Comparator.compare(0, 0).delta());
-        Assert.assertEquals(0L, col7Comparator.compare(1, 1).delta());
-        Assert.assertEquals(-1L, col7Comparator.compare(2, 2).delta());
+        assertEquals(1L, col7Comparator.compare(0, 0).delta());
+        assertEquals(0L, col7Comparator.compare(1, 1).delta());
+        assertEquals(-1L, col7Comparator.compare(2, 2).delta());
 
     }
 
@@ -115,20 +116,20 @@ public class DfColumnCompareTest
 
         DfCellComparator coCo1 = df1.columnComparator(df1, "col1", "col2");
 
-        Assert.assertTrue(coCo1.compare(0, 0).compared() < 0);
-        Assert.assertTrue(coCo1.compare(1, 1).compared() == 0);
-        Assert.assertTrue(coCo1.compare(2, 2).compared() > 0);
+        assertTrue(coCo1.compare(0, 0).compared() < 0);
+        assertTrue(coCo1.compare(1, 1).compared() == 0);
+        assertTrue(coCo1.compare(2, 2).compared() > 0);
 
         DfCellComparator coCo2 = df1.columnComparator(df1, "col3", "col3");
 
-        Assert.assertTrue(coCo2.compare(0, 0).compared() == 0);
-        Assert.assertTrue(coCo2.compare(1, 1).compared() == 0);
-        Assert.assertTrue(coCo2.compare(2, 2).compared() == 0);
-        Assert.assertTrue(coCo2.compare(0, 1).compared() > 0);
-        Assert.assertTrue(coCo2.compare(0, 2).compared() > 0);
-        Assert.assertTrue(coCo2.compare(2, 1).compared() > 0);
-        Assert.assertTrue(coCo2.compare(1, 2).compared() < 0);
-        Assert.assertTrue(coCo2.compare(2, 0).compared() < 0);
+        assertTrue(coCo2.compare(0, 0).compared() == 0);
+        assertTrue(coCo2.compare(1, 1).compared() == 0);
+        assertTrue(coCo2.compare(2, 2).compared() == 0);
+        assertTrue(coCo2.compare(0, 1).compared() > 0);
+        assertTrue(coCo2.compare(0, 2).compared() > 0);
+        assertTrue(coCo2.compare(2, 1).compared() > 0);
+        assertTrue(coCo2.compare(1, 2).compared() < 0);
+        assertTrue(coCo2.compare(2, 0).compared() < 0);
     }
 
     @Test
@@ -160,14 +161,14 @@ public class DfColumnCompareTest
 //            "X", "B", "3"
 
         DfCellComparator col1Comparator = df1.columnComparator(df2, "col1", "col1");
-        Assert.assertTrue(col1Comparator.compare(0, 0).compared() > 0);
-        Assert.assertTrue(col1Comparator.compare(1, 1).compared() > 0);
-        Assert.assertTrue(col1Comparator.compare(2, 2).compared() < 0);
+        assertTrue(col1Comparator.compare(0, 0).compared() > 0);
+        assertTrue(col1Comparator.compare(1, 1).compared() > 0);
+        assertTrue(col1Comparator.compare(2, 2).compared() < 0);
 
         DfCellComparator col2Comparator = df1.columnComparator(df2, "col2", "column2");
-        Assert.assertTrue(col2Comparator.compare(0, 0).compared() < 0);
-        Assert.assertTrue(col2Comparator.compare(1, 1).compared() > 0);
-        Assert.assertTrue(col2Comparator.compare(2, 2).compared() == 0);
+        assertTrue(col2Comparator.compare(0, 0).compared() < 0);
+        assertTrue(col2Comparator.compare(1, 1).compared() > 0);
+        assertTrue(col2Comparator.compare(2, 2).compared() == 0);
     }
 
     @Test
@@ -190,42 +191,42 @@ public class DfColumnCompareTest
                 ;
 
         DfCellComparator col1Comparator = df1.columnComparator(df2, "col1", "col1");
-        Assert.assertTrue(col1Comparator.compare(0, 0).rightIsNull());
-        Assert.assertFalse(col1Comparator.compare(0, 0).leftIsNull());
-        Assert.assertFalse(col1Comparator.compare(0, 0).noNulls());
+        assertTrue(col1Comparator.compare(0, 0).rightIsNull());
+        assertFalse(col1Comparator.compare(0, 0).leftIsNull());
+        assertFalse(col1Comparator.compare(0, 0).noNulls());
 
-        Assert.assertTrue(col1Comparator.compare(1, 1).leftIsNull());
+        assertTrue(col1Comparator.compare(1, 1).leftIsNull());
 
-        Assert.assertTrue(col1Comparator.compare(2, 2).bothAreNulls());
-        Assert.assertTrue(col1Comparator.compare(2, 2).rightIsNull());
-        Assert.assertTrue(col1Comparator.compare(2, 2).leftIsNull());
-        Assert.assertFalse(col1Comparator.compare(2, 2).noNulls());
+        assertTrue(col1Comparator.compare(2, 2).bothAreNulls());
+        assertTrue(col1Comparator.compare(2, 2).rightIsNull());
+        assertTrue(col1Comparator.compare(2, 2).leftIsNull());
+        assertFalse(col1Comparator.compare(2, 2).noNulls());
 
-        Assert.assertTrue(col1Comparator.compare(3, 3).noNulls());
+        assertTrue(col1Comparator.compare(3, 3).noNulls());
 
         DfCellComparator col2Comparator = df1.columnComparator(df2, "col2", "number");
-        Assert.assertTrue(col2Comparator.compare(0, 0).leftIsNull());
-        Assert.assertTrue(col2Comparator.compare(1, 1).rightIsNull());
-        Assert.assertTrue(col2Comparator.compare(2, 2).noNulls());
-        Assert.assertTrue(col2Comparator.compare(3, 3).bothAreNulls());
+        assertTrue(col2Comparator.compare(0, 0).leftIsNull());
+        assertTrue(col2Comparator.compare(1, 1).rightIsNull());
+        assertTrue(col2Comparator.compare(2, 2).noNulls());
+        assertTrue(col2Comparator.compare(3, 3).bothAreNulls());
 
         DfCellComparator col3Comparator = df1.columnComparator(df2, "col3", "date");
-        Assert.assertTrue(col3Comparator.compare(0, 0).rightIsNull());
-        Assert.assertTrue(col3Comparator.compare(1, 1).bothAreNulls());
-        Assert.assertTrue(col3Comparator.compare(2, 2).leftIsNull());
-        Assert.assertTrue(col3Comparator.compare(3, 3).noNulls());
+        assertTrue(col3Comparator.compare(0, 0).rightIsNull());
+        assertTrue(col3Comparator.compare(1, 1).bothAreNulls());
+        assertTrue(col3Comparator.compare(2, 2).leftIsNull());
+        assertTrue(col3Comparator.compare(3, 3).noNulls());
 
         DfCellComparator col4Comparator = df1.columnComparator(df2, "col4", "amount");
-        Assert.assertTrue(col4Comparator.compare(0, 0).noNulls());
-        Assert.assertTrue(col4Comparator.compare(1, 1).rightIsNull());
-        Assert.assertTrue(col4Comparator.compare(2, 2).bothAreNulls());
-        Assert.assertTrue(col4Comparator.compare(3, 3).leftIsNull());
+        assertTrue(col4Comparator.compare(0, 0).noNulls());
+        assertTrue(col4Comparator.compare(1, 1).rightIsNull());
+        assertTrue(col4Comparator.compare(2, 2).bothAreNulls());
+        assertTrue(col4Comparator.compare(3, 3).leftIsNull());
 
         DfCellComparator col5Comparator = df1.columnComparator(df2, "col5", "decimal");
-        Assert.assertTrue(col5Comparator.compare(0, 0).bothAreNulls());
-        Assert.assertTrue(col5Comparator.compare(1, 1).leftIsNull());
-        Assert.assertTrue(col5Comparator.compare(2, 2).rightIsNull());
-        Assert.assertTrue(col5Comparator.compare(3, 3).noNulls());
+        assertTrue(col5Comparator.compare(0, 0).bothAreNulls());
+        assertTrue(col5Comparator.compare(1, 1).leftIsNull());
+        assertTrue(col5Comparator.compare(2, 2).rightIsNull());
+        assertTrue(col5Comparator.compare(3, 3).noNulls());
     }
 
     @Test
@@ -255,28 +256,28 @@ public class DfColumnCompareTest
 
         DfCellComparator col1Comparator = df1.columnComparator(df2, "col1", "number");
 
-        Assert.assertTrue(col1Comparator.compare(0, 0).compared() == 0);
-        Assert.assertTrue(col1Comparator.compare(1, 1).compared() > 0);
-        Assert.assertTrue(col1Comparator.compare(2, 2).compared() > 0);
-        Assert.assertTrue(col1Comparator.compare(3, 3).compared() < 0);
-        Assert.assertTrue(col1Comparator.compare(4, 4).compared() < 0);
-        Assert.assertTrue(col1Comparator.compare(5, 5).compared() > 0);
-        Assert.assertTrue(col1Comparator.compare(6, 6).compared() < 0);
+        assertTrue(col1Comparator.compare(0, 0).compared() == 0);
+        assertTrue(col1Comparator.compare(1, 1).compared() > 0);
+        assertTrue(col1Comparator.compare(2, 2).compared() > 0);
+        assertTrue(col1Comparator.compare(3, 3).compared() < 0);
+        assertTrue(col1Comparator.compare(4, 4).compared() < 0);
+        assertTrue(col1Comparator.compare(5, 5).compared() > 0);
+        assertTrue(col1Comparator.compare(6, 6).compared() < 0);
 
         DfCellComparator col2Comparator = df1.columnComparator(df2, "col2", "value");
 
-        Assert.assertTrue(col2Comparator.compare(0, 0).compared() == 0);
-        Assert.assertTrue(col2Comparator.compare(1, 1).compared() > 0);
-        Assert.assertTrue(col2Comparator.compare(2, 2).compared() > 0);
-        Assert.assertTrue(col2Comparator.compare(3, 3).compared() < 0);
-        Assert.assertTrue(col2Comparator.compare(4, 4).compared() < 0);
-        Assert.assertTrue(col2Comparator.compare(5, 5).compared() > 0);
-        Assert.assertTrue(col2Comparator.compare(6, 6).compared() < 0);
+        assertTrue(col2Comparator.compare(0, 0).compared() == 0);
+        assertTrue(col2Comparator.compare(1, 1).compared() > 0);
+        assertTrue(col2Comparator.compare(2, 2).compared() > 0);
+        assertTrue(col2Comparator.compare(3, 3).compared() < 0);
+        assertTrue(col2Comparator.compare(4, 4).compared() < 0);
+        assertTrue(col2Comparator.compare(5, 5).compared() > 0);
+        assertTrue(col2Comparator.compare(6, 6).compared() < 0);
 
-        Assert.assertTrue(Double.isInfinite(col2Comparator.compare(5, 5).dDelta()));
-        Assert.assertTrue(col2Comparator.compare(5, 5).dDelta() > 0);
+        assertTrue(Double.isInfinite(col2Comparator.compare(5, 5).dDelta()));
+        assertTrue(col2Comparator.compare(5, 5).dDelta() > 0);
 
-        Assert.assertTrue(Double.isInfinite(col2Comparator.compare(6, 6).dDelta()));
-        Assert.assertTrue(col2Comparator.compare(6, 6).dDelta() < 0);
+        assertTrue(Double.isInfinite(col2Comparator.compare(6, 6).dDelta()));
+        assertTrue(col2Comparator.compare(6, 6).dDelta() < 0);
     }
 }

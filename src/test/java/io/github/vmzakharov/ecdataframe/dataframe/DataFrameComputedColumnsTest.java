@@ -10,17 +10,19 @@ import org.eclipse.collections.impl.factory.primitive.DoubleLists;
 import org.eclipse.collections.impl.factory.primitive.FloatLists;
 import org.eclipse.collections.impl.factory.primitive.IntLists;
 import org.eclipse.collections.impl.factory.primitive.LongLists;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.time.LocalDate;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 public class DataFrameComputedColumnsTest
 {
     private DataFrame df;
 
-    @Before
+    @BeforeEach
     public void initializeDataFrame()
     {
         this.df = new DataFrame("this.df1")
@@ -37,12 +39,12 @@ public class DataFrameComputedColumnsTest
     {
         this.df.addLongColumn("Number Two", "2");
 
-        Assert.assertEquals(6, this.df.columnCount());
-        Assert.assertEquals(4, this.df.rowCount());
+        assertEquals(6, this.df.columnCount());
+        assertEquals(4, this.df.rowCount());
 
         for (int i = 0; i < 4; i++)
         {
-            Assert.assertEquals(2, this.df.getLong("Number Two", i));
+            assertEquals(2, this.df.getLong("Number Two", i));
         }
     }
 
@@ -51,14 +53,14 @@ public class DataFrameComputedColumnsTest
     {
         this.df.addLongColumn("Double Count", "Count * 2").addLongColumn("Two More", "Count + 2");
 
-        Assert.assertEquals(7, this.df.columnCount());
-        Assert.assertEquals(4, this.df.rowCount());
+        assertEquals(7, this.df.columnCount());
+        assertEquals(4, this.df.rowCount());
 
-        Assert.assertEquals(LongLists.immutable.of(10L, 20L, 22L, 0L), this.df.getLongColumn("Double Count").toLongList());
-        Assert.assertEquals(7L, this.df.getLongColumn("Two More").getLong(0));
-        Assert.assertEquals(12L, this.df.getLongColumn("Two More").getLong(1));
-        Assert.assertEquals(13L, this.df.getLongColumn("Two More").getLong(2));
-        Assert.assertEquals(2L, this.df.getLongColumn("Two More").getLong(3));
+        assertEquals(LongLists.immutable.of(10L, 20L, 22L, 0L), this.df.getLongColumn("Double Count").toLongList());
+        assertEquals(7L, this.df.getLongColumn("Two More").getLong(0));
+        assertEquals(12L, this.df.getLongColumn("Two More").getLong(1));
+        assertEquals(13L, this.df.getLongColumn("Two More").getLong(2));
+        assertEquals(2L, this.df.getLongColumn("Two More").getLong(3));
     }
 
     @Test
@@ -70,8 +72,8 @@ public class DataFrameComputedColumnsTest
             .addLongColumn("AllTogetherNow", "CountTwice + CountTwiceAndTwo")
             ;
 
-        Assert.assertEquals(LongLists.immutable.of(12L, 22L, 24L, 2L), this.df.getLongColumn("CountTwiceAndTwo").toLongList());
-        Assert.assertEquals(LongLists.immutable.of(22L, 42L, 46L, 2L), this.df.getLongColumn("AllTogetherNow").toLongList());
+        assertEquals(LongLists.immutable.of(12L, 22L, 24L, 2L), this.df.getLongColumn("CountTwiceAndTwo").toLongList());
+        assertEquals(LongLists.immutable.of(22L, 42L, 46L, 2L), this.df.getLongColumn("AllTogetherNow").toLongList());
     }
 
     @Test
@@ -83,7 +85,7 @@ public class DataFrameComputedColumnsTest
 
         this.df.addLongColumn("CountMore", "Count * Three");
 
-        Assert.assertEquals(LongLists.immutable.of(15L, 30L, 33L, 0L), this.df.getLongColumn("CountMore").toLongList());
+        assertEquals(LongLists.immutable.of(15L, 30L, 33L, 0L), this.df.getLongColumn("CountMore").toLongList());
     }
 
     @Test
@@ -91,7 +93,7 @@ public class DataFrameComputedColumnsTest
     {
         this.df.addDoubleColumn("ValuePlus", "Value + 1.01");
 
-        Assert.assertEquals(DoubleLists.immutable.of(24.46, 13.35, 57.79, 8.90), this.df.getDoubleColumn("ValuePlus").toDoubleList());
+        assertEquals(DoubleLists.immutable.of(24.46, 13.35, 57.79, 8.90), this.df.getDoubleColumn("ValuePlus").toDoubleList());
     }
 
     @Test
@@ -101,9 +103,9 @@ public class DataFrameComputedColumnsTest
         this.df.addColumn("NegativePetCount", "-PetCount");
         this.df.addColumn("PetCountPlusDouble", "PetCount + 1.1");
 
-        Assert.assertEquals(LongLists.immutable.of(3L, 2L, 1L, 7L), this.df.getLongColumn("PetCountPlusOne").toLongList());
-        Assert.assertEquals(IntLists.immutable.of(-2, -1, 0, -6), this.df.getIntColumn("NegativePetCount").toIntList());
-        Assert.assertEquals(DoubleLists.immutable.of(3.1, 2.1, 1.1, 7.1), this.df.getDoubleColumn("PetCountPlusDouble").toDoubleList());
+        assertEquals(LongLists.immutable.of(3L, 2L, 1L, 7L), this.df.getLongColumn("PetCountPlusOne").toLongList());
+        assertEquals(IntLists.immutable.of(-2, -1, 0, -6), this.df.getIntColumn("NegativePetCount").toIntList());
+        assertEquals(DoubleLists.immutable.of(3.1, 2.1, 1.1, 7.1), this.df.getDoubleColumn("PetCountPlusDouble").toDoubleList());
     }
 
     @Test
@@ -113,9 +115,9 @@ public class DataFrameComputedColumnsTest
         this.df.addColumn("FloatieAndLong", "Floatie + Count");
         this.df.addColumn("FloatieAndDouble", "Floatie + Value");
 
-        Assert.assertEquals(FloatLists.immutable.of(-1.25f, -2.5f, -4.75f, -1.0f), this.df.getFloatColumn("NegativeFloatie").toFloatList());
-        Assert.assertEquals(DoubleLists.immutable.of(6.25, 12.5, 15.75, 1.0), this.df.getDoubleColumn("FloatieAndLong").toDoubleList());
-        Assert.assertEquals(DoubleLists.immutable.of(24.7, 14.84, 61.53, 8.89), this.df.getDoubleColumn("FloatieAndDouble").toDoubleList());
+        assertEquals(FloatLists.immutable.of(-1.25f, -2.5f, -4.75f, -1.0f), this.df.getFloatColumn("NegativeFloatie").toFloatList());
+        assertEquals(DoubleLists.immutable.of(6.25, 12.5, 15.75, 1.0), this.df.getDoubleColumn("FloatieAndLong").toDoubleList());
+        assertEquals(DoubleLists.immutable.of(24.7, 14.84, 61.53, 8.89), this.df.getDoubleColumn("FloatieAndDouble").toDoubleList());
     }
 
     @Test
@@ -123,7 +125,7 @@ public class DataFrameComputedColumnsTest
     {
         this.df.addStringColumn("Greeting", "\"Dear \" + Name");
 
-        Assert.assertEquals(Lists.immutable.of("Dear Alice", "Dear Bob", "Dear Carol", "Dear Dan"), this.df.getStringColumn("Greeting").toList());
+        assertEquals(Lists.immutable.of("Dear Alice", "Dear Bob", "Dear Carol", "Dear Dan"), this.df.getStringColumn("Greeting").toList());
     }
 
     @Test
@@ -131,7 +133,7 @@ public class DataFrameComputedColumnsTest
     {
         this.df.addStringColumn("Nickname", "substr(Name, 0, 3) + \"ka\"");
 
-        Assert.assertEquals(Lists.immutable.of("Alika", "Bobka", "Carka", "Danka"), this.df.getStringColumn("Nickname").toList());
+        assertEquals(Lists.immutable.of("Alika", "Bobka", "Carka", "Danka"), this.df.getStringColumn("Nickname").toList());
     }
 
     @Test
@@ -155,52 +157,56 @@ public class DataFrameComputedColumnsTest
 
         this.df.addDoubleColumn("Complication", script);
 
-        Assert.assertEquals(DoubleLists.immutable.of(25.45, 24.68, 113.56, 9.89), this.df.getDoubleColumn("Complication").toDoubleList());
+        assertEquals(DoubleLists.immutable.of(25.45, 24.68, 113.56, 9.89), this.df.getDoubleColumn("Complication").toDoubleList());
     }
 
     @Test
     public void usingScriptWithVariables()
     {
         String script =
-                  "a = 7\n"
-                + "if Count > a then\n"
-                + "  Value * 2\n"
-                + "else\n"
-                + "  Value + 2\n"
-                + "endif";
+                """
+                a = 7
+                if Count > a then
+                  Value * 2
+                else
+                  Value + 2
+                endif""";
         this.df.addDoubleColumn("Complication", script);
 
-        Assert.assertEquals(DoubleLists.immutable.of(25.45, 24.68, 113.56, 9.89), this.df.getDoubleColumn("Complication").toDoubleList());
+        assertEquals(DoubleLists.immutable.of(25.45, 24.68, 113.56, 9.89), this.df.getDoubleColumn("Complication").toDoubleList());
     }
 
     @Test
     public void usingScriptWithFunctionDeclaration()
     {
         String script =
-                  "function bigEnough(value)\n"
-                + "{\n"
-                + "   value > 7\n"
-                + "}\n"
-                + "\n"
-                + "if bigEnough(Count) then\n"
-                + "  Value * 2\n"
-                + "else\n"
-                + "  Value + 2\n"
-                + "endif";
+                """
+                function bigEnough(value)
+                {
+                   value > 7
+                }
+
+                if bigEnough(Count) then
+                  Value * 2
+                else
+                  Value + 2
+                endif""";
 
         this.df.addDoubleColumn("Complication", script);
 
-        Assert.assertEquals(DoubleLists.immutable.of(25.45, 24.68, 113.56, 9.89), this.df.getDoubleColumn("Complication").toDoubleList());
+        assertEquals(DoubleLists.immutable.of(25.45, 24.68, 113.56, 9.89), this.df.getDoubleColumn("Complication").toDoubleList());
     }
 
     @Test
     public void usingScriptWithOutsideContext()
     {
         String outerScriptString =
-                "function inTheList(item, list)\n"
-                        + "{\n"
-                        + "  item in list\n"
-                        + "}\n"
+                """
+                function inTheList(item, list)
+                {
+                  item in list
+                }
+                """
                 ;
 
         AnonymousScript outerScript = ExpressionParserHelper.DEFAULT.toScript(outerScriptString);
@@ -220,7 +226,7 @@ public class DataFrameComputedColumnsTest
 
         this.df.addDoubleColumn("Complication", script);
 
-        Assert.assertEquals(DoubleLists.immutable.of(46.9, 24.68, 58.78, 9.89), this.df.getDoubleColumn("Complication").toDoubleList());
+        assertEquals(DoubleLists.immutable.of(46.9, 24.68, 58.78, 9.89), this.df.getDoubleColumn("Complication").toDoubleList());
     }
 
     @Test

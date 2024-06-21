@@ -1,11 +1,12 @@
 package io.github.vmzakharov.ecdataframe.dataframe;
 
 import org.eclipse.collections.impl.factory.Lists;
-import org.junit.Assert;
-import org.junit.Test;
+
+import org.junit.jupiter.api.Test;
 
 import static io.github.vmzakharov.ecdataframe.dataframe.AggregateFunction.*;
 import static io.github.vmzakharov.ecdataframe.dsl.value.ValueType.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class DataFrameAggregationTest
 {
@@ -37,9 +38,9 @@ public class DataFrameAggregationTest
 
         DataFrame summed = df.sum(Lists.immutable.of("Bar", "Qux", "Thud"));
 
-        Assert.assertEquals(0L, summed.getLongColumn("Bar").getLong(0));
-        Assert.assertEquals(0.0, summed.getDoubleColumn("Qux").getDouble(0), TOLERANCE);
-        Assert.assertEquals(0.0, summed.getDoubleColumn("Thud").getDouble(0), TOLERANCE);
+        assertEquals(0L, summed.getLongColumn("Bar").getLong(0));
+        assertEquals(0.0, summed.getDoubleColumn("Qux").getDouble(0), TOLERANCE);
+        assertEquals(0.0, summed.getDoubleColumn("Thud").getDouble(0), TOLERANCE);
     }
 
     @Test
@@ -53,7 +54,7 @@ public class DataFrameAggregationTest
                         Lists.immutable.of("Name")
                 );
 
-        Assert.assertTrue(summed.isEmpty());
+        assertTrue(summed.isEmpty());
     }
 
     @Test
@@ -73,88 +74,135 @@ public class DataFrameAggregationTest
         );
     }
 
-    @Test(expected = RuntimeException.class)
+    @Test
     public void averageEmptyLongThrowsException()
     {
-        new DataFrame("FrameOfData").addStringColumn("Name").addLongColumn("Bar")
-                                    .aggregate(Lists.immutable.of(avg("Bar")));
+        assertThrows(
+                RuntimeException.class,
+                () -> new DataFrame("FrameOfData")
+                        .addStringColumn("Name").addLongColumn("Bar")
+                        .aggregate(Lists.immutable.of(avg("Bar")))
+        );
     }
 
-    @Test(expected = RuntimeException.class)
+    @Test
     public void averageEmptyDoubleThrowsException()
     {
-        new DataFrame("FrameOfData").addStringColumn("Name").addDoubleColumn("Baz").addDoubleColumn("Qux")
-                                    .aggregate(Lists.immutable.of(avg("Baz"), avg("Qux")));
+        assertThrows(
+                RuntimeException.class,
+                () -> new DataFrame("FrameOfData")
+                    .addStringColumn("Name").addDoubleColumn("Baz").addDoubleColumn("Qux")
+                    .aggregate(Lists.immutable.of(avg("Baz"), avg("Qux")))
+        );
     }
 
-    @Test(expected = RuntimeException.class)
+    @Test
     public void averageEmptyIntThrowsException()
     {
-        new DataFrame("FrameOfData").addStringColumn("Name").addIntColumn("Waldo")
-                                    .aggregate(Lists.immutable.of(avg("Waldo")));
+        assertThrows(
+                RuntimeException.class,
+                () -> new DataFrame("FrameOfData")
+                        .addStringColumn("Name").addIntColumn("Waldo")
+                        .aggregate(Lists.immutable.of(avg("Waldo"))));
     }
 
-    @Test(expected = RuntimeException.class)
+    @Test
     public void averageEmptyFloatThrowsException()
     {
-        new DataFrame("FrameOfData").addStringColumn("Name").addFloatColumn("Thud")
-                                    .aggregate(Lists.immutable.of(avg("Thud")));
+        assertThrows(
+                RuntimeException.class,
+                () -> new DataFrame("FrameOfData")
+                        .addStringColumn("Name").addFloatColumn("Thud")
+                        .aggregate(Lists.immutable.of(avg("Thud")))
+        );
     }
 
-    @Test(expected = RuntimeException.class)
+    @Test
     public void maxEmptyLongThrowsException()
     {
-        new DataFrame("FrameOfData").addStringColumn("Name").addLongColumn("Bar")
-                                    .aggregate(Lists.immutable.of(max("Bar")));
+        assertThrows(
+                RuntimeException.class,
+                () -> new DataFrame("FrameOfData")
+                        .addStringColumn("Name").addLongColumn("Bar")
+                        .aggregate(Lists.immutable.of(max("Bar")))
+        );
     }
 
-    @Test(expected = RuntimeException.class)
+    @Test
     public void maxEmptyDoubleThrowsException()
     {
-        new DataFrame("FrameOfData").addStringColumn("Name").addDoubleColumn("Baz").addDoubleColumn("Qux")
-                                    .aggregate(Lists.immutable.of(max("Baz"), max("Qux")));
+        assertThrows(
+                RuntimeException.class,
+                () -> new DataFrame("FrameOfData")
+                        .addStringColumn("Name").addDoubleColumn("Baz").addDoubleColumn("Qux")
+                        .aggregate(Lists.immutable.of(max("Baz"), max("Qux")))
+        );
     }
 
-    @Test(expected = RuntimeException.class)
+    @Test
     public void maxEmptyFloatThrowsException()
     {
-        new DataFrame("FrameOfData").addStringColumn("Name").addFloatColumn("Baz")
-                                    .aggregate(Lists.immutable.of(max("Baz")));
+        assertThrows(
+                RuntimeException.class,
+                () -> new DataFrame("FrameOfData")
+                        .addStringColumn("Name").addFloatColumn("Baz")
+                        .aggregate(Lists.immutable.of(max("Baz")))
+        );
     }
 
-    @Test(expected = RuntimeException.class)
+    @Test
     public void maxEmptyIntThrowsException()
     {
-        new DataFrame("FrameOfData").addStringColumn("Name").addIntColumn("Waldo")
-                                    .aggregate(Lists.immutable.of(max("Waldo")));
+        assertThrows(
+                RuntimeException.class,
+                () -> new DataFrame("FrameOfData")
+                        .addStringColumn("Name").addIntColumn("Waldo")
+                        .aggregate(Lists.immutable.of(max("Waldo")))
+        );
     }
 
-    @Test(expected = RuntimeException.class)
+    @Test
     public void minEmptyLongThrowsException()
     {
-        new DataFrame("FrameOfData").addStringColumn("Name").addLongColumn("Bar")
-                                    .aggregate(Lists.immutable.of(min("Bar")));
+        assertThrows(
+                RuntimeException.class,
+                () -> new DataFrame("FrameOfData")
+                        .addStringColumn("Name").addLongColumn("Bar")
+                        .aggregate(Lists.immutable.of(min("Bar")))
+        );
     }
 
-    @Test(expected = RuntimeException.class)
+    @Test
     public void minEmptyDoubleThrowsException()
     {
-        new DataFrame("FrameOfData").addStringColumn("Name").addDoubleColumn("Baz").addDoubleColumn("Qux")
-                                    .aggregate(Lists.immutable.of(min("Baz"), min("Qux")));
+        assertThrows(
+                RuntimeException.class,
+                () -> new DataFrame("FrameOfData")
+                        .addStringColumn("Name").addDoubleColumn("Baz").addDoubleColumn("Qux")
+                        .aggregate(Lists.immutable.of(min("Baz"), min("Qux")))
+        );
     }
 
-    @Test(expected = RuntimeException.class)
+    @Test
     public void minEmptyIntThrowsException()
     {
-        new DataFrame("FrameOfData").addStringColumn("Name").addIntColumn("Waldo")
-                                    .aggregate(Lists.immutable.of(min("Waldo")));
+        assertThrows(
+                RuntimeException.class,
+                () -> new DataFrame("FrameOfData")
+                        .addStringColumn("Name").addIntColumn("Waldo")
+                        .aggregate(Lists.immutable.of(min("Waldo")))
+        );
     }
 
-    @Test(expected = RuntimeException.class)
+    @Test
     public void minEmptyFloatThrowsException()
     {
-        new DataFrame("FrameOfData").addStringColumn("Name").addFloatColumn("Waldo")
-                                    .aggregate(Lists.immutable.of(min("Waldo")));
+        assertThrows(
+                RuntimeException.class,
+                () -> new DataFrame("FrameOfData")
+                        .addStringColumn("Name").addFloatColumn("Waldo")
+                        .aggregate(Lists.immutable.of(min("Waldo")))
+        );
     }
 
     @Test
@@ -173,7 +221,7 @@ public class DataFrameAggregationTest
         DataFrameUtil.assertEquals(expected, summed);
     }
 
-    @Test(expected = RuntimeException.class)
+    @Test
     public void sumNonNumericTriggersError()
     {
         DataFrame df = new DataFrame("FrameOfData")
@@ -182,9 +230,7 @@ public class DataFrameAggregationTest
                 .addRow("Bob", "Def", 456L, 12.0, 25.0)
                 .addRow("Carol", "Xyz", 789L, 15.0, 40.0);
 
-        DataFrame summed = df.sum(Lists.immutable.of("Foo", "Bar", "Baz"));
-
-        Assert.fail("Shouldn't get to this line");
+        assertThrows(RuntimeException.class, () -> df.sum(Lists.immutable.of("Foo", "Bar", "Baz")));
     }
 
     @Test
@@ -257,7 +303,7 @@ public class DataFrameAggregationTest
     @Test
     public void builtInAggregationFunctionNames()
     {
-        Assert.assertEquals(
+        assertEquals(
             Lists.immutable.of("Avg", "Count", "Max", "Min", "Same", "Sum"),
             Lists.immutable.of(avg("NA"), count("NA"), max("NA"), min("NA"), same("NA"), sum("NA"))
                     .collect(AggregateFunction::getName)
@@ -267,22 +313,22 @@ public class DataFrameAggregationTest
     @Test
     public void builtInAggregationSupportedTypes()
     {
-        Assert.assertEquals(
+        assertEquals(
                 Lists.immutable.of(INT, LONG, DOUBLE, FLOAT, DECIMAL),
                 avg("NA").supportedSourceTypes());
-        Assert.assertEquals(
+        assertEquals(
                 Lists.immutable.of(INT, LONG, DOUBLE, FLOAT, STRING, DATE, DATE_TIME, DECIMAL),
                 count("NA").supportedSourceTypes());
-        Assert.assertEquals(
+        assertEquals(
                 Lists.immutable.of(INT, LONG, DOUBLE, FLOAT, DECIMAL),
                 max("NA").supportedSourceTypes());
-        Assert.assertEquals(
+        assertEquals(
                 Lists.immutable.of(INT, LONG, DOUBLE, FLOAT, DECIMAL),
                 min("NA").supportedSourceTypes());
-        Assert.assertEquals(
+        assertEquals(
                 Lists.immutable.of(INT, LONG, DOUBLE, FLOAT, STRING, DATE, DATE_TIME, DECIMAL),
                 same("NA").supportedSourceTypes());
-        Assert.assertEquals(
+        assertEquals(
                 Lists.immutable.of(INT, LONG, DOUBLE, FLOAT, DECIMAL),
                 sum("NA").supportedSourceTypes());
     }

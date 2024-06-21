@@ -1,7 +1,7 @@
 package io.github.vmzakharov.ecdataframe.dataframe;
 
 import org.eclipse.collections.impl.factory.Lists;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import static io.github.vmzakharov.ecdataframe.dataframe.AggregateFunction.avg;
 import static io.github.vmzakharov.ecdataframe.dataframe.AggregateFunction.count;

@@ -1,8 +1,9 @@
 package io.github.vmzakharov.ecdataframe.dataframe;
 
 import org.eclipse.collections.impl.factory.Lists;
-import org.junit.Before;
-import org.junit.Test;
+
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import static io.github.vmzakharov.ecdataframe.dataframe.AggregateFunction.avg;
 import static io.github.vmzakharov.ecdataframe.dataframe.AggregateFunction.count;
@@ -12,7 +13,7 @@ public class DataFramePivotTest
 {
     private DataFrame donutSales;
     
-    @Before
+    @BeforeEach
     public void initializeDonutSales()
     {
         this.donutSales = new DataFrame("Donut Shop Purchases")

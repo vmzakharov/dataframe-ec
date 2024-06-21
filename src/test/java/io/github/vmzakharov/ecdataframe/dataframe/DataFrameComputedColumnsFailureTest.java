@@ -2,22 +2,24 @@ package io.github.vmzakharov.ecdataframe.dataframe;
 
 import io.github.vmzakharov.ecdataframe.util.ConfigureMessages;
 import io.github.vmzakharov.ecdataframe.util.FormatWithPlaceholders;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
+
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 public class DataFrameComputedColumnsFailureTest
 {
     private DataFrame df;
 
-    @BeforeClass
+    @BeforeAll
     static public void initializeMessages()
     {
         ConfigureMessages.initialize();
     }
 
-    @Before
+    @BeforeEach
     public void initializeDataFrame()
     {
         this.df = new DataFrame("df1")
@@ -35,90 +37,64 @@ public class DataFrameComputedColumnsFailureTest
     @Test
     public void incompatibleTypesInExpression()
     {
-        try
-        {
-            this.df.addColumn("Wat", "Name + Count");
-            Assert.fail("Should have thrown an exception");
-        }
-        catch (RuntimeException e)
-        {
-            Assert.assertEquals(
-                    FormatWithPlaceholders.messageFromKey("DF_CALC_COL_INFER_TYPE")
-                            .with("dataFrameName", "df1")
-                            .with("columnName", "Wat")
-                            .with("expression", "Name + Count")
-                            .with("errorList", FormatWithPlaceholders.messageFromKey("TYPE_INFER_TYPES_IN_EXPRESSION") + ": (Name + Count)")
-                            .toString()
-                    ,
-                    e.getMessage());
-        }
+        Exception e = assertThrows(RuntimeException.class, () -> this.df.addColumn("Wat", "Name + Count"));
+
+        assertEquals(
+            FormatWithPlaceholders.messageFromKey("DF_CALC_COL_INFER_TYPE")
+                    .with("dataFrameName", "df1")
+                    .with("columnName", "Wat")
+                    .with("expression", "Name + Count")
+                    .with("errorList", FormatWithPlaceholders.messageFromKey("TYPE_INFER_TYPES_IN_EXPRESSION") + ": (Name + Count)")
+                    .toString()
+            ,
+            e.getMessage());
     }
 
     @Test
     public void typeConflictExpressionVsColumn1()
     {
-        try
-        {
-            this.df.addFloatColumn("Wat", "Name + 'abc'");
-            Assert.fail("Should have thrown an exception");
-        }
-        catch (Exception e)
-        {
-            Assert.assertEquals(
-                    FormatWithPlaceholders.messageFromKey("DF_CALC_COL_TYPE_MISMATCH")
-                                          .with("dataFrameName", "df1")
-                                          .with("columnName", "Wat")
-                                          .with("expression", "Name + 'abc'")
-                                          .with("inferredType", "STRING")
-                                          .with("specifiedType", "FLOAT")
-                                          .toString()
-                    ,
-                    e.getMessage());
-        }
+        Exception e = assertThrows(RuntimeException.class, () -> this.df.addFloatColumn("Wat", "Name + 'abc'"));
+        assertEquals(
+                FormatWithPlaceholders.messageFromKey("DF_CALC_COL_TYPE_MISMATCH")
+                                      .with("dataFrameName", "df1")
+                                      .with("columnName", "Wat")
+                                      .with("expression", "Name + 'abc'")
+                                      .with("inferredType", "STRING")
+                                      .with("specifiedType", "FLOAT")
+                                      .toString()
+                ,
+                e.getMessage());
     }
 
     @Test
     public void typeConflictExpressionVsColumn2()
     {
-        try
-        {
-            this.df.addFloatColumn("Wat", "Floatie + 1.23");
-            Assert.fail("Should have thrown an exception");
-        }
-        catch (Exception e)
-        {
-            Assert.assertEquals(
-                    FormatWithPlaceholders.messageFromKey("DF_CALC_COL_TYPE_MISMATCH")
-                                          .with("dataFrameName", "df1")
-                                          .with("columnName", "Wat")
-                                          .with("expression", "Floatie + 1.23")
-                                          .with("inferredType", "DOUBLE")
-                                          .with("specifiedType", "FLOAT")
-                                          .toString()
-                    ,
-                    e.getMessage());
-        }
+        Exception e = assertThrows(RuntimeException.class, () -> this.df.addFloatColumn("Wat", "Floatie + 1.23"));
+
+        assertEquals(
+                FormatWithPlaceholders.messageFromKey("DF_CALC_COL_TYPE_MISMATCH")
+                                      .with("dataFrameName", "df1")
+                                      .with("columnName", "Wat")
+                                      .with("expression", "Floatie + 1.23")
+                                      .with("inferredType", "DOUBLE")
+                                      .with("specifiedType", "FLOAT")
+                                      .toString()
+                ,
+                e.getMessage());
     }
 
     @Test
     public void undefinedReference()
     {
-        try
-        {
-            this.df.addLongColumn("Wat", "Count + Chocola");
-            Assert.fail("Should have thrown an exception");
-        }
-        catch (Exception e)
-        {
-            Assert.assertEquals(
-                    FormatWithPlaceholders.messageFromKey("DF_CALC_COL_INFER_TYPE")
-                                          .with("dataFrameName", "df1")
-                                          .with("columnName", "Wat")
-                                          .with("expression", "Count + Chocola")
-                                          .with("errorList", FormatWithPlaceholders.messageFromKey("TYPE_INFER_UNDEFINED_VARIABLE") + ": Chocola")
-                                          .toString()
-                    ,
-                    e.getMessage());
-        }
+        Exception e = assertThrows(RuntimeException.class, () -> this.df.addLongColumn("Wat", "Count + Chocola"));
+        assertEquals(
+                FormatWithPlaceholders.messageFromKey("DF_CALC_COL_INFER_TYPE")
+                                      .with("dataFrameName", "df1")
+                                      .with("columnName", "Wat")
+                                      .with("expression", "Count + Chocola")
+                                      .with("errorList", FormatWithPlaceholders.messageFromKey("TYPE_INFER_UNDEFINED_VARIABLE") + ": Chocola")
+                                      .toString()
+                ,
+                e.getMessage());
     }
 }
