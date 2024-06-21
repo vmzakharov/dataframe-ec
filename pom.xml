@@ -38,7 +38,6 @@
         <checkstyle.version>8.41</checkstyle.version>
         <checkstyle.plugin.version>3.1.2</checkstyle.plugin.version>
         <pitest.version>1.14.3</pitest.version>
-        <junit.version>4.13.2</junit.version>
     </properties>
 
     <dependencies>
@@ -56,12 +55,6 @@
             <groupId>org.eclipse.collections</groupId>
             <artifactId>eclipse-collections</artifactId>
             <version>${eclipseCollections.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <version>${junit.version}</version>
-            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>com.google.jimfs</groupId>
