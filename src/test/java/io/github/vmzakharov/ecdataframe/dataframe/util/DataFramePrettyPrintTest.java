@@ -1,15 +1,17 @@
 package io.github.vmzakharov.ecdataframe.dataframe.util;
 
 import io.github.vmzakharov.ecdataframe.dataframe.DataFrame;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 public class DataFramePrettyPrintTest
 {
     private DataFrame df;
 
-    @Before
+    @BeforeEach
     public void setupDataFrame()
     {
         this.df = new DataFrame("frame")
@@ -25,26 +27,30 @@ public class DataFramePrettyPrintTest
     public void simple()
     {
         String expected =
-                  "|Foo    |    Bar|Baz      |    Waldo|\n"
-                + "|\"Alice\"|   1000|\"abc\"    |  12.3456|\n"
-                + "|\"Bob\"  |     20|\"def hij\"| 112.3400|\n"
-                + "|\"Carl\" |      3|\"xyz\"    |1234.3457|\n"
-                + "|\"Doris\"|4000000|\"klm\"    |   1.3000|\n";
+                """
+                |Foo    |    Bar|Baz      |    Waldo|
+                |"Alice"|   1000|"abc"    |  12.3456|
+                |"Bob"  |     20|"def hij"| 112.3400|
+                |"Carl" |      3|"xyz"    |1234.3457|
+                |"Doris"|4000000|"klm"    |   1.3000|
+                """;
 
-        Assert.assertEquals(expected, new DataFramePrettyPrint().prettyPrint(this.df));
+        assertEquals(expected, new DataFramePrettyPrint().prettyPrint(this.df));
     }
 
     @Test
     public void overrideFormats()
     {
         String expected =
-                   "|Foo  |      Bar|Baz    |      Waldo|\n"
-                 + "|Alice|    1,000|abc    |   12.34560|\n"
-                 + "|Bob  |       20|def hij|  112.34000|\n"
-                 + "|Carl |        3|xyz    |1,234.34568|\n"
-                 + "|Doris|4,000,000|klm    |    1.30000|\n";
+                """
+                |Foo  |      Bar|Baz    |      Waldo|
+                |Alice|    1,000|abc    |   12.34560|
+                |Bob  |       20|def hij|  112.34000|
+                |Carl |        3|xyz    |1,234.34568|
+                |Doris|4,000,000|klm    |    1.30000|
+                """;
 
-        Assert.assertEquals(expected,
+        assertEquals(expected,
                 new DataFramePrettyPrint()
                     .doubleFormat("%,.5f")
                     .longFormat("%,d")
@@ -56,24 +62,26 @@ public class DataFramePrettyPrintTest
     public void horizontalSeparators()
     {
         String expected =
-                  "+-----+-------+-------+---------+\n"
-                + "|Foo  |    Bar|Baz    |    Waldo|\n"
-                + "+-----+-------+-------+---------+\n"
-                + "|Alice|   1000|abc    |  12.3456|\n"
-                + "+-----+-------+-------+---------+\n"
-                + "|Bob  |     20|def hij| 112.3400|\n"
-                + "+-----+-------+-------+---------+\n"
-                + "|Carl |      3|xyz    |1234.3457|\n"
-                + "+-----+-------+-------+---------+\n"
-                + "|Doris|4000000|klm    |   1.3000|\n"
-                + "+-----+-------+-------+---------+\n";
+                """
+                +-----+-------+-------+---------+
+                |Foo  |    Bar|Baz    |    Waldo|
+                +-----+-------+-------+---------+
+                |Alice|   1000|abc    |  12.3456|
+                +-----+-------+-------+---------+
+                |Bob  |     20|def hij| 112.3400|
+                +-----+-------+-------+---------+
+                |Carl |      3|xyz    |1234.3457|
+                +-----+-------+-------+---------+
+                |Doris|4000000|klm    |   1.3000|
+                +-----+-------+-------+---------+
+                """;
 
         String formatted = new DataFramePrettyPrint()
                 .quoteStrings(false)
                 .horizontalSeparators(true)
                 .prettyPrint(this.df);
 
-        Assert.assertEquals(expected, formatted);
+        assertEquals(expected, formatted);
     }
 
     @Test
@@ -90,13 +98,15 @@ public class DataFramePrettyPrintTest
         String result = new DataFramePrettyPrint().prettyPrint(dfWithLongStrings);
 
         String expected =
-                  "|Foo                   |This is a very lo...|Baz                   |    Waldo|\n"
-                + "|\"Alice\"               |                1000|\"abc\"                 |  12.3456|\n"
-                + "|\"A very long strin...\"|                  20|\"def hij\"             | 112.3400|\n"
-                + "|\"Carl\"                |                   3|\"xyz\"                 |1234.3457|\n"
-                + "|\"Doris\"               |             4000000|\"This is another l...\"|   1.3000|\n";
+                """
+                |Foo                   |This is a very lo...|Baz                   |    Waldo|
+                |"Alice"               |                1000|"abc"                 |  12.3456|
+                |"A very long strin..."|                  20|"def hij"             | 112.3400|
+                |"Carl"                |                   3|"xyz"                 |1234.3457|
+                |"Doris"               |             4000000|"This is another l..."|   1.3000|
+                """;
 
-        Assert.assertEquals(expected, result);
+        assertEquals(expected, result);
     }
 
     @Test
@@ -109,18 +119,20 @@ public class DataFramePrettyPrintTest
                 .prettyPrint(this.df);
 
         String expected =
-                   "+-----+-------+-------+-------+\n"
-                 + "|Foo  |    Bar|Baz    |  Waldo|\n"
-                 + "+-----+-------+-------+-------+\n"
-                 + "|Alice|   1000|abc    |12.3456|\n"
-                 + "+-----+-------+-------+-------+\n"
-                 + "|Bob  |     20|def hij|112....|\n"
-                 + "+-----+-------+-------+-------+\n"
-                 + "|Carl |      3|xyz    |1234...|\n"
-                 + "+-----+-------+-------+-------+\n"
-                 + "|Doris|4000000|klm    | 1.3000|\n"
-                 + "+-----+-------+-------+-------+\n";
+                """
+                +-----+-------+-------+-------+
+                |Foo  |    Bar|Baz    |  Waldo|
+                +-----+-------+-------+-------+
+                |Alice|   1000|abc    |12.3456|
+                +-----+-------+-------+-------+
+                |Bob  |     20|def hij|112....|
+                +-----+-------+-------+-------+
+                |Carl |      3|xyz    |1234...|
+                +-----+-------+-------+-------+
+                |Doris|4000000|klm    | 1.3000|
+                +-----+-------+-------+-------+
+                """;
 
-        Assert.assertEquals(expected, result);
+        assertEquals(expected, result);
     }
 }

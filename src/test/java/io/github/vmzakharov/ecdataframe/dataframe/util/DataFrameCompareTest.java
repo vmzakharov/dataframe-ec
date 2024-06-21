@@ -4,9 +4,9 @@ import io.github.vmzakharov.ecdataframe.dataframe.DataFrame;
 import io.github.vmzakharov.ecdataframe.dsl.value.ValueType;
 import org.eclipse.collections.api.list.ImmutableList;
 import org.eclipse.collections.impl.factory.Lists;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;
 
@@ -15,12 +15,13 @@ import static io.github.vmzakharov.ecdataframe.dsl.value.ValueType.DOUBLE;
 import static io.github.vmzakharov.ecdataframe.dsl.value.ValueType.LONG;
 import static io.github.vmzakharov.ecdataframe.dsl.value.ValueType.STRING;
 import static io.github.vmzakharov.ecdataframe.util.FormatWithPlaceholders.messageFromKey;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class DataFrameCompareTest
 {
     private DataFrameCompare comparer;
 
-    @Before
+    @BeforeEach
     public void setUpComparer()
     {
         this.comparer = new DataFrameCompare();
@@ -43,9 +44,9 @@ public class DataFrameCompareTest
                 .addRow("Carl", 12, 103.03, BigDecimal.valueOf(127, 2))
                 ;
 
-        Assert.assertTrue(this.comparer.equal(df1, df2));
-        Assert.assertTrue(this.comparer.equal(df2, df1));
-        Assert.assertTrue(this.comparer.equal(df1, df1));
+        assertTrue(this.comparer.equal(df1, df2));
+        assertTrue(this.comparer.equal(df2, df1));
+        assertTrue(this.comparer.equal(df1, df1));
     }
 
     @Test
@@ -65,9 +66,9 @@ public class DataFrameCompareTest
                 .addRow("Carl",  12, 103.03000001)
                 ;
 
-        Assert.assertTrue(this.comparer.equal(df1, df2, 0.00001));
-        Assert.assertTrue(this.comparer.equal(df2, df1, 0.00001));
-        Assert.assertTrue(this.comparer.equal(df1, df1, 0.00001));
+        assertTrue(this.comparer.equal(df1, df2, 0.00001));
+        assertTrue(this.comparer.equal(df2, df1, 0.00001));
+        assertTrue(this.comparer.equal(df1, df1, 0.00001));
     }
 
     @Test
@@ -87,16 +88,16 @@ public class DataFrameCompareTest
                 .addRow("Carl",  12, 103.03000001)
                 ;
 
-        Assert.assertFalse(this.comparer.equal(df1, df2, 0.00001));
-        Assert.assertEquals(
+        assertFalse(this.comparer.equal(df1, df2, 0.00001));
+        assertEquals(
                 messageFromKey("DF_EQ_CELL_VALUE_MISMATCH")
                         .with("rowIndex", 1).with("columnIndex", 2).with("lhValue", 102.0201).with("rhValue", 102.02)
                         .toString(),
                 this.comparer.reason()
         );
 
-        Assert.assertFalse(this.comparer.equal(df2, df1, 0.00001));
-        Assert.assertEquals(
+        assertFalse(this.comparer.equal(df2, df1, 0.00001));
+        assertEquals(
                 messageFromKey("DF_EQ_CELL_VALUE_MISMATCH")
                         .with("rowIndex", 1).with("columnIndex", 2).with("lhValue", 102.02).with("rhValue", 102.0201)
                         .toString(),
@@ -121,15 +122,15 @@ public class DataFrameCompareTest
                 .addRow("Carl", 12, 103.03, BigDecimal.valueOf(127, 2))
                 ;
 
-        Assert.assertFalse(this.comparer.equal(df1, df2));
-        Assert.assertEquals(
+        assertFalse(this.comparer.equal(df1, df2));
+        assertEquals(
                 messageFromKey("DF_EQ_CELL_VALUE_MISMATCH")
                         .with("rowIndex", 1).with("columnIndex", 2).with("lhValue", 102.02).with("rhValue", 555.55)
                         .toString(),
                 this.comparer.reason()
         );
 
-        Assert.assertFalse(this.comparer.equal(df2, df1));
+        assertFalse(this.comparer.equal(df2, df1));
     }
 
     @Test
@@ -152,16 +153,16 @@ public class DataFrameCompareTest
         ImmutableList<String> df1Headers = Lists.immutable.of("Foo", "Bar", "Waldo", "Qux");
         ImmutableList<String> df2Headers = Lists.immutable.of("Foo", "Bar", "Baz", "Qux");
 
-        Assert.assertFalse(this.comparer.equal(df1, df2));
-        Assert.assertEquals(
+        assertFalse(this.comparer.equal(df1, df2));
+        assertEquals(
             messageFromKey("DF_EQ_COL_HEADER_MISMATCH")
                 .with("lhColumnHeaders", df1Headers.toString()).with("rhColumnHeaders", df2Headers.toString())
                 .toString(),
             this.comparer.reason()
         );
 
-        Assert.assertFalse(this.comparer.equal(df2, df1));
-        Assert.assertEquals(
+        assertFalse(this.comparer.equal(df2, df1));
+        assertEquals(
             messageFromKey("DF_EQ_COL_HEADER_MISMATCH")
                 .with("lhColumnHeaders", df2Headers.toString()).with("rhColumnHeaders", df1Headers.toString())
                 .toString(),
@@ -189,15 +190,15 @@ public class DataFrameCompareTest
         ImmutableList<ValueType> df1Types = Lists.immutable.of(STRING, LONG, DOUBLE, DECIMAL);
         ImmutableList<ValueType> df2Types = Lists.immutable.of(STRING, LONG, STRING, DECIMAL);
 
-        Assert.assertFalse(this.comparer.equal(df1, df2));
-        Assert.assertEquals(
+        assertFalse(this.comparer.equal(df1, df2));
+        assertEquals(
                 messageFromKey("DF_EQ_COL_TYPE_MISMATCH")
                         .with("lhColumnTypes", df1Types.toString()).with("rhColumnTypes", df2Types.toString())
                         .toString(),
                 this.comparer.reason()
         );
 
-        Assert.assertFalse(this.comparer.equal(df2, df1));
+        assertFalse(this.comparer.equal(df2, df1));
     }
 
     @Test
@@ -216,8 +217,8 @@ public class DataFrameCompareTest
                 .addRow("Carl", 12, 103.03)
                 ;
 
-        Assert.assertFalse(this.comparer.equal(df1, df2));
-        Assert.assertEquals(
+        assertFalse(this.comparer.equal(df1, df2));
+        assertEquals(
                 messageFromKey("DF_EQ_DIM_MISMATCH")
                         .with("lhRowCount", 3).with("lhColumnCount", 4)
                         .with("rhRowCount", 2).with("rhColumnCount", 3)
@@ -225,7 +226,7 @@ public class DataFrameCompareTest
                 this.comparer.reason()
         );
 
-        Assert.assertFalse(this.comparer.equal(df2, df1));
+        assertFalse(this.comparer.equal(df2, df1));
     }
 
     @Test
@@ -245,8 +246,8 @@ public class DataFrameCompareTest
                 .addRow("Carl", 12, 103.03, BigDecimal.valueOf(127, 2))
                 ;
 
-        Assert.assertFalse(this.comparer.equal(df1, df2));
-        Assert.assertEquals(
+        assertFalse(this.comparer.equal(df1, df2));
+        assertEquals(
                 messageFromKey("DF_EQ_CELL_VALUE_MISMATCH")
                         .with("rowIndex", 2).with("columnIndex", 3)
                         .with("lhValue", BigDecimal.valueOf(555, 5).toString()).with("rhValue", BigDecimal.valueOf(127, 2).toString())
@@ -254,7 +255,7 @@ public class DataFrameCompareTest
                 this.comparer.reason()
         );
 
-        Assert.assertFalse(this.comparer.equal(df2, df1));
+        assertFalse(this.comparer.equal(df2, df1));
     }
 
     @Test
@@ -274,15 +275,15 @@ public class DataFrameCompareTest
                 .addRow("Carl", 12, 103.03, BigDecimal.valueOf(127, 2))
                 ;
 
-        Assert.assertFalse(this.comparer.equal(df1, df2));
-        Assert.assertEquals(
+        assertFalse(this.comparer.equal(df1, df2));
+        assertEquals(
             messageFromKey("DF_EQ_CELL_VALUE_MISMATCH")
                     .with("rowIndex", 1).with("columnIndex", 0).with("lhValue", "Bob").with("rhValue", null)
                     .toString(),
             this.comparer.reason()
         );
 
-        Assert.assertFalse(this.comparer.equal(df2, df1));
+        assertFalse(this.comparer.equal(df2, df1));
     }
 
     @Test
@@ -302,8 +303,8 @@ public class DataFrameCompareTest
                 .addRow("Carl", 12, 103.03, BigDecimal.valueOf(127, 2))
                 ;
 
-        Assert.assertFalse(this.comparer.equal(df1, df2));
-        Assert.assertEquals(
+        assertFalse(this.comparer.equal(df1, df2));
+        assertEquals(
             messageFromKey("DF_EQ_CELL_VALUE_MISMATCH")
                 .with("rowIndex", 0).with("columnIndex", 3)
                 .with("lhValue", BigDecimal.valueOf(123, 2).toString()).with("rhValue", null)
@@ -311,8 +312,8 @@ public class DataFrameCompareTest
             this.comparer.reason()
         );
 
-        Assert.assertFalse(this.comparer.equal(df2, df1));
-        Assert.assertEquals(
+        assertFalse(this.comparer.equal(df2, df1));
+        assertEquals(
                 messageFromKey("DF_EQ_CELL_VALUE_MISMATCH")
                         .with("rowIndex", 0).with("columnIndex", 3)
                         .with("lhValue", null).with("rhValue", BigDecimal.valueOf(123, 2).toString())
@@ -338,13 +339,13 @@ public class DataFrameCompareTest
                 .addRow("Alice", 10, 101.01, BigDecimal.valueOf(123, 2))
                 ;
 
-        Assert.assertFalse(this.comparer.equal(df1, df2));
-        Assert.assertFalse(this.comparer.equal(df2, df1));
+        assertFalse(this.comparer.equal(df1, df2));
+        assertFalse(this.comparer.equal(df2, df1));
 
-        Assert.assertTrue(this.comparer.equalIgnoreRowOrder(df1, df2));
-        Assert.assertTrue(this.comparer.equalIgnoreRowOrder(df2, df1));
+        assertTrue(this.comparer.equalIgnoreRowOrder(df1, df2));
+        assertTrue(this.comparer.equalIgnoreRowOrder(df2, df1));
 
-        Assert.assertTrue(this.comparer.equalIgnoreRowOrder(df1, df1));
+        assertTrue(this.comparer.equalIgnoreRowOrder(df1, df1));
     }
 
     @Test
@@ -364,15 +365,15 @@ public class DataFrameCompareTest
                 .addRow(BigDecimal.valueOf(123, 2), "Alice", 101.01, 10)
                 ;
 
-        Assert.assertFalse(this.comparer.equal(df1, df2));
-        Assert.assertFalse(this.comparer.equal(df2, df1));
+        assertFalse(this.comparer.equal(df1, df2));
+        assertFalse(this.comparer.equal(df2, df1));
 
-        Assert.assertFalse(this.comparer.equalIgnoreRowOrder(df1, df2));
-        Assert.assertFalse(this.comparer.equalIgnoreRowOrder(df2, df1));
+        assertFalse(this.comparer.equalIgnoreRowOrder(df1, df2));
+        assertFalse(this.comparer.equalIgnoreRowOrder(df2, df1));
 
-        Assert.assertTrue(this.comparer.equalIgnoreRowAndColumnOrder(df1, df2));
-        Assert.assertTrue(this.comparer.equalIgnoreRowAndColumnOrder(df2, df1));
-        Assert.assertTrue(this.comparer.equalIgnoreRowAndColumnOrder(df1, df1));
+        assertTrue(this.comparer.equalIgnoreRowAndColumnOrder(df1, df2));
+        assertTrue(this.comparer.equalIgnoreRowAndColumnOrder(df2, df1));
+        assertTrue(this.comparer.equalIgnoreRowAndColumnOrder(df1, df1));
     }
 
     @Test
@@ -392,11 +393,11 @@ public class DataFrameCompareTest
                 .addRow(BigDecimal.valueOf(123, 2), "Alice", 101.01,    10)
                 ;
 
-        Assert.assertFalse(this.comparer.equalIgnoreRowAndColumnOrder(df1, df2));
+        assertFalse(this.comparer.equalIgnoreRowAndColumnOrder(df1, df2));
 
-        Assert.assertFalse(this.comparer.equalIgnoreRowAndColumnOrder(df1, df2, 0.000001));
+        assertFalse(this.comparer.equalIgnoreRowAndColumnOrder(df1, df2, 0.000001));
 
-        Assert.assertTrue(this.comparer.equalIgnoreRowAndColumnOrder(df1, df2, 0.001));
-        Assert.assertTrue(this.comparer.equalIgnoreRowAndColumnOrder(df2, df1, 0.001));
+        assertTrue(this.comparer.equalIgnoreRowAndColumnOrder(df1, df2, 0.001));
+        assertTrue(this.comparer.equalIgnoreRowAndColumnOrder(df2, df1, 0.001));
     }
 }
