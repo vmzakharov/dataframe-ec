@@ -4,14 +4,15 @@ import io.github.vmzakharov.ecdataframe.dataframe.DataFrame;
 import io.github.vmzakharov.ecdataframe.dataframe.DataFrameUtil;
 import io.github.vmzakharov.ecdataframe.dsl.value.ValueType;
 import org.eclipse.collections.api.map.MutableMap;
-import org.junit.Assert;
-import org.junit.Test;
+
+import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 import static io.github.vmzakharov.ecdataframe.dsl.value.ValueType.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class DataFrameLoadTest
 {
@@ -19,12 +20,13 @@ public class DataFrameLoadTest
     public void loadData()
     {
         CsvDataSet dataSet = new StringBasedCsvDataSet("Foo", "Employees",
-                "Name,EmployeeId,HireDate,Dept,Salary\n"
-                        + "\"Alice\",1234,2020-01-01,\"Accounting\",110000.00\n"
-                        + "\"Bob\",1233,2010-01-01,\"Bee-bee-boo-boo\",100000.00\n"
-                        + "\"Carl\",10000,2005-11-21,\"Controllers\",130000.00\n"
-                        + "\"Diane\",10001,2012-09-20,\"\",130000.00\n"
-                        + "\"Ed\",10002,,,0.00"
+                """
+                Name,EmployeeId,HireDate,Dept,Salary
+                "Alice",1234,2020-01-01,"Accounting",110000.00
+                "Bob",1233,2010-01-01,"Bee-bee-boo-boo",100000.00
+                "Carl",10000,2005-11-21,"Controllers",130000.00
+                "Diane",10001,2012-09-20,"",130000.00
+                "Ed",10002,,,0.00"""
         );
 
         DataFrame loaded = dataSet.loadAsDataFrame();
@@ -44,12 +46,13 @@ public class DataFrameLoadTest
     public void dateParsingFormat1()
     {
         CsvDataSet dataSet = new StringBasedCsvDataSet("Foo", "Dates",
-                "Name,Date\n"
-                        + "\"Alice\",2020-01-01\n"
-                        + "\"Bob\",  2010-1-01\n"
-                        + "\"Carl\", 2005-11-21\n"
-                        + "\"Diane\",2012-09-2\n"
-                        + "\"Ed\","
+                """
+                Name,Date
+                "Alice",2020-01-01
+                "Bob",  2010-1-01
+                "Carl", 2005-11-21
+                "Diane",2012-09-2
+                "Ed","""
         );
 
         DataFrame loaded = dataSet.loadAsDataFrame();
@@ -69,12 +72,13 @@ public class DataFrameLoadTest
     public void dateParsingFormat2()
     {
         CsvDataSet dataSet = new StringBasedCsvDataSet("Foo", "Dates",
-                "Name,Date\n"
-                        + "\"Alice\",2020/01/01\n"
-                        + "\"Bob\",  2010/1/01\n"
-                        + "\"Carl\", 2005/11/21\n"
-                        + "\"Diane\",2012/09/2\n"
-                        + "\"Ed\","
+                """
+                Name,Date
+                "Alice",2020/01/01
+                "Bob",  2010/1/01
+                "Carl", 2005/11/21
+                "Diane",2012/09/2
+                "Ed","""
         );
 
         DataFrame loaded = dataSet.loadAsDataFrame();
@@ -94,12 +98,13 @@ public class DataFrameLoadTest
     public void dateParsingFormat3()
     {
         CsvDataSet dataSet = new StringBasedCsvDataSet("Foo", "Dates",
-                  "Name,Date\n"
-                + "\"Alice\",01/01/2020\n"
-                + "\"Bob\",  1/01/2010\n"
-                + "\"Carl\", 11/21/2005\n"
-                + "\"Diane\",09/2/2012\n"
-                + "\"Ed\","
+                """
+                Name,Date
+                "Alice",01/01/2020
+                "Bob",  1/01/2010
+                "Carl", 11/21/2005
+                "Diane",09/2/2012
+                "Ed","""
         );
 
         DataFrame loaded = dataSet.loadAsDataFrame();
@@ -119,11 +124,13 @@ public class DataFrameLoadTest
     public void dateTimeDefaultParsing()
     {
         CsvDataSet dataSet = new StringBasedCsvDataSet("Foo", "Dates And Also Times",
-                "Name,DateTime\n"
-                + "\"Alice\",2020-9-22T13:14:15\n"
-                + "\"Bob\",2021-10-23T13:14:16\n"
-                + "\"Carl\",\n"
-                + "\"Diane\",2023-12-24T13:14:15\n"
+                """
+                Name,DateTime
+                "Alice",2020-9-22T13:14:15
+                "Bob",2021-10-23T13:14:16
+                "Carl",
+                "Diane",2023-12-24T13:14:15
+                """
         );
 
         DataFrame loaded = dataSet.loadAsDataFrame();
@@ -147,11 +154,13 @@ public class DataFrameLoadTest
         schema.addColumn("DateTime", DATE_TIME, "uuuu*M*d-HH*mm*ss");
 
         CsvDataSet dataSet = new StringBasedCsvDataSet("Foo", "Dates And Also Times", schema,
-                "Name,DateTime\n"
-                + "\"Alice\",2020*9*22-13*14*15\n"
-                + "\"Bob\",  2021*10*23-13*14*16\n"
-                + "\"Carl\", \n"
-                + "\"Diane\",2023*12*24-13*15*15\n"
+                """
+                Name,DateTime
+                "Alice",2020*9*22-13*14*15
+                "Bob",  2021*10*23-13*14*16
+                "Carl",\s
+                "Diane",2023*12*24-13*15*15
+                """
         );
 
         DataFrame loaded = dataSet.loadAsDataFrame();
@@ -180,12 +189,13 @@ public class DataFrameLoadTest
                 .addColumn("LunchAllowance", FLOAT);
 
         CsvDataSet dataSet = new StringBasedCsvDataSet("Foo", "Employees", schema,
-                "Name,EmployeeId,HireDate,Dept,Salary,PetCount,LunchAllowance\n"
-                        + "\"Alice\",1234,2020-01-01,\"Accounting\",110000.00,2,15.25\n"
-                        + "\"Bob\",1233,2010-01-01,\"Bee-bee-boo-boo\",100000.00,0,12.50\n"
-                        + "\"Carl\",10000,2005-11-21,\"Controllers\",130000.00,1,15.75\n"
-                        + "\"Diane\",10001,2012-09-20,\"\",130000.00,8,10.50\n"
-                        + "\"Ed\",10002,,,0.00,,"
+                """
+                Name,EmployeeId,HireDate,Dept,Salary,PetCount,LunchAllowance
+                "Alice",1234,2020-01-01,"Accounting",110000.00,2,15.25
+                "Bob",1233,2010-01-01,"Bee-bee-boo-boo",100000.00,0,12.50
+                "Carl",10000,2005-11-21,"Controllers",130000.00,1,15.75
+                "Diane",10001,2012-09-20,"",130000.00,8,10.50
+                "Ed",10002,,,0.00,,"""
         );
 
         DataFrame loaded = dataSet.loadAsDataFrame();
@@ -214,12 +224,13 @@ public class DataFrameLoadTest
         schema.addColumn("Salary", DOUBLE);
 
         CsvDataSet dataSet = new StringBasedCsvDataSet("Foo", "Employees", schema,
-                "Name,EmployeeId,HireDate,Dept,Salary\n"
-                        + "\"Alice\",1234,2020-01-01,\"Accounting\",110000.00\n"
-                        + "\"Bob\",1233,2010-01-01,\"Bee-bee-boo-boo\",100000.00\n"
-                        + "\"Carl\",10000,2005-11-21,\"Controllers\",130000.00\n"
-                        + "\"Diane\",10001,2012-09-20,\"\",130000.00\n"
-                        + "\"Ed\",10002,,,0.00"
+                """
+                Name,EmployeeId,HireDate,Dept,Salary
+                "Alice",1234,2020-01-01,"Accounting",110000.00
+                "Bob",1233,2010-01-01,"Bee-bee-boo-boo",100000.00
+                "Carl",10000,2005-11-21,"Controllers",130000.00
+                "Diane",10001,2012-09-20,"",130000.00
+                "Ed",10002,,,0.00"""
         );
 
         DataFrame loaded = dataSet.loadAsDataFrame();
@@ -243,12 +254,13 @@ public class DataFrameLoadTest
         schema.addColumn("Date", DATE, "d-MMM-uuuu");
 
         CsvDataSet dataSet = new StringBasedCsvDataSet("Foo", "Dates", schema,
-                "Name,Date\n"
-                        + "\"Alice\",1-Jan-2020\n"
-                        + "\"Bob\",01-Jan-2010\n"
-                        + "\"Carl\",21-Nov-2005\n"
-                        + "\"Diane\",2-Sep-2012\n"
-                        + "\"Ed\","
+                """
+                Name,Date
+                "Alice",1-Jan-2020
+                "Bob",01-Jan-2010
+                "Carl",21-Nov-2005
+                "Diane",2-Sep-2012
+                "Ed","""
         );
 
         DataFrame loaded = dataSet.loadAsDataFrame();
@@ -272,13 +284,15 @@ public class DataFrameLoadTest
         schema.addColumn("Date", DATE, "M/d/uuuu h:m:s a");
 
         CsvDataSet dataSet = new StringBasedCsvDataSet("Foo", "Dates", schema,
-                "Name,Date\n"
-                        + "\"Alice\",11/11/2020 11:11:11 AM\n"
-                        + "\"Bob\",01/31/2010 12:12:00 PM\n"
-                        + "\"Carl\",1/5/2005 12:00:00 AM\n"
-                        + "\"Diane\",2/09/2012 4:55:15 PM\n"
-                        + "\"Ed\",\n"
-                        + "\"Frank\",2/19/2012 04:05:15 PM\n"
+                """
+                Name,Date
+                "Alice",11/11/2020 11:11:11 AM
+                "Bob",01/31/2010 12:12:00 PM
+                "Carl",1/5/2005 12:00:00 AM
+                "Diane",2/09/2012 4:55:15 PM
+                "Ed",
+                "Frank",2/19/2012 04:05:15 PM
+                """
         );
 
         DataFrame loaded = dataSet.loadAsDataFrame();
@@ -295,21 +309,20 @@ public class DataFrameLoadTest
         DataFrameUtil.assertEquals(expected, loaded);
     }
 
-    @Test(expected = RuntimeException.class)
+    @Test
     public void headerDataMismatchThrowsException()
     {
         CsvDataSet dataSet = new StringBasedCsvDataSet("Foo", "Dates",
-                "Name,Date,Count\n"
-                + "\"Alice\",1-Jan-2020,10\n"
-                + "\"Bob\",01-Jan-2010,11\n"
-                + "\"Carl\",21-Nov-2005,12\n"
-                + "\"Diane\",2-Sep-2012,13\n"
-                + "\"Ed\","
+                """
+                Name,Date,Count
+                "Alice",1-Jan-2020,10
+                "Bob",01-Jan-2010,11
+                "Carl",21-Nov-2005,12
+                "Diane",2-Sep-2012,13
+                "Ed","""
         );
 
-        DataFrame loaded = dataSet.loadAsDataFrame();
-
-        Assert.assertNotNull(loaded);
+        assertThrows(RuntimeException.class, dataSet::loadAsDataFrame);
     }
 
     @Test
@@ -318,12 +331,13 @@ public class DataFrameLoadTest
         try
         {
             CsvDataSet dataSet = new StringBasedCsvDataSet("Foo", "Dates",
-                    "Name,Date,Count\n"
-                    + "\"Alice\",1-Jan-2020,10\n"
-                    + "\"Bob\",01-Jan-2010,11\n"
-                    + "\"Carl\",21-Nov-2005,12\n"
-                    + "\"Diane\",2-Sep-2012,13\n"
-                    + "\"Ed\","
+                    """
+                    Name,Date,Count
+                    "Alice",1-Jan-2020,10
+                    "Bob",01-Jan-2010,11
+                    "Carl",21-Nov-2005,12
+                    "Diane",2-Sep-2012,13
+                    "Ed","""
             );
 
             dataSet.loadAsDataFrame();
@@ -331,11 +345,11 @@ public class DataFrameLoadTest
         catch (RuntimeException re)
         {
             String expectedMessage = "The number of elements in the header does not match the number of elements in the data row 5 (3 vs 2)";
-            Assert.assertEquals(expectedMessage, re.getMessage());
+            assertEquals(expectedMessage, re.getMessage());
         }
     }
 
-    @Test(expected = RuntimeException.class)
+    @Test
     public void schemaColumnCountMismatchThrowsException()
     {
 
@@ -345,18 +359,19 @@ public class DataFrameLoadTest
         schema.addColumn("Number", LONG);
 
         CsvDataSet dataSet = new StringBasedCsvDataSet("Foo", "Dates", schema,
-                "Name,Date\n"
-                + "\"Alice\",1-Jan-2020\n"
-                + "\"Bob\",01-Jan-2010\n"
-                + "\"Carl\",21-Nov-2005\n"
-                + "\"Diane\",2-Sep-2012\n"
-                + "\"Ed\","
+                """
+                Name,Date
+                "Alice",1-Jan-2020
+                "Bob",01-Jan-2010
+                "Carl",21-Nov-2005
+                "Diane",2-Sep-2012
+                "Ed","""
         );
 
-        Assert.assertNotNull(dataSet.loadAsDataFrame());
+        assertThrows(RuntimeException.class, dataSet::loadAsDataFrame);
     }
 
-    @Test(expected = RuntimeException.class)
+    @Test
     public void schemaColumnNameMismatchThrowsException()
     {
 
@@ -366,18 +381,19 @@ public class DataFrameLoadTest
         schema.addColumn("Number", LONG);
 
         CsvDataSet dataSet = new StringBasedCsvDataSet("Foo", "Dates", schema,
-                "Name,Something,Number\n"
-                + "\"Alice\",1-Jan-2020,1\n"
-                + "\"Bob\",01-Jan-2010,2\n"
-                + "\"Carl\",21-Nov-2005,3\n"
-                + "\"Diane\",2-Sep-2012,4\n"
-                + "\"Ed\",,5"
+                """
+                Name,Something,Number
+                "Alice",1-Jan-2020,1
+                "Bob",01-Jan-2010,2
+                "Carl",21-Nov-2005,3
+                "Diane",2-Sep-2012,4
+                "Ed",,5"""
         );
 
-        Assert.assertNotNull(dataSet.loadAsDataFrame());
+        assertThrows(RuntimeException.class, dataSet::loadAsDataFrame);
     }
 
-    @Test(expected = RuntimeException.class)
+    @Test
     public void schemaHeaderMismatchThrowsException()
     {
         CsvSchema schema = new CsvSchema();
@@ -385,17 +401,16 @@ public class DataFrameLoadTest
         schema.addColumn("Date", DATE, "d-MMM-uuuu");
 
         CsvDataSet dataSet = new StringBasedCsvDataSet("Foo", "Dates", schema,
-                "Name,Date,Number\n"
-                        + "\"Alice\",1-Jan-2020\n"
-                        + "\"Bob\",01-Jan-2010\n"
-                        + "\"Carl\",21-Nov-2005\n"
-                        + "\"Diane\",2-Sep-2012\n"
-                        + "\"Ed\","
+                """
+                Name,Date,Number
+                "Alice",1-Jan-2020
+                "Bob",01-Jan-2010
+                "Carl",21-Nov-2005
+                "Diane",2-Sep-2012
+                "Ed","""
         );
 
-        DataFrame loaded = dataSet.loadAsDataFrame();
-
-        Assert.assertNotNull(loaded);
+        assertThrows(RuntimeException.class, dataSet::loadAsDataFrame);
     }
 
     @Test
@@ -411,12 +426,13 @@ public class DataFrameLoadTest
         schema.addColumn("Salary", DOUBLE);
 
         CsvDataSet dataSet = new StringBasedCsvDataSet("Foo", "Employees", schema,
-                "Name|EmployeeId|HireDate|Salary\n"
-                        + "'Alice'|1234|2020-01-01|110000.00\n"
-                        + "'Bob'|1233|2010-01-01|-NULL-\n"
-                        + "'Carl'||2005-11-21|130000.00\n"
-                        + "'Diane'|10001|2012-09-20|130000.00\n"
-                        + "'Ed'|10002|-NULL-|0.00"
+                """
+                Name|EmployeeId|HireDate|Salary
+                'Alice'|1234|2020-01-01|110000.00
+                'Bob'|1233|2010-01-01|-NULL-
+                'Carl'||2005-11-21|130000.00
+                'Diane'|10001|2012-09-20|130000.00
+                'Ed'|10002|-NULL-|0.00"""
         );
 
         DataFrame loaded = dataSet.loadAsDataFrame();
@@ -436,12 +452,13 @@ public class DataFrameLoadTest
     public void headFewerThanTotalLines()
     {
         CsvDataSet dataSet = new StringBasedCsvDataSet("Foo", "Employees",
-                "Name,EmployeeId,HireDate,Dept,Salary\n"
-                        + "\"Alice\",1234,2020-01-01,\"Accounting\",110000.00\n"
-                        + "\"Bob\",1233,2010-01-01,\"Bee-bee-boo-boo\",100000.00\n"
-                        + "\"Carl\",10000,2005-11-21,\"Controllers\",130000.00\n"
-                        + "\"Diane\",10001,2012-09-20,\"\",130000.00\n"
-                        + "\"Ed\",10002,,,0.00"
+                """
+                Name,EmployeeId,HireDate,Dept,Salary
+                "Alice",1234,2020-01-01,"Accounting",110000.00
+                "Bob",1233,2010-01-01,"Bee-bee-boo-boo",100000.00
+                "Carl",10000,2005-11-21,"Controllers",130000.00
+                "Diane",10001,2012-09-20,"",130000.00
+                "Ed",10002,,,0.00"""
         );
 
         DataFrame loaded = dataSet.loadAsDataFrame(2);
@@ -458,12 +475,13 @@ public class DataFrameLoadTest
     public void headMoreThanTotalLines()
     {
         CsvDataSet dataSet = new StringBasedCsvDataSet("Foo", "Employees",
-                "Name,EmployeeId,HireDate,Dept,Salary\n"
-                        + "\"Alice\",1234,2020-01-01,\"Accounting\",110000.00\n"
-                        + "\"Bob\",1233,2010-01-01,\"Bee-bee-boo-boo\",100000.00\n"
-                        + "\"Carl\",10000,2005-11-21,\"Controllers\",130000.00\n"
-                        + "\"Diane\",10001,2012-09-20,\"\",130000.00\n"
-                        + "\"Ed\",10002,,,0.00"
+                """
+                Name,EmployeeId,HireDate,Dept,Salary
+                "Alice",1234,2020-01-01,"Accounting",110000.00
+                "Bob",1233,2010-01-01,"Bee-bee-boo-boo",100000.00
+                "Carl",10000,2005-11-21,"Controllers",130000.00
+                "Diane",10001,2012-09-20,"",130000.00
+                "Ed",10002,,,0.00"""
         );
 
         DataFrame loaded = dataSet.loadAsDataFrame(100);
@@ -483,23 +501,24 @@ public class DataFrameLoadTest
     public void headZeroOrNegativeLines()
     {
         CsvDataSet dataSet = new StringBasedCsvDataSet("Foo", "Employees",
-                "Name,EmployeeId,HireDate,Dept,Salary\n"
-                        + "\"Alice\",1234,2020-01-01,\"Accounting\",110000.00\n"
-                        + "\"Bob\",1233,2010-01-01,\"Bee-bee-boo-boo\",100000.00\n"
-                        + "\"Carl\",10000,2005-11-21,\"Controllers\",130000.00\n"
-                        + "\"Diane\",10001,2012-09-20,\"\",130000.00\n"
-                        + "\"Ed\",10002,,,0.00"
+                """
+                Name,EmployeeId,HireDate,Dept,Salary
+                "Alice",1234,2020-01-01,"Accounting",110000.00
+                "Bob",1233,2010-01-01,"Bee-bee-boo-boo",100000.00
+                "Carl",10000,2005-11-21,"Controllers",130000.00
+                "Diane",10001,2012-09-20,"",130000.00
+                "Ed",10002,,,0.00"""
         );
 
         DataFrame loaded = dataSet.loadAsDataFrame(0);
 
-        Assert.assertNotNull(loaded);
-        Assert.assertEquals(0, loaded.rowCount());
+        assertNotNull(loaded);
+        assertEquals(0, loaded.rowCount());
 
         loaded = dataSet.loadAsDataFrame(-1);
 
-        Assert.assertNotNull(loaded);
-        Assert.assertEquals(0, loaded.rowCount());
+        assertNotNull(loaded);
+        assertEquals(0, loaded.rowCount());
     }
 
     @Test
@@ -511,8 +530,8 @@ public class DataFrameLoadTest
 
         DataFrame loaded = dataSet.loadAsDataFrame();
 
-        Assert.assertEquals(0, loaded.rowCount());
-        Assert.assertEquals(3, loaded.columnCount());
+        assertEquals(0, loaded.rowCount());
+        assertEquals(3, loaded.columnCount());
     }
 
     @Test
@@ -529,17 +548,19 @@ public class DataFrameLoadTest
 
         DataFrame loaded = dataSet.loadAsDataFrame();
 
-        Assert.assertEquals(0, loaded.rowCount());
-        Assert.assertEquals(3, loaded.columnCount());
+        assertEquals(0, loaded.rowCount());
+        assertEquals(3, loaded.columnCount());
     }
 
     @Test
     public void headersEnclosedInQuotes()
     {
         CsvDataSet dataSet = new StringBasedCsvDataSet("Foo", "Employees",
-                "\"Name\",\"Employee Id\",\"Hire Date\",Dept,\"Salary, USD\"\n"
-                        + "\"Alice\",1234,2020-01-01,\"Accounting\",110000.00\n"
-                        + "\"Bob\",1233,2010-01-01,\"Bee-bee-boo-boo\",100000.00\n"
+                """
+                "Name","Employee Id","Hire Date",Dept,"Salary, USD"
+                "Alice",1234,2020-01-01,"Accounting",110000.00
+                "Bob",1233,2010-01-01,"Bee-bee-boo-boo",100000.00
+                """
         );
 
         DataFrame loaded = dataSet.loadAsDataFrame();
@@ -557,9 +578,11 @@ public class DataFrameLoadTest
     public void headersWithSpaces()
     {
         CsvDataSet dataSet = new StringBasedCsvDataSet("Foo", "Employees",
-                "Name,\"Employee Id\",Hire Date,Dept,Salary in USD\n"
-                        + "\"Alice\",1234,2020-01-01,\"Accounting\",110000.00\n"
-                        + "\"Bob\",1233,2010-01-01,\"Bee-bee-boo-boo\",100000.00\n"
+                """
+                Name,"Employee Id",Hire Date,Dept,Salary in USD
+                "Alice",1234,2020-01-01,"Accounting",110000.00
+                "Bob",1233,2010-01-01,"Bee-bee-boo-boo",100000.00
+                """
         );
 
         DataFrame loaded = dataSet.loadAsDataFrame();
@@ -577,11 +600,13 @@ public class DataFrameLoadTest
     public void inferSchema()
     {
         CsvDataSet dataSet = new StringBasedCsvDataSet("Foo", "Employees",
-                  "Name,EmployeeId,DeptNo,HireDate,Salary,MaybeNumber\n"
-                + "\"Alice\",1234,,2020-01-01,110000,\n"
-                + "\"Bob\",1235,100,2010-01-01,100000.50,12\n"
-                + "\"Carl\",1236,100,Wednesday,100000.60,12.34\n"
-                + "\"Doris\",1237,101,2010-01-01,100000.70,Hi\n"
+                """
+                Name,EmployeeId,DeptNo,HireDate,Salary,MaybeNumber
+                "Alice",1234,,2020-01-01,110000,
+                "Bob",1235,100,2010-01-01,100000.50,12
+                "Carl",1236,100,Wednesday,100000.60,12.34
+                "Doris",1237,101,2010-01-01,100000.70,Hi
+                """
         );
 
         CsvSchema schema = dataSet.inferSchema();
@@ -589,23 +614,25 @@ public class DataFrameLoadTest
         MutableMap<String, ValueType> typeByName =
                 schema.getColumns().toMap(CsvSchemaColumn::getName, CsvSchemaColumn::getType);
 
-        Assert.assertEquals(STRING, typeByName.get("Name"));
-        Assert.assertEquals(LONG,   typeByName.get("EmployeeId"));
-        Assert.assertEquals(LONG,   typeByName.get("DeptNo"));
-        Assert.assertEquals(STRING, typeByName.get("HireDate"));
-        Assert.assertEquals(DOUBLE, typeByName.get("Salary"));
-        Assert.assertEquals(STRING, typeByName.get("MaybeNumber"));
+        assertEquals(STRING, typeByName.get("Name"));
+        assertEquals(LONG,   typeByName.get("EmployeeId"));
+        assertEquals(LONG,   typeByName.get("DeptNo"));
+        assertEquals(STRING, typeByName.get("HireDate"));
+        assertEquals(DOUBLE, typeByName.get("Salary"));
+        assertEquals(STRING, typeByName.get("MaybeNumber"));
     }
 
     @Test
     public void inferSchemaFromFirstTwoLines()
     {
         CsvDataSet dataSet = new StringBasedCsvDataSet("Foo", "Employees",
-                  "Name,EmployeeId,DeptNo,HireDate,Salary,MaybeNumber\n"
-                  + "\"Alice\",1234,,2020-01-01,110000,\n"
-                  + "\"Bob\",1235,100,2010-01-01,100000.50,12\n"
-                  + "\"Carl\",1236,100,Wednesday,100000.60,12.34\n"
-                  + "\"Doris\",1237,101,2010-01-01,100000.70,Hi\n"
+                """
+                Name,EmployeeId,DeptNo,HireDate,Salary,MaybeNumber
+                "Alice",1234,,2020-01-01,110000,
+                "Bob",1235,100,2010-01-01,100000.50,12
+                "Carl",1236,100,Wednesday,100000.60,12.34
+                "Doris",1237,101,2010-01-01,100000.70,Hi
+                """
         );
 
         CsvSchema schema = dataSet.inferSchema(2);
@@ -613,20 +640,22 @@ public class DataFrameLoadTest
         MutableMap<String, ValueType> typeByName =
                 schema.getColumns().toMap(CsvSchemaColumn::getName, CsvSchemaColumn::getType);
 
-        Assert.assertEquals(STRING, typeByName.get("Name"));
-        Assert.assertEquals(LONG,   typeByName.get("EmployeeId"));
-        Assert.assertEquals(LONG,   typeByName.get("DeptNo"));
-        Assert.assertEquals(DATE,   typeByName.get("HireDate"));
-        Assert.assertEquals(DOUBLE, typeByName.get("Salary"));
-        Assert.assertEquals(LONG,   typeByName.get("MaybeNumber"));
+        assertEquals(STRING, typeByName.get("Name"));
+        assertEquals(LONG,   typeByName.get("EmployeeId"));
+        assertEquals(LONG,   typeByName.get("DeptNo"));
+        assertEquals(DATE,   typeByName.get("HireDate"));
+        assertEquals(DOUBLE, typeByName.get("Salary"));
+        assertEquals(LONG,   typeByName.get("MaybeNumber"));
     }
 
     @Test
     public void inferSchemaFromOneDataLine()
     {
         CsvDataSet dataSet = new StringBasedCsvDataSet("Foo", "Employees",
-                "Name,EmployeeId,DeptNo,HireDate,Salary,MaybeNumber\n"
-                        + "\"Alice\",1234,,2020-01-01,110000.12,Hi\n"
+                """
+                Name,EmployeeId,DeptNo,HireDate,Salary,MaybeNumber
+                "Alice",1234,,2020-01-01,110000.12,Hi
+                """
         );
 
         CsvSchema schema = dataSet.inferSchema();
@@ -634,12 +663,12 @@ public class DataFrameLoadTest
         MutableMap<String, ValueType> typeByName =
                 schema.getColumns().toMap(CsvSchemaColumn::getName, CsvSchemaColumn::getType);
 
-        Assert.assertEquals(STRING, typeByName.get("Name"));
-        Assert.assertEquals(LONG,   typeByName.get("EmployeeId"));
-        Assert.assertEquals(STRING, typeByName.get("DeptNo"));
-        Assert.assertEquals(DATE,   typeByName.get("HireDate"));
-        Assert.assertEquals(DOUBLE, typeByName.get("Salary"));
-        Assert.assertEquals(STRING, typeByName.get("MaybeNumber"));
+        assertEquals(STRING, typeByName.get("Name"));
+        assertEquals(LONG,   typeByName.get("EmployeeId"));
+        assertEquals(STRING, typeByName.get("DeptNo"));
+        assertEquals(DATE,   typeByName.get("HireDate"));
+        assertEquals(DOUBLE, typeByName.get("Salary"));
+        assertEquals(STRING, typeByName.get("MaybeNumber"));
     }
 
     @Test
@@ -654,22 +683,24 @@ public class DataFrameLoadTest
         MutableMap<String, ValueType> typeByName =
                 schema.getColumns().toMap(CsvSchemaColumn::getName, CsvSchemaColumn::getType);
 
-        Assert.assertEquals(STRING, typeByName.get("Name"));
-        Assert.assertEquals(STRING, typeByName.get("EmployeeId"));
-        Assert.assertEquals(STRING, typeByName.get("DeptNo"));
-        Assert.assertEquals(STRING, typeByName.get("HireDate"));
-        Assert.assertEquals(STRING, typeByName.get("Salary"));
-        Assert.assertEquals(STRING, typeByName.get("MaybeNumber"));
+        assertEquals(STRING, typeByName.get("Name"));
+        assertEquals(STRING, typeByName.get("EmployeeId"));
+        assertEquals(STRING, typeByName.get("DeptNo"));
+        assertEquals(STRING, typeByName.get("HireDate"));
+        assertEquals(STRING, typeByName.get("Salary"));
+        assertEquals(STRING, typeByName.get("MaybeNumber"));
     }
 
     @Test
     public void inferSchemaMakeSureTheFirstLineProcessed()
     {
         CsvDataSet dataSet = new StringBasedCsvDataSet("Foo", "Employees",
-                "Name,EmployeeId,DeptNo,HireDate,Salary,MaybeNumber\n"
-                        + "\"Alice\",One,Two,Three,Four,Five\n"
-                        + "\"Bob\",1235,100,2010-01-01,100000.50,12\n"
-                        + "\"Doris\",1237,101,2010-01-01,100000.70,15\n"
+                """
+                Name,EmployeeId,DeptNo,HireDate,Salary,MaybeNumber
+                "Alice",One,Two,Three,Four,Five
+                "Bob",1235,100,2010-01-01,100000.50,12
+                "Doris",1237,101,2010-01-01,100000.70,15
+                """
         );
 
         CsvSchema schema = dataSet.inferSchema();
@@ -677,36 +708,39 @@ public class DataFrameLoadTest
         MutableMap<String, ValueType> typeByName =
                 schema.getColumns().toMap(CsvSchemaColumn::getName, CsvSchemaColumn::getType);
 
-        Assert.assertEquals(STRING, typeByName.get("Name"));
-        Assert.assertEquals(STRING, typeByName.get("EmployeeId"));
-        Assert.assertEquals(STRING, typeByName.get("DeptNo"));
-        Assert.assertEquals(STRING, typeByName.get("HireDate"));
-        Assert.assertEquals(STRING, typeByName.get("Salary"));
-        Assert.assertEquals(STRING, typeByName.get("MaybeNumber"));
+        assertEquals(STRING, typeByName.get("Name"));
+        assertEquals(STRING, typeByName.get("EmployeeId"));
+        assertEquals(STRING, typeByName.get("DeptNo"));
+        assertEquals(STRING, typeByName.get("HireDate"));
+        assertEquals(STRING, typeByName.get("Salary"));
+        assertEquals(STRING, typeByName.get("MaybeNumber"));
     }
 
-    @Test(expected = RuntimeException.class)
+    @Test
     public void inferSchemaWithMismatchedRowsFails()
     {
         CsvDataSet dataSet = new StringBasedCsvDataSet("Foo", "Employees",
-                "Name,EmployeeId,DeptNo,HireDate,Salary,MaybeNumber\n"
-                        + "\"Alice\",1234,,110000,\n"
-                        + "\"Bob\",1235,100,2010-01-01,100000.50,12\n"
+                """
+                Name,EmployeeId,DeptNo,HireDate,Salary,MaybeNumber
+                "Alice",1234,,110000,
+                "Bob",1235,100,2010-01-01,100000.50,12
+                """
         );
 
-        CsvSchema schema = dataSet.inferSchema();
-        Assert.assertNotNull(schema);
+        assertThrows(RuntimeException.class, dataSet::inferSchema);
     }
 
     @Test
     public void inferSchemaOnLoad()
     {
         CsvDataSet dataSet = new StringBasedCsvDataSet("Foo", "Employees",
-                "Name,EmployeeId,DeptNo,HireDate,Salary,MaybeNumber\n"
-                        + "\"Alice\",1234,,2020-01-01,110000,\n"
-                        + "\"Bob\",1235,100,2010-01-01,100000.50,12\n"
-                        + "\"Carl\",1236,100,Wednesday,100000.60,12.34\n"
-                        + "\"Doris\",1237,101,2010-01-01,100000.70,Hi\n"
+                """
+                Name,EmployeeId,DeptNo,HireDate,Salary,MaybeNumber
+                "Alice",1234,,2020-01-01,110000,
+                "Bob",1235,100,2010-01-01,100000.50,12
+                "Carl",1236,100,Wednesday,100000.60,12.34
+                "Doris",1237,101,2010-01-01,100000.70,Hi
+                """
         );
 
         DataFrame loaded = dataSet.loadAsDataFrame();
@@ -727,11 +761,13 @@ public class DataFrameLoadTest
     public void inferSchemaAndThenLoad()
     {
         CsvDataSet dataSet = new StringBasedCsvDataSet("Foo", "Employees",
-                "Name,EmployeeId,DeptNo,HireDate,Salary,MaybeNumber\n"
-                        + "\"Alice\",1234,,2020-01-01,110000,\n"
-                        + "\"Bob\",1235,100,2010-01-01,100000.50,12\n"
-                        + "\"Carl\",1236,100,Wednesday,100000.60,12.34\n"
-                        + "\"Doris\",1237,101,2010-01-01,100000.70,Hi\n"
+                """
+                Name,EmployeeId,DeptNo,HireDate,Salary,MaybeNumber
+                "Alice",1234,,2020-01-01,110000,
+                "Bob",1235,100,2010-01-01,100000.50,12
+                "Carl",1236,100,Wednesday,100000.60,12.34
+                "Doris",1237,101,2010-01-01,100000.70,Hi
+                """
         );
 
         dataSet.inferSchema();
@@ -754,11 +790,13 @@ public class DataFrameLoadTest
     public void inferSchemaWithMoreEmptyValues()
     {
         CsvDataSet dataSet = new StringBasedCsvDataSet("Foo", "Employees",
-                  "Name,EmployeeId,DeptNo,HireDate,OtherDate,Salary,All Empty,MaybeNumber\n"
-                + ",1234,,2020-01-01,2020-01-01,110000,,\n"
-                + "\"Bob\",1235,100,2010-01-01,2010-01-01,100000.50,,12\n"
-                + ",1236,,10/25/2015,2015-10-25,,,12.34\n"
-                + "\"Doris\",,101,2010-01-01,2010-01-01,100000.70,,Hi\n"
+                """
+                Name,EmployeeId,DeptNo,HireDate,OtherDate,Salary,All Empty,MaybeNumber
+                ,1234,,2020-01-01,2020-01-01,110000,,
+                "Bob",1235,100,2010-01-01,2010-01-01,100000.50,,12
+                ,1236,,10/25/2015,2015-10-25,,,12.34
+                "Doris",,101,2010-01-01,2010-01-01,100000.70,,Hi
+                """
         );
 
         CsvSchema schema = dataSet.inferSchema();
@@ -766,14 +804,14 @@ public class DataFrameLoadTest
         MutableMap<String, ValueType> typeByName =
                 schema.getColumns().toMap(CsvSchemaColumn::getName, CsvSchemaColumn::getType);
 
-        Assert.assertEquals(STRING, typeByName.get("Name"));
-        Assert.assertEquals(LONG,   typeByName.get("EmployeeId"));
-        Assert.assertEquals(LONG,   typeByName.get("DeptNo"));
-        Assert.assertEquals(STRING, typeByName.get("HireDate"));
-        Assert.assertEquals(DATE,   typeByName.get("OtherDate"));
-        Assert.assertEquals(DOUBLE, typeByName.get("Salary"));
-        Assert.assertEquals(STRING, typeByName.get("All Empty"));
-        Assert.assertEquals(STRING, typeByName.get("MaybeNumber"));
+        assertEquals(STRING, typeByName.get("Name"));
+        assertEquals(LONG,   typeByName.get("EmployeeId"));
+        assertEquals(LONG,   typeByName.get("DeptNo"));
+        assertEquals(STRING, typeByName.get("HireDate"));
+        assertEquals(DATE,   typeByName.get("OtherDate"));
+        assertEquals(DOUBLE, typeByName.get("Salary"));
+        assertEquals(STRING, typeByName.get("All Empty"));
+        assertEquals(STRING, typeByName.get("MaybeNumber"));
     }
 
     @Test
@@ -790,12 +828,13 @@ public class DataFrameLoadTest
             .addColumn("LunchAllowance", FLOAT);
 
         CsvDataSet dataSet = new StringBasedCsvDataSet("Foo", "Employees", schema,
-                "Name,EmployeeId,HireDate,Dept,Salary,Abc,PetCount,LunchAllowance\n"
-                        + "\"Diane\",10001,2012-09-20,\"\",,\"ABC\",8,10.50\n"
-                        + "\"Alice\",1234,2020-01-01,\"Accounting\",110000.00,,0,12.50\n"
-                        + "\"Bob\",1233,2010-01-01,\"Bee-bee-boo-boo\",100000.00,\"ABC\",1,10.25\n"
-                        + "\"Carl\",,2005-11-21,\"Controllers\",130000.00,\"ABC\",,\n"
-                        + "\"Ed\",10002,,,0.00,,2,"
+                """
+                Name,EmployeeId,HireDate,Dept,Salary,Abc,PetCount,LunchAllowance
+                "Diane",10001,2012-09-20,"",,"ABC",8,10.50
+                "Alice",1234,2020-01-01,"Accounting",110000.00,,0,12.50
+                "Bob",1233,2010-01-01,"Bee-bee-boo-boo",100000.00,"ABC",1,10.25
+                "Carl",,2005-11-21,"Controllers",130000.00,"ABC",,
+                "Ed",10002,,,0.00,,2,"""
         );
 
         dataSet.convertEmptyElementsToNulls();
@@ -817,12 +856,13 @@ public class DataFrameLoadTest
     @Test
     public void inferSchemaThenLoadWithNulls()
     {
-        String data = "Name,EmployeeId,HireDate,Dept,Salary,Abc\n"
-                + "\"Diane\",10001,2012-09-20,\"\",,\"ABC\"\n"
-                + "\"Alice\",1234,2020-01-01,\"Accounting\",110000.00,\n"
-                + "\"Bob\",1233,2010-01-01,\"Bee-bee-boo-boo\",100000.00,\"ABC\"\n"
-                + "\"Carl\",,2005-11-21,\"Controllers\",130000.00,\"ABC\"\n"
-                + "\"Ed\",10002,,,0.00,";
+        String data = """
+                Name,EmployeeId,HireDate,Dept,Salary,Abc
+                "Diane",10001,2012-09-20,"",,"ABC"
+                "Alice",1234,2020-01-01,"Accounting",110000.00,
+                "Bob",1233,2010-01-01,"Bee-bee-boo-boo",100000.00,"ABC"
+                "Carl",,2005-11-21,"Controllers",130000.00,"ABC"
+                "Ed",10002,,,0.00,""";
 
         CsvDataSet dataSetToInferFrom = new StringBasedCsvDataSet("Foo", "Employees", data);
         CsvSchema inferredSchema = dataSetToInferFrom.inferSchema();
@@ -854,7 +894,7 @@ public class DataFrameLoadTest
                         .loadAsDataFrame());
     }
 
-    @Test(expected = RuntimeException.class)
+    @Test
     public void emptyHeaderThrowsException()
     {
         CsvDataSet dataSet = new StringBasedCsvDataSet("Foo", "Employees",
@@ -863,7 +903,7 @@ public class DataFrameLoadTest
                         + "\"Doris\",1237,101,2010-01-01,100000.70,15\n"
         );
 
-        DataFrame df = dataSet.loadAsDataFrame();
+        assertThrows(RuntimeException.class, dataSet::loadAsDataFrame);
     }
 
     @Test
@@ -878,8 +918,10 @@ public class DataFrameLoadTest
             .hasHeaderLine(false);
 
         CsvDataSet dataSet = new StringBasedCsvDataSet("Foo", "Employees", schema,
-                  "\"Bob\",1235,2010-01-01,100000.50,12\n"
-                + "\"Doris\",1237,2010-01-01,100000.70,15\n"
+                """
+                "Bob",1235,2010-01-01,100000.50,12
+                "Doris",1237,2010-01-01,100000.70,15
+                """
         );
 
         DataFrame df = dataSet.loadAsDataFrame();
@@ -893,7 +935,7 @@ public class DataFrameLoadTest
         );
     }
 
-    @Test(expected = RuntimeException.class)
+    @Test
     public void duplicateHeader()
     {
         CsvDataSet dataSet = new StringBasedCsvDataSet("Foo", "Employees",
@@ -902,7 +944,7 @@ public class DataFrameLoadTest
                         + "\"Doris\",1237,101,2010-01-01,100000.70,15\n"
         );
 
-        DataFrame df = dataSet.loadAsDataFrame();
+        assertThrows(RuntimeException.class, dataSet::loadAsDataFrame);
     }
 
     @Test
@@ -916,10 +958,12 @@ public class DataFrameLoadTest
                 ;
 
         CsvDataSet dataSet = new StringBasedCsvDataSet("Foo", "Employees", schema,
-                "Name,EmployeeId,Salary,Bonus\n"
-                + "\"Alice\",1234,12000010.1,100.1\n"
-                + "\"Bob\",1235,1000005.12,100.2\n"
-                + "\"Doris\",1237,100000.701,100.3\n"
+                """
+                Name,EmployeeId,Salary,Bonus
+                "Alice",1234,12000010.1,100.1
+                "Bob",1235,1000005.12,100.2
+                "Doris",1237,100000.701,100.3
+                """
         );
 
         DataFrame df = dataSet.loadAsDataFrame();

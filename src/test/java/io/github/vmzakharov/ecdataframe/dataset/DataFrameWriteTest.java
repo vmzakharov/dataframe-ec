@@ -2,8 +2,8 @@ package io.github.vmzakharov.ecdataframe.dataset;
 
 import io.github.vmzakharov.ecdataframe.dataframe.DataFrame;
 import io.github.vmzakharov.ecdataframe.dsl.value.ValueType;
-import org.junit.Assert;
-import org.junit.Test;
+
+import org.junit.jupiter.api.Test;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -12,6 +12,7 @@ import static io.github.vmzakharov.ecdataframe.dsl.value.ValueType.DATE;
 import static io.github.vmzakharov.ecdataframe.dsl.value.ValueType.DOUBLE;
 import static io.github.vmzakharov.ecdataframe.dsl.value.ValueType.LONG;
 import static io.github.vmzakharov.ecdataframe.dsl.value.ValueType.STRING;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class DataFrameWriteTest
 {
@@ -31,14 +32,16 @@ public class DataFrameWriteTest
         StringBasedCsvDataSet dataSet = new StringBasedCsvDataSet("Foo", "Employees", "");
         dataSet.write(dataFrame);
 
-        String expected = "Name,EmployeeId,HireDate,Dept,Salary,PetCount,LunchAllowance\n"
-                        + "\"Alice\",1234,2020-1-1,\"Accounting\",110000.0,12,20.25\n"
-                        + "\"Bob\",1233,2010-1-1,\"Bee-bee-boo-boo\",100000.0,-10,-10.75\n"
-                        + "\"Carl\",10000,2005-11-21,\"Controllers\",130000.0,,15.25\n"
-                        + "\"Diane\",10001,2012-9-20,\"\",,10,4.5\n"
-                        + "\"Ed\",10002,,,0.0,,\n";
+        String expected = """
+                Name,EmployeeId,HireDate,Dept,Salary,PetCount,LunchAllowance
+                "Alice",1234,2020-1-1,"Accounting",110000.0,12,20.25
+                "Bob",1233,2010-1-1,"Bee-bee-boo-boo",100000.0,-10,-10.75
+                "Carl",10000,2005-11-21,"Controllers",130000.0,,15.25
+                "Diane",10001,2012-9-20,"",,10,4.5
+                "Ed",10002,,,0.0,,
+                """;
 
-        Assert.assertEquals(expected, dataSet.getWrittenData());
+        assertEquals(expected, dataSet.getWrittenData());
     }
 
     @Test
@@ -56,14 +59,16 @@ public class DataFrameWriteTest
         StringBasedCsvDataSet dataSet = new StringBasedCsvDataSet("Foo", "Employees", "");
         dataSet.write(dataFrame);
 
-        String expected = "Name,EmployeeId,HireDate,Dept,Salary\n"
-                + "\"Alice\",1234,2020-1-1,\"Accounting\",110000.0\n"
-                + "\"Bob\",1233,2010-1-1,\"Bee-bee-boo-boo\",100000.0\n"
-                + "\"Carl\",10000,2005-11-21,\"Controllers\",130000.0\n"
-                + "\"Diane\",10001,2012-9-20,\"\",\n"
-                + "\"Ed\",10002,,,0.0\n";
+        String expected = """
+                Name,EmployeeId,HireDate,Dept,Salary
+                "Alice",1234,2020-1-1,"Accounting",110000.0
+                "Bob",1233,2010-1-1,"Bee-bee-boo-boo",100000.0
+                "Carl",10000,2005-11-21,"Controllers",130000.0
+                "Diane",10001,2012-9-20,"",
+                "Ed",10002,,,0.0
+                """;
 
-        Assert.assertEquals(expected, dataSet.getWrittenData());
+        assertEquals(expected, dataSet.getWrittenData());
     }
 
     @Test
@@ -94,15 +99,17 @@ public class DataFrameWriteTest
         StringBasedCsvDataSet dataSet = new StringBasedCsvDataSet("Foo", "Employees", schema, "");
         dataSet.write(dataFrame);
 
-        String expected = "Name,EmployeeId,HireDate,OtherDate,Dept,Salary,PetCount,LunchAllowance\n"
-                + "'Alice',1234,2020-01-01,1/1/2021,'Accounting',110000.0,12,20.25\n"
-                + "'Bob',1233,2010-01-01,1/1/2021,'Bee-bee-boo-boo',100000.0,-10,-10.75\n"
-                + "'Carl',,2005-11-21,11/21/2021,'Controllers',,,15.25\n"
-                + "'Diane',10001,2012-09-20,9/20/2022,'',130000.0,10,4.5\n"
-                + "'Ed',10002,,,,0.0,,\n"
+        String expected = """
+                Name,EmployeeId,HireDate,OtherDate,Dept,Salary,PetCount,LunchAllowance
+                'Alice',1234,2020-01-01,1/1/2021,'Accounting',110000.0,12,20.25
+                'Bob',1233,2010-01-01,1/1/2021,'Bee-bee-boo-boo',100000.0,-10,-10.75
+                'Carl',,2005-11-21,11/21/2021,'Controllers',,,15.25
+                'Diane',10001,2012-09-20,9/20/2022,'',130000.0,10,4.5
+                'Ed',10002,,,,0.0,,
+                """
                 ;
 
-        Assert.assertEquals(expected, dataSet.getWrittenData());
+        assertEquals(expected, dataSet.getWrittenData());
     }
 
     @Test
@@ -130,14 +137,16 @@ public class DataFrameWriteTest
         StringBasedCsvDataSet dataSet = new StringBasedCsvDataSet("Foo", "Employees", schema, "");
         dataSet.write(dataFrame);
 
-        String expected = "Name|EmployeeId|HireDate|Dept|Salary\n"
-                + "'Alice'|1234|2020-01-01|'Accounting'|110000.0\n"
-                + "'Bob'|1233|-null-|'Bee-bee-boo-boo'|100000.0\n"
-                + "'Carl'|10000|2005-11-21|'Controllers'|-null-\n"
-                + "'Diane'|10001|2012-09-20|''|130000.0\n"
-                + "'Ed'|10002|-null-|-null-|0.0\n";
+        String expected = """
+                Name|EmployeeId|HireDate|Dept|Salary
+                'Alice'|1234|2020-01-01|'Accounting'|110000.0
+                'Bob'|1233|-null-|'Bee-bee-boo-boo'|100000.0
+                'Carl'|10000|2005-11-21|'Controllers'|-null-
+                'Diane'|10001|2012-09-20|''|130000.0
+                'Ed'|10002|-null-|-null-|0.0
+                """;
 
-        Assert.assertEquals(expected, dataSet.getWrittenData());
+        assertEquals(expected, dataSet.getWrittenData());
     }
 
     @Test
@@ -154,13 +163,15 @@ public class DataFrameWriteTest
         StringBasedCsvDataSet dataSet = new StringBasedCsvDataSet("Foo", "People",  "");
         dataSet.write(dataFrame);
 
-        String expected = "Name,DateTime\n"
-                        + "\"Alice\",2020-9-22T13:14:15\n"
-                        + "\"Bob\",2021-10-23T13:14:16\n"
-                        + "\"Carl\",\n"
-                        + "\"Diane\",2023-12-24T13:14:15\n";
+        String expected = """
+                Name,DateTime
+                "Alice",2020-9-22T13:14:15
+                "Bob",2021-10-23T13:14:16
+                "Carl",
+                "Diane",2023-12-24T13:14:15
+                """;
 
-        Assert.assertEquals(expected, dataSet.getWrittenData());
+        assertEquals(expected, dataSet.getWrittenData());
     }
 
     @Test
@@ -184,13 +195,15 @@ public class DataFrameWriteTest
         StringBasedCsvDataSet dataSet = new StringBasedCsvDataSet("Foo", "People", schema, "");
         dataSet.write(dataFrame);
 
-        String expected = "Name,DateTime,LooksDifferent\n"
-                        + "\"Alice\",2020-09-22/13:14:15,2020*9*22-13*14*15\n"
-                        + "\"Bob\",2021-10-23/13:14:16,2021*10*23-13*14*16\n"
-                        + "\"Carl\",,\n"
-                        + "\"Diane\",2023-12-24/13:14:15,2023*12*24-13*14*15\n";
+        String expected = """
+                Name,DateTime,LooksDifferent
+                "Alice",2020-09-22/13:14:15,2020*9*22-13*14*15
+                "Bob",2021-10-23/13:14:16,2021*10*23-13*14*16
+                "Carl",,
+                "Diane",2023-12-24/13:14:15,2023*12*24-13*14*15
+                """;
 
-        Assert.assertEquals(expected, dataSet.getWrittenData());
+        assertEquals(expected, dataSet.getWrittenData());
     }
 
     @Test
@@ -214,9 +227,11 @@ public class DataFrameWriteTest
         dataSet.write(dataFrame);
 
         String expected =
-                  "\"Bob\",1235,2010-01-01,100000.5,12\n"
-                + "\"Doris\",1237,2010-01-01,100000.7,15\n";
+                """
+                "Bob",1235,2010-01-01,100000.5,12
+                "Doris",1237,2010-01-01,100000.7,15
+                """;
 
-        Assert.assertEquals(expected, dataSet.getWrittenData());
+        assertEquals(expected, dataSet.getWrittenData());
     }
 }

@@ -4,8 +4,8 @@ import com.google.common.jimfs.Configuration;
 import com.google.common.jimfs.Jimfs;
 import io.github.vmzakharov.ecdataframe.dataframe.DataFrame;
 import io.github.vmzakharov.ecdataframe.dataframe.DataFrameUtil;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -21,7 +21,7 @@ public class DataFrameLoadFromZippedTest
 {
     private FileSystem fileSystem;
 
-    @Before
+    @BeforeEach
     public void configureFileSystem()
     {
         this.fileSystem = Jimfs.newFileSystem(Configuration.unix());
@@ -32,12 +32,13 @@ public class DataFrameLoadFromZippedTest
     throws IOException
     {
         String text =
-                "Name,EmployeeId,HireDate,Dept,Salary\n"
-                + "\"Alice\",1234,2020-01-01,\"Accounting\",110000.00\n"
-                + "\"Bob\",1233,2010-01-01,\"Bee-bee-boo-boo\",100000.00\n"
-                + "\"Carl\",10000,2005-11-21,\"Controllers\",130000.00\n"
-                + "\"Diane\",10001,2012-09-20,\"\",130000.00\n"
-                + "\"Ed\",10002,,,0.00"
+                """
+                Name,EmployeeId,HireDate,Dept,Salary
+                "Alice",1234,2020-01-01,"Accounting",110000.00
+                "Bob",1233,2010-01-01,"Bee-bee-boo-boo",100000.00
+                "Carl",10000,2005-11-21,"Controllers",130000.00
+                "Diane",10001,2012-09-20,"",130000.00
+                "Ed",10002,,,0.00"""
                 ;
 
         this.writeTextToZippedFile("/foo", "employees.csv", text);
@@ -63,13 +64,13 @@ public class DataFrameLoadFromZippedTest
     public void loadDateFromGZip()
     throws IOException
     {
-        String text =
-                "Name,Date\n"
-                + "\"Alice\",2020-01-01\n"
-                + "\"Bob\",  2010-1-01\n"
-                + "\"Carl\", 2005-11-21\n"
-                + "\"Diane\",2012-09-2\n"
-                + "\"Ed\","
+        String text = """
+                Name,Date
+                "Alice",2020-01-01
+                "Bob",  2010-1-01
+                "Carl", 2005-11-21
+                "Diane",2012-09-2
+                "Ed","""
                 ;
         this.writeTextToGZippedFile("/foo", "dates.csv", text);
 

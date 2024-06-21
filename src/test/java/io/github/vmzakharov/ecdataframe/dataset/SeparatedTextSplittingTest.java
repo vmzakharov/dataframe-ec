@@ -2,15 +2,15 @@ package io.github.vmzakharov.ecdataframe.dataset;
 
 import org.eclipse.collections.api.factory.Lists;
 import org.eclipse.collections.api.list.MutableList;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 public class SeparatedTextSplittingTest
 {
     private CsvDataSet dataSet;
 
-    @Before
+    @BeforeEach
     public void configureDataSet()
     {
         this.dataSet = new CsvDataSet("Foo", "Bar", new CsvSchema());
@@ -86,6 +86,6 @@ public class SeparatedTextSplittingTest
         MutableList<String> result = Lists.mutable.of();
         this.dataSet.splitMindingQsInto(input, result);
 
-        Assert.assertArrayEquals(expected, result.toArray());
+        Assertions.assertArrayEquals(expected, result.toArray());
     }
 }
