@@ -3,8 +3,9 @@ package io.github.vmzakharov.ecdataframe;
 import io.github.vmzakharov.ecdataframe.dsl.value.BooleanValue;
 import io.github.vmzakharov.ecdataframe.dsl.value.LongValue;
 import io.github.vmzakharov.ecdataframe.dsl.value.Value;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 public class VectorExpressionTest
 {
@@ -19,13 +20,13 @@ public class VectorExpressionTest
                 """
         );
 
-        Assert.assertTrue(((BooleanValue) result).isTrue());
+        assertTrue(((BooleanValue) result).isTrue());
     }
 
     @Test
     public void index()
     {
-        Assert.assertEquals(2L, ExpressionTestUtil.evaluateToLong("(1, 2, 3)[1]"));
+        assertEquals(2L, ExpressionTestUtil.evaluateToLong("(1, 2, 3)[1]"));
     }
 
     @Test
@@ -39,7 +40,7 @@ public class VectorExpressionTest
                 """
         );
 
-        Assert.assertEquals("c", result.stringValue());
+        assertEquals("c", result.stringValue());
     }
 
     @Test
@@ -59,7 +60,7 @@ public class VectorExpressionTest
                 foo(2)[2] + foo(1)[1]\s"""
         );
 
-        Assert.assertEquals(8L, ((LongValue) result).longValue());
+        assertEquals(8L, ((LongValue) result).longValue());
     }
 
 }

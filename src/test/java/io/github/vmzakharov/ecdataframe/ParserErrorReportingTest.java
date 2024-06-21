@@ -8,8 +8,10 @@ import org.eclipse.collections.api.list.ListIterable;
 import org.eclipse.collections.api.list.MutableList;
 import org.eclipse.collections.api.tuple.primitive.IntIntPair;
 import org.eclipse.collections.impl.tuple.primitive.PrimitiveTuples;
-import org.junit.Assert;
-import org.junit.Test;
+
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 public class ParserErrorReportingTest
 {
@@ -21,13 +23,13 @@ public class ParserErrorReportingTest
 
         parserHelper.toExpression("5 + ");
 
-        Assert.assertTrue(errorListener.hasErrors());
-        Assert.assertEquals(1, errorListener.getErrors().size());
+        assertTrue(errorListener.hasErrors());
+        assertEquals(1, errorListener.getErrors().size());
 
         CollectingErrorListener.Error error = errorListener.getErrors().get(0);
 
-        Assert.assertEquals(1, error.line());
-        Assert.assertEquals(4, error.charPositionInLine());
+        assertEquals(1, error.line());
+        assertEquals(4, error.charPositionInLine());
     }
 
     // todo: make the script rule fail on this input.
@@ -40,15 +42,15 @@ public class ParserErrorReportingTest
 //        Script script = parserHelper.toScript(" and x");
         Expression script = parserHelper.toExpression(" and x");
 
-        Assert.assertNull(script);
+        assertNull(script);
 
-        Assert.assertTrue(errorListener.hasErrors());
-        Assert.assertEquals(1, errorListener.getErrors().size());
+        assertTrue(errorListener.hasErrors());
+        assertEquals(1, errorListener.getErrors().size());
 
         CollectingErrorListener.Error error = errorListener.getErrors().get(0);
 
-        Assert.assertEquals(1, error.line());
-        Assert.assertEquals(1, error.charPositionInLine());
+        assertEquals(1, error.line());
+        assertEquals(1, error.charPositionInLine());
     }
 
     @Test
@@ -68,20 +70,20 @@ public class ParserErrorReportingTest
                   (x == 'greater') ? 'yes' }
                 """);
 
-        Assert.assertTrue(errorListener.hasErrors());
+        assertTrue(errorListener.hasErrors());
 
-        Assert.assertEquals(3, errorListener.getErrors().size());
+        assertEquals(3, errorListener.getErrors().size());
 
         MutableList<IntIntPair> errorPositions = Lists.mutable.of(
                 PrimitiveTuples.pair(1, 13), PrimitiveTuples.pair(4, 4), PrimitiveTuples.pair(8, 27));
 
         errorListener.getErrors().forEachInBoth(errorPositions, (e, a) -> {
-            Assert.assertEquals(e.briefErrorMessage(), a.getOne(), e.line());
-            Assert.assertEquals(e.briefErrorMessage(), a.getTwo(), e.charPositionInLine());
+            assertEquals(a.getOne(), e.line(), e.briefErrorMessage());
+            assertEquals(a.getTwo(), e.charPositionInLine(), e.briefErrorMessage());
         });
 
         ListIterable<Integer> tokenLengths = Lists.immutable.of(3, 1, 1);
         errorListener.getErrors().forEachInBoth(tokenLengths, (e, a) ->
-                Assert.assertEquals((int) a, e.tokenStopIndex() - e.tokenStartIndex() + 1));
+                assertEquals((int) a, e.tokenStopIndex() - e.tokenStartIndex() + 1));
     }
 }

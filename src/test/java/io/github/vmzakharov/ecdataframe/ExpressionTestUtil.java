@@ -18,11 +18,13 @@ import io.github.vmzakharov.ecdataframe.dsl.value.VectorValue;
 import io.github.vmzakharov.ecdataframe.dsl.visitor.InMemoryEvaluationVisitor;
 import io.github.vmzakharov.ecdataframe.util.ExpressionParserHelper;
 import org.eclipse.collections.api.list.ListIterable;
-import org.junit.Assert;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 final public class ExpressionTestUtil
 {
@@ -81,14 +83,14 @@ final public class ExpressionTestUtil
     public static String evaluateToString(String s)
     {
         Value result = evaluateExpression(s);
-        Assert.assertTrue(result.isString());
+        assertTrue(result.isString());
         return result.stringValue();
     }
 
     public static BigDecimal evaluateToDecimal(String s)
     {
         Value result = evaluateExpression(s);
-        Assert.assertTrue(result.isDecimal());
+        assertTrue(result.isDecimal());
         return ((DecimalValue) result).decimalValue();
     }
 
@@ -96,8 +98,8 @@ final public class ExpressionTestUtil
     {
         Value value = evaluateScriptWithContext(scriptString, context);
 
-        Assert.assertTrue(value.isDouble());
-        Assert.assertEquals(expected, ((DoubleValue) value).doubleValue(), TOLERANCE);
+        assertTrue(value.isDouble());
+        assertEquals(expected, ((DoubleValue) value).doubleValue(), TOLERANCE);
     }
 
     public static LocalDate evaluateToDate(String s)
@@ -155,13 +157,13 @@ final public class ExpressionTestUtil
 
     private static void assertTrueValue(Value aValue)
     {
-        Assert.assertTrue(aValue.isBoolean());
-        Assert.assertTrue(((BooleanValue) aValue).isTrue());
+        assertTrue(aValue.isBoolean());
+        assertTrue(((BooleanValue) aValue).isTrue());
     }
 
     private static void assertFalseValue(Value aValue)
     {
-        Assert.assertTrue(aValue.isBoolean());
-        Assert.assertTrue(((BooleanValue) aValue).isFalse());
+        assertTrue(aValue.isBoolean());
+        assertTrue(((BooleanValue) aValue).isFalse());
     }
 }

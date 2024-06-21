@@ -7,8 +7,10 @@ import io.github.vmzakharov.ecdataframe.dsl.value.LongValue;
 import io.github.vmzakharov.ecdataframe.dsl.value.StringValue;
 import io.github.vmzakharov.ecdataframe.dsl.value.Value;
 import io.github.vmzakharov.ecdataframe.dsl.visitor.InMemoryEvaluationVisitor;
-import org.junit.Assert;
-import org.junit.Test;
+
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 public class ExpressionWithNullValuesTest
 {
@@ -21,15 +23,15 @@ public class ExpressionWithNullValuesTest
 
         AnonymousScript script = ExpressionTestUtil.toScript("a + b");
         Value result = script.evaluate(new InMemoryEvaluationVisitor(context));
-        Assert.assertTrue(result.isVoid());
+        assertTrue(result.isVoid());
 
         script = ExpressionTestUtil.toScript("2 + a + 1 - b * 7");
         result = script.evaluate(new InMemoryEvaluationVisitor(context));
-        Assert.assertTrue(result.isVoid());
+        assertTrue(result.isVoid());
 
         script = ExpressionTestUtil.toScript("a + (b - b) + 3");
         result = script.evaluate(new InMemoryEvaluationVisitor(context));
-        Assert.assertTrue(result.isVoid());
+        assertTrue(result.isVoid());
     }
 
     @Test
@@ -41,11 +43,11 @@ public class ExpressionWithNullValuesTest
 
         AnonymousScript script = ExpressionTestUtil.toScript("a + b");
         Value result = script.evaluate(new InMemoryEvaluationVisitor(context));
-        Assert.assertTrue(result.isVoid());
+        assertTrue(result.isVoid());
 
         script = ExpressionTestUtil.toScript("b + 'X'");
         result = script.evaluate(new InMemoryEvaluationVisitor(context));
-        Assert.assertTrue(result.isVoid());
+        assertTrue(result.isVoid());
     }
 
     @Test
@@ -56,7 +58,7 @@ public class ExpressionWithNullValuesTest
 
         AnonymousScript script = ExpressionTestUtil.toScript("substr(a, 1, 10)");
         Value result = script.evaluate(new InMemoryEvaluationVisitor(context));
-        Assert.assertTrue(result.isVoid());
+        assertTrue(result.isVoid());
     }
 
     @Test
@@ -68,18 +70,18 @@ public class ExpressionWithNullValuesTest
 
         AnonymousScript script = ExpressionTestUtil.toScript("a is not null and a in ('1', '2', '3')");
         Value result = script.evaluate(new InMemoryEvaluationVisitor(context));
-        Assert.assertTrue(result.isBoolean());
-        Assert.assertTrue(((BooleanValue) result).isFalse());
+        assertTrue(result.isBoolean());
+        assertTrue(((BooleanValue) result).isFalse());
 
         script = ExpressionTestUtil.toScript("a is null or a in ('1', '2', '3')");
         result = script.evaluate(new InMemoryEvaluationVisitor(context));
-        Assert.assertTrue(result.isBoolean());
-        Assert.assertTrue(((BooleanValue) result).isTrue());
+        assertTrue(result.isBoolean());
+        assertTrue(((BooleanValue) result).isTrue());
 
         script = ExpressionTestUtil.toScript("a in ('1', '2', voidValue, '3')");
         result = script.evaluate(new InMemoryEvaluationVisitor(context));
-        Assert.assertTrue(result.isBoolean());
-        Assert.assertTrue(((BooleanValue) result).isTrue());
+        assertTrue(result.isBoolean());
+        assertTrue(((BooleanValue) result).isTrue());
     }
 
     @Test
@@ -92,15 +94,15 @@ public class ExpressionWithNullValuesTest
 
         AnonymousScript script = ExpressionTestUtil.toScript("c is null ? a + b : a");
         Value result = script.evaluate(new InMemoryEvaluationVisitor(context));
-        Assert.assertEquals(7L, ((LongValue) result).longValue());
+        assertEquals(7L, ((LongValue) result).longValue());
 
         script = ExpressionTestUtil.toScript("c is not null ? a + b : a");
         result = script.evaluate(new InMemoryEvaluationVisitor(context));
-        Assert.assertEquals(5L, ((LongValue) result).longValue());
+        assertEquals(5L, ((LongValue) result).longValue());
 
         script = ExpressionTestUtil.toScript("a is not null ? a : a + b");
         result = script.evaluate(new InMemoryEvaluationVisitor(context));
-        Assert.assertEquals(5L, ((LongValue) result).longValue());
+        assertEquals(5L, ((LongValue) result).longValue());
     }
 
     public void comparison()

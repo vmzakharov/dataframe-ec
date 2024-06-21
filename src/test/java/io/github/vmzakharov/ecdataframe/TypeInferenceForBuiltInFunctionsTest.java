@@ -7,7 +7,7 @@ import io.github.vmzakharov.ecdataframe.dsl.value.LongValue;
 import io.github.vmzakharov.ecdataframe.dsl.value.Value;
 import io.github.vmzakharov.ecdataframe.dsl.value.ValueType;
 import org.eclipse.collections.api.list.ListIterable;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import static io.github.vmzakharov.ecdataframe.TypeInferenceUtil.assertScriptType;
 

@@ -5,8 +5,10 @@ import io.github.vmzakharov.ecdataframe.dsl.value.BooleanValue;
 import io.github.vmzakharov.ecdataframe.dsl.value.LongValue;
 import io.github.vmzakharov.ecdataframe.dsl.value.Value;
 import io.github.vmzakharov.ecdataframe.dsl.visitor.InMemoryEvaluationVisitor;
-import org.junit.Assert;
-import org.junit.Test;
+
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 public class ScriptFromStringTest
 {
@@ -19,8 +21,8 @@ public class ScriptFromStringTest
                 + "z = x + y";
         AnonymousScript script = ExpressionTestUtil.toScript(scriptText);
         Value result = script.evaluate(new InMemoryEvaluationVisitor());
-        Assert.assertTrue(result.isLong());
-        Assert.assertEquals(3, ((LongValue) result).longValue());
+        assertTrue(result.isLong());
+        assertEquals(3, ((LongValue) result).longValue());
     }
 
     @Test
@@ -32,8 +34,8 @@ public class ScriptFromStringTest
                 + "z=x+ y\n"
                 + "3+1 +2";
         Value result = ExpressionTestUtil.evaluateScript(scriptText);
-        Assert.assertTrue(result.isLong());
-        Assert.assertEquals(6, ((LongValue) result).longValue());
+        assertTrue(result.isLong());
+        assertEquals(6, ((LongValue) result).longValue());
     }
 
     @Test
@@ -44,8 +46,8 @@ public class ScriptFromStringTest
                 x = 1
                 y = 1
                 x in (3, 2, y)""");
-        Assert.assertTrue(result.isBoolean());
-        Assert.assertTrue(((BooleanValue) result).isTrue());
+        assertTrue(result.isBoolean());
+        assertTrue(((BooleanValue) result).isTrue());
 
         result = ExpressionTestUtil.evaluateScript(
                 """
@@ -53,16 +55,16 @@ public class ScriptFromStringTest
                 y= "b"
                 q= "c"
                 x in ("b", y, q)""");
-        Assert.assertTrue(result.isBoolean());
-        Assert.assertFalse(((BooleanValue) result).isTrue());
+        assertTrue(result.isBoolean());
+        assertFalse(((BooleanValue) result).isTrue());
 
         result = ExpressionTestUtil.evaluateScript(
                 """
                 y= "b"
                 q= "c"
                 "c" in ("b", y, q)""");
-        Assert.assertTrue(result.isBoolean());
-        Assert.assertTrue(((BooleanValue) result).isTrue());
+        assertTrue(result.isBoolean());
+        assertTrue(((BooleanValue) result).isTrue());
     }
 
     @Test
@@ -81,7 +83,7 @@ public class ScriptFromStringTest
                 """
         );
 
-        Assert.assertEquals("in", result.stringValue());
+        assertEquals("in", result.stringValue());
     }
 
     @Test
@@ -105,7 +107,7 @@ public class ScriptFromStringTest
                 """
         );
 
-        Assert.assertEquals(6, ((LongValue) result).longValue());
+        assertEquals(6, ((LongValue) result).longValue());
     }
 
     @Test
@@ -122,7 +124,7 @@ public class ScriptFromStringTest
                 endif
                 """
         );
-        Assert.assertEquals("not in", result.stringValue());
+        assertEquals("not in", result.stringValue());
     }
 
     @Test
@@ -144,7 +146,7 @@ public class ScriptFromStringTest
                 """
         );
 
-        Assert.assertEquals(6, ((LongValue) result).longValue());
+        assertEquals(6, ((LongValue) result).longValue());
     }
 
     @Test
@@ -158,8 +160,8 @@ public class ScriptFromStringTest
                 2 * ${It was a cold day}""";
 
         Value result = ExpressionTestUtil.evaluateScript(scriptText);
-        Assert.assertTrue(result.isLong());
-        Assert.assertEquals(6, ((LongValue) result).longValue());
+        assertTrue(result.isLong());
+        assertEquals(6, ((LongValue) result).longValue());
     }
 
     @Test
@@ -173,8 +175,8 @@ public class ScriptFromStringTest
                 """;
 
         Value result = ExpressionTestUtil.evaluateScript(scriptText);
-        Assert.assertTrue(result.isLong());
-        Assert.assertEquals(1, ((LongValue) result).longValue());
+        assertTrue(result.isLong());
+        assertEquals(1, ((LongValue) result).longValue());
     }
 
     @Test
@@ -186,7 +188,7 @@ public class ScriptFromStringTest
 
         AnonymousScript script = ExpressionTestUtil.toScript(scriptText);
         Value result = script.evaluate(new InMemoryEvaluationVisitor());
-        Assert.assertTrue(result.isBoolean());
-        Assert.assertTrue(((BooleanValue) result).isTrue());
+        assertTrue(result.isBoolean());
+        assertTrue(((BooleanValue) result).isTrue());
     }
 }

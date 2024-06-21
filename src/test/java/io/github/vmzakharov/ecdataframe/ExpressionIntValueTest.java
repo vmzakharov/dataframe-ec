@@ -5,17 +5,18 @@ import io.github.vmzakharov.ecdataframe.dsl.SimpleEvalContext;
 import io.github.vmzakharov.ecdataframe.dsl.value.IntValue;
 import io.github.vmzakharov.ecdataframe.dsl.value.LongValue;
 import io.github.vmzakharov.ecdataframe.dsl.value.Value;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import static io.github.vmzakharov.ecdataframe.ExpressionTestUtil.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class ExpressionIntValueTest
 {
     private EvalContext context;
 
-    @Before
+    @BeforeEach
     public void setContextVariables()
     {
         this.context = new SimpleEvalContext();
@@ -121,15 +122,15 @@ public class ExpressionIntValueTest
     {
         Value value = evaluateScriptWithContext(scriptString, this.context);
 
-        Assert.assertTrue(value.isLong());
-        Assert.assertEquals(expected, ((LongValue) value).longValue());
+        assertTrue(value.isLong());
+        assertEquals(expected, ((LongValue) value).longValue());
     }
 
     private void assertIntResult(int expected, String scriptString)
     {
         Value value = evaluateScriptWithContext(scriptString, this.context);
 
-        Assert.assertTrue(value.isInt());
-        Assert.assertEquals(expected, ((IntValue) value).intValue());
+        assertTrue(value.isInt());
+        assertEquals(expected, ((IntValue) value).intValue());
     }
 }

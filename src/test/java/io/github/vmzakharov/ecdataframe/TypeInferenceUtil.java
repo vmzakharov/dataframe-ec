@@ -5,7 +5,7 @@ import io.github.vmzakharov.ecdataframe.dsl.Expression;
 import io.github.vmzakharov.ecdataframe.dsl.SimpleEvalContext;
 import io.github.vmzakharov.ecdataframe.dsl.value.ValueType;
 import io.github.vmzakharov.ecdataframe.dsl.visitor.TypeInferenceVisitor;
-import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
 
 final public class TypeInferenceUtil
 {
@@ -24,6 +24,6 @@ final public class TypeInferenceUtil
         Expression expression = ExpressionTestUtil.toScript(scriptAsString);
         TypeInferenceVisitor visitor = new TypeInferenceVisitor(context);
         expression.accept(visitor);
-        Assert.assertEquals(valueType, visitor.getLastExpressionType());
+        Assertions.assertEquals(valueType, visitor.getLastExpressionType());
     }
 }

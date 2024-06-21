@@ -1,14 +1,26 @@
 package io.github.vmzakharov.ecdataframe;
 
-import org.junit.Test;
+import io.github.vmzakharov.ecdataframe.util.FormatWithPlaceholders;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class ImmutableVariablesTest
 {
-    @Test(expected = RuntimeException.class)
+    @Test
     public void immutableVariables()
     {
-        ExpressionTestUtil.evaluateScript(
-                  "a = 1\n"
-                + "a = 2");
+        Exception exception = assertThrows(
+                RuntimeException.class,
+                () -> ExpressionTestUtil.evaluateScript(
+                        "a = 1\n"
+                        + "a = 2")
+                );
+
+        Assertions.assertEquals(
+                FormatWithPlaceholders.messageFromKey("DSL_VAR_IMMUTABLE").with("variableName", "a").toString(),
+                exception.getMessage()
+        );
     }
 }

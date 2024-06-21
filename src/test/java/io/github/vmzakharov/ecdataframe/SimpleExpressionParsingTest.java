@@ -15,9 +15,11 @@ import io.github.vmzakharov.ecdataframe.dsl.value.LongValue;
 import io.github.vmzakharov.ecdataframe.dsl.value.Value;
 import io.github.vmzakharov.ecdataframe.dsl.visitor.InMemoryEvaluationVisitor;
 import org.eclipse.collections.impl.factory.Lists;
-import org.junit.Assert;
-import org.junit.Ignore;
-import org.junit.Test;
+
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 public class SimpleExpressionParsingTest
 {
@@ -26,24 +28,24 @@ public class SimpleExpressionParsingTest
     {
         Expression expression = ExpressionTestUtil.toExpression("-1\n");
 
-        Assert.assertEquals(UnaryExpr.class, expression.getClass());
+        assertEquals(UnaryExpr.class, expression.getClass());
         UnaryExpr unaryExpr = (UnaryExpr) expression;
-        Assert.assertEquals(UnaryOp.MINUS, unaryExpr.getOperation());
+        assertEquals(UnaryOp.MINUS, unaryExpr.getOperation());
     }
 
     @Test
     public void assignment()
     {
         Expression expression = ExpressionTestUtil.toExpression("a = 5\n");
-        Assert.assertEquals("a", ((AssingExpr) expression).getVarName());
+        assertEquals("a", ((AssingExpr) expression).getVarName());
 
         EvalContext evalContext = new SimpleEvalContext();
 
         LongValue result = (LongValue) expression.evaluate(new InMemoryEvaluationVisitor(evalContext));
 
-        Assert.assertEquals(5, result.longValue());
+        assertEquals(5, result.longValue());
 
-        Assert.assertEquals(5, ((LongValue) evalContext.getVariable("a")).longValue());
+        assertEquals(5, ((LongValue) evalContext.getVariable("a")).longValue());
     }
 
     @Test
@@ -51,16 +53,16 @@ public class SimpleExpressionParsingTest
     {
         Expression expression = ExpressionTestUtil.toExpression("x(1, y * 7)");
 
-        Assert.assertEquals(FunctionCallExpr.class, expression.getClass());
+        assertEquals(FunctionCallExpr.class, expression.getClass());
 
         FunctionCallExpr fcExpr = (FunctionCallExpr) expression;
 
-        Assert.assertEquals("x", fcExpr.getFunctionName());
+        assertEquals("x", fcExpr.getFunctionName());
         Expression param1 = fcExpr.getParameters().get(0);
         Expression param2 = fcExpr.getParameters().get(1);
 
-        Assert.assertEquals(LongValue.class, param1.getClass());
-        Assert.assertEquals(BinaryExpr.class, param2.getClass());
+        assertEquals(LongValue.class, param1.getClass());
+        assertEquals(BinaryExpr.class, param2.getClass());
     }
 
     @Test
@@ -68,12 +70,12 @@ public class SimpleExpressionParsingTest
     {
         Expression expression = ExpressionTestUtil.toExpression("fff()");
 
-        Assert.assertEquals(FunctionCallExpr.class, expression.getClass());
+        assertEquals(FunctionCallExpr.class, expression.getClass());
 
         FunctionCallExpr fcExpr = (FunctionCallExpr) expression;
 
-        Assert.assertEquals("fff", fcExpr.getFunctionName());
-        Assert.assertEquals(0, fcExpr.getParameters().size());
+        assertEquals("fff", fcExpr.getFunctionName());
+        assertEquals(0, fcExpr.getParameters().size());
     }
 
     @Test
@@ -83,12 +85,12 @@ public class SimpleExpressionParsingTest
 
         Expression expression = script.getExpressions().get(0);
 
-        Assert.assertEquals(ProjectionExpr.class, expression.getClass());
+        assertEquals(ProjectionExpr.class, expression.getClass());
 
         ProjectionExpr projectionExpr = (ProjectionExpr) expression;
 
-        Assert.assertEquals(2, projectionExpr.getProjectionElements().size());
-        Assert.assertNotNull(projectionExpr.getWhereClause());
+        assertEquals(2, projectionExpr.getProjectionElements().size());
+        assertNotNull(projectionExpr.getWhereClause());
     }
 
     @Test
@@ -102,13 +104,13 @@ public class SimpleExpressionParsingTest
 
         Expression expression = script.getExpressions().get(0);
 
-        Assert.assertEquals(ProjectionExpr.class, expression.getClass());
+        assertEquals(ProjectionExpr.class, expression.getClass());
 
         ProjectionExpr projectionExpr = (ProjectionExpr) expression;
 
-        Assert.assertEquals(2, projectionExpr.getProjectionElements().size());
-        Assert.assertEquals(Lists.mutable.of("barbar", "bazbaz"), projectionExpr.getElementNames());
-        Assert.assertNotNull(projectionExpr.getWhereClause());
+        assertEquals(2, projectionExpr.getProjectionElements().size());
+        assertEquals(Lists.mutable.of("barbar", "bazbaz"), projectionExpr.getElementNames());
+        assertNotNull(projectionExpr.getWhereClause());
     }
 
     @Test
@@ -118,19 +120,19 @@ public class SimpleExpressionParsingTest
 
         Expression expression = script.getExpressions().get(0);
 
-        Assert.assertEquals(VectorExpr.class, expression.getClass());
+        assertEquals(VectorExpr.class, expression.getClass());
 
         VectorExpr vectorExpr = (VectorExpr) expression;
 
-        Assert.assertEquals(3, vectorExpr.getElements().size());
+        assertEquals(3, vectorExpr.getElements().size());
 
-        Assert.assertEquals(
+        assertEquals(
                 Lists.immutable.of("\"a\"", "\"b\"", "\"c\""),
                 vectorExpr.getElements().collect(e -> ((Value) e).asStringLiteral()));
     }
 
     @Test
-    @Ignore
+    @Disabled
     public void singleElementVectorExpression()
     {
         // TODO: remove ambiguous syntax for single element arrays
@@ -138,13 +140,13 @@ public class SimpleExpressionParsingTest
 
         Expression expression = script.getExpressions().get(0);
 
-        Assert.assertEquals(VectorExpr.class, expression.getClass());
+        assertEquals(VectorExpr.class, expression.getClass());
 
         VectorExpr vectorExpr = (VectorExpr) expression;
 
-        Assert.assertEquals(3, vectorExpr.getElements().size());
+        assertEquals(3, vectorExpr.getElements().size());
 
-        Assert.assertEquals(
+        assertEquals(
                 Lists.immutable.of("\"a\""),
                 vectorExpr.getElements().collect(e -> ((Value) e).asStringLiteral()));
     }

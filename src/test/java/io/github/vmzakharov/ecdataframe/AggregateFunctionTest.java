@@ -5,10 +5,9 @@ import io.github.vmzakharov.ecdataframe.dsl.value.ValueType;
 import io.github.vmzakharov.ecdataframe.util.FormatWithPlaceholders;
 import org.eclipse.collections.api.list.ListIterable;
 import org.eclipse.collections.impl.factory.Lists;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class AggregateFunctionTest
 {
@@ -27,20 +26,19 @@ public class AggregateFunctionTest
     public void testFailureToClone()
     {
         AggregateFunction wontClone = new CloneResistant();
-        try
-        {
-            AggregateFunction cloned = wontClone.cloneWith("Baz", "Qux");
-            fail("Shouldn't get here");
-        }
-        catch (Exception e)
-        {
-            assertEquals(
-                    FormatWithPlaceholders
-                        .messageFromKey("AGG_CANNOT_CLONE")
-                        .with("operation", wontClone.getName())
-                        .toString(),
-                    e.getMessage());
-        }
+
+        Exception exception = assertThrows(
+                RuntimeException.class,
+                () ->  wontClone.cloneWith("Baz", "Qux")
+        );
+
+        assertEquals(
+                FormatWithPlaceholders
+                    .messageFromKey("AGG_CANNOT_CLONE")
+                    .with("operation", wontClone.getName())
+                    .toString(),
+                exception.getMessage()
+        );
     }
 
     private static class CloneResistant

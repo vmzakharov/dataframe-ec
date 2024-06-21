@@ -15,16 +15,17 @@ import org.eclipse.collections.api.list.ListIterable;
 import org.eclipse.collections.api.tuple.Twin;
 import org.eclipse.collections.impl.factory.Lists;
 import org.eclipse.collections.impl.tuple.Tuples;
-import org.junit.Assert;
-import org.junit.BeforeClass;
-import org.junit.Test;
+
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 
 import static io.github.vmzakharov.ecdataframe.TypeInferenceUtil.assertScriptType;
 import static io.github.vmzakharov.ecdataframe.util.FormatWithPlaceholders.messageFromKey;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class TypeInferenceTest
 {
-    @BeforeClass
+    @BeforeAll
     public static void initializeErrorMessages()
     {
         ConfigureMessages.initialize();
@@ -254,9 +255,10 @@ public class TypeInferenceTest
                         + "x[1]",
                 ValueType.VOID);
 
-        assertScriptType("x = v('a', 'b', 1)\n"
-                        + "i = 2\n"
-                        + "x[i]",
+        assertScriptType("""
+                        x = v('a', 'b', 1)
+                        i = 2
+                        x[i]""",
                 ValueType.VOID);
     }
 
@@ -306,19 +308,21 @@ public class TypeInferenceTest
     public void conditionalIncompatibleTypes()
     {
         this.assertError(
-                   "a = 1\n"
-                + "b = 2\n"
-                + "x = 5\n"
-                + "if a > b then\n"
-                + "  x\n"
-                + "else\n"
-                + "  'abc'\n"
-                + "endif",
-                this.prettyPrint("if a > b then\n"
-                        + "  x\n"
-                        + "else\n"
-                        + "  'abc'\n"
-                        + "endif"),
+                """
+                a = 1
+                b = 2
+                x = 5
+                if a > b then
+                  x
+                else
+                  'abc'
+                endif""",
+                this.prettyPrint("""
+                        if a > b then
+                          x
+                        else
+                          'abc'
+                        endif"""),
                 messageFromKey("TYPE_INFER_ELSE_INCOMPATIBLE").toString());
     }
 
@@ -352,35 +356,41 @@ public class TypeInferenceTest
     public void manyErrorsInOneScriptCatchesAllErrors()
     {
         this.assertErrors(
-                  "x = 5\n"
-                + "x + 'abc'\n"
-                + "'x' < 1\n",
+                """
+                x = 5
+                x + 'abc'
+                'x' < 1
+                """,
                 Lists.immutable.of(
                         Tuples.twin(messageFromKey("TYPE_INFER_TYPES_IN_EXPRESSION").toString(), "(x + \"abc\")"),
                         Tuples.twin(messageFromKey("TYPE_INFER_TYPES_IN_EXPRESSION").toString(), "(\"x\" < 1)")
                 ));
 
         this.assertErrors(
-                  "y = 5\n"
-                + "x + 1\n"
-                + "'x' < y\n",
+                """
+                y = 5
+                x + 1
+                'x' < y
+                """,
                 Lists.immutable.of(
                         Tuples.twin(messageFromKey("TYPE_INFER_UNDEFINED_VARIABLE").toString(), "x"),
                         Tuples.twin(messageFromKey("TYPE_INFER_TYPES_IN_EXPRESSION").toString(), "(\"x\" < y)")
                 ));
 
         this.assertErrors(
-                  "if x > 3\n"
-                + "then 'abc'\n"
-                + "else 1\n"
-                + "endif",
+                """
+                if x > 3
+                then 'abc'
+                else 1
+                endif""",
                 Lists.immutable.of(
                         Tuples.twin(messageFromKey("TYPE_INFER_UNDEFINED_VARIABLE").toString(), "x"),
-                        Tuples.twin(messageFromKey("TYPE_INFER_ELSE_INCOMPATIBLE").toString(), "if (x > 3) then\n"
-                                + "  \"abc\"\n"
-                                + "else\n"
-                                + "  1\n"
-                                + "endif")
+                        Tuples.twin(messageFromKey("TYPE_INFER_ELSE_INCOMPATIBLE").toString(), """
+                                if (x > 3) then
+                                  "abc"
+                                else
+                                  1
+                                endif""")
                 ));
     }
 
@@ -401,10 +411,11 @@ public class TypeInferenceTest
         this.assertError("1 + abc", "abc", messageFromKey("TYPE_INFER_UNDEFINED_VARIABLE").toString());
         this.assertError("x == 'abc'\ny + x", "x", messageFromKey("TYPE_INFER_UNDEFINED_VARIABLE").toString());
         this.assertError(
-                  "if x == 4\n"
-                + "then 'four'\n"
-                + "else 'not four'\n"
-                + "endif",
+                """
+                if x == 4
+                then 'four'
+                else 'not four'
+                endif""",
                 "x", messageFromKey("TYPE_INFER_UNDEFINED_VARIABLE").toString());
     }
 
@@ -414,9 +425,9 @@ public class TypeInferenceTest
         TypeInferenceVisitor visitor = new TypeInferenceVisitor();
         script.accept(visitor);
 
-        Assert.assertTrue("Expected a type inference error", visitor.hasErrors());
+        assertTrue(visitor.hasErrors(), "Expected a type inference error");
 
-        Assert.assertEquals(expectedErrors, visitor.getErrors());
+        assertEquals(expectedErrors, visitor.getErrors());
     }
 
     private void assertError(String scriptString, String errorText)
@@ -435,10 +446,10 @@ public class TypeInferenceTest
         TypeInferenceVisitor visitor = new TypeInferenceVisitor(context);
         script.accept(visitor);
 
-        Assert.assertTrue("Expected a type inference error", visitor.hasErrors());
-        Assert.assertEquals("Error type", errorText, visitor.getErrorDescription());
+        assertTrue(visitor.hasErrors(), "Expected a type inference error");
+        assertEquals(errorText, visitor.getErrorDescription(), "Error type");
 
-        Assert.assertEquals("Error expression", errorDescription, visitor.getErrorExpressionString());
+        assertEquals(errorDescription, visitor.getErrorExpressionString(), "Error expression");
     }
 
     private String prettyPrint(String expressionString)

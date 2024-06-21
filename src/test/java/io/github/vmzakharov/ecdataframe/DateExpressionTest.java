@@ -1,9 +1,12 @@
 package io.github.vmzakharov.ecdataframe;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.time.LocalDate;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class DateExpressionTest
 {
@@ -11,13 +14,13 @@ public class DateExpressionTest
     public void parseDate()
     {
         LocalDate date = ExpressionTestUtil.evaluateToDate("toDate(\"2020-02-15\")");
-        Assert.assertEquals(LocalDate.of(2020, 2, 15), date);
+        assertEquals(LocalDate.of(2020, 2, 15), date);
     }
 
     @Test
     public void dateProximity()
     {
-        Assert.assertTrue(ExpressionTestUtil.evaluateToBoolean("withinDays(toDate(\"2020-02-15\"), toDate(\"2020-02-17\"), 3)"));
-        Assert.assertFalse(ExpressionTestUtil.evaluateToBoolean("withinDays(toDate(\"2020-02-11\"), toDate(\"2020-02-17\"), 3)"));
+        assertTrue(ExpressionTestUtil.evaluateToBoolean("withinDays(toDate(\"2020-02-15\"), toDate(\"2020-02-17\"), 3)"));
+        assertFalse(ExpressionTestUtil.evaluateToBoolean("withinDays(toDate(\"2020-02-11\"), toDate(\"2020-02-17\"), 3)"));
     }
 }

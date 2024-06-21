@@ -2,10 +2,12 @@ package io.github.vmzakharov.ecdataframe;
 
 import io.github.vmzakharov.ecdataframe.dsl.SimpleEvalContext;
 import io.github.vmzakharov.ecdataframe.dsl.value.Value;
-import org.junit.Test;
+
+import org.junit.jupiter.api.Test;
 
 import static io.github.vmzakharov.ecdataframe.ExpressionTestUtil.scriptEvaluatesToFalse;
 import static io.github.vmzakharov.ecdataframe.ExpressionTestUtil.scriptEvaluatesToTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class IsEmptyOperationTest
 {
@@ -55,21 +57,27 @@ public class IsEmptyOperationTest
         scriptEvaluatesToFalse("x is not null", context);
     }
 
-    @Test(expected = UnsupportedOperationException.class)
+    @Test
     public void voidValueNotIsNotEmpty()
     {
         SimpleEvalContext context = new SimpleEvalContext();
         context.setVariable("x", Value.VOID);
 
-        scriptEvaluatesToFalse("x is not empty", context);
+        assertThrows(
+                UnsupportedOperationException.class,
+                () -> scriptEvaluatesToFalse("x is not empty", context)
+        );
     }
 
-    @Test(expected = UnsupportedOperationException.class)
+    @Test
     public void voidValueNotIsEmpty()
     {
         SimpleEvalContext context = new SimpleEvalContext();
         context.setVariable("x", Value.VOID);
 
-        scriptEvaluatesToFalse("x is empty", context);
+        assertThrows(
+                UnsupportedOperationException.class,
+                () -> scriptEvaluatesToFalse("x is empty", context)
+        );
     }
 }

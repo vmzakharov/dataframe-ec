@@ -5,18 +5,20 @@ import io.github.vmzakharov.ecdataframe.dsl.SimpleEvalContext;
 import io.github.vmzakharov.ecdataframe.dsl.value.FloatValue;
 import io.github.vmzakharov.ecdataframe.dsl.value.IntValue;
 import io.github.vmzakharov.ecdataframe.dsl.value.Value;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
 
 import static io.github.vmzakharov.ecdataframe.ExpressionTestUtil.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 public class ExpressionFloatValueTest
 {
     static private final double TOLERANCE = 0.00000001;
     private EvalContext context;
 
-    @Before
+    @BeforeEach
     public void setContextVariables()
     {
         this.context = new SimpleEvalContext();
@@ -126,7 +128,7 @@ public class ExpressionFloatValueTest
     {
         Value value = evaluateScriptWithContext(scriptString, this.context);
 
-        Assert.assertTrue(value.isFloat());
-        Assert.assertEquals(expected, ((FloatValue) value).floatValue(), TOLERANCE);
+        assertTrue(value.isFloat());
+        assertEquals(expected, ((FloatValue) value).floatValue(), TOLERANCE);
     }
 }

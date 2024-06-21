@@ -7,15 +7,17 @@ import io.github.vmzakharov.ecdataframe.dsl.value.LongValue;
 import io.github.vmzakharov.ecdataframe.dsl.value.StringValue;
 import io.github.vmzakharov.ecdataframe.dsl.value.Value;
 import io.github.vmzakharov.ecdataframe.dsl.visitor.InMemoryEvaluationVisitor;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 public class HandcraftedExpressionTreeTest
 {
     private InMemoryEvaluationVisitor evaluationVisitor;
 
-    @Before
+    @BeforeEach
     public void setEvalContext()
     {
         this.evaluationVisitor = new InMemoryEvaluationVisitor();
@@ -30,7 +32,7 @@ public class HandcraftedExpressionTreeTest
                 ArithmeticOp.ADD
         ).evaluate(this.evaluationVisitor);
 
-        Assert.assertEquals(579, ((LongValue) result).longValue());
+        assertEquals(579, ((LongValue) result).longValue());
     }
 
     @Test
@@ -42,7 +44,7 @@ public class HandcraftedExpressionTreeTest
                 ArithmeticOp.ADD
         ).evaluate(this.evaluationVisitor);
 
-        Assert.assertEquals(579.346, ((DoubleValue) result).doubleValue(), 0.0000000001);
+        assertEquals(579.346, ((DoubleValue) result).doubleValue(), 0.0000000001);
     }
 
     @Test
@@ -54,6 +56,6 @@ public class HandcraftedExpressionTreeTest
                 ArithmeticOp.ADD
         ).evaluate(this.evaluationVisitor);
 
-        Assert.assertEquals("OompaLoompa", result.stringValue());
+        assertEquals("OompaLoompa", result.stringValue());
     }
 }
