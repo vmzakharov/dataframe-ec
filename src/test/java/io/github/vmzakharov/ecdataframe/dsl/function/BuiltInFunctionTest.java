@@ -13,14 +13,15 @@ import org.eclipse.collections.api.factory.Sets;
 import org.eclipse.collections.api.set.ImmutableSet;
 import org.eclipse.collections.impl.factory.Lists;
 import org.eclipse.collections.impl.factory.primitive.LongLists;
-import org.junit.Assert;
-import org.junit.Test;
+
+import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 import static io.github.vmzakharov.ecdataframe.ExpressionTestUtil.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class BuiltInFunctionTest
 {
@@ -40,7 +41,7 @@ public class BuiltInFunctionTest
 
         script.evaluate(new InMemoryEvaluationVisitor());
 
-        Assert.assertEquals("4\nene-mene\nHello!\n", collectingPrinter.toString());
+        assertEquals("4\nene-mene\nHello!\n", collectingPrinter.toString());
     }
 
     @Test
@@ -57,86 +58,86 @@ public class BuiltInFunctionTest
 
         script.evaluate(new InMemoryEvaluationVisitor());
 
-        Assert.assertEquals("4 = 4\nene-mene, hello!\n", collectingPrinter.toString());
+        assertEquals("4 = 4\nene-mene, hello!\n", collectingPrinter.toString());
     }
 
     @Test
     public void substring()
     {
-        Assert.assertEquals("there", evaluateToString("substr(\"Hello, there!\", 7, 12)"));
-        Assert.assertEquals("there!", evaluateToString("substr(\"Hello, there!\", 7)"));
-        Assert.assertEquals("Hello, there", evaluateToString("substr(\"Hello, there!\", 0, 12)"));
+        assertEquals("there", evaluateToString("substr(\"Hello, there!\", 7, 12)"));
+        assertEquals("there!", evaluateToString("substr(\"Hello, there!\", 7)"));
+        assertEquals("Hello, there", evaluateToString("substr(\"Hello, there!\", 0, 12)"));
 
         SimpleEvalContext context = new SimpleEvalContext();
         context.setVariable("x", Value.VOID);
-        Assert.assertEquals(Value.VOID, evaluateScriptWithContext("substr(x, 10, 20)", context));
+        assertEquals(Value.VOID, evaluateScriptWithContext("substr(x, 10, 20)", context));
     }
 
     @Test
     public void toUpper()
     {
-        Assert.assertEquals("HELLO", evaluateToString("toUpper('Hello')"));
-        Assert.assertEquals("THERE! 123", evaluateToString("toUpper(\"THERE! 123\")"));
+        assertEquals("HELLO", evaluateToString("toUpper('Hello')"));
+        assertEquals("THERE! 123", evaluateToString("toUpper(\"THERE! 123\")"));
     }
 
     @Test
     public void trim()
     {
-        Assert.assertEquals("Hello", evaluateToString("trim('Hello    ')"));
-        Assert.assertEquals("Hello", evaluateToString("trim('   Hello')"));
-        Assert.assertEquals("Hello", evaluateToString("trim('    Hello    ')"));
-        Assert.assertEquals("Hello  there", evaluateToString("trim('    Hello  there    ')"));
+        assertEquals("Hello", evaluateToString("trim('Hello    ')"));
+        assertEquals("Hello", evaluateToString("trim('   Hello')"));
+        assertEquals("Hello", evaluateToString("trim('    Hello    ')"));
+        assertEquals("Hello  there", evaluateToString("trim('    Hello  there    ')"));
     }
 
     @Test
     public void withinDays()
     {
-        Assert.assertTrue(evaluateToBoolean("withinDays(toDate(2020, 11, 22), toDate(2020, 11, 20), 4)"));
-        Assert.assertTrue(evaluateToBoolean("withinDays(toDate(2020, 11, 20), toDate(2020, 11, 22), 4)"));
-        Assert.assertFalse(evaluateToBoolean("withinDays(toDate(2020, 11, 22), toDate(2020, 11, 20), 1)"));
-        Assert.assertFalse(evaluateToBoolean("withinDays(toDate(2020, 11, 20), toDate(2020, 11, 24), 2)"));
+        assertTrue(evaluateToBoolean("withinDays(toDate(2020, 11, 22), toDate(2020, 11, 20), 4)"));
+        assertTrue(evaluateToBoolean("withinDays(toDate(2020, 11, 20), toDate(2020, 11, 22), 4)"));
+        assertFalse(evaluateToBoolean("withinDays(toDate(2020, 11, 22), toDate(2020, 11, 20), 1)"));
+        assertFalse(evaluateToBoolean("withinDays(toDate(2020, 11, 20), toDate(2020, 11, 24), 2)"));
     }
 
     @Test
     public void functionNamesNotCaseSensitive()
     {
-        Assert.assertEquals("HELLO", evaluateToString("toUpper('Hello')"));
-        Assert.assertEquals("HELLO", evaluateToString("toupper('Hello')"));
-        Assert.assertEquals("HELLO", evaluateToString("TOUPPER('Hello')"));
-        Assert.assertEquals("HELLO", evaluateToString("ToUpper('Hello')"));
+        assertEquals("HELLO", evaluateToString("toUpper('Hello')"));
+        assertEquals("HELLO", evaluateToString("toupper('Hello')"));
+        assertEquals("HELLO", evaluateToString("TOUPPER('Hello')"));
+        assertEquals("HELLO", evaluateToString("ToUpper('Hello')"));
     }
 
     @Test
     public void startsWith()
     {
-        Assert.assertTrue(evaluateToBoolean("startsWith(\"Hello, there!\", \"Hello\")"));
-        Assert.assertFalse(evaluateToBoolean("startsWith(\"Hello, there!\", \"Hola\")"));
-        Assert.assertFalse(evaluateToBoolean("startsWith(\"Hello, there!\", \"there\")"));
+        assertTrue(evaluateToBoolean("startsWith(\"Hello, there!\", \"Hello\")"));
+        assertFalse(evaluateToBoolean("startsWith(\"Hello, there!\", \"Hola\")"));
+        assertFalse(evaluateToBoolean("startsWith(\"Hello, there!\", \"there\")"));
     }
 
     @Test
     public void stringContains()
     {
-        Assert.assertTrue(evaluateToBoolean("contains(\"Hello, there!\", \"Hello\")"));
-        Assert.assertTrue(evaluateToBoolean("contains(\"Hello, there!\", \"lo, th\")"));
-        Assert.assertTrue(evaluateToBoolean("contains(\"Hello, there!\", \"there!\")"));
-        Assert.assertFalse(evaluateToBoolean("contains(\"Hello, there!\", \"Hola\")"));
+        assertTrue(evaluateToBoolean("contains(\"Hello, there!\", \"Hello\")"));
+        assertTrue(evaluateToBoolean("contains(\"Hello, there!\", \"lo, th\")"));
+        assertTrue(evaluateToBoolean("contains(\"Hello, there!\", \"there!\")"));
+        assertFalse(evaluateToBoolean("contains(\"Hello, there!\", \"Hola\")"));
     }
 
     @Test
     public void vectorFactory()
     {
-        Assert.assertEquals(
+        assertEquals(
                 LongLists.immutable.of(1L, 2L, 3L),
                 evaluateToVector("v(1, 2, 3)").collectLong(each -> ((LongValue) each).longValue())
         );
 
-        Assert.assertEquals(
+        assertEquals(
                 Lists.immutable.of("abc"),
                 evaluateToVector("v('abc')").collect(Value::stringValue)
         );
 
-        Assert.assertEquals(
+        assertEquals(
                 Lists.immutable.of(1L, "two", 3L),
                 evaluateToVector("v(1, 'two', 3)")
                         .collect(each -> each.isLong() ? ((LongValue) each).longValue() : each.stringValue())
@@ -146,14 +147,14 @@ public class BuiltInFunctionTest
     @Test
     public void abs()
     {
-        Assert.assertEquals(10, evaluateToLong("abs(-10)"));
-        Assert.assertEquals(10, evaluateToLong("abs(10)"));
-        Assert.assertEquals(10.0, evaluateToDouble("abs(-10.0)"), 0.0);
-        Assert.assertEquals(10.0, evaluateToDouble("abs(10.0)"), 0.0);
+        assertEquals(10, evaluateToLong("abs(-10)"));
+        assertEquals(10, evaluateToLong("abs(10)"));
+        assertEquals(10.0, evaluateToDouble("abs(-10.0)"), 0.0);
+        assertEquals(10.0, evaluateToDouble("abs(10.0)"), 0.0);
 
         SimpleEvalContext context = new SimpleEvalContext();
         context.setVariable("x", Value.VOID);
-        Assert.assertEquals(Value.VOID, evaluateScriptWithContext("abs(x)", context));
+        assertEquals(Value.VOID, evaluateScriptWithContext("abs(x)", context));
     }
 
     @Test
@@ -162,9 +163,9 @@ public class BuiltInFunctionTest
         SimpleEvalContext context = new SimpleEvalContext();
         context.setVariable("y", new IntValue(-5));
         IntValue result1 = (IntValue) evaluateScriptWithContext("abs(y)", context);
-        Assert.assertEquals(5, result1.intValue());
+        assertEquals(5, result1.intValue());
         IntValue result2 = (IntValue) evaluateScriptWithContext("abs(-y)", context);
-        Assert.assertEquals(5, result2.intValue());
+        assertEquals(5, result2.intValue());
     }
 
     @Test
@@ -174,15 +175,15 @@ public class BuiltInFunctionTest
         context.setVariable("y", new IntValue(123));
         context.setVariable("z", new IntValue(-456));
         Value result1 = evaluateScriptWithContext("toString(y)", context);
-        Assert.assertEquals("123", result1.stringValue());
+        assertEquals("123", result1.stringValue());
         Value result2 = evaluateScriptWithContext("toString(z)", context);
-        Assert.assertEquals("-456", result2.stringValue());
+        assertEquals("-456", result2.stringValue());
     }
 
-    @Test(expected = RuntimeException.class)
+    @Test
     public void absForString()
     {
-        evaluateExpression("abs('Hello')");
+        assertThrows(RuntimeException.class, () -> evaluateExpression("abs('Hello')"));
     }
 
     @Test
@@ -191,9 +192,9 @@ public class BuiltInFunctionTest
         SimpleEvalContext context = new SimpleEvalContext();
         context.setVariable("y", new FloatValue(-5.25f));
         FloatValue result1 = (FloatValue) evaluateScriptWithContext("abs(y)", context);
-        Assert.assertEquals(5.25f, result1.floatValue(), TOLERANCE);
+        assertEquals(5.25f, result1.floatValue(), TOLERANCE);
         FloatValue result2 = (FloatValue) evaluateScriptWithContext("abs(-y)", context);
-        Assert.assertEquals(5.25f, result2.floatValue(), TOLERANCE);
+        assertEquals(5.25f, result2.floatValue(), TOLERANCE);
     }
 
     @Test
@@ -205,78 +206,78 @@ public class BuiltInFunctionTest
         context.setVariable("z", new FloatValue(-456.25f));
 
         Value result1 = evaluateScriptWithContext("toString(y)", context);
-        Assert.assertEquals("123.125", result1.stringValue());
+        assertEquals("123.125", result1.stringValue());
 
         Value result2 = evaluateScriptWithContext("toString(z)", context);
-        Assert.assertEquals("-456.25", result2.stringValue());
+        assertEquals("-456.25", result2.stringValue());
     }
 
     @Test
     public void toStringFunction()
     {
-        Assert.assertEquals("12345", evaluateToString("toString(12345)"));
-        Assert.assertEquals("-10", evaluateToString("toString(-10)"));
+        assertEquals("12345", evaluateToString("toString(12345)"));
+        assertEquals("-10", evaluateToString("toString(-10)"));
 
-        Assert.assertEquals("123.45", evaluateToString("toString(123.45)"));
+        assertEquals("123.45", evaluateToString("toString(123.45)"));
 
-        Assert.assertEquals("Boo", evaluateToString("toString('Boo')"));
+        assertEquals("Boo", evaluateToString("toString('Boo')"));
 
-        Assert.assertEquals("2020-10-06", evaluateToString("toString(toDate('2020-10-06'))"));
+        assertEquals("2020-10-06", evaluateToString("toString(toDate('2020-10-06'))"));
 
-        Assert.assertEquals(LocalDate.of(2020, 10, 6), evaluateToDate("toDate(toString(toDate('2020-10-06')))"));
+        assertEquals(LocalDate.of(2020, 10, 6), evaluateToDate("toDate(toString(toDate('2020-10-06')))"));
     }
 
     @Test
     public void toDate()
     {
-        Assert.assertEquals(LocalDate.of(2021, 11, 1), evaluateToDate("toDate('2021-11-01')"));
-        Assert.assertEquals(LocalDate.of(2021, 11, 21), evaluateToDate("toDate(2021, 11, 21)"));
-        Assert.assertEquals(LocalDate.of(2021, 11, 21), evaluateToDate("toDate(\"2021-11-21\")"));
-        Assert.assertEquals(LocalDate.of(2011, 12, 20), evaluateToDate("toDate('2011-12-20')"));
+        assertEquals(LocalDate.of(2021, 11, 1), evaluateToDate("toDate('2021-11-01')"));
+        assertEquals(LocalDate.of(2021, 11, 21), evaluateToDate("toDate(2021, 11, 21)"));
+        assertEquals(LocalDate.of(2021, 11, 21), evaluateToDate("toDate(\"2021-11-21\")"));
+        assertEquals(LocalDate.of(2011, 12, 20), evaluateToDate("toDate('2011-12-20')"));
     }
 
     @Test
     public void toDateTime()
     {
-        Assert.assertEquals(LocalDateTime.of(2021, 11,  1, 10, 35), evaluateToDateTime("toDateTime('2021-11-01T10:35')"));
-        Assert.assertEquals(LocalDateTime.of(2021, 11, 21, 10, 35), evaluateToDateTime("toDateTime(2021, 11, 21, 10, 35)"));
-        Assert.assertEquals(LocalDateTime.of(2021, 11, 21, 15, 5, 35), evaluateToDateTime("toDateTime(\"2021-11-21T15:05:35\")"));
-        Assert.assertEquals(LocalDateTime.of(2011, 12, 20, 20, 45, 5), evaluateToDateTime("toDateTime('2011-12-20T20:45:05')"));
+        assertEquals(LocalDateTime.of(2021, 11,  1, 10, 35), evaluateToDateTime("toDateTime('2021-11-01T10:35')"));
+        assertEquals(LocalDateTime.of(2021, 11, 21, 10, 35), evaluateToDateTime("toDateTime(2021, 11, 21, 10, 35)"));
+        assertEquals(LocalDateTime.of(2021, 11, 21, 15, 5, 35), evaluateToDateTime("toDateTime(\"2021-11-21T15:05:35\")"));
+        assertEquals(LocalDateTime.of(2011, 12, 20, 20, 45, 5), evaluateToDateTime("toDateTime('2011-12-20T20:45:05')"));
     }
 
     @Test
     public void toLong()
     {
-        Assert.assertEquals(123L, evaluateToLong("toLong('123')"));
-        Assert.assertEquals(-567L, evaluateToLong("toLong(\"-567\")"));
+        assertEquals(123L, evaluateToLong("toLong('123')"));
+        assertEquals(-567L, evaluateToLong("toLong(\"-567\")"));
     }
 
     @Test
     public void toInt()
     {
-        Assert.assertEquals(123, evaluateToInt("toInt('123')"));
-        Assert.assertEquals(-567, evaluateToInt("toInt(\"-567\")"));
+        assertEquals(123, evaluateToInt("toInt('123')"));
+        assertEquals(-567, evaluateToInt("toInt(\"-567\")"));
     }
 
     @Test
     public void toDouble()
     {
-        Assert.assertEquals(123.0, evaluateToDouble("toDouble('123')"), TOLERANCE);
-        Assert.assertEquals(-456.789, evaluateToDouble("toDouble('-456.789')"), TOLERANCE);
+        assertEquals(123.0, evaluateToDouble("toDouble('123')"), TOLERANCE);
+        assertEquals(-456.789, evaluateToDouble("toDouble('-456.789')"), TOLERANCE);
     }
 
     @Test
     public void toFloat()
     {
-        Assert.assertEquals(123.0f, evaluateToFloat("toFloat('123')"), TOLERANCE);
-        Assert.assertEquals(-456.789f, evaluateToFloat("toFloat('-456.789')"), TOLERANCE);
+        assertEquals(123.0f, evaluateToFloat("toFloat('123')"), TOLERANCE);
+        assertEquals(-456.789f, evaluateToFloat("toFloat('-456.789')"), TOLERANCE);
     }
 
     @Test
     public void toDecimal()
     {
-        Assert.assertEquals(BigDecimal.valueOf(123, 5), evaluateToDecimal("toDecimal(123, 5)"));
-        Assert.assertEquals(BigDecimal.valueOf(-456, -2), evaluateToDecimal("toDecimal(-456, -2)"));
+        assertEquals(BigDecimal.valueOf(123, 5), evaluateToDecimal("toDecimal(123, 5)"));
+        assertEquals(BigDecimal.valueOf(-456, -2), evaluateToDecimal("toDecimal(-456, -2)"));
     }
 
     @Test
@@ -291,6 +292,6 @@ public class BuiltInFunctionTest
                 "toFloat",  "toLong", "toInt", "toString", "toUpper", "trim", "withinDays", "format", "toDecimal", "v"
         );
 
-        Assert.assertEquals(expectedFunctionNames.collect(String::toUpperCase), actualFunctionNames);
+        assertEquals(expectedFunctionNames.collect(String::toUpperCase), actualFunctionNames);
     }
 }

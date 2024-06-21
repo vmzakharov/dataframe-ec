@@ -16,9 +16,9 @@ import io.github.vmzakharov.ecdataframe.dsl.visitor.TypeInferenceVisitor;
 import io.github.vmzakharov.ecdataframe.util.ExpressionParserHelper;
 import org.eclipse.collections.api.factory.Lists;
 import org.eclipse.collections.api.list.ListIterable;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -26,12 +26,13 @@ import java.time.LocalDateTime;
 import static io.github.vmzakharov.ecdataframe.dsl.value.ValueType.DOUBLE;
 import static io.github.vmzakharov.ecdataframe.dsl.value.ValueType.LONG;
 import static io.github.vmzakharov.ecdataframe.dsl.value.ValueType.STRING;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class HierarchicalDataSetProjectionTest
 {
     private HierarchicalDataSet dataSet;
 
-    @Before
+    @BeforeEach
     public void initializeDataSet()
     {
         this.dataSet = new ObjectListDataSet("Person", Lists.immutable.of(
@@ -43,23 +44,23 @@ public class HierarchicalDataSetProjectionTest
     @Test
     public void simpleDataSetOperations()
     {
-        Assert.assertTrue(this.dataSet.hasNext());
+        assertTrue(this.dataSet.hasNext());
 
         this.dataSet.next();
 
-        Assert.assertEquals("Alice", this.dataSet.getValue("name"));
-        Assert.assertEquals(123L, this.dataSet.getValue("luckyNumber"));
-        Assert.assertEquals(95.7, this.dataSet.getValue("temperature"));
+        assertEquals("Alice", this.dataSet.getValue("name"));
+        assertEquals(123L, this.dataSet.getValue("luckyNumber"));
+        assertEquals(95.7, this.dataSet.getValue("temperature"));
 
-        Assert.assertTrue(this.dataSet.hasNext());
+        assertTrue(this.dataSet.hasNext());
 
         this.dataSet.next();
 
-        Assert.assertEquals("Bob", this.dataSet.getValue("name"));
-        Assert.assertEquals(456L, this.dataSet.getValue("luckyNumber"));
-        Assert.assertEquals(36.6, this.dataSet.getValue("temperature"));
+        assertEquals("Bob", this.dataSet.getValue("name"));
+        assertEquals(456L, this.dataSet.getValue("luckyNumber"));
+        assertEquals(36.6, this.dataSet.getValue("temperature"));
 
-        Assert.assertFalse(this.dataSet.hasNext());
+        assertFalse(this.dataSet.hasNext());
     }
 
     @Test
@@ -67,22 +68,22 @@ public class HierarchicalDataSetProjectionTest
     {
         this.dataSet.next();
 
-        Assert.assertEquals("Alice", this.dataSet.getValue("name"));
-        Assert.assertEquals(123L, this.dataSet.getValue("luckyNumber"));
-        Assert.assertEquals(123L, this.dataSet.getValue("bigLuckyNumber"));
-        Assert.assertEquals(95.7, this.dataSet.getValue("temperature"));
-        Assert.assertEquals(95.7, this.dataSet.getValue("bigTemperature"));
-        Assert.assertEquals("Lutefisk", this.dataSet.getValue("favoriteFood.description"));
+        assertEquals("Alice", this.dataSet.getValue("name"));
+        assertEquals(123L, this.dataSet.getValue("luckyNumber"));
+        assertEquals(123L, this.dataSet.getValue("bigLuckyNumber"));
+        assertEquals(95.7, this.dataSet.getValue("temperature"));
+        assertEquals(95.7, this.dataSet.getValue("bigTemperature"));
+        assertEquals("Lutefisk", this.dataSet.getValue("favoriteFood.description"));
 
         this.dataSet.next();
 
-        Assert.assertEquals("Bob", this.dataSet.getValue("name"));
-        Assert.assertEquals(456L, this.dataSet.getValue("luckyNumber"));
-        Assert.assertEquals(456L, this.dataSet.getValue("bigLuckyNumber"));
-        Assert.assertEquals(36.6, this.dataSet.getValue("bigTemperature"));
-        Assert.assertEquals(LocalDate.of(2022, 4, 2), this.dataSet.getValue("specialDate"));
-        Assert.assertEquals("Chocolate", this.dataSet.getValue("favoriteFood.description"));
-        Assert.assertEquals(LocalDateTime.of(2022, 4, 6, 15, 24, 35), this.dataSet.getValue("favoriteFood.lastEaten"));
+        assertEquals("Bob", this.dataSet.getValue("name"));
+        assertEquals(456L, this.dataSet.getValue("luckyNumber"));
+        assertEquals(456L, this.dataSet.getValue("bigLuckyNumber"));
+        assertEquals(36.6, this.dataSet.getValue("bigTemperature"));
+        assertEquals(LocalDate.of(2022, 4, 2), this.dataSet.getValue("specialDate"));
+        assertEquals("Chocolate", this.dataSet.getValue("favoriteFood.description"));
+        assertEquals(LocalDateTime.of(2022, 4, 6, 15, 24, 35), this.dataSet.getValue("favoriteFood.lastEaten"));
     }
 
     @Test
@@ -105,7 +106,7 @@ public class HierarchicalDataSetProjectionTest
 
         ListIterable<ValueType> projectionExpressionTypes = expr.getProjectionExpressions().collect(visitor::inferExpressionType);
 
-        Assert.assertEquals(Lists.immutable.of(STRING, LONG, DOUBLE, STRING), projectionExpressionTypes);
+        assertEquals(Lists.immutable.of(STRING, LONG, DOUBLE, STRING), projectionExpressionTypes);
     }
 
     @Test
@@ -128,7 +129,7 @@ public class HierarchicalDataSetProjectionTest
 
         Value result = script.evaluate(visitor);
 
-        Assert.assertEquals(DataFrameValue.class, result.getClass());
+        assertEquals(DataFrameValue.class, result.getClass());
 
         DataFrameUtil.assertEquals(
                 new DataFrame("expected")
@@ -158,7 +159,7 @@ public class HierarchicalDataSetProjectionTest
 
         Value result = script.evaluate(visitor);
 
-        Assert.assertEquals(DataFrameValue.class, result.getClass());
+        assertEquals(DataFrameValue.class, result.getClass());
 
         DataFrameUtil.assertEquals(
                 new DataFrame("expected")
@@ -189,7 +190,7 @@ public class HierarchicalDataSetProjectionTest
 
         Value result = script.evaluate(visitor);
 
-        Assert.assertEquals(DataFrameValue.class, result.getClass());
+        assertEquals(DataFrameValue.class, result.getClass());
 
         DataFrameUtil.assertEquals(
                 new DataFrame("expected")
@@ -221,7 +222,7 @@ public class HierarchicalDataSetProjectionTest
 
         Value result = script.evaluate(visitor);
 
-        Assert.assertEquals(DataFrameValue.class, result.getClass());
+        assertEquals(DataFrameValue.class, result.getClass());
 
         DataFrameUtil.assertEquals(
                 new DataFrame("expected")

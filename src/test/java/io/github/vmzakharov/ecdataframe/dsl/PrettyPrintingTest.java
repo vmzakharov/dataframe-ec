@@ -2,8 +2,9 @@ package io.github.vmzakharov.ecdataframe.dsl;
 
 import io.github.vmzakharov.ecdataframe.ExpressionTestUtil;
 import io.github.vmzakharov.ecdataframe.dsl.visitor.PrettyPrintVisitor;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 public class PrettyPrintingTest
 {
@@ -19,7 +20,7 @@ public class PrettyPrintingTest
 
         String result = PrettyPrintVisitor.exprToString(script);
 
-        Assert.assertEquals("x = 1\n"
+        assertEquals("x = 1\n"
                 + "y = 2\n"
                 + "z = (x + y)\n"
                 + "((3 + 1) + 2)\n"
@@ -40,7 +41,7 @@ public class PrettyPrintingTest
 
         String result = PrettyPrintVisitor.exprToString(script);
 
-        Assert.assertEquals(
+        assertEquals(
                   "function sum(a, b)\n"
                 + "{\n"
                 + "  (a + b)\n"
@@ -63,7 +64,7 @@ public class PrettyPrintingTest
 
         String result = PrettyPrintVisitor.exprToString(script);
 
-        Assert.assertEquals("x = 1\n"
+        assertEquals("x = 1\n"
                 + "y = 2\n"
                 + "foo(x, (y + 2), time(), \"Oy\")\n"
                 + "((3 + bar(1, 2)) - zzz())\n"
@@ -81,7 +82,7 @@ public class PrettyPrintingTest
 
         String result = PrettyPrintVisitor.exprToString(script);
 
-        Assert.assertEquals("project {Foo.bar, Foo.baz} where (Foo.qux > 7)\n", result);
+        assertEquals("project {Foo.bar, Foo.baz} where (Foo.qux > 7)\n", result);
     }
 
     @Test
@@ -96,7 +97,7 @@ public class PrettyPrintingTest
 
         String result = PrettyPrintVisitor.exprToString(script);
 
-        Assert.assertEquals(
+        assertEquals(
                   "if (a > b) then\n"
                 + "  \"a\"\n"
                 + "else\n"
@@ -113,7 +114,7 @@ public class PrettyPrintingTest
 
         String result = PrettyPrintVisitor.exprToString(expression);
 
-        Assert.assertEquals("(a > b) ? (5 + 6) : 12", result);
+        assertEquals("(a > b) ? (5 + 6) : 12", result);
     }
 
     @Test
@@ -128,7 +129,7 @@ public class PrettyPrintingTest
 
         String result = PrettyPrintVisitor.exprToString(script);
 
-        Assert.assertEquals(
+        assertEquals(
                   "if (a > b) then\n"
                 + "  (a > b) ? (5 + 6) : 12\n"
                 + "else\n"
@@ -150,7 +151,7 @@ public class PrettyPrintingTest
 
         String result = PrettyPrintVisitor.exprToString(script);
 
-        Assert.assertEquals(
+        assertEquals(
                   "${hello, friend} = \"hello\"\n"
                 + "if (${a b} > ${b-c}) then\n"
                 + "  ${a b}\n"
@@ -167,7 +168,7 @@ public class PrettyPrintingTest
 
         String result = PrettyPrintVisitor.exprToString(expression);
 
-        Assert.assertEquals("(\"foo\" in (\"qux\", 'ba\"r', \"baz\", \"wal'do\"))", result);
+        assertEquals("(\"foo\" in (\"qux\", 'ba\"r', \"baz\", \"wal'do\"))", result);
     }
 
     @Test
@@ -178,6 +179,6 @@ public class PrettyPrintingTest
 
         String result = PrettyPrintVisitor.exprToString(expression);
 
-        Assert.assertEquals("((1 + 2) / (7.0 + 9))", result);
+        assertEquals("((1 + 2) / (7.0 + 9))", result);
     }
 }

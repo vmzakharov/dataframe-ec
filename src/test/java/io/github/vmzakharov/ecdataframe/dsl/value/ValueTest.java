@@ -1,56 +1,57 @@
 package io.github.vmzakharov.ecdataframe.dsl.value;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 public class ValueTest
 {
     @Test
     public void booleansMakeSense()
     {
-        Assert.assertTrue(BooleanValue.TRUE.isTrue());
-        Assert.assertFalse(BooleanValue.TRUE.isFalse());
+        assertTrue(BooleanValue.TRUE.isTrue());
+        assertFalse(BooleanValue.TRUE.isFalse());
 
-        Assert.assertTrue(BooleanValue.FALSE.isFalse());
-        Assert.assertFalse(BooleanValue.FALSE.isTrue());
+        assertTrue(BooleanValue.FALSE.isFalse());
+        assertFalse(BooleanValue.FALSE.isTrue());
 
-        Assert.assertSame(BooleanValue.TRUE, BooleanValue.valueOf(true));
-        Assert.assertSame(BooleanValue.FALSE, BooleanValue.valueOf(false));
+        assertSame(BooleanValue.TRUE, BooleanValue.valueOf(true));
+        assertSame(BooleanValue.FALSE, BooleanValue.valueOf(false));
     }
 
     @Test
     public void voidValueMakesSense()
     {
-        Assert.assertTrue(Value.VOID.isVoid());
+        assertTrue(Value.VOID.isVoid());
     }
 
-    @Test(expected = RuntimeException.class)
+    @Test
     public void stringValuesWrapNulls()
     {
-        new StringValue(null);
+        assertThrows(RuntimeException.class, () -> new StringValue(null));
     }
 
-    @Test(expected = RuntimeException.class)
+    @Test
     public void decimalValuesCannotWrapNulls()
     {
-        new DecimalValue(null);
+        assertThrows(RuntimeException.class, () -> new DecimalValue(null));
     }
 
-    @Test(expected = RuntimeException.class)
+    @Test
     public void dateValuesCannotWrapNulls()
     {
-        new DateValue(null);
+        assertThrows(RuntimeException.class, () -> new DateValue(null));
     }
 
-    @Test(expected = RuntimeException.class)
+    @Test
     public void dateTimeValuesCannotWrapNulls()
     {
-        new DateTimeValue(null);
+        assertThrows(RuntimeException.class, () -> new DateTimeValue(null));
     }
 
-    @Test(expected = RuntimeException.class)
+    @Test
     public void dataFrameValuesCannotWrapNulls()
     {
-        new DataFrameValue(null);
+        assertThrows(RuntimeException.class, () -> new DataFrameValue(null));
     }
 }

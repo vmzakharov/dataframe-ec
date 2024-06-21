@@ -7,8 +7,10 @@ import io.github.vmzakharov.ecdataframe.dsl.value.Value;
 import io.github.vmzakharov.ecdataframe.dsl.value.ValueType;
 import org.eclipse.collections.api.list.ListIterable;
 import org.eclipse.collections.impl.factory.Lists;
-import org.junit.Assert;
-import org.junit.Test;
+
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 public class RuntimeAddedFunctionTest
 {
@@ -32,7 +34,7 @@ public class RuntimeAddedFunctionTest
             }
         });
 
-        Assert.assertEquals(5, ExpressionTestUtil.evaluateToLong("plusTwo(3)"));
-        Assert.assertEquals(4, ExpressionTestUtil.evaluateToLong("abs(plusTwo(-6))"));
+        assertEquals(5, ExpressionTestUtil.evaluateToLong("plusTwo(3)"));
+        assertEquals(4, ExpressionTestUtil.evaluateToLong("abs(plusTwo(-6))"));
     }
 }
