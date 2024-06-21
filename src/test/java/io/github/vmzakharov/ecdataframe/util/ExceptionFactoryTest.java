@@ -1,45 +1,35 @@
 package io.github.vmzakharov.ecdataframe.util;
 
 import org.eclipse.collections.api.factory.Maps;
-import org.junit.Assert;
-import org.junit.Test;
+
+import org.junit.jupiter.api.Test;
 
 import static io.github.vmzakharov.ecdataframe.util.ExceptionFactory.exception;
 import static io.github.vmzakharov.ecdataframe.util.ExceptionFactory.exceptionByKey;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class ExceptionFactoryTest
 {
     @Test
     public void defaultExceptionType()
     {
-        try
-        {
-            ExceptionFactory.initialize();
-            exception("Hello").fire();
-            Assert.fail("didn't throw");
-        }
-        catch (RuntimeException e)
-        {
-            Assert.assertEquals(RuntimeException.class, e.getClass());
-            Assert.assertEquals("Hello", e.getMessage());
-        }
+        ExceptionFactory.initialize();
+
+        Exception e = assertThrows(RuntimeException.class, () -> exception("Hello").fire());
+
+        assertEquals("Hello", e.getMessage());
     }
 
     @Test
     public void exceptionMessageByKey()
     {
-        try
-        {
-            FormatWithPlaceholders.addMessagesFromMap(Maps.mutable.with("HELLO", "Hello, ${Name}"));
-            ExceptionFactory.initialize();
-            exceptionByKey("HELLO").with("Name", "Bob").fire();
-            Assert.fail("didn't throw");
-        }
-        catch (RuntimeException e)
-        {
-            Assert.assertEquals(RuntimeException.class, e.getClass());
-            Assert.assertEquals("Hello, Bob", e.getMessage());
-        }
+        FormatWithPlaceholders.addMessagesFromMap(Maps.mutable.with("HELLO", "Hello, ${Name}"));
+        ExceptionFactory.initialize();
+
+        Exception e = assertThrows(RuntimeException.class, () -> exceptionByKey("HELLO").with("Name", "Bob").fire());
+
+        assertEquals("Hello, Bob", e.getMessage());
     }
 
     @Test
@@ -47,64 +37,47 @@ public class ExceptionFactoryTest
     {
         Throwable cause = new RuntimeException("Boom!");
 
-        try
-        {
-            ExceptionFactory.initialize();
-            exception("Hello").fire(cause);
-            Assert.fail("didn't throw");
-        }
-        catch (RuntimeException e)
-        {
-            Assert.assertEquals(RuntimeException.class, e.getClass());
-            Assert.assertEquals("Hello", e.getMessage());
-            Assert.assertEquals(cause, e.getCause());
-        }
+        ExceptionFactory.initialize();
+        Exception e = assertThrows(RuntimeException.class, () -> exception("Hello").fire(cause));
+
+        assertEquals("Hello", e.getMessage());
+        assertEquals(cause, e.getCause());
     }
 
     @Test
     public void defaultUnsupported()
     {
-        try
-        {
-            ExceptionFactory.initialize();
-            throw exception("Do it!").getUnsupported();
-        }
-        catch (UnsupportedOperationException e)
-        {
-            Assert.assertEquals(UnsupportedOperationException.class, e.getClass());
-            Assert.assertEquals("Do it!", e.getMessage());
-        }
+        ExceptionFactory.initialize();
+
+        Exception e = assertThrows(
+                UnsupportedOperationException.class,
+                () -> {
+                    throw exception("Do it!").getUnsupported();
+                });
+
+        assertEquals("Do it!", e.getMessage());
     }
 
     @Test
     public void overrideExceptionType()
     {
-        try
-        {
-            ExceptionFactory.exceptionFactories(VerySpecialException::new, VerySpecialException::new, DontWanna::new);
-            exception("Hello").fire();
-            Assert.fail("didn't throw");
-        }
-        catch (RuntimeException e)
-        {
-            Assert.assertEquals(VerySpecialException.class, e.getClass());
-            Assert.assertEquals("Hello", e.getMessage());
-        }
+        ExceptionFactory.exceptionFactories(VerySpecialException::new, VerySpecialException::new, DontWanna::new);
+
+        Exception e = assertThrows(VerySpecialException.class, () -> exception("Hello").fire());
+
+        assertEquals("Hello", e.getMessage());
     }
 
     @Test
     public void overrideUnsupported()
     {
-        try
-        {
-            ExceptionFactory.exceptionFactories(VerySpecialException::new, VerySpecialException::new, DontWanna::new);
+        ExceptionFactory.exceptionFactories(VerySpecialException::new, VerySpecialException::new, DontWanna::new);
+
+        Exception e = assertThrows(DontWanna.class, () -> {
             throw exception("Do it!").getUnsupported();
-        }
-        catch (UnsupportedOperationException e)
-        {
-            Assert.assertEquals(DontWanna.class, e.getClass());
-            Assert.assertEquals("Do it!", e.getMessage());
-        }
+        });
+
+        assertEquals("Do it!", e.getMessage());
     }
 
     @Test
@@ -112,18 +85,12 @@ public class ExceptionFactoryTest
     {
         Throwable cause = new RuntimeException("Boom!");
 
-        try
-        {
-            ExceptionFactory.exceptionFactories(VerySpecialException::new, VerySpecialException::new, DontWanna::new);
-            exception("Hello").fire(cause);
-            Assert.fail("didn't throw");
-        }
-        catch (RuntimeException e)
-        {
-            Assert.assertEquals(VerySpecialException.class, e.getClass());
-            Assert.assertEquals("Hello", e.getMessage());
-            Assert.assertEquals(cause, e.getCause());
-        }
+        ExceptionFactory.exceptionFactories(VerySpecialException::new, VerySpecialException::new, DontWanna::new);
+
+        Exception e = assertThrows(VerySpecialException.class, () -> exception("Hello").fire(cause));
+
+        assertEquals("Hello", e.getMessage());
+        assertEquals(cause, e.getCause());
     }
 
     @Test
@@ -133,36 +100,27 @@ public class ExceptionFactoryTest
         ExceptionFactory.setPrintedMessagePrefix("Boo-boo: ");
         ExceptionFactory.setErrorPrinter(printer);
 
-        try
-        {
-            exception("ouch").fire();
-        }
-        catch (RuntimeException e)
-        {
-            Assert.assertEquals("Boo-boo: ouch\n", printer.toString());
-        }
+        assertThrows(RuntimeException.class, () -> exception("ouch").fire());
+
+        assertEquals("Boo-boo: ouch\n", printer.toString());
 
         printer.clear();
 
-        try
-        {
-            exception("ow-ow").fire(new RuntimeException("Nothing to see here"));
-        }
-        catch (RuntimeException e)
-        {
-            Assert.assertEquals("Boo-boo: ow-ow\n", printer.toString());
-        }
+        assertThrows(
+                RuntimeException.class,
+                () -> exception("ow-ow").fire(new RuntimeException("Nothing to see here")));
+
+        assertEquals("Boo-boo: ow-ow\n", printer.toString());
 
         printer.clear();
 
-        try
-        {
-            throw exception("oh, well").getUnsupported();
-        }
-        catch (UnsupportedOperationException e)
-        {
-            Assert.assertEquals("Boo-boo: oh, well\n", printer.toString());
-        }
+        assertThrows(
+                UnsupportedOperationException.class,
+                () -> {
+                    throw exception("oh, well").getUnsupported();
+                });
+
+        assertEquals("Boo-boo: oh, well\n", printer.toString());
 
         ExceptionFactory.initialize();
     }

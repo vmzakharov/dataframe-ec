@@ -2,8 +2,8 @@ package io.github.vmzakharov.ecdataframe.util;
 
 import org.eclipse.collections.api.map.MutableMap;
 import org.eclipse.collections.impl.factory.Maps;
-import org.junit.Assert;
-import org.junit.Test;
+
+import org.junit.jupiter.api.Test;
 
 import java.util.Properties;
 import java.util.ResourceBundle;
@@ -11,26 +11,27 @@ import java.util.ResourceBundle;
 import static io.github.vmzakharov.ecdataframe.util.FormatWithPlaceholders.UNKNOWN_KEY_MESSAGE;
 import static io.github.vmzakharov.ecdataframe.util.FormatWithPlaceholders.message;
 import static io.github.vmzakharov.ecdataframe.util.FormatWithPlaceholders.messageFromKey;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class FormatWithPlaceholderTest
 {
     @Test
     public void noPlaceholders()
     {
-        Assert.assertEquals("Hello. How are you?", message("Hello. How are you?").toString());
+        assertEquals("Hello. How are you?", message("Hello. How are you?").toString());
     }
 
     @Test
     public void onePlaceholder()
     {
-        Assert.assertEquals("Hello, Alice. How are you?",
+        assertEquals("Hello, Alice. How are you?",
                 message("Hello, ${name}. How are you?").with("name", "Alice").toString());
     }
 
     @Test
     public void manyPlaceholders()
     {
-        Assert.assertEquals("Hello, Alice. How are you today?",
+        assertEquals("Hello, Alice. How are you today?",
                 message("Hello, ${name}. How are you ${time}?")
                         .with("name", "Alice").with("time", "today").toString());
     }
@@ -38,17 +39,17 @@ public class FormatWithPlaceholderTest
     @Test
     public void repeatingPlaceholders()
     {
-        Assert.assertEquals("Hello, Alice. How are you today, Alice?",
+        assertEquals("Hello, Alice. How are you today, Alice?",
                 message("Hello, ${name}. How are you ${time}, ${name}?").with("name", "Alice").with("time", "today").toString());
     }
 
     @Test
     public void missingPlaceholder()
     {
-        Assert.assertEquals("Hello, (name is unknown). How are you?",
+        assertEquals("Hello, (name is unknown). How are you?",
                 message("Hello, ${name}. How are you?").toString());
 
-        Assert.assertEquals("Hello, (name is unknown). How are you today, (name is unknown)?",
+        assertEquals("Hello, (name is unknown). How are you today, (name is unknown)?",
                 message("Hello, ${name}. How are you ${time}, ${name}?").with("time", "today").toStringSupplier().get());
     }
 
@@ -57,9 +58,9 @@ public class FormatWithPlaceholderTest
     {
         FormatWithPlaceholders.addMessagesFromResourceBundle(ResourceBundle.getBundle("Messages"));
 
-        Assert.assertEquals("Hello, Alice! How are you?", messageFromKey("GREETING").with("name", "Alice").toString());
+        assertEquals("Hello, Alice! How are you?", messageFromKey("GREETING").with("name", "Alice").toString());
 
-        Assert.assertEquals("GREETINGS PROFESSOR FALKEN.", messageFromKey("SALUTATION").with("lastName", "FALKEN").toString());
+        assertEquals("GREETINGS PROFESSOR FALKEN.", messageFromKey("SALUTATION").with("lastName", "FALKEN").toString());
     }
 
     @Test
@@ -71,9 +72,9 @@ public class FormatWithPlaceholderTest
 
         FormatWithPlaceholders.addMessagesFromProperties(props);
 
-        Assert.assertEquals("Hello, Alice! How are you?", messageFromKey("GREETING").with("name", "Alice").toString());
+        assertEquals("Hello, Alice! How are you?", messageFromKey("GREETING").with("name", "Alice").toString());
 
-        Assert.assertEquals("GREETINGS PROFESSOR FALKEN.", messageFromKey("SALUTATION").with("lastName", "FALKEN").toString());
+        assertEquals("GREETINGS PROFESSOR FALKEN.", messageFromKey("SALUTATION").with("lastName", "FALKEN").toString());
     }
 
     @Test
@@ -86,15 +87,15 @@ public class FormatWithPlaceholderTest
 
         FormatWithPlaceholders.addMessagesFromMap(messagesByKey);
 
-        Assert.assertEquals("Hello, ${Alice}! How are you?", messageFromKey("GREETING").with("name", "${Alice}").toString());
+        assertEquals("Hello, ${Alice}! How are you?", messageFromKey("GREETING").with("name", "${Alice}").toString());
 
-        Assert.assertEquals("GREETINGS PROFESSOR JENKINS.", messageFromKey("SALUTATION").with("lastName", "JENKINS").toString());
+        assertEquals("GREETINGS PROFESSOR JENKINS.", messageFromKey("SALUTATION").with("lastName", "JENKINS").toString());
     }
 
     @Test
     public void unknownKey()
     {
         String key = "Oompa Loompa";
-        Assert.assertEquals(String.format(UNKNOWN_KEY_MESSAGE, key), messageFromKey(key).toString());
+        assertEquals(String.format(UNKNOWN_KEY_MESSAGE, key), messageFromKey(key).toString());
     }
 }
