@@ -33,11 +33,11 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <eclipseCollections.version>11.0.0</eclipseCollections.version>
-        <antlr4.version>4.9.2</antlr4.version>
-        <checkstyle.version>8.41</checkstyle.version>
-        <checkstyle.plugin.version>3.1.2</checkstyle.plugin.version>
-        <pitest.version>1.14.3</pitest.version>
+        <eclipseCollections.version>11.1.0</eclipseCollections.version>
+        <antlr4.version>4.13.1</antlr4.version>
+        <checkstyle.version>10.17.0</checkstyle.version>
+        <checkstyle.plugin.version>3.4.0</checkstyle.plugin.version>
+        <pitest.version>1.16.1</pitest.version>
     </properties>
 
     <dependencies>
