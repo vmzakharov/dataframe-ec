@@ -55,7 +55,6 @@
         </module>
         <module name="SimplifyBooleanExpression"/>
         <module name="SimplifyBooleanReturn"/>
-        <module name="UnnecessaryParentheses"/>
 
         <!-- Checks for class design -->
         <!-- See https://checkstyle.org/config_design.htm -->
