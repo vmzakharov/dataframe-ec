@@ -70,7 +70,7 @@ extends HierarchicalDataSet
     {
         MutableList<MethodHandle> getters = this.valueGetters.get(propertyChainString);
 
-        if (getters.size() == 0)
+        if (getters.isEmpty())
         {
             getters = this.valueGetters.getIfAbsentPutAll(propertyChainString, this.getGetters(propertyChainString));
         }
@@ -192,12 +192,12 @@ extends HierarchicalDataSet
 
     private Object firstObject()
     {
-        if (this.items.size() == 0)
+        if (this.items.isEmpty())
         {
             exceptionByKey("OBJ_EMPTY_DATA_SET_ACCESS").with("dataSetName", this.getName()).fire();
         }
 
-        return this.items.get(0);
+        return this.items.getFirst();
     }
 
     private Object currentObject()

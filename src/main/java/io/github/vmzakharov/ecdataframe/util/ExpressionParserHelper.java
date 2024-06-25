@@ -65,9 +65,9 @@ public class ExpressionParserHelper
             return null;
         }
 
-        if (script.getExpressions().size() == 1 && script.getFunctions().size() == 0)
+        if (script.getExpressions().size() == 1 && script.getFunctions().isEmpty())
         {
-            return script.getExpressions().get(0);
+            return script.getExpressions().getFirst();
         }
 
         return script;

@@ -172,12 +172,12 @@ implements ExpressionVisitor
 
     public String getErrorDescription()
     {
-        return this.getErrors().get(0).getOne();
+        return this.getErrors().getFirst().getOne();
     }
 
     public String getErrorExpressionString()
     {
-        return this.getErrors().get(0).getTwo();
+        return this.getErrors().getFirst().getTwo();
     }
 
     public ListIterable<Twin<String>> getErrors()

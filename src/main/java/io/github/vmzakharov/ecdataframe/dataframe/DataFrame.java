@@ -802,7 +802,7 @@ implements DfIterate
         }
         else
         {
-            this.rowCount = storedColumnsSizes.get(0);
+            this.rowCount = storedColumnsSizes.getFirst();
             if (storedColumnsSizes.anySatisfy(e -> e != this.rowCount))
             {
                 exceptionByKey("DF_DIFFERENT_COL_SIZES").with("dataFrameName", this.getName()).fire();
@@ -2109,7 +2109,7 @@ implements DfIterate
             else
             {
                 // use the first row
-                int targetRowIndex = found.get(0);
+                int targetRowIndex = found.getFirst();
 
                 columnsToSelectFrom.forEachInBoth(addedColumns, (selectFrom, addTo) -> addTo.addObject(selectFrom.getObject(targetRowIndex)));
             }

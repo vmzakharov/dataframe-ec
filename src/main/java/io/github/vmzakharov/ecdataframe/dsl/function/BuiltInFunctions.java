@@ -198,7 +198,7 @@ final public class BuiltInFunctions
             @Override
             public ValueType returnType(ListIterable<ValueType> parameterTypes)
             {
-                return parameterTypes.get(0);
+                return parameterTypes.getFirst();
             }
         });
 

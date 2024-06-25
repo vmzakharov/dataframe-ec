@@ -83,7 +83,7 @@ public class SimpleExpressionParsingTest
     {
         Script script = ExpressionTestUtil.toScript("project {Foo.bar, Foo.baz} where Foo.qux > 7");
 
-        Expression expression = script.getExpressions().get(0);
+        Expression expression = script.getExpressions().getFirst();
 
         assertEquals(ProjectionExpr.class, expression.getClass());
 
@@ -102,7 +102,7 @@ public class SimpleExpressionParsingTest
                 + "bazbaz : Foo.baz"
                 + "} where Foo.qux > 7");
 
-        Expression expression = script.getExpressions().get(0);
+        Expression expression = script.getExpressions().getFirst();
 
         assertEquals(ProjectionExpr.class, expression.getClass());
 
@@ -118,7 +118,7 @@ public class SimpleExpressionParsingTest
     {
         Script script = ExpressionTestUtil.toScript("(\"a\", \"b\", \"c\")");
 
-        Expression expression = script.getExpressions().get(0);
+        Expression expression = script.getExpressions().getFirst();
 
         assertEquals(VectorExpr.class, expression.getClass());
 
@@ -138,7 +138,7 @@ public class SimpleExpressionParsingTest
         // TODO: remove ambiguous syntax for single element arrays
         Script script = ExpressionTestUtil.toScript("('a')");
 
-        Expression expression = script.getExpressions().get(0);
+        Expression expression = script.getExpressions().getFirst();
 
         assertEquals(VectorExpr.class, expression.getClass());
 
