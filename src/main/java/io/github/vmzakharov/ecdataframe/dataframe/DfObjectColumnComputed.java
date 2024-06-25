@@ -5,7 +5,7 @@ import io.github.vmzakharov.ecdataframe.util.ExpressionParserHelper;
 import org.eclipse.collections.api.list.ImmutableList;
 import org.eclipse.collections.api.list.ListIterable;
 import org.eclipse.collections.impl.factory.Lists;
-import org.eclipse.collections.impl.list.Interval;
+import org.eclipse.collections.impl.list.primitive.IntInterval;
 
 abstract public class DfObjectColumnComputed<T>
 extends DfObjectColumnAbstract<T>
@@ -24,18 +24,16 @@ implements DfColumnComputed
     @Override
     public ImmutableList<T> toList()
     {
-        if (this.getDataFrame().rowCount() == 0)
+        int rowCount = this.getDataFrame().rowCount();
+        if (rowCount == 0)
         {
             return Lists.immutable.empty();
         }
 
-        ImmutableList<T> result = Interval
-                .zeroTo(this.getDataFrame().rowCount() - 1)
-                .collect(this::getTypedObject)
-                .toList()
+        return IntInterval
+                .zeroTo(rowCount - 1)
+                .collect(this::getTypedObject, Lists.mutable.withInitialCapacity(rowCount))
                 .toImmutable();
-
-        return result;
     }
 
     @Override
