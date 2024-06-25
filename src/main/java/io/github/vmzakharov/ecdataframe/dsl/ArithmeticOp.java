@@ -132,6 +132,7 @@ public interface ArithmeticOp
         }
     };
 
+    @Override
     default Value apply(Value operand1, Value operand2)
     {
         if (operand1.isVoid() || operand2.isVoid())

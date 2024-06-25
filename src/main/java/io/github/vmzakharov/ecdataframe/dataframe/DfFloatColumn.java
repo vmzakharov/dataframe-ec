@@ -36,6 +36,7 @@ extends DfColumnAbstract
                 .toImmutable();
     }
 
+    @Override
     public ValueType getType()
     {
         return ValueType.FLOAT;
@@ -65,6 +66,7 @@ extends DfColumnAbstract
         return mergedCol;
     }
 
+    @Override
     public DfColumn copyTo(DataFrame target)
     {
         DfFloatColumn targetCol = (DfFloatColumn)  this.copyColumnSchemaAndEnsureCapacity(target);

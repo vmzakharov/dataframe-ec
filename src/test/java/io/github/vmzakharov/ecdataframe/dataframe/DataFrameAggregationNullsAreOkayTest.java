@@ -150,6 +150,7 @@ public class DataFrameAggregationNullsAreOkayTest
             return 0;
         }
 
+        @Override
         public long getLongValue(DfColumn sourceColumn, int sourceRowIndex)
         {
             return sourceColumn.isNull(sourceRowIndex) ? 1 : 0;

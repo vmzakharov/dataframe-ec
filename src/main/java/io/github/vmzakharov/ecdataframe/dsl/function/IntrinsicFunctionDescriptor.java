@@ -29,6 +29,7 @@ implements FunctionDescriptor
         this(newName, Lists.immutable.empty());
     }
 
+    @Override
     public String getName()
     {
         return this.name;
@@ -44,6 +45,7 @@ implements FunctionDescriptor
         this.parameterNames = newParameterNames;
     }
 
+    @Override
     public ListIterable<String> getParameterNames()
     {
         return this.parameterNames;

@@ -21,6 +21,7 @@ implements FunctionDescriptor
         this.parameterNames = newParameterNames;
     }
 
+    @Override
     public String getName()
     {
         return this.name;
@@ -43,6 +44,7 @@ implements FunctionDescriptor
         return evaluationVisitor.visitFunctionScriptExpr(this);
     }
 
+    @Override
     public ListIterable<String> getParameterNames()
     {
         return this.parameterNames;

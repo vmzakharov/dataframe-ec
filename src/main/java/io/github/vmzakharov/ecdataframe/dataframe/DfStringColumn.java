@@ -21,6 +21,7 @@ extends DfObjectColumn<String>
         return value == null ? "" : '"' + this.getValueAsString(rowIndex) + '"';
     }
 
+    @Override
     default ValueType getType()
     {
         return ValueType.STRING;

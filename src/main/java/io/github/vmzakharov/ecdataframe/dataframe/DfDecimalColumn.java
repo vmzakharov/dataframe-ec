@@ -17,6 +17,7 @@ extends DfObjectColumn<BigDecimal>
         return value == null ? "" : value.toString();
     }
 
+    @Override
     default ValueType getType()
     {
         return ValueType.DECIMAL;
