@@ -26,7 +26,7 @@ public class ParserErrorReportingTest
         assertTrue(errorListener.hasErrors());
         assertEquals(1, errorListener.getErrors().size());
 
-        CollectingErrorListener.Error error = errorListener.getErrors().get(0);
+        CollectingErrorListener.Error error = errorListener.getErrors().getFirst();
 
         assertEquals(1, error.line());
         assertEquals(4, error.charPositionInLine());
@@ -47,7 +47,7 @@ public class ParserErrorReportingTest
         assertTrue(errorListener.hasErrors());
         assertEquals(1, errorListener.getErrors().size());
 
-        CollectingErrorListener.Error error = errorListener.getErrors().get(0);
+        CollectingErrorListener.Error error = errorListener.getErrors().getFirst();
 
         assertEquals(1, error.line());
         assertEquals(1, error.charPositionInLine());

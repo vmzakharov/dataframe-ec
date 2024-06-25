@@ -35,7 +35,7 @@ implements Expression
 
     public String getEntityName()
     {
-        return this.pathElements.get(0);
+        return this.pathElements.getFirst();
     }
 
     public String getPropertyChainString()

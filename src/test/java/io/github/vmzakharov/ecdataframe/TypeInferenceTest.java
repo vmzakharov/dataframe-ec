@@ -455,6 +455,6 @@ public class TypeInferenceTest
     private String prettyPrint(String expressionString)
     {
         return PrettyPrintVisitor.exprToString(
-                ExpressionTestUtil.toScript(expressionString).getExpressions().get(0));
+                ExpressionTestUtil.toScript(expressionString).getExpressions().getFirst());
     }
 }
