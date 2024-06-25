@@ -4,7 +4,7 @@ import io.github.vmzakharov.ecdataframe.dataframe.compare.DoubleComparisonResult
 import io.github.vmzakharov.ecdataframe.dsl.value.ValueType;
 import org.eclipse.collections.api.list.primitive.ImmutableDoubleList;
 import org.eclipse.collections.impl.factory.primitive.DoubleLists;
-import org.eclipse.collections.impl.list.Interval;
+import org.eclipse.collections.impl.list.primitive.IntInterval;
 
 abstract public class DfDoubleColumn
 extends DfColumnAbstract
@@ -24,15 +24,15 @@ extends DfColumnAbstract
 
     public ImmutableDoubleList toDoubleList()
     {
-        if (this.getDataFrame().rowCount() == 0)
+        int rowCount = this.getDataFrame().rowCount();
+        if (rowCount == 0)
         {
             return DoubleLists.immutable.empty();
         }
 
-        return Interval
-            .zeroTo(this.getDataFrame().rowCount() - 1)
-            .collectDouble(this::getDouble)
-            .toList()
+        return IntInterval
+            .zeroTo(rowCount - 1)
+            .collectDouble(this::getDouble, DoubleLists.mutable.withInitialCapacity(rowCount))
             .toImmutable();
     }
 
