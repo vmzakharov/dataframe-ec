@@ -394,7 +394,7 @@ implements DfIterate
     {
         StringBuilder s = new StringBuilder();
 
-        s.append(this.columns.collect(DfColumn::getName).makeString(","));
+        s.append(this.columns.makeString(DfColumn::getName, "", ",", ""));
         s.append('\n');
 
         int columnCount = this.columnCount();
