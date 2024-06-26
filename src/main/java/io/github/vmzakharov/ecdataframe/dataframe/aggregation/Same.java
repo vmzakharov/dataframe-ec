@@ -159,7 +159,7 @@ extends AggregateFunction
     public Object applyToDoubleColumn(DfDoubleColumn doubleColumn)
     {
         double first = doubleColumn.getDouble(0);
-        if (doubleColumn.toDoubleList().allSatisfy(each -> each == first))
+        if (doubleColumn.asDoubleIterable().allSatisfy(each -> each == first))
         {
             return first;
         }
@@ -171,7 +171,7 @@ extends AggregateFunction
     public Object applyToFloatColumn(DfFloatColumn floatColumn)
     {
         float first = floatColumn.getFloat(0);
-        if (floatColumn.toFloatList().allSatisfy(each -> each == first))
+        if (floatColumn.asFloatIterable().allSatisfy(each -> each == first))
         {
             return first;
         }
@@ -183,7 +183,7 @@ extends AggregateFunction
     public Object applyToLongColumn(DfLongColumn longColumn)
     {
         long first = longColumn.getLong(0);
-        if (longColumn.toLongList().allSatisfy(each -> each == first))
+        if (longColumn.asLongIterable().allSatisfy(each -> each == first))
         {
             return first;
         }
@@ -195,7 +195,7 @@ extends AggregateFunction
     public Object applyToIntColumn(DfIntColumn intColumn)
     {
         long first = intColumn.getInt(0);
-        if (intColumn.toIntList().allSatisfy(each -> each == first))
+        if (intColumn.asIntIterable().allSatisfy(each -> each == first))
         {
             return first;
         }

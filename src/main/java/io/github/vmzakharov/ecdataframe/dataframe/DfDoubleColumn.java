@@ -2,12 +2,13 @@ package io.github.vmzakharov.ecdataframe.dataframe;
 
 import io.github.vmzakharov.ecdataframe.dataframe.compare.DoubleComparisonResult;
 import io.github.vmzakharov.ecdataframe.dsl.value.ValueType;
+import org.eclipse.collections.api.DoubleIterable;
 import org.eclipse.collections.api.list.primitive.ImmutableDoubleList;
 import org.eclipse.collections.impl.factory.primitive.DoubleLists;
 import org.eclipse.collections.impl.list.primitive.IntInterval;
 
 abstract public class DfDoubleColumn
-extends DfColumnAbstract
+        extends DfColumnAbstract
 {
     public DfDoubleColumn(DataFrame newDataFrame, String newName)
     {
@@ -24,16 +25,20 @@ extends DfColumnAbstract
 
     public ImmutableDoubleList toDoubleList()
     {
+        return this.asDoubleIterable().toList().toImmutable();
+    }
+
+    public DoubleIterable asDoubleIterable()
+    {
         int rowCount = this.getDataFrame().rowCount();
         if (rowCount == 0)
         {
             return DoubleLists.immutable.empty();
         }
 
-        return IntInterval
-            .zeroTo(rowCount - 1)
-            .collectDouble(this::getDouble, DoubleLists.mutable.withInitialCapacity(rowCount))
-            .toImmutable();
+        return IntInterval.zeroTo(rowCount - 1)
+                .asLazy()
+                .collectDouble(this::getDouble);
     }
 
     @Override

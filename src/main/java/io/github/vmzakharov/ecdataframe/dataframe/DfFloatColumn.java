@@ -2,6 +2,7 @@ package io.github.vmzakharov.ecdataframe.dataframe;
 
 import io.github.vmzakharov.ecdataframe.dataframe.compare.DoubleComparisonResult;
 import io.github.vmzakharov.ecdataframe.dsl.value.ValueType;
+import org.eclipse.collections.api.FloatIterable;
 import org.eclipse.collections.api.list.primitive.ImmutableFloatList;
 import org.eclipse.collections.impl.factory.primitive.FloatLists;
 import org.eclipse.collections.impl.list.primitive.IntInterval;
@@ -24,16 +25,20 @@ extends DfColumnAbstract
 
     public ImmutableFloatList toFloatList()
     {
+        return this.asFloatIterable().toList().toImmutable();
+    }
+
+    public FloatIterable asFloatIterable()
+    {
         int rowCount = this.getDataFrame().rowCount();
         if (rowCount == 0)
         {
             return FloatLists.immutable.empty();
         }
 
-        return IntInterval
-                .zeroTo(rowCount - 1)
-                .collectFloat(this::getFloat, FloatLists.mutable.withInitialCapacity(rowCount))
-                .toImmutable();
+        return IntInterval.zeroTo(rowCount - 1)
+                .asLazy()
+                .collectFloat(this::getFloat);
     }
 
     @Override
