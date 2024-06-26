@@ -2,6 +2,7 @@ package io.github.vmzakharov.ecdataframe.dataframe;
 
 import io.github.vmzakharov.ecdataframe.dataframe.compare.LongComparisonResult;
 import io.github.vmzakharov.ecdataframe.dsl.value.ValueType;
+import org.eclipse.collections.api.LongIterable;
 import org.eclipse.collections.api.list.primitive.ImmutableLongList;
 import org.eclipse.collections.impl.factory.primitive.LongLists;
 import org.eclipse.collections.impl.list.primitive.IntInterval;
@@ -24,16 +25,20 @@ extends DfColumnAbstract
 
     public ImmutableLongList toLongList()
     {
+        return this.asLongIterable().toList().toImmutable();
+    }
+
+    public LongIterable asLongIterable()
+    {
         int rowCount = this.getDataFrame().rowCount();
         if (rowCount == 0)
         {
             return LongLists.immutable.empty();
         }
 
-        return IntInterval
-                .zeroTo(rowCount - 1)
-                .collectLong(this::getLong, LongLists.mutable.withInitialCapacity(rowCount))
-                .toImmutable();
+        return IntInterval.zeroTo(rowCount - 1)
+                .asLazy()
+                .collectLong(this::getLong);
     }
 
     @Override

@@ -62,25 +62,25 @@ extends AggregateFunction
     @Override
     public Object applyToDoubleColumn(DfDoubleColumn doubleColumn)
     {
-        return doubleColumn.toDoubleList().average();
+        return doubleColumn.asDoubleIterable().average();
     }
 
     @Override
     public Object applyToFloatColumn(DfFloatColumn floatColumn)
     {
-        return (float) floatColumn.toFloatList().average();
+        return (float) floatColumn.asFloatIterable().average();
     }
 
     @Override
     public Object applyToLongColumn(DfLongColumn longColumn)
     {
-        return Math.round(longColumn.toLongList().average());
+        return Math.round(longColumn.asLongIterable().average());
     }
 
     @Override
     public Object applyToIntColumn(DfIntColumn intColumn)
     {
-        return Math.round(intColumn.toIntList().average());
+        return Math.round(intColumn.asIntIterable().average());
     }
 
     @Override
