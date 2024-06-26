@@ -82,6 +82,7 @@ implements DfColumnStored
         return this.getFloatWithoutNullCheck(rowIndex);
     }
 
+    @Override
     public float getFloat(int rowIndex)
     {
         if (this.isNull(rowIndex))
@@ -127,6 +128,7 @@ implements DfColumnStored
         this.values.add(Float.NaN);
     }
 
+    @Override
     public void aggregateValueInto(int rowIndex, DfColumn sourceColumn, int sourceRowIndex, AggregateFunction aggregator)
     {
         aggregator.aggregateValueIntoFloat(this, rowIndex, sourceColumn, sourceRowIndex);

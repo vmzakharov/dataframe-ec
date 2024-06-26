@@ -14,6 +14,7 @@ implements RealNumberValue
         return this.value;
     }
 
+    @Override
     public double doubleValue()
     {
         return this.value;

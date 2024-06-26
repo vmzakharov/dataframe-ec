@@ -58,6 +58,7 @@ implements DfColumnStored
         this.nullMap.add(isNullValue);
     }
 
+    @Override
     public int getInt(int rowIndex)
     {
         if (this.isNull(rowIndex))
@@ -137,6 +138,7 @@ implements DfColumnStored
         this.nullMap.set(rowIndex, true);
     }
 
+    @Override
     public Object getObject(int rowIndex)
     {
         if (this.isNull(rowIndex))

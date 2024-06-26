@@ -20,6 +20,7 @@ extends DfObjectColumn<LocalDateTime>
         return value == null ? "" : this.FORMATTER.format(value);
     }
 
+    @Override
     default ValueType getType()
     {
         return ValueType.DATE_TIME;

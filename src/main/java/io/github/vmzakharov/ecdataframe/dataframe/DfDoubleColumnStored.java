@@ -83,6 +83,7 @@ implements DfColumnStored
         return this.getDoubleWithoutNullCheck(rowIndex);
     }
 
+    @Override
     public double getDouble(int rowIndex)
     {
         if (this.isNull(rowIndex))
@@ -128,6 +129,7 @@ implements DfColumnStored
         this.values.add(Double.NaN);
     }
 
+    @Override
     public void aggregateValueInto(int rowIndex, DfColumn sourceColumn, int sourceRowIndex, AggregateFunction aggregator)
     {
         aggregator.aggregateValueIntoDouble(this, rowIndex, sourceColumn, sourceRowIndex);

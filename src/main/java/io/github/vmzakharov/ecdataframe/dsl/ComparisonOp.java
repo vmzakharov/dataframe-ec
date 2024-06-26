@@ -59,6 +59,7 @@ extends PredicateOp
 
     ComparisonOp NE = new ComparisonOp()
     {
+        @Override
         public BooleanValue apply(Value operand1, Value operand2)
         {
             if (operand1.isVoid())

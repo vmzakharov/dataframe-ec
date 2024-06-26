@@ -12,6 +12,7 @@ import static io.github.vmzakharov.ecdataframe.util.ExceptionFactory.exceptionBy
 public interface PredicateOp
 extends BinaryOp
 {
+    @Override
     default BooleanValue apply(Value operand1, Value operand2)
     {
         if (operand1.isVoid() || operand2.isVoid())

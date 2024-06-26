@@ -90,6 +90,7 @@ public class DataFrameAggregationWithCustomFunctionsTest
             super(newColumnName, newTargetColumnName);
         }
 
+        @Override
         public ListIterable<ValueType> supportedSourceTypes()
         {
             return Lists.immutable.of(STRING);
@@ -144,6 +145,7 @@ public class DataFrameAggregationWithCustomFunctionsTest
             super(newColumnName, newTargetColumnName);
         }
 
+        @Override
         public ListIterable<ValueType> supportedSourceTypes()
         {
             return Lists.immutable.of(STRING);

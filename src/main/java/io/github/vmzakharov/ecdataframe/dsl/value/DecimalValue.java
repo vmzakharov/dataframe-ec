@@ -51,6 +51,7 @@ implements NumberValue
         return ValueType.DECIMAL;
     }
 
+    @Override
     public BigDecimal decimalValue()
     {
         return this.value;

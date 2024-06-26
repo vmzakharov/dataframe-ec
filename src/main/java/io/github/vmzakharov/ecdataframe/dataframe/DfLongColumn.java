@@ -36,6 +36,7 @@ extends DfColumnAbstract
                 .toImmutable();
     }
 
+    @Override
     public ValueType getType()
     {
         return ValueType.LONG;
@@ -65,6 +66,7 @@ extends DfColumnAbstract
         return mergedCol;
     }
 
+    @Override
     public DfColumn copyTo(DataFrame target)
     {
         DfLongColumn targetCol = (DfLongColumn)  this.copyColumnSchemaAndEnsureCapacity(target);

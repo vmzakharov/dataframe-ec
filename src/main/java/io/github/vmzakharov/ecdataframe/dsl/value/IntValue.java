@@ -32,6 +32,7 @@ implements WholeNumberValue
         return this.value;
     }
 
+    @Override
     public BigDecimal decimalValue()
     {
         return BigDecimal.valueOf(this.value);

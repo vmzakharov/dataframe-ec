@@ -9,6 +9,7 @@ import java.math.BigDecimal;
 public record DoubleValue(double value)
 implements RealNumberValue
 {
+    @Override
     public double doubleValue()
     {
         return this.value;
