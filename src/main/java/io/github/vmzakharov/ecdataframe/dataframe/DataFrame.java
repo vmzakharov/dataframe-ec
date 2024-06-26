@@ -968,7 +968,7 @@ implements DfIterate
                     .forEach(agg -> {
                             DfColumn valueColumn = this.getColumnNamed(agg.getSourceColumnName());
                             inputRowCountPerAggregateRow.get(agg.getTargetColumnName())[accumulatorRowIndex]++;
-                            pivoted.getColumnNamed(agg.getTargetColumnName())
+                            agg.getTargetColumn(pivoted)
                                    .applyAggregator(accumulatorRowIndex, valueColumn, finalRowIndex, agg);
                         });
         }
@@ -1061,6 +1061,7 @@ implements DfIterate
         DataFrame aggregatedDataFrame = new DataFrame("Aggregate Of " + this.getName());
 
         columnsToGroupByNames
+                .asLazy()
                 .collect(this::getColumnNamed)
                 .forEach(col -> aggregatedDataFrame.addColumn(col.getName(), col.getType()));
 
@@ -1069,8 +1070,7 @@ implements DfIterate
         );
 
         ListIterable<DfColumn> accumulatorColumns = aggregators
-                .collect(AggregateFunction::getTargetColumnName)
-                .collect(aggregatedDataFrame::getColumnNamed);
+                .collectWith(AggregateFunction::getTargetColumn, aggregatedDataFrame);
 
         DfIndexKeeper index = new DfIndexKeeper(aggregatedDataFrame, columnsToGroupByNames, this);
 

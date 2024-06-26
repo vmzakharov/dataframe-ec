@@ -157,7 +157,7 @@ extends AggregateFunction
     @Override
     public void finishAggregating(DataFrame aggregatedDataFrame, int[] countsByRow)
     {
-        DfColumn aggregatedColumn = aggregatedDataFrame.getColumnNamed(this.getTargetColumnName());
+        DfColumn aggregatedColumn = this.getTargetColumn(aggregatedDataFrame);
         int columnSize = aggregatedColumn.getSize();
 
         IntProcedure avgValueSetter = null;
