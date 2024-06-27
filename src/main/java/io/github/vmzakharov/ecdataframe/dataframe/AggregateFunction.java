@@ -199,7 +199,7 @@ public abstract class AggregateFunction
                 .with("operationDescription", this.getDescription())
                 .with("columnName", column.getName())
                 .with("columnType", column.getType().toString().toLowerCase())
-                .get();
+                .getUnsupported();
     }
 
     public int intInitialValue()

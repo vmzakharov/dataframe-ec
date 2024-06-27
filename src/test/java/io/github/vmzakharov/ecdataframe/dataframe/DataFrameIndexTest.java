@@ -144,18 +144,13 @@ public class DataFrameIndexTest
 
         dataFrame.dropIndex("ByName");
 
-        try
-        {
-            dataFrame.index("ByName").sizeAt("Carol");
-        }
-        catch (RuntimeException e)
-        {
-            assertEquals(
-                messageFromKey("DF_INDEX_DOES_NOT_EXIST")
-                    .with("indexName", "ByName")
-                    .with("dataFrameName", dataFrame.getName())
-                    .toString(),
-                e.getMessage());
-        }
+        Exception e = assertThrows(RuntimeException.class, () -> dataFrame.index("ByName").sizeAt("Carol"));
+
+        assertEquals(
+            messageFromKey("DF_INDEX_DOES_NOT_EXIST")
+                .with("indexName", "ByName")
+                .with("dataFrameName", dataFrame.getName())
+                .toString(),
+            e.getMessage());
     }
 }

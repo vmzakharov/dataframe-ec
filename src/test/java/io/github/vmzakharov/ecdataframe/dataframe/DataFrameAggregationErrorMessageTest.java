@@ -5,6 +5,7 @@ import io.github.vmzakharov.ecdataframe.util.FormatWithPlaceholders;
 import org.eclipse.collections.api.list.ListIterable;
 import org.eclipse.collections.impl.factory.Lists;
 
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -61,21 +62,16 @@ public class DataFrameAggregationErrorMessageTest
     {
         AggregateFunction aggregator = new BadAggregation(columnName);
 
-        try
-        {
-            this.dataFrame.aggregate(Lists.immutable.of(aggregator));
-        }
-        catch (Exception e)
-        {
-            assertEquals(
-                    FormatWithPlaceholders.messageFromKey("AGG_COL_TYPE_UNSUPPORTED")
-                            .with("operation", aggregator.getName())
-                            .with("operationDescription", aggregator.getDescription())
-                            .with("columnName", columnName)
-                            .with("columnType", columnType)
-                            .toString(),
-                    e.getMessage());
-        }
+        Exception e = Assertions.assertThrows(UnsupportedOperationException.class, () -> this.dataFrame.aggregate(Lists.immutable.of(aggregator)));
+
+        assertEquals(
+                FormatWithPlaceholders.messageFromKey("AGG_COL_TYPE_UNSUPPORTED")
+                        .with("operation", aggregator.getName())
+                        .with("operationDescription", aggregator.getDescription())
+                        .with("columnName", columnName)
+                        .with("columnType", columnType)
+                        .toString(),
+                e.getMessage());
     }
 
     private static class BadAggregation
