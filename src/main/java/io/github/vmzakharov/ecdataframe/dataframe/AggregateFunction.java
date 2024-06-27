@@ -138,6 +138,11 @@ public abstract class AggregateFunction
         return this.targetColumnName;
     }
 
+    public DfColumn getTargetColumn(DataFrame dataframe)
+    {
+        return dataframe.getColumnNamed(this.targetColumnName);
+    }
+
     public ValueType targetColumnType(ValueType sourceColumnType)
     {
         return sourceColumnType;
