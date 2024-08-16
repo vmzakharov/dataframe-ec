@@ -1047,10 +1047,10 @@ implements DfIterate
             ListIterable<String> columnsToGroupByNames,
             boolean createSourceRowIdIndex)
     {
-        MutableList<MutableIntList> sumIndex = null;
+        MutableList<MutableIntList> sourceRowIds = null;
         if (createSourceRowIdIndex)
         {
-            sumIndex = Lists.mutable.of();
+            sourceRowIds = Lists.mutable.of();
         }
 
         int[] inputRowCountPerAggregateRow = new int[this.rowCount()]; // sizing for the worst case scenario: no aggregation
@@ -1086,13 +1086,12 @@ implements DfIterate
 
             if (createSourceRowIdIndex)
             {
-                while (sumIndex.size() <= accumulatorRowIndex)
+                while (sourceRowIds.size() <= accumulatorRowIndex)
                 {
-                    sumIndex.add(IntLists.mutable.of());
+                    sourceRowIds.add(IntLists.mutable.of());
                 }
 
-                sumIndex.get(accumulatorRowIndex)
-                        .add(rowIndex);
+                sourceRowIds.get(accumulatorRowIndex).add(rowIndex);
             }
 
             inputRowCountPerAggregateRow[accumulatorRowIndex]++;
@@ -1105,7 +1104,7 @@ implements DfIterate
 
         if (createSourceRowIdIndex)
         {
-            aggregatedDataFrame.aggregateIndex = sumIndex;
+            aggregatedDataFrame.aggregateIndex = sourceRowIds;
         }
 
         aggregators.forEach(agg -> agg.finishAggregating(aggregatedDataFrame, inputRowCountPerAggregateRow));
@@ -2108,7 +2107,7 @@ implements DfIterate
             }
             else
             {
-                // use the first row
+                // use the first row in case there are multiple rows matching this lookup key
                 int targetRowIndex = found.getFirst();
 
                 columnsToSelectFrom.forEachInBoth(addedColumns, (selectFrom, addTo) -> addTo.addObject(selectFrom.getObject(targetRowIndex)));
