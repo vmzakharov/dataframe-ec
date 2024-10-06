@@ -136,7 +136,7 @@ public class HierarchicalDataSetProjectionTest
                         .addStringColumn("Person.name").addLongColumn("Lucky Number").addDoubleColumn("Temp").addStringColumn("Abc")
                         .addRow("Alice", 123, 95.7, "ABC")
                         .addRow("Bob",   456, 36.6, "ABC"),
-                ((DataFrameValue) result).dataFrameValue()
+                ((DataFrameValue) result).dataFrame()
         );
     }
 
@@ -166,7 +166,7 @@ public class HierarchicalDataSetProjectionTest
                         .addStringColumn("Person.name").addLongColumn("Big Lucky Number").addDoubleColumn("BigTemp")
                         .addRow("Alice", 123, 95.7)
                         .addRow("Bob",   456, 36.6),
-                ((DataFrameValue) result).dataFrameValue()
+                ((DataFrameValue) result).dataFrame()
         );
     }
 
@@ -196,7 +196,7 @@ public class HierarchicalDataSetProjectionTest
                 new DataFrame("expected")
                         .addStringColumn("Person.name").addLongColumn("Lucky Number").addDoubleColumn("Temp").addStringColumn("Food")
                         .addRow("Alice", 123, 95.7, "Lutefisk"),
-                ((DataFrameValue) result).dataFrameValue()
+                ((DataFrameValue) result).dataFrame()
         );
     }
 
@@ -230,7 +230,7 @@ public class HierarchicalDataSetProjectionTest
                         .addStringColumn("FavoriteFood").addDateTimeColumn("LastEaten").addDateColumn("LastEatenDateOnly")
                         .addRow("Alice", 123, LocalDate.of(2022, 4, 3), "Lutefisk",  LocalDateTime.of(1911, 11, 11, 11, 11, 11), LocalDate.of(1911, 11, 11))
                         .addRow("Bob",   456, LocalDate.of(2022, 4, 2), "Chocolate", LocalDateTime.of(2022, 4, 6, 15, 24, 35),   LocalDate.of(2022, 4, 6)),
-                ((DataFrameValue) result).dataFrameValue()
+                ((DataFrameValue) result).dataFrame()
         );
     }
 }

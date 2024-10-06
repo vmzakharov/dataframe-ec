@@ -12,11 +12,6 @@ implements Value
         this.throwExceptionIfNull(dataFrame);
     }
 
-    public DataFrame dataFrameValue()
-    {
-        return this.dataFrame;
-    }
-
     @Override
     public String asStringLiteral()
     {
