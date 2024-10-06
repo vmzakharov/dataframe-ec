@@ -143,39 +143,39 @@ implements ExpressionEvaluationVisitor
             return Value.VOID;
         }
 
-        if (rawValue instanceof String)
+        if (rawValue instanceof String s)
         {
-            return new StringValue(rawValue.toString());
+            return new StringValue(s);
         }
 
-        if (rawValue instanceof Integer)
+        if (rawValue instanceof Integer i)
         {
-            return new LongValue((Integer) rawValue);
+            return new LongValue(i);
         }
 
-        if (rawValue instanceof Long)
+        if (rawValue instanceof Long l)
         {
-            return new LongValue((Long) rawValue);
+            return new LongValue(l);
         }
 
-        if (rawValue instanceof Float)
+        if (rawValue instanceof Float f)
         {
-            return new DoubleValue((Float) rawValue);
+            return new DoubleValue(f);
         }
 
-        if (rawValue instanceof Double)
+        if (rawValue instanceof Double d)
         {
-            return new DoubleValue((Double) rawValue);
+            return new DoubleValue(d);
         }
 
-        if (rawValue instanceof LocalDate)
+        if (rawValue instanceof LocalDate ld)
         {
-            return new DateValue((LocalDate) rawValue);
+            return new DateValue(ld);
         }
 
-        if (rawValue instanceof LocalDateTime)
+        if (rawValue instanceof LocalDateTime ldt)
         {
-            return new DateTimeValue((LocalDateTime) rawValue);
+            return new DateTimeValue(ldt);
         }
 
         throw exceptionByKey("DSL_FAIL_TO_CONVERT_RAW_VAL")
