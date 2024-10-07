@@ -4,19 +4,18 @@ import io.github.vmzakharov.ecdataframe.dsl.value.Value;
 import io.github.vmzakharov.ecdataframe.dsl.visitor.ExpressionEvaluationVisitor;
 import io.github.vmzakharov.ecdataframe.dsl.visitor.ExpressionVisitor;
 
-public record DecimalExpr(Expression unscaledValueExpr, Expression scaleExpr)
+public record AssignExpr(String varName, boolean isEscaped, Expression expression)
 implements Expression
 {
-
     @Override
-    public Value evaluate(ExpressionEvaluationVisitor evaluationVisitor)
+    public Value evaluate(ExpressionEvaluationVisitor visitor)
     {
-        return evaluationVisitor.visitDecimalExpr(this);
+        return visitor.visitAssignExpr(this);
     }
 
     @Override
     public void accept(ExpressionVisitor visitor)
     {
-        visitor.visitDecimalExpr(this);
+        visitor.visitAssignExpr(this);
     }
 }

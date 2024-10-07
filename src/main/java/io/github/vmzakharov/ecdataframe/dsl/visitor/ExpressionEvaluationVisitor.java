@@ -1,7 +1,7 @@
 package io.github.vmzakharov.ecdataframe.dsl.visitor;
 
 import io.github.vmzakharov.ecdataframe.dsl.AnonymousScript;
-import io.github.vmzakharov.ecdataframe.dsl.AssingExpr;
+import io.github.vmzakharov.ecdataframe.dsl.AssignExpr;
 import io.github.vmzakharov.ecdataframe.dsl.BinaryExpr;
 import io.github.vmzakharov.ecdataframe.dsl.DecimalExpr;
 import io.github.vmzakharov.ecdataframe.dsl.FunctionCallExpr;
@@ -18,7 +18,7 @@ import io.github.vmzakharov.ecdataframe.dsl.value.Value;
 
 public interface ExpressionEvaluationVisitor
 {
-    Value visitAssignExpr(AssingExpr expr);
+    Value visitAssignExpr(AssignExpr expr);
 
     Value visitBinaryExpr(BinaryExpr expr);
 

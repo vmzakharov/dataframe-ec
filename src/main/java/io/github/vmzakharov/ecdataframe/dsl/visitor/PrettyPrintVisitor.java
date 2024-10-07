@@ -2,7 +2,7 @@ package io.github.vmzakharov.ecdataframe.dsl.visitor;
 
 import io.github.vmzakharov.ecdataframe.dsl.AliasExpr;
 import io.github.vmzakharov.ecdataframe.dsl.AnonymousScript;
-import io.github.vmzakharov.ecdataframe.dsl.AssingExpr;
+import io.github.vmzakharov.ecdataframe.dsl.AssignExpr;
 import io.github.vmzakharov.ecdataframe.dsl.BinaryExpr;
 import io.github.vmzakharov.ecdataframe.dsl.DecimalExpr;
 import io.github.vmzakharov.ecdataframe.dsl.Expression;
@@ -49,11 +49,11 @@ implements ExpressionVisitor
     }
 
     @Override
-    public void visitAssignExpr(AssingExpr expr)
+    public void visitAssignExpr(AssignExpr expr)
     {
-        this.print(this.escapeVarNameIfNeeded(expr.getVarName(), expr.isEscaped()))
+        this.print(this.escapeVarNameIfNeeded(expr.varName(), expr.isEscaped()))
             .print(" = ")
-            .printExpression(expr.getExpression());
+            .printExpression(expr.expression());
     }
 
     private String escapeVarNameIfNeeded(String name, boolean escaped)

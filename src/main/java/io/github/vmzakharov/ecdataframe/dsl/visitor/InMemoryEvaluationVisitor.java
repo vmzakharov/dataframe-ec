@@ -3,7 +3,7 @@ package io.github.vmzakharov.ecdataframe.dsl.visitor;
 import io.github.vmzakharov.ecdataframe.dataframe.DataFrame;
 import io.github.vmzakharov.ecdataframe.dataset.HierarchicalDataSet;
 import io.github.vmzakharov.ecdataframe.dsl.AnonymousScript;
-import io.github.vmzakharov.ecdataframe.dsl.AssingExpr;
+import io.github.vmzakharov.ecdataframe.dsl.AssignExpr;
 import io.github.vmzakharov.ecdataframe.dsl.BinaryExpr;
 import io.github.vmzakharov.ecdataframe.dsl.DecimalExpr;
 import io.github.vmzakharov.ecdataframe.dsl.EvalContext;
@@ -59,9 +59,9 @@ implements ExpressionEvaluationVisitor
     }
 
     @Override
-    public Value visitAssignExpr(AssingExpr expr)
+    public Value visitAssignExpr(AssignExpr expr)
     {
-        return this.getContext().setVariable(expr.getVarName(), expr.getExpression().evaluate(this));
+        return this.getContext().setVariable(expr.varName(), expr.expression().evaluate(this));
     }
 
     @Override

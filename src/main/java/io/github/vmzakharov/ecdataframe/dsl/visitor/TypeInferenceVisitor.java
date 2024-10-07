@@ -4,7 +4,7 @@ import io.github.vmzakharov.ecdataframe.dataset.HierarchicalDataSet;
 import io.github.vmzakharov.ecdataframe.dsl.AliasExpr;
 import io.github.vmzakharov.ecdataframe.dsl.AnonymousScript;
 import io.github.vmzakharov.ecdataframe.dsl.ArithmeticOp;
-import io.github.vmzakharov.ecdataframe.dsl.AssingExpr;
+import io.github.vmzakharov.ecdataframe.dsl.AssignExpr;
 import io.github.vmzakharov.ecdataframe.dsl.BinaryExpr;
 import io.github.vmzakharov.ecdataframe.dsl.BooleanOp;
 import io.github.vmzakharov.ecdataframe.dsl.ComparisonOp;
@@ -73,9 +73,9 @@ implements ExpressionVisitor
     }
 
     @Override
-    public void visitAssignExpr(AssingExpr expr)
+    public void visitAssignExpr(AssignExpr expr)
     {
-        this.storeVariableType(expr.getVarName(), this.processAndPopResult(expr.getExpression()));
+        this.storeVariableType(expr.varName(), this.processAndPopResult(expr.expression()));
     }
 
     public void storeVariableType(String variableName, ValueType valueType)

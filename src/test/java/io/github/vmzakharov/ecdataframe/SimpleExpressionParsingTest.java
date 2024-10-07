@@ -1,6 +1,6 @@
 package io.github.vmzakharov.ecdataframe;
 
-import io.github.vmzakharov.ecdataframe.dsl.AssingExpr;
+import io.github.vmzakharov.ecdataframe.dsl.AssignExpr;
 import io.github.vmzakharov.ecdataframe.dsl.BinaryExpr;
 import io.github.vmzakharov.ecdataframe.dsl.EvalContext;
 import io.github.vmzakharov.ecdataframe.dsl.Expression;
@@ -37,7 +37,7 @@ public class SimpleExpressionParsingTest
     public void assignment()
     {
         Expression expression = ExpressionTestUtil.toExpression("a = 5\n");
-        assertEquals("a", ((AssingExpr) expression).getVarName());
+        assertEquals("a", ((AssignExpr) expression).varName());
 
         EvalContext evalContext = new SimpleEvalContext();
 

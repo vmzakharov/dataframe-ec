@@ -3,7 +3,7 @@ package io.github.vmzakharov.ecdataframe.grammar;
 import io.github.vmzakharov.ecdataframe.dsl.AliasExpr;
 import io.github.vmzakharov.ecdataframe.dsl.AnonymousScript;
 import io.github.vmzakharov.ecdataframe.dsl.ArithmeticOp;
-import io.github.vmzakharov.ecdataframe.dsl.AssingExpr;
+import io.github.vmzakharov.ecdataframe.dsl.AssignExpr;
 import io.github.vmzakharov.ecdataframe.dsl.BinaryExpr;
 import io.github.vmzakharov.ecdataframe.dsl.BooleanOp;
 import io.github.vmzakharov.ecdataframe.dsl.ComparisonOp;
@@ -59,7 +59,7 @@ extends ModelScriptBaseVisitor<Expression>
         }
         Expression expression = this.visit(ctx.expr());
         return this.addStatementToCurrentScriptContext(
-                new AssingExpr(this.unEscape(varName), this.isEscaped(varName), expression));
+                new AssignExpr(this.unEscape(varName), this.isEscaped(varName), expression));
     }
 
     private String unEscape(String varName)
@@ -134,24 +134,14 @@ extends ModelScriptBaseVisitor<Expression>
 
     private Expression visitBinaryOperation(ModelScriptParser.ExprContext exprContext1, ModelScriptParser.ExprContext exprContext2, Token opToken)
     {
-        ArithmeticOp operation;
-        switch (opToken.getType())
+        ArithmeticOp operation = switch (opToken.getType())
         {
-            case ModelScriptParser.MUL:
-                operation = ArithmeticOp.MULTIPLY;
-                break;
-            case ModelScriptParser.DIV:
-                operation = ArithmeticOp.DIVIDE;
-                break;
-            case ModelScriptParser.ADD:
-                operation = ArithmeticOp.ADD;
-                break;
-            case ModelScriptParser.SUB:
-                operation = ArithmeticOp.SUBTRACT;
-                break;
-            default:
-                throw new RuntimeException("Do not understand token '" + opToken.getText() + "'");
-        }
+            case ModelScriptParser.MUL -> ArithmeticOp.MULTIPLY;
+            case ModelScriptParser.DIV -> ArithmeticOp.DIVIDE;
+            case ModelScriptParser.ADD -> ArithmeticOp.ADD;
+            case ModelScriptParser.SUB -> ArithmeticOp.SUBTRACT;
+            default -> throw new RuntimeException("Do not understand token '" + opToken.getText() + "'");
+        };
 
         return new BinaryExpr(this.visit(exprContext1), this.visit(exprContext2), operation);
     }
@@ -170,21 +160,13 @@ extends ModelScriptBaseVisitor<Expression>
 
     private Expression visitBooleanOperation(ModelScriptParser.ExprContext exprContext1, ModelScriptParser.ExprContext exprContext2, Token opToken)
     {
-        BooleanOp operation;
-        switch (opToken.getType())
+        BooleanOp operation = switch (opToken.getType())
         {
-            case ModelScriptParser.AND:
-                operation = BooleanOp.AND;
-                break;
-            case ModelScriptParser.OR:
-                operation = BooleanOp.OR;
-                break;
-            case ModelScriptParser.XOR:
-                operation = BooleanOp.XOR;
-                break;
-            default:
-                throw new RuntimeException("Do not understand token '" + opToken.getText() + "'");
-        }
+            case ModelScriptParser.AND -> BooleanOp.AND;
+            case ModelScriptParser.OR -> BooleanOp.OR;
+            case ModelScriptParser.XOR -> BooleanOp.XOR;
+            default -> throw new RuntimeException("Do not understand token '" + opToken.getText() + "'");
+        };
 
         return new BinaryExpr(this.visit(exprContext1), this.visit(exprContext2), operation);
     }
@@ -192,30 +174,16 @@ extends ModelScriptBaseVisitor<Expression>
     @Override
     public Expression visitCompareExpr(ModelScriptParser.CompareExprContext ctx)
     {
-        ComparisonOp operation;
-        switch (ctx.op.getType())
+        ComparisonOp operation = switch (ctx.op.getType())
         {
-            case ModelScriptParser.GT:
-                operation = ComparisonOp.GT;
-                break;
-            case ModelScriptParser.GTE:
-                operation = ComparisonOp.GTE;
-                break;
-            case ModelScriptParser.LT:
-                operation = ComparisonOp.LT;
-                break;
-            case ModelScriptParser.LTE:
-                operation = ComparisonOp.LTE;
-                break;
-            case ModelScriptParser.EQ:
-                operation = ComparisonOp.EQ;
-                break;
-            case ModelScriptParser.NE:
-                operation = ComparisonOp.NE;
-                break;
-            default:
-                throw new RuntimeException("Do not understand token '" + ctx.op.getText() + "'");
-        }
+            case ModelScriptParser.GT -> ComparisonOp.GT;
+            case ModelScriptParser.GTE -> ComparisonOp.GTE;
+            case ModelScriptParser.LT -> ComparisonOp.LT;
+            case ModelScriptParser.LTE -> ComparisonOp.LTE;
+            case ModelScriptParser.EQ -> ComparisonOp.EQ;
+            case ModelScriptParser.NE -> ComparisonOp.NE;
+            default -> throw new RuntimeException("Do not understand token '" + ctx.op.getText() + "'");
+        };
 
         return new BinaryExpr(this.visit(ctx.expr(0)), this.visit(ctx.expr(1)), operation);
     }
