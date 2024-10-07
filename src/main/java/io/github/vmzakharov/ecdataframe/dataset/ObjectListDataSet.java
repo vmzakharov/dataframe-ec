@@ -13,6 +13,7 @@ import org.eclipse.collections.impl.utility.ArrayIterate;
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Method;
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.chrono.ChronoLocalDate;
@@ -165,16 +166,29 @@ extends HierarchicalDataSet
             return ValueType.STRING;
         }
 
-        if (currentClass.equals(long.class) || currentClass.equals(int.class)
-            || currentClass.equals(Long.class) || currentClass.equals(Integer.class))
+        if (currentClass.equals(long.class) || currentClass.equals(Long.class))
         {
             return ValueType.LONG;
         }
 
-        if (currentClass.equals(double.class) || currentClass.equals(float.class)
-            || currentClass.equals(Double.class) || currentClass.equals(Float.class))
+        if (currentClass.equals(int.class) || currentClass.equals(Integer.class))
+        {
+            return ValueType.INT;
+        }
+
+        if (currentClass.equals(double.class) || currentClass.equals(Double.class))
         {
             return ValueType.DOUBLE;
+        }
+
+        if (currentClass.equals(float.class) || currentClass.equals(Float.class))
+        {
+            return ValueType.FLOAT;
+        }
+
+        if (currentClass.equals(BigDecimal.class))
+        {
+            return ValueType.DECIMAL;
         }
 
         if (currentClass.equals(LocalDate.class) || ChronoLocalDate.class.isAssignableFrom(currentClass))

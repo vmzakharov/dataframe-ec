@@ -28,6 +28,8 @@ import io.github.vmzakharov.ecdataframe.dsl.value.DateTimeValue;
 import io.github.vmzakharov.ecdataframe.dsl.value.DateValue;
 import io.github.vmzakharov.ecdataframe.dsl.value.DecimalValue;
 import io.github.vmzakharov.ecdataframe.dsl.value.DoubleValue;
+import io.github.vmzakharov.ecdataframe.dsl.value.FloatValue;
+import io.github.vmzakharov.ecdataframe.dsl.value.IntValue;
 import io.github.vmzakharov.ecdataframe.dsl.value.LongValue;
 import io.github.vmzakharov.ecdataframe.dsl.value.StringValue;
 import io.github.vmzakharov.ecdataframe.dsl.value.Value;
@@ -35,6 +37,7 @@ import io.github.vmzakharov.ecdataframe.dsl.value.ValueType;
 import io.github.vmzakharov.ecdataframe.dsl.value.VectorValue;
 import org.eclipse.collections.api.list.ListIterable;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
@@ -150,7 +153,7 @@ implements ExpressionEvaluationVisitor
 
         if (rawValue instanceof Integer i)
         {
-            return new LongValue(i);
+            return new IntValue(i);
         }
 
         if (rawValue instanceof Long l)
@@ -160,7 +163,7 @@ implements ExpressionEvaluationVisitor
 
         if (rawValue instanceof Float f)
         {
-            return new DoubleValue(f);
+            return new FloatValue(f);
         }
 
         if (rawValue instanceof Double d)
@@ -176,6 +179,11 @@ implements ExpressionEvaluationVisitor
         if (rawValue instanceof LocalDateTime ldt)
         {
             return new DateTimeValue(ldt);
+        }
+
+        if (rawValue instanceof BigDecimal bd)
+        {
+            return new DecimalValue(bd);
         }
 
         throw exceptionByKey("DSL_FAIL_TO_CONVERT_RAW_VAL")

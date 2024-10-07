@@ -141,7 +141,7 @@ public class HierarchicalDataSetProjectionTest
     }
 
     @Test
-    public void projectionWithBigNumbers()
+    public void projectionWithBoxedNumbers()
     {
         String scriptString =
                 """

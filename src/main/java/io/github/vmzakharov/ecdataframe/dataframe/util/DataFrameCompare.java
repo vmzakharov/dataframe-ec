@@ -212,15 +212,20 @@ public class DataFrameCompare
     {
         boolean failed;
 
-        if ((thisValue instanceof BigDecimal) && (thatValue != null))
+        if ((thisValue instanceof BigDecimal thisBd) && (thatValue != null))
         {
-            failed = !(thatValue instanceof BigDecimal) || (((BigDecimal) thisValue).compareTo((BigDecimal) thatValue) != 0);
-        }
-        else if (thisValue instanceof Double && thatValue instanceof Double)
-        {
-            double thisDouble = (Double) thisValue;
-            double thatDouble = (Double) thatValue;
 
+            if (thatValue instanceof BigDecimal thatBd)
+            {
+                 failed = thisBd.subtract(thatBd).abs().compareTo(BigDecimal.valueOf(tolerance)) > 0;
+            }
+            else
+            {
+                failed = true;
+            }
+        }
+        else if (thisValue instanceof Double thisDouble && thatValue instanceof Double thatDouble)
+        {
             failed = tolerance == 0.0
                     ? (Double.compare(thisDouble, thatDouble) != 0) : (Math.abs(thisDouble - thatDouble) > tolerance);
         }
