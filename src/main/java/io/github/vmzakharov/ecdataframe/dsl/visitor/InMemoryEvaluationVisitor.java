@@ -67,15 +67,15 @@ implements ExpressionEvaluationVisitor
     @Override
     public Value visitBinaryExpr(BinaryExpr expr)
     {
-        return expr.getOperation().apply(
-                () -> expr.getOperand1().evaluate(this),
-                () -> expr.getOperand2().evaluate(this));
+        return expr.operation().apply(
+                () -> expr.operand1().evaluate(this),
+                () -> expr.operand2().evaluate(this));
     }
 
     @Override
     public Value visitUnaryExpr(UnaryExpr expr)
     {
-        return expr.getOperation().apply(expr.getOperand().evaluate(this));
+        return expr.operation().apply(expr.operand().evaluate(this));
     }
 
     @Override
@@ -87,15 +87,15 @@ implements ExpressionEvaluationVisitor
     @Override
     public Value visitFunctionCallExpr(FunctionCallExpr expr)
     {
-        String functionName = expr.getNormalizedFunctionName();
+        String functionName = expr.normalizedFunctionName();
         SimpleEvalContext localContext = new SimpleEvalContext();
-        ListIterable<Value> parameterValues = expr.getParameters().collectWith(Expression::evaluate, this);
+        ListIterable<Value> parameterValues = expr.parameters().collectWith(Expression::evaluate, this);
 
         FunctionScript functionScript = this.getContext().getDeclaredFunction(functionName);
 
         if (functionScript != null)
         {
-            if (expr.getParameters().size() != functionScript.getParameterNames().size())
+            if (expr.parameters().size() != functionScript.getParameterNames().size())
             {
                 exceptionByKey("DSL_EXPLICIT_PARAM_MISMATCH").with("functionName", functionName).fire();
             }
@@ -113,12 +113,12 @@ implements ExpressionEvaluationVisitor
 
             if (functionDescriptor == null)
             {
-                exceptionByKey("DSL_UNKNOWN_FUN").with("functionName", expr.getFunctionName()).fire();
+                exceptionByKey("DSL_UNKNOWN_FUN").with("functionName", expr.functionName()).fire();
             }
 
             if (functionDescriptor.hasExplicitParameters())
             {
-                if (expr.getParameters().size() != functionDescriptor.getParameterNames().size())
+                if (expr.parameters().size() != functionDescriptor.getParameterNames().size())
                 {
                     exceptionByKey("DSL_EXPLICIT_PARAM_MISMATCH").with("functionName", functionName).fire();
                 }
@@ -221,15 +221,15 @@ implements ExpressionEvaluationVisitor
     @Override
     public Value visitIfElseExpr(IfElseExpr expr)
     {
-        BooleanValue condValue = (BooleanValue) expr.getCondition().evaluate(this);
+        BooleanValue condValue = (BooleanValue) expr.condition().evaluate(this);
         if (condValue.isTrue())
         {
-            return expr.getIfScript().evaluate(this);
+            return expr.ifScript().evaluate(this);
         }
 
         if (expr.hasElseSection())
         {
-            return expr.getElseScript().evaluate(this);
+            return expr.elseScript().evaluate(this);
         }
 
         return Value.VOID;
@@ -244,33 +244,33 @@ implements ExpressionEvaluationVisitor
     @Override
     public Value visitVarExpr(VarExpr expr)
     {
-        return this.getContext().getVariable(expr.getVariableName());
+        return this.getContext().getVariable(expr.variableName());
     }
 
     @Override
     public Value visitProjectionExpr(ProjectionExpr expr)
     {
-        PropertyPathExpr propertyPathExpr = (PropertyPathExpr) expr.getProjectionExpressions().detect(
+        PropertyPathExpr propertyPathExpr = (PropertyPathExpr) expr.projectionExpressions().detect(
                 e -> e instanceof PropertyPathExpr);
 
         HierarchicalDataSet dataSet = this.getContext().getDataSet(propertyPathExpr.getEntityName());
 
-        boolean missingWhereClause = expr.getWhereClause() == null;
+        boolean missingWhereClause = expr.whereClause() == null;
 
         DataFrame dataFrame = new DataFrame("Projection");
 
         TypeInferenceVisitor typeInferenceVisitor = new TypeInferenceVisitor(this.getContext());
-        ListIterable<ValueType> projectionExpressionTypes = expr.getProjectionExpressions().collect(typeInferenceVisitor::inferExpressionType);
+        ListIterable<ValueType> projectionExpressionTypes = expr.projectionExpressions().collect(typeInferenceVisitor::inferExpressionType);
 
-        expr.getElementNames().zip(projectionExpressionTypes).each(p -> dataFrame.addColumn(p.getOne(), p.getTwo()));
+        expr.elementNames().zip(projectionExpressionTypes).each(p -> dataFrame.addColumn(p.getOne(), p.getTwo()));
 
         dataSet.openFileForReading();
         while (dataSet.hasNext())
         {
             dataSet.next();
-            if (missingWhereClause || ((BooleanValue) expr.getWhereClause().evaluate(this)).isTrue())
+            if (missingWhereClause || ((BooleanValue) expr.whereClause().evaluate(this)).isTrue())
             {
-                ListIterable<Value> rowValues = expr.getProjectionExpressions().collect(e -> e.evaluate(this));
+                ListIterable<Value> rowValues = expr.projectionExpressions().collect(e -> e.evaluate(this));
                 dataFrame.addRow(rowValues);
             }
         }
@@ -283,15 +283,15 @@ implements ExpressionEvaluationVisitor
     public Value visitVectorExpr(VectorExpr expr)
     {
         return new VectorValue(
-                expr.getElements().collect(e -> e.evaluate(this))
+                expr.elements().collect(e -> e.evaluate(this))
         );
     }
 
     @Override
     public Value visitIndexExpr(IndexExpr expr)
     {
-        VectorValue vector = (VectorValue) expr.getVectorExpr().evaluate(this);
-        LongValue index = (LongValue) expr.getIndexExpr().evaluate(this);
+        VectorValue vector = (VectorValue) expr.vectorExpr().evaluate(this);
+        LongValue index = (LongValue) expr.indexExpr().evaluate(this);
         return vector.get((int) index.longValue());
     }
 

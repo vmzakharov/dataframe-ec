@@ -4,27 +4,9 @@ import io.github.vmzakharov.ecdataframe.dsl.value.Value;
 import io.github.vmzakharov.ecdataframe.dsl.visitor.ExpressionEvaluationVisitor;
 import io.github.vmzakharov.ecdataframe.dsl.visitor.ExpressionVisitor;
 
-public class UnaryExpr
+public record UnaryExpr(UnaryOp operation, Expression operand)
 implements Expression
 {
-    private final UnaryOp operation;
-    private final Expression operand;
-
-    public UnaryExpr(UnaryOp newOperation, Expression newOperand)
-    {
-        this.operand = newOperand;
-        this.operation = newOperation;
-    }
-
-    public Expression getOperand()
-    {
-        return this.operand;
-    }
-
-    public UnaryOp getOperation()
-    {
-        return this.operation;
-    }
 
     @Override
     public Value evaluate(ExpressionEvaluationVisitor evaluationVisitor)

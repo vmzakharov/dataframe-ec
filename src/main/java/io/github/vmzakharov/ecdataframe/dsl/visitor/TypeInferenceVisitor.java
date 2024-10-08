@@ -99,31 +99,31 @@ implements ExpressionVisitor
     {
         ValueType resultType;
 
-        ValueType type1 = this.processAndPopResult(expr.getOperand1());
+        ValueType type1 = this.processAndPopResult(expr.operand1());
 
-        ValueType type2 = this.processAndPopResult(expr.getOperand2());
+        ValueType type2 = this.processAndPopResult(expr.operand2());
 
         resultType = VOID;
 
-        if (expr.getOperation() instanceof ArithmeticOp)
+        if (expr.operation() instanceof ArithmeticOp)
         {
             resultType = this.arithmeticTypeCompatibleWith(type1, type2);
         }
-        else if (expr.getOperation() instanceof BooleanOp)
+        else if (expr.operation() instanceof BooleanOp)
         {
             if (type1.isBoolean() && type2.isBoolean())
             {
                 resultType = BOOLEAN;
             }
         }
-        else if (expr.getOperation() instanceof ContainsOp)
+        else if (expr.operation() instanceof ContainsOp)
         {
             if (type2.isVector() || (type1.isString() && type2.isString()))
             {
                 resultType = BOOLEAN;
             }
         }
-        else if (expr.getOperation() instanceof ComparisonOp)
+        else if (expr.operation() instanceof ComparisonOp)
         {
             if ((type1.isNumber() && type2.isNumber()) || (type1 == type2))
             {
@@ -132,7 +132,7 @@ implements ExpressionVisitor
         }
         else
         {
-            this.recordError("Unknown operation " + expr.getOperation(), PrettyPrintVisitor.exprToString(expr));
+            this.recordError("Unknown operation " + expr.operation(), PrettyPrintVisitor.exprToString(expr));
         }
 
         // if type1 or type2 is void it means we have already failed in evaluating them expression
@@ -218,8 +218,8 @@ implements ExpressionVisitor
     @Override
     public void visitUnaryExpr(UnaryExpr expr)
     {
-        ValueType operandType = this.processAndPopResult(expr.getOperand());
-        UnaryOp operation = expr.getOperation();
+        ValueType operandType = this.processAndPopResult(expr.operand());
+        UnaryOp operation = expr.operation();
 
         if (operation == UnaryOp.MINUS && operandType.isNumber())
         {
@@ -266,28 +266,28 @@ implements ExpressionVisitor
     @Override
     public void visitFunctionCallExpr(FunctionCallExpr expr)
     {
-        IntrinsicFunctionDescriptor functionDescriptor = BuiltInFunctions.getFunctionDescriptor(expr.getNormalizedFunctionName());
+        IntrinsicFunctionDescriptor functionDescriptor = BuiltInFunctions.getFunctionDescriptor(expr.normalizedFunctionName());
         if (functionDescriptor != null)
         {
             this.processBuiltInFunction(expr, functionDescriptor);
         }
         else
         {
-            FunctionScript functionScript = this.getFunction(expr.getNormalizedFunctionName());
+            FunctionScript functionScript = this.getFunction(expr.normalizedFunctionName());
             if (functionScript != null)
             {
                 this.processDeclaredFunction(expr, functionScript);
             }
             else
             {
-                this.recordError(messageFromKey("TYPE_INFER_UNDEFINED_FUNCTION").toString(), expr.getFunctionName());
+                this.recordError(messageFromKey("TYPE_INFER_UNDEFINED_FUNCTION").toString(), expr.functionName());
             }
         }
     }
 
     private void processBuiltInFunction(FunctionCallExpr expr, IntrinsicFunctionDescriptor functionDescriptor)
     {
-        ListIterable<ValueType> parameterTypes = expr.getParameters().collect(p -> {
+        ListIterable<ValueType> parameterTypes = expr.parameters().collect(p -> {
             p.accept(this);
             return this.getLastExpressionType();
         });
@@ -298,7 +298,7 @@ implements ExpressionVisitor
     private void processDeclaredFunction(FunctionCallExpr expr, FunctionScript functionScript)
     {
         TypeInferenceVisitor functionCallContextVisitor = new TypeInferenceVisitor();
-        expr.getParameters().forEachWithIndex((p, i) -> {
+        expr.parameters().forEachWithIndex((p, i) -> {
                     String paramName = functionScript.getParameterNames().get(i);
                     p.accept(this);
                     functionCallContextVisitor.storeVariableType(paramName, this.getLastExpressionType());
@@ -339,13 +339,13 @@ implements ExpressionVisitor
     @Override
     public void visitAliasExpr(AliasExpr expr)
     {
-        expr.getExpression().accept(this);
+        expr.expression().accept(this);
     }
 
     @Override
     public void visitVarExpr(VarExpr expr)
     {
-        String variableName = expr.getVariableName();
+        String variableName = expr.variableName();
         ValueType variableType = this.variableTypes.get(variableName);
         if (variableType == null)
         {
@@ -381,17 +381,17 @@ implements ExpressionVisitor
     @Override
     public void visitIndexExpr(IndexExpr expr)
     {
-        Expression vectorExpr = expr.getVectorExpr();
+        Expression vectorExpr = expr.vectorExpr();
         ValueType vectorType = this.processAndPopResult(vectorExpr);
 
-        Expression indexExpr = expr.getIndexExpr();
+        Expression indexExpr = expr.indexExpr();
 
         if (indexExpr instanceof Value indexVal && vectorExpr instanceof VectorExpr) // the vector and the index are both specified as literals
         {
             if (indexVal.isLong())
             {
                 long index = ((LongValue) indexVal).longValue();
-                Expression exprAtIndex = ((VectorExpr) vectorExpr).getElements().get((int) index);
+                Expression exprAtIndex = ((VectorExpr) vectorExpr).elements().get((int) index);
                 exprAtIndex.accept(this);
                 return;
             }
@@ -446,7 +446,7 @@ implements ExpressionVisitor
     @Override
     public void visitIfElseExpr(IfElseExpr expr)
     {
-        ValueType conditionType = this.processAndPopResult(expr.getCondition());
+        ValueType conditionType = this.processAndPopResult(expr.condition());
 
         // void means we have already failed in the condition expression so no point in propagating this error
         if (!conditionType.isBoolean() && !conditionType.isVoid())
@@ -454,11 +454,11 @@ implements ExpressionVisitor
             this.recordError(messageFromKey("TYPE_INFER_CONDITION_NOT_BOOLEAN").toString(), PrettyPrintVisitor.exprToString(expr));
         }
 
-        ValueType ifType = this.processAndPopResult(expr.getIfScript());
+        ValueType ifType = this.processAndPopResult(expr.ifScript());
 
         if (expr.hasElseSection())
         {
-            ValueType elseType = this.processAndPopResult(expr.getElseScript());
+            ValueType elseType = this.processAndPopResult(expr.elseScript());
 
             ValueType valueType = this.arithmeticTypeCompatibleWith(ifType, elseType);
             this.store(valueType);

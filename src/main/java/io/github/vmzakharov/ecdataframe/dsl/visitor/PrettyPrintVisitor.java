@@ -64,21 +64,21 @@ implements ExpressionVisitor
     @Override
     public void visitBinaryExpr(BinaryExpr expr)
     {
-        this.print("(").printExpression(expr.getOperand1()).print(" ")
-            .print(expr.getOperation().asString())
-            .print(" ").printExpression(expr.getOperand2()).print(")");
+        this.print("(").printExpression(expr.operand1()).print(" ")
+            .print(expr.operation().asString())
+            .print(" ").printExpression(expr.operand2()).print(")");
     }
 
     @Override
     public void visitUnaryExpr(UnaryExpr expr)
     {
-        if (expr.getOperation().isPrefix())
+        if (expr.operation().isPrefix())
         {
-            this.print(expr.getOperation().asString()).print("(").printExpression(expr.getOperand()).print(")");
+            this.print(expr.operation().asString()).print("(").printExpression(expr.operand()).print(")");
         }
         else
         {
-            this.print("(").printExpression(expr.getOperand()).print(") ").print(expr.getOperation().asString());
+            this.print("(").printExpression(expr.operand()).print(") ").print(expr.operation().asString());
         }
     }
 
@@ -91,7 +91,7 @@ implements ExpressionVisitor
     @Override
     public void visitFunctionCallExpr(FunctionCallExpr expr)
     {
-        this.print(expr.getFunctionName()).print("(").printExpressionList(expr.getParameters()).print(")");
+        this.print(expr.functionName()).print("(").printExpressionList(expr.parameters()).print(")");
     }
 
     private PrettyPrintVisitor printExpressionListLn(ListIterable<Expression> expressions)
@@ -135,7 +135,7 @@ implements ExpressionVisitor
     @Override
     public void visitPropertyPathExpr(PropertyPathExpr expr)
     {
-        this.print(expr.getPathElements().makeString("."));
+        this.print(expr.pathElements().makeString("."));
     }
 
     @Override
@@ -170,38 +170,38 @@ implements ExpressionVisitor
     @Override
     public void visitVarExpr(VarExpr expr)
     {
-          this.print(this.escapeVarNameIfNeeded(expr.getVariableName(), expr.isEscaped()));
+          this.print(this.escapeVarNameIfNeeded(expr.variableName(), expr.isEscaped()));
     }
 
     @Override
     public void visitProjectionExpr(ProjectionExpr expr)
     {
         this.print("project {")
-            .printExpressionList(expr.getProjectionElements())
+            .printExpressionList(expr.projectionElements())
             .print("}");
 
-        if (expr.getWhereClause() != null)
+        if (expr.whereClause() != null)
         {
-            this.print(" where ").printExpression(expr.getWhereClause());
+            this.print(" where ").printExpression(expr.whereClause());
         }
     }
 
     @Override
     public void visitAliasExpr(AliasExpr expr)
     {
-        this.print(expr.getAlias()).print(" : ").printExpression(expr.getExpression());
+        this.print(expr.alias()).print(" : ").printExpression(expr.expression());
     }
 
     @Override
     public void visitVectorExpr(VectorExpr expr)
     {
-        this.print("(").printExpressionList(expr.getElements()).print(")");
+        this.print("(").printExpressionList(expr.elements()).print(")");
     }
 
     @Override
     public void visitIndexExpr(IndexExpr expr)
     {
-        this.printExpression(expr.getVectorExpr()).print("[").printExpression(expr.getIndexExpr()).print("]");
+        this.printExpression(expr.vectorExpr()).print("[").printExpression(expr.indexExpr()).print("]");
     }
 
     @Override
@@ -220,24 +220,24 @@ implements ExpressionVisitor
         if (expr.isTernary())
         {
             this
-                .printExpression(expr.getCondition())
+                .printExpression(expr.condition())
                 .print(" ? ")
-                .printExpression(expr.getIfScript())
+                .printExpression(expr.ifScript())
                 .print(" : ")
-                .printExpression(expr.getElseScript());
+                .printExpression(expr.elseScript());
         }
         else
         {
-            this.print("if ").printExpression(expr.getCondition()).print(" then").newLine();
+            this.print("if ").printExpression(expr.condition()).print(" then").newLine();
             this.tab();
-            expr.getIfScript().accept(this);
+            expr.ifScript().accept(this);
             this.tabBack();
 
             if (expr.hasElseSection())
             {
                 this.print("else").newLine();
                 this.tab();
-                expr.getElseScript().accept(this);
+                expr.elseScript().accept(this);
                 this.tabBack();
             }
 

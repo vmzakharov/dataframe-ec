@@ -8,36 +8,39 @@ import org.eclipse.collections.api.list.ListIterable;
 import org.eclipse.collections.api.list.MutableList;
 import org.eclipse.collections.impl.factory.Lists;
 
-public class ProjectionExpr
+public record ProjectionExpr(
+        ListIterable<Expression> projectionElements,
+        Expression whereClause,
+        ListIterable<String> elementNames,
+        ListIterable<Expression> projectionExpressions)
 implements Expression
 {
-    private final Expression whereClause;
-    private final ListIterable<Expression> projectionElements;
-    private final MutableList<String> elementNames = Lists.mutable.of();
-    private final MutableList<Expression> projectionExpressions = Lists.mutable.of();
-
     public ProjectionExpr(ListIterable<Expression> newProjectionElements)
     {
         this(newProjectionElements, null);
     }
 
-    public ProjectionExpr(ListIterable<Expression> newProjectionElements, Expression newWhereClause)
+    public ProjectionExpr(ListIterable<Expression> projectionElements, Expression whereClause)
     {
-        this.projectionElements = newProjectionElements;
-        this.whereClause = newWhereClause;
+        this(projectionElements, whereClause, Lists.mutable.empty(), Lists.mutable.empty());
+
+        // need to update these properties but don't want to expose the mutable type in the record API
+        // so the property is declared as "Iterable", which means we have to cast here to update it
+        MutableList<String> mElementNames = (MutableList<String>) this.elementNames;
+        MutableList<Expression> mProjectionExpressions = (MutableList<Expression>) this.projectionExpressions;
 
         for (int i = 0; i < this.projectionElements.size(); i++)
         {
             Expression element = this.projectionElements.get(i);
             if (element instanceof AliasExpr aliasExpr)
             {
-                this.elementNames.add(aliasExpr.getAlias());
-                this.projectionExpressions.add(aliasExpr.getExpression());
+                mElementNames.add(aliasExpr.alias());
+                mProjectionExpressions.add(aliasExpr.expression());
             }
             else
             {
-                this.elementNames.add(PrettyPrintVisitor.exprToString(element));
-                this.projectionExpressions.add(element);
+                mElementNames.add(PrettyPrintVisitor.exprToString(element));
+                mProjectionExpressions.add(element);
             }
         }
     }
@@ -52,25 +55,5 @@ implements Expression
     public void accept(ExpressionVisitor visitor)
     {
         visitor.visitProjectionExpr(this);
-    }
-
-    public Expression getWhereClause()
-    {
-        return this.whereClause;
-    }
-
-    public ListIterable<Expression> getProjectionElements()
-    {
-        return this.projectionElements;
-    }
-
-    public ListIterable<Expression> getProjectionExpressions()
-    {
-        return this.projectionExpressions;
-    }
-
-    public ListIterable<String> getElementNames()
-    {
-        return this.elementNames;
     }
 }

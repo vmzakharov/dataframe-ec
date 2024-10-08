@@ -104,7 +104,7 @@ public class HierarchicalDataSetProjectionTest
 
         ProjectionExpr expr = (ProjectionExpr) ExpressionParserHelper.DEFAULT.toProjection(scriptString);
 
-        ListIterable<ValueType> projectionExpressionTypes = expr.getProjectionExpressions().collect(visitor::inferExpressionType);
+        ListIterable<ValueType> projectionExpressionTypes = expr.projectionExpressions().collect(visitor::inferExpressionType);
 
         assertEquals(Lists.immutable.of(STRING, LONG, DOUBLE, STRING), projectionExpressionTypes);
     }

@@ -4,17 +4,9 @@ import io.github.vmzakharov.ecdataframe.dsl.value.Value;
 import io.github.vmzakharov.ecdataframe.dsl.visitor.ExpressionEvaluationVisitor;
 import io.github.vmzakharov.ecdataframe.dsl.visitor.ExpressionVisitor;
 
-public class AliasExpr
+public record AliasExpr(String alias, Expression expression)
 implements Expression
 {
-    private final String alias;
-    private final Expression expression;
-
-    public AliasExpr(String newAlias, Expression newExpression)
-    {
-        this.alias = newAlias;
-        this.expression = newExpression;
-    }
 
     @Override
     public Value evaluate(ExpressionEvaluationVisitor evaluationVisitor)
@@ -26,15 +18,5 @@ implements Expression
     public void accept(ExpressionVisitor visitor)
     {
         visitor.visitAliasExpr(this);
-    }
-
-    public String getAlias()
-    {
-        return this.alias;
-    }
-
-    public Expression getExpression()
-    {
-        return this.expression;
     }
 }

@@ -30,7 +30,7 @@ public class SimpleExpressionParsingTest
 
         assertEquals(UnaryExpr.class, expression.getClass());
         UnaryExpr unaryExpr = (UnaryExpr) expression;
-        assertEquals(UnaryOp.MINUS, unaryExpr.getOperation());
+        assertEquals(UnaryOp.MINUS, unaryExpr.operation());
     }
 
     @Test
@@ -57,9 +57,9 @@ public class SimpleExpressionParsingTest
 
         FunctionCallExpr fcExpr = (FunctionCallExpr) expression;
 
-        assertEquals("x", fcExpr.getFunctionName());
-        Expression param1 = fcExpr.getParameters().get(0);
-        Expression param2 = fcExpr.getParameters().get(1);
+        assertEquals("x", fcExpr.functionName());
+        Expression param1 = fcExpr.parameters().get(0);
+        Expression param2 = fcExpr.parameters().get(1);
 
         assertEquals(LongValue.class, param1.getClass());
         assertEquals(BinaryExpr.class, param2.getClass());
@@ -74,8 +74,8 @@ public class SimpleExpressionParsingTest
 
         FunctionCallExpr fcExpr = (FunctionCallExpr) expression;
 
-        assertEquals("fff", fcExpr.getFunctionName());
-        assertEquals(0, fcExpr.getParameters().size());
+        assertEquals("fff", fcExpr.functionName());
+        assertEquals(0, fcExpr.parameters().size());
     }
 
     @Test
@@ -89,8 +89,8 @@ public class SimpleExpressionParsingTest
 
         ProjectionExpr projectionExpr = (ProjectionExpr) expression;
 
-        assertEquals(2, projectionExpr.getProjectionElements().size());
-        assertNotNull(projectionExpr.getWhereClause());
+        assertEquals(2, projectionExpr.projectionElements().size());
+        assertNotNull(projectionExpr.whereClause());
     }
 
     @Test
@@ -108,9 +108,9 @@ public class SimpleExpressionParsingTest
 
         ProjectionExpr projectionExpr = (ProjectionExpr) expression;
 
-        assertEquals(2, projectionExpr.getProjectionElements().size());
-        assertEquals(Lists.mutable.of("barbar", "bazbaz"), projectionExpr.getElementNames());
-        assertNotNull(projectionExpr.getWhereClause());
+        assertEquals(2, projectionExpr.projectionElements().size());
+        assertEquals(Lists.mutable.of("barbar", "bazbaz"), projectionExpr.elementNames());
+        assertNotNull(projectionExpr.whereClause());
     }
 
     @Test
@@ -124,11 +124,11 @@ public class SimpleExpressionParsingTest
 
         VectorExpr vectorExpr = (VectorExpr) expression;
 
-        assertEquals(3, vectorExpr.getElements().size());
+        assertEquals(3, vectorExpr.elements().size());
 
         assertEquals(
                 Lists.immutable.of("\"a\"", "\"b\"", "\"c\""),
-                vectorExpr.getElements().collect(e -> ((Value) e).asStringLiteral()));
+                vectorExpr.elements().collect(e -> ((Value) e).asStringLiteral()));
     }
 
     @Test
@@ -144,10 +144,10 @@ public class SimpleExpressionParsingTest
 
         VectorExpr vectorExpr = (VectorExpr) expression;
 
-        assertEquals(3, vectorExpr.getElements().size());
+        assertEquals(3, vectorExpr.elements().size());
 
         assertEquals(
                 Lists.immutable.of("\"a\""),
-                vectorExpr.getElements().collect(e -> ((Value) e).asStringLiteral()));
+                vectorExpr.elements().collect(e -> ((Value) e).asStringLiteral()));
     }
 }

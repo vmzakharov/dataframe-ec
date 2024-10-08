@@ -72,7 +72,7 @@ public class ProjectionExtraTypesTest
         TypeInferenceVisitor visitor = new TypeInferenceVisitor(context);
         ProjectionExpr expr = (ProjectionExpr) ExpressionParserHelper.DEFAULT.toProjection(scriptString);
 
-        ListIterable<ValueType> projectionExpressionTypes = expr.getProjectionExpressions().collect(visitor::inferExpressionType);
+        ListIterable<ValueType> projectionExpressionTypes = expr.projectionExpressions().collect(visitor::inferExpressionType);
 
         assertEquals(Lists.immutable.of(STRING, FLOAT, INT, DOUBLE, DECIMAL, LONG), projectionExpressionTypes);
     }

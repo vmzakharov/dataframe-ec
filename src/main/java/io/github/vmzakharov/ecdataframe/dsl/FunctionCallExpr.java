@@ -6,18 +6,12 @@ import io.github.vmzakharov.ecdataframe.dsl.visitor.ExpressionVisitor;
 import org.eclipse.collections.api.list.ListIterable;
 import org.eclipse.collections.impl.factory.Lists;
 
-public class FunctionCallExpr
+public record FunctionCallExpr(String functionName, String normalizedFunctionName, ListIterable<Expression> parameters)
 implements Expression
 {
-    final private String functionName;
-    final private String normalizedFunctionName;
-    final private ListIterable<Expression> parameters;
-
-    public FunctionCallExpr(String newFunctionName, ListIterable<Expression> newParameters)
+    public FunctionCallExpr(String functionName, ListIterable<Expression> parameters)
     {
-        this.functionName = newFunctionName;
-        this.normalizedFunctionName = this.functionName.toUpperCase();
-        this.parameters = newParameters;
+        this(functionName, functionName.toUpperCase(), parameters);
     }
 
     public FunctionCallExpr(String newFunctionName)
@@ -35,20 +29,5 @@ implements Expression
     public void accept(ExpressionVisitor visitor)
     {
         visitor.visitFunctionCallExpr(this);
-    }
-
-    public String getFunctionName()
-    {
-        return this.functionName;
-    }
-
-    public String getNormalizedFunctionName()
-    {
-        return this.normalizedFunctionName;
-    }
-
-    public ListIterable<Expression> getParameters()
-    {
-        return this.parameters;
     }
 }
