@@ -12,7 +12,7 @@ Get the latest release of `dataframe-ec` here:
 <dependency>
   <groupId>io.github.vmzakharov</groupId>
   <artifactId>dataframe-ec</artifactId>
-  <version>0.20.0</version>
+  <version>1.0.0</version>
 </dependency>
 ```
 

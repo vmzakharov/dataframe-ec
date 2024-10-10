@@ -1,4 +1,12 @@
 # Releases
+### 1.0.0
+* **switches to [Semantic Versioning](https://semver.org/)** 
+* adds collect() iteration patterns to data frames and data frame indices
+* adds support for projection of properties of int, float, and decimal types
+* internal changes
+  * further refactoring to take advantage of Java 17 features
+  * switches unit testing to JUnit 5
+  * miscellaneous performance optimizations
 ### 0.20.0
 * **switches to Java 17 as minimum version**. The last release of dataframe-ec to support Java 8+ is 0.19.8
 * type inference fixes/enhancements, better type consistency validation for computed columns  
