@@ -4,11 +4,11 @@ import org.eclipse.collections.api.bag.MutableBag;
 import org.eclipse.collections.api.factory.Bags;
 import org.eclipse.collections.api.factory.Lists;
 import org.eclipse.collections.api.list.ListIterable;
+import org.eclipse.collections.api.list.MutableList;
 import org.eclipse.collections.api.list.primitive.DoubleList;
 import org.eclipse.collections.api.list.primitive.FloatList;
 import org.eclipse.collections.impl.factory.primitive.DoubleLists;
 import org.eclipse.collections.impl.factory.primitive.FloatLists;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -93,6 +93,60 @@ public class DataFrameIterateTest
     }
 
     @Test
+    public void dataFrameCollect()
+    {
+        ListIterable<String> strings = this.dataFrame.collect(row ->
+                row.getString("Name") + ','
+                + row.getLong("Bar") + ','
+                + row.getDouble("Baz") + ','
+                + row.getInt("Qux") + ','
+                + row.getFloat("Thud")
+        );
+
+        assertEquals(
+                """
+                Alice,11,20.0,110,10.25
+                Carol,12,10.0,120,12.5
+                Alice,33,25.0,330,14.75
+                Carol,24,66.1,240,16.25
+                Carol,24,41.0,240,18.5
+                Abigail,33,11.0,330,20.75"""
+                ,
+                strings.makeString("\n")
+        );
+
+        MutableBag<LocalDate> dateCount = this.dataFrame
+                .collect(row -> row.getDate("Date"))
+                .into(Bags.mutable.of());
+
+        assertEquals(1, dateCount.occurrencesOf(LocalDate.of(2023, 10, 21)));
+        assertEquals(3, dateCount.occurrencesOf(LocalDate.of(2023, 12, 24)));
+        assertEquals(2, dateCount.occurrencesOf(LocalDate.of(2023, 11, 23)));
+
+        MutableBag<LocalDateTime> dateTimeCount =
+                this.dataFrame.collect(
+                        Bags.mutable::empty,
+                        (result, row) -> result.add(row.getDateTime("DateTime"))
+                );
+
+        assertEquals(3, dateTimeCount.occurrencesOf(LocalDateTime.of(2023, 10, 21, 11, 11, 11)));
+        assertEquals(1, dateTimeCount.occurrencesOf(LocalDateTime.of(2023, 11, 23, 11, 13, 11)));
+        assertEquals(1, dateTimeCount.occurrencesOf(LocalDateTime.of(2023, 12, 24, 11, 14, 11)));
+        assertEquals(1, dateTimeCount.occurrencesOf(LocalDateTime.of(2023, 12, 24, 11, 15, 11)));
+
+        MutableBag<BigDecimal> decimalCount =
+                this.dataFrame.collect(
+                        Bags.mutable::empty,
+                        (result, row) -> result.add(row.getDecimal("Decimal"))
+                );
+
+        assertEquals(3, decimalCount.occurrencesOf(BigDecimal.valueOf(123, 2)));
+        assertEquals(1, decimalCount.occurrencesOf(BigDecimal.valueOf(124, 2)));
+        assertEquals(1, decimalCount.occurrencesOf(BigDecimal.valueOf(222, 2)));
+        assertEquals(1, decimalCount.occurrencesOf(BigDecimal.valueOf(333, 2)));
+    }
+
+    @Test
     public void sortedDataFrameForEach()
     {
         StringBuilder nameBarBaz = new StringBuilder();
@@ -124,6 +178,20 @@ public class DataFrameIterateTest
     public void emptyDataFrameForEach()
     {
         this.dataFrame.cloneStructure("Empty").forEach(c -> fail());
+    }
+
+    @Test
+    public void emptyDataFrameCollect()
+    {
+        ListIterable<String> collected = this.dataFrame.cloneStructure("Empty").collect(c -> "Hello");
+
+        assertTrue(collected.isEmpty());
+
+        MutableList<String> bucket = Lists.mutable.empty();
+        collected = this.dataFrame.cloneStructure("Empty").collect(() -> bucket, (a, v) -> a.add("Hello"));
+
+        assertTrue(collected.isEmpty());
+        assertSame(bucket, collected);
     }
 
     @Test
@@ -169,6 +237,51 @@ public class DataFrameIterateTest
         this.dataFrame.index("anIndex")
                  .iterateAt("Dave", 48L)
                  .forEach(c -> fail());
+    }
+
+    @Test
+    public void indexCollect()
+    {
+        this.dataFrame.createIndex("anIndex", Lists.immutable.of("Name", "Bar"));
+
+        assertEquals(
+                Lists.immutable.of(BigDecimal.valueOf(222, 2), BigDecimal.valueOf(333, 2)),
+                this.dataFrame.index("anIndex")
+                      .iterateAt("Carol", 24L)
+                      .collect(c -> c.getDecimal("Decimal"))
+        );
+
+        assertEquals(
+                Lists.immutable.of(66.1, 41.0),
+                this.dataFrame.index("anIndex")
+                              .iterateAt("Carol", 24L)
+                              .collect(row -> row.getDouble("Baz"))
+        );
+
+        assertEquals(
+                Lists.immutable.of(16.25f, 18.5f),
+                this.dataFrame.index("anIndex")
+                              .iterateAt("Carol", 24L)
+                              .collect(row -> row.getFloat("Thud"))
+        );
+
+        assertEquals(
+                Lists.immutable.of(LocalDate.of(2023, 12, 24), LocalDate.of(2023, 12, 24)),
+                this.dataFrame.index("anIndex")
+                              .iterateAt("Carol", 24L)
+                              .collect(row -> row.getDate("Date"))
+        );
+
+        assertEquals(
+                Lists.immutable.of(LocalDateTime.of(2023, 12, 24, 11, 14, 11), LocalDateTime.of(2023, 12, 24, 11, 15, 11)),
+                this.dataFrame.index("anIndex")
+                              .iterateAt("Carol", 24L)
+                              .collect(row -> row.getDateTime("DateTime"))
+        );
+
+        this.dataFrame.index("anIndex")
+                 .iterateAt("Dave", 48L)
+                 .collect(row -> fail());
     }
 
     @Test

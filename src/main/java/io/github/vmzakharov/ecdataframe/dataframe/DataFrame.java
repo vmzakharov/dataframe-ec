@@ -54,6 +54,9 @@ import java.util.function.Supplier;
 import static io.github.vmzakharov.ecdataframe.dataframe.DfColumnSortOrder.ASC;
 import static io.github.vmzakharov.ecdataframe.util.ExceptionFactory.exceptionByKey;
 
+/**
+ * Data Frame - a tabular data structure
+ */
 public class DataFrame
 implements DfIterate
 {
@@ -2132,16 +2135,37 @@ implements DfIterate
         return !this.isEmpty();
     }
 
+    /**
+     * creates a named index based on the values of one or more columns. A data frame can have multiple indexes defined
+     * for it
+     * @param indexName the name of the index to be created
+     * @param columnNames the names of the columns to index data frame by
+     * @see io.github.vmzakharov.ecdataframe.dataframe.DataFrame#index(String)
+     * @see io.github.vmzakharov.ecdataframe.dataframe.DataFrame#dropIndex(String)
+     */
     public void createIndex(String indexName, ListIterable<String> columnNames)
     {
         this.indices.put(indexName, new DfIndex(this, columnNames));
     }
 
+    /**
+     * drops a named index from the list of indexes for this data frame
+     * @param indexName the name of the index to be dropped
+     * @see io.github.vmzakharov.ecdataframe.dataframe.DataFrame#createIndex(String, ListIterable)
+     * @see io.github.vmzakharov.ecdataframe.dataframe.DataFrame#index(String)
+     */
     public void dropIndex(String indexName)
     {
         this.indices.remove(indexName);
     }
 
+    /**
+     * returns an existing index with the specified name. The index is an instance of the {@link DfIndex} class that
+     * allows indexed access to the data frame including iterating over subsets of rows with the same index values
+     * @param indexName the name of the index to retrieve
+     * @see io.github.vmzakharov.ecdataframe.dataframe.DataFrame#createIndex(String, ListIterable)
+     * @see io.github.vmzakharov.ecdataframe.dataframe.DataFrame#dropIndex(String)
+     */
     public DfIndex index(String indexName)
     {
         DfIndex found = this.indices.get(indexName);

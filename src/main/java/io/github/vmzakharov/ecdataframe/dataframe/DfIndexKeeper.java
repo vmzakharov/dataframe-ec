@@ -11,6 +11,8 @@ import org.eclipse.collections.impl.factory.primitive.ObjectIntMaps;
  * Maintains an index on a data frame based on one or more column values. If a row with a specified index value does
  * not exist, will add the row with the respective values to the data frame. This can be useful for example for
  * aggregation to maintain a dataframe with accumulator rows.
+ * For indexed access to a data frame see the {@link io.github.vmzakharov.ecdataframe.dataframe.DataFrame#createIndex(String, ListIterable)}
+ * and {@link io.github.vmzakharov.ecdataframe.dataframe.DataFrame#index(String)} methods
  */
 public class DfIndexKeeper
 {
@@ -99,14 +101,20 @@ public class DfIndexKeeper
 
     public ListIterable<Object> computeKeyFrom(int rowIndex)
     {
-        // TODO: avoid recreating the list - perhaps have a separate lookup key (reusable) vs stored key
-        MutableList<Object> key = Lists.fixedSize.of(new Object[this.columnsToIndexBy.size()]);
+        // TODO: 2024-10-10 avoid recreating the list - perhaps have a separate lookup key (reusable) vs stored key
+        //       requires more testing at scale to confirm benefits
+        MutableList<Object> key = this.createKeyHolder();
 
         this.sourceColumns.forEachWithIndex(
             (col, index) -> key.set(index, col.getObject(rowIndex))
         );
 
         return key;
+    }
+
+    private MutableList<Object> createKeyHolder()
+    {
+        return Lists.fixedSize.of(new Object[this.columnsToIndexBy.size()]);
     }
 
     public void addIndex(ListIterable<Object> key, int rowIndex)
