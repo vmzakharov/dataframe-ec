@@ -79,7 +79,7 @@ extends ModelScriptBaseVisitor<Expression>
 
     private Expression addStatementToCurrentScriptContext(Expression expression)
     {
-        return this.getScript().addStatement(expression);
+        return this.getScript().addExpression(expression);
     }
 
     @Override

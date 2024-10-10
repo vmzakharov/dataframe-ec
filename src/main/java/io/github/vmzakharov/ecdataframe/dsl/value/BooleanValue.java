@@ -5,6 +5,9 @@ import io.github.vmzakharov.ecdataframe.dsl.UnaryOp;
 
 import static io.github.vmzakharov.ecdataframe.util.ExceptionFactory.exceptionByKey;
 
+/**
+ * The DSL value of boolean type (true, false)
+ */
 public interface BooleanValue
 extends Value
 {
@@ -12,6 +15,12 @@ extends Value
 
     BooleanValue FALSE = new BooleanFalse();
 
+    /**
+     * A factory method returning the instance of {@code BooleanValue} with the same truth value as the parameter, that
+     * is {@code TRUE} for {@code boolean} {@code true} and {@code FALSE} for {@code boolean} {@code false}
+     * @param value the value for which the corresponding instance of this class will be returned
+     * @return the instance of {@code BooleanValue} with the same truth value as the parameter
+     */
     static BooleanValue valueOf(boolean value)
     {
         return value ? TRUE : FALSE;
@@ -32,10 +41,23 @@ extends Value
         return operation.applyBoolean(this.isTrue());
     }
 
+    /**
+     * checks if this instance of {@code BooleanValue} is true
+     * @return true if this instance is true, false otherwise
+     */
     boolean isTrue();
 
+    /**
+     * checks if this instance of {@code BooleanValue} is false
+     * @return true if this instance is false, false otherwise
+     */
     boolean isFalse();
 
+    /**
+     * checks if this instance of {@code BooleanValue} has the same truth value as the parameter
+     * @param booleanValue the value to compare with
+     * @return true if this instance and the parameter have the same truth value, false otherwise
+     */
     boolean is(boolean booleanValue);
 
     @Override
@@ -51,6 +73,9 @@ extends Value
         return Boolean.compare(this.isTrue(), ((BooleanValue) other).isTrue());
     }
 
+    /**
+     * Represents the boolean value of {@code true}, effectively a singleton.
+     */
     record BooleanTrue()
     implements BooleanValue
     {
@@ -79,6 +104,9 @@ extends Value
         }
     }
 
+    /**
+     * Represents the boolean value of {@code true}, effectively a singleton.
+     */
     record BooleanFalse()
     implements BooleanValue
     {

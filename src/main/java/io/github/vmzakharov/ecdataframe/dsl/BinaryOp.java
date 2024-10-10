@@ -4,8 +4,17 @@ import io.github.vmzakharov.ecdataframe.dsl.value.Value;
 
 import java.util.function.Supplier;
 
+/**
+ * A binary operation in the expression DSL
+ */
 public interface BinaryOp
 {
+    /**
+     * Applies this operation to the operands
+     * @param operand1 the first operand
+     * @param operand2 the second operand
+     * @return the result of applying this operation
+     */
     Value apply(Value operand1, Value operand2);
 
     /**
@@ -20,5 +29,9 @@ public interface BinaryOp
         return this.apply(operand1.get(), operand2.get());
     }
 
+    /**
+     * The parseable string representation of this operation parseable
+     * @return the string representation of this operation
+     */
     String asString();
 }

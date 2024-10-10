@@ -14,7 +14,7 @@ extends Expression
      * @param anExpression an expression to be added to the script
      * @return the expression
      */
-    Expression addStatement(Expression anExpression);
+    Expression addExpression(Expression anExpression);
 
     /**
      * returns all the expressions from the script

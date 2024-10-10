@@ -15,16 +15,32 @@ import java.lang.reflect.InvocationTargetException;
 
 import static io.github.vmzakharov.ecdataframe.util.ExceptionFactory.exceptionByKey;
 
+/**
+ * A superclass that all aggregation functions need to extend. It defines the aggregation API as well as the factory
+ * methods for the built-in aggregation function
+ */
 public abstract class AggregateFunction
 {
     private final String sourceColumnName;
     private final String targetColumnName;
 
+    /**
+     * Create an instance of an aggregation function, which will aggregate the values in the source data frame column
+     * {@code newSourceColumnName} and store the results in the target data frame column with the same name
+     * @param newSourceColumnName the name of the column to aggregate and also the name of the result column
+     */
     public AggregateFunction(String newSourceColumnName)
     {
         this(newSourceColumnName, newSourceColumnName);
     }
 
+    /**
+     * Create an instance of an aggregation function, which will aggregate the values in the source data frame column
+     * {@code newSourceColumnName} and store the results in the target data frame column with the name
+     * {@code newTargetColumnName}
+     * @param newSourceColumnName the name of the column to aggregate in the source data frame
+     * @param newTargetColumnName the name of the result column in the target date frame
+     */
     public AggregateFunction(String newSourceColumnName, String newTargetColumnName)
     {
         this.sourceColumnName = newSourceColumnName;
@@ -61,21 +77,49 @@ public abstract class AggregateFunction
         return new Max(newSourceColumnName, newTargetColumnName);
     }
 
+    /**
+     * Returns an instance of the {@code Avg} aggregation function. This aggregation function will store results in a
+     * column of the same type as the source column, which may result in a loss of precision. If this is a concern,
+     * use {@code avd2d} instead.
+     * @param newSourceColumnName the name of the column to aggregate and also the name of the result column
+     * @return a new aggregator
+     */
     public static AggregateFunction avg(String newSourceColumnName)
     {
         return new Avg(newSourceColumnName);
     }
 
+    /**
+     * Returns an instance of the {@code Avg} aggregation function. This aggregation function will store results in a
+     * column of the same type as the source column, which may result in a loss of precision. If this is a concern,
+     * use {@code avd2d} instead.
+     * @param newSourceColumnName the name of the column to aggregate in the source data frame
+     * @param newTargetColumnName the name of the result column in the target date frame
+     * @return a new average aggregator
+     */
     public static AggregateFunction avg(String newSourceColumnName, String newTargetColumnName)
     {
         return new Avg(newSourceColumnName, newTargetColumnName);
     }
 
+    /**
+     * Returns an instance of the {@code Avg2d} aggregation function ("average to double"). This aggregation function
+     * will store results in a column of the double type, which may result in better precision compared to {@code avg}.
+     * @param newSourceColumnName the name of the column to aggregate and also the name of the result column
+     * @return a new aggregator
+     */
     public static AggregateFunction avg2d(String newSourceColumnName)
     {
         return new Avg2d(newSourceColumnName);
     }
 
+    /**
+     * Returns an instance of the {@code Avg2d} aggregation function ("average to double"). This aggregation function
+     * will store results in a column of the double type, which may result in better precision compared to {@code avg}.
+     * @param newSourceColumnName the name of the column to aggregate in the source data frame
+     * @param newTargetColumnName the name of the result column in the target date frame
+     * @return a new average aggregator
+     */
     public static AggregateFunction avg2d(String newSourceColumnName, String newTargetColumnName)
     {
         return new Avg2d(newSourceColumnName, newTargetColumnName);
@@ -133,6 +177,9 @@ public abstract class AggregateFunction
         return this.sourceColumnName;
     }
 
+    /**
+     * @return the name of the aggregation result column in the target date frame
+     */
     public String getTargetColumnName()
     {
         return this.targetColumnName;
