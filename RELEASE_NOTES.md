@@ -1,4 +1,6 @@
 # Releases
+### 1.1.0
+* adds support for columns of boolean type
 ### 1.0.0
 * **switches to [Semantic Versioning](https://semver.org/)** 
 * adds collect() iteration patterns to data frames and data frame indices

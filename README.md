@@ -12,7 +12,7 @@ Get the latest release of `dataframe-ec` here:
 <dependency>
   <groupId>io.github.vmzakharov</groupId>
   <artifactId>dataframe-ec</artifactId>
-  <version>1.0.0</version>
+  <version>1.1.0</version>
 </dependency>
 ```
 
@@ -613,8 +613,10 @@ A DSL script is a sequence of one or more statements (see below for the kinds of
 
 The language supports variable and literal values of the following types:
 - string
-- long - integer values
-- double - floating point value
+- int - 32-bit integer values (up to  2^31 – 1)
+- long - 64-bit integer values (up to 2^63 - 1)
+- float - 32-bit floating point values
+- double - 64-bit floating point values
 - decimal - arbitrary precision (for all practical reasons) numbers
 - date
 - date-time
