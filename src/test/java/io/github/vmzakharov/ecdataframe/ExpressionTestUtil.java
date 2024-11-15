@@ -143,6 +143,12 @@ final public class ExpressionTestUtil
         assertFalseValue(result);
     }
 
+    public static void scriptEvaluatesToVoid(String scriptAsString, EvalContext context)
+    {
+        Value result = evaluateScriptWithContext(scriptAsString, context);
+        assertTrue(result.isVoid(), () -> "Expected void, got " + result);
+    }
+
     public static Value evaluateScriptWithContext(String scriptAsString, EvalContext context)
     {
         AnonymousScript script = ExpressionTestUtil.toScript(scriptAsString);

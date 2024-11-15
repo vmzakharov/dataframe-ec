@@ -1,6 +1,7 @@
 package io.github.vmzakharov.ecdataframe.dataset;
 
 import io.github.vmzakharov.ecdataframe.dataframe.DataFrame;
+import io.github.vmzakharov.ecdataframe.dataframe.DfBooleanColumn;
 import io.github.vmzakharov.ecdataframe.dataframe.DfColumn;
 import io.github.vmzakharov.ecdataframe.dataframe.DfDateColumn;
 import io.github.vmzakharov.ecdataframe.dataframe.DfDateTimeColumn;
@@ -219,6 +220,11 @@ extends DataSetAbstract
                 {
                     float floatValue = ((DfFloatColumn) dfColumn).getFloat(rowIndex);
                     yield schemaColumn.getFloatFormatter().format(floatValue);
+                }
+                case BOOLEAN ->
+                {
+                    boolean booleanValue = ((DfBooleanColumn) dfColumn).getBoolean(rowIndex);
+                    yield schemaColumn.getBooleanFormatter().format(booleanValue);
                 }
                 case STRING ->
                 {
@@ -504,6 +510,7 @@ extends DataSetAbstract
             case DOUBLE -> s -> schemaCol.parseAsDoubleAndAdd(s, lastColumn);
             case INT -> s -> schemaCol.parseAsIntAndAdd(s, lastColumn);
             case FLOAT -> s -> schemaCol.parseAsFloatAndAdd(s, lastColumn);
+            case BOOLEAN -> s -> schemaCol.parseAsBooleanAndAdd(s, lastColumn);
             case STRING -> s -> lastColumn.addObject(schemaCol.parseAsString(s));
             case DATE -> s -> lastColumn.addObject(schemaCol.parseAsLocalDate(s));
             case DATE_TIME -> s -> lastColumn.addObject(schemaCol.parseAsLocalDateTime(s));

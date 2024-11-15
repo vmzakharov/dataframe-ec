@@ -55,9 +55,9 @@ public class IntFormatter
         return this.intParser.applyAsInt(aString);
     }
 
-    public String format(long longValue)
+    public String format(int intValue)
     {
-        return this.decimalFormat == null ? Long.toString(longValue) : this.decimalFormat.format(longValue);
+        return this.decimalFormat == null ? Integer.toString(intValue) : this.decimalFormat.format(intValue);
     }
 
     private String stripNonNumericCharacters(String s)

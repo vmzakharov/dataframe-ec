@@ -59,8 +59,8 @@ public class FloatFormatter
         return this.nonNumericPattern.matcher(s).replaceAll("");
     }
 
-    public String format(double doubleValue)
+    public String format(float floatValue)
     {
-        return this.decimalFormat == null ? Double.toString(doubleValue) : this.decimalFormat.format(doubleValue);
+        return this.decimalFormat == null ? Float.toString(floatValue) : this.decimalFormat.format(floatValue);
     }
 }

@@ -13,6 +13,7 @@ import io.github.vmzakharov.ecdataframe.dsl.visitor.ExpressionEvaluationVisitor;
 import io.github.vmzakharov.ecdataframe.dsl.visitor.InMemoryEvaluationVisitor;
 import io.github.vmzakharov.ecdataframe.dsl.visitor.TypeInferenceVisitor;
 import io.github.vmzakharov.ecdataframe.util.ExpressionParserHelper;
+import org.eclipse.collections.api.BooleanIterable;
 import org.eclipse.collections.api.DoubleIterable;
 import org.eclipse.collections.api.FloatIterable;
 import org.eclipse.collections.api.IntIterable;
@@ -140,6 +141,11 @@ implements DfIterate
         return this;
     }
 
+    /**
+     * Add a stored column of int type to this data frame
+     * @param newColumnName the name of the column to be added
+     * @return this data frame
+     */
     public DataFrame addIntColumn(String newColumnName)
     {
         return this.addColumn(newColumnName, ValueType.INT);
@@ -161,6 +167,22 @@ implements DfIterate
     public DataFrame addIntColumn(String newColumnName, IntIterable values)
     {
         this.attachColumn(new DfIntColumnStored(this, newColumnName, values));
+        return this;
+    }
+
+    /**
+     * Add a stored column of boolean type to this data frame
+     * @param newColumnName the name of the column to be added
+     * @return this data frame
+     */
+    public DataFrame addBooleanColumn(String newColumnName)
+    {
+        return this.addColumn(newColumnName, ValueType.BOOLEAN);
+    }
+
+    public DataFrame addBooleanColumn(String newColumnName, BooleanIterable values)
+    {
+        this.attachColumn(new DfBooleanColumnStored(this, newColumnName, values));
         return this;
     }
 
@@ -510,6 +532,7 @@ implements DfIterate
             case DECIMAL -> new DfDecimalColumnStored(this, columnName);
             case INT -> new DfIntColumnStored(this, columnName);
             case FLOAT -> new DfFloatColumnStored(this, columnName);
+            case BOOLEAN -> new DfBooleanColumnStored(this, columnName);
             default -> throw exceptionByKey("DF_ADD_COL_UNKNOWN_TYPE")
                     .with("columnName", columnName)
                     .with("type", type)
@@ -599,6 +622,7 @@ implements DfIterate
             case DECIMAL -> new DfDecimalColumnComputed(this, columnName, expressionAsString);
             case INT -> new DfIntColumnComputed(this, columnName, expressionAsString);
             case FLOAT -> new DfFloatColumnComputed(this, columnName, expressionAsString);
+            case BOOLEAN -> new DfBooleanColumnComputed(this, columnName, expressionAsString);
             default -> throw exceptionByKey("DF_ADD_COL_UNKNOWN_TYPE").with("columnName", columnName)
                                                                       .with("type", type)
                                                                       .get();
@@ -679,6 +703,11 @@ implements DfIterate
         return this.getIntColumn(columnName).getInt(this.rowIndexMap(rowIndex));
     }
 
+    public boolean getBoolean(String columnName, int rowIndex)
+    {
+        return this.getBooleanColumn(columnName).getBoolean(this.rowIndexMap(rowIndex));
+    }
+
     public String getString(String columnName, int rowIndex)
     {
         return this.getStringColumn(columnName).getTypedObject(this.rowIndexMap(rowIndex));
@@ -717,6 +746,11 @@ implements DfIterate
     public DfIntColumn getIntColumn(String columnName)
     {
         return (DfIntColumn) this.getColumnNamed(columnName);
+    }
+
+    public DfBooleanColumn getBooleanColumn(String columnName)
+    {
+        return (DfBooleanColumn) this.getColumnNamed(columnName);
     }
 
     public DfDoubleColumn getDoubleColumn(String columnName)

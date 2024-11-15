@@ -13,8 +13,22 @@ extends BinaryOp
         @Override
         public Value apply(Supplier<Value> operand1, Supplier<Value> operand2)
         {
-            BooleanValue op1Value = (BooleanValue) operand1.get();
-            return op1Value.isTrue() ? operand2.get() : BooleanValue.FALSE;
+            Value op1Value = operand1.get();
+
+            if (op1Value.isVoid())
+            {
+                Value op2Value = operand2.get();
+                if (op2Value.isVoid())
+                {
+                    return Value.VOID;
+                }
+                else
+                {
+                    return ((BooleanValue) op2Value).isFalse() ? BooleanValue.FALSE : Value.VOID;
+                }
+            }
+
+            return ((BooleanValue) op1Value).isFalse() ?  BooleanValue.FALSE : operand2.get();
         }
 
         @Override
@@ -35,8 +49,22 @@ extends BinaryOp
         @Override
         public Value apply(Supplier<Value> operand1, Supplier<Value> operand2)
         {
-            BooleanValue op1Value = (BooleanValue) operand1.get();
-            return op1Value.isTrue() ? BooleanValue.TRUE : operand2.get();
+            Value op1Value = operand1.get();
+
+            if (op1Value.isVoid())
+            {
+                Value op2Value = operand2.get();
+                if (op2Value.isVoid())
+                {
+                    return Value.VOID;
+                }
+                else
+                {
+                    return ((BooleanValue) op2Value).isTrue() ? BooleanValue.TRUE : Value.VOID;
+                }
+            }
+
+            return ((BooleanValue) op1Value).isTrue() ? BooleanValue.TRUE : operand2.get();
         }
 
         @Override
@@ -70,6 +98,11 @@ extends BinaryOp
     @Override
     default Value apply(Value operand1, Value operand2)
     {
+        if (operand1.isVoid() || operand2.isVoid())
+        {
+            return Value.VOID;
+        }
+
         return this.apply((BooleanValue) operand1, (BooleanValue) operand2);
     }
 

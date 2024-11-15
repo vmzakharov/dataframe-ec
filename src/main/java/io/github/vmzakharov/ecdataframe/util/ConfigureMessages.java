@@ -51,6 +51,7 @@ final public class ConfigureMessages
         addMessage("CSV_FILE_LOAD_FAIL",              "Failed to load file as a data frame '${fileName}'");
         addMessage("CSV_POPULATING_BAD_COL_TYPE",     "Attempting to populate unsupported column type: ${columnType}");
         addMessage("CSV_UNBALANCED_QUOTES",           "Unbalanced quotes at index ${index} in ${aString}");
+        addMessage("CSV_INVALID_FORMAT_STR",          "Invalid format string '${format}' for type '${type}'");
         addMessage("CSV_PARSE_ERR",                   "Failed to parse input string to ${type}: '${inputString}'");
         addMessage("OBJ_END_OF_DATA_SET",             "No more elements in data set ${dataSetName}");
         addMessage("OBJ_METHOD_INVOKE_FAIL",          "Failed to invoke ${method}");

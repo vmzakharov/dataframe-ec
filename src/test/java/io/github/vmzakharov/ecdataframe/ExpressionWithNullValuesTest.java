@@ -105,6 +105,7 @@ public class ExpressionWithNullValuesTest
         assertEquals(5L, ((LongValue) result).longValue());
     }
 
+    @Test
     public void comparison()
     {
         SimpleEvalContext context = new SimpleEvalContext();
@@ -136,5 +137,47 @@ public class ExpressionWithNullValuesTest
 
         ExpressionTestUtil.scriptEvaluatesToFalse("'foo' in ('a', b, 'c')", context);
         ExpressionTestUtil.scriptEvaluatesToTrue("'foo' not in ('a', b, 'c')", context);
+    }
+
+    @Test
+    public void booleanOpsWithNulls()
+    {
+        SimpleEvalContext context = new SimpleEvalContext();
+        context.setVariable("t", BooleanValue.TRUE);
+        context.setVariable("f", BooleanValue.FALSE);
+        context.setVariable("v", Value.VOID);
+
+        // a quick sanity check
+        ExpressionTestUtil.scriptEvaluatesToFalse("f", context);
+        ExpressionTestUtil.scriptEvaluatesToTrue("t", context);
+        ExpressionTestUtil.scriptEvaluatesToVoid("v", context);
+
+        ExpressionTestUtil.scriptEvaluatesToFalse("t and f", context);
+        ExpressionTestUtil.scriptEvaluatesToTrue("t or f", context);
+
+        ExpressionTestUtil.scriptEvaluatesToFalse("t xor t", context);
+        ExpressionTestUtil.scriptEvaluatesToFalse("f xor f", context);
+        ExpressionTestUtil.scriptEvaluatesToTrue("f xor t", context);
+        ExpressionTestUtil.scriptEvaluatesToTrue("not f", context);
+
+        ExpressionTestUtil.scriptEvaluatesToVoid("not v", context);
+
+        ExpressionTestUtil.scriptEvaluatesToFalse("f and v", context);
+        ExpressionTestUtil.scriptEvaluatesToFalse("v and f", context);
+        ExpressionTestUtil.scriptEvaluatesToVoid("v and t", context);
+        ExpressionTestUtil.scriptEvaluatesToVoid("t and v", context);
+        ExpressionTestUtil.scriptEvaluatesToVoid("v and v", context);
+
+        ExpressionTestUtil.scriptEvaluatesToVoid("v or f", context);
+        ExpressionTestUtil.scriptEvaluatesToVoid("v or v", context);
+        ExpressionTestUtil.scriptEvaluatesToVoid("f or v", context);
+        ExpressionTestUtil.scriptEvaluatesToTrue("t or v", context);
+        ExpressionTestUtil.scriptEvaluatesToTrue("v or t", context);
+
+        ExpressionTestUtil.scriptEvaluatesToVoid("v xor v", context);
+        ExpressionTestUtil.scriptEvaluatesToVoid("v xor t", context);
+        ExpressionTestUtil.scriptEvaluatesToVoid("v xor f", context);
+        ExpressionTestUtil.scriptEvaluatesToVoid("t xor v", context);
+        ExpressionTestUtil.scriptEvaluatesToVoid("f xor v", context);
     }
 }

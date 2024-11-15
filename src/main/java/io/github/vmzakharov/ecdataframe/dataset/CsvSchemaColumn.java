@@ -1,5 +1,6 @@
 package io.github.vmzakharov.ecdataframe.dataset;
 
+import io.github.vmzakharov.ecdataframe.dataframe.DfBooleanColumnStored;
 import io.github.vmzakharov.ecdataframe.dataframe.DfColumn;
 import io.github.vmzakharov.ecdataframe.dataframe.DfDoubleColumnStored;
 import io.github.vmzakharov.ecdataframe.dataframe.DfFloatColumnStored;
@@ -25,6 +26,7 @@ public class CsvSchemaColumn
     transient private FloatFormatter floatFormatter;
     transient private LongFormatter longFormatter;
     transient private IntFormatter intFormatter;
+    transient private BooleanFormatter booleanFormatter;
 
     public CsvSchemaColumn(CsvSchema newCsvSchema, String newName, ValueType newType, String newPattern)
     {
@@ -67,6 +69,10 @@ public class CsvSchemaColumn
         else if (this.type.isFloat())
         {
             this.floatFormatter = new FloatFormatter(this.pattern);
+        }
+        else if (this.type.isBoolean())
+        {
+            this.booleanFormatter = new BooleanFormatter(this.pattern);
         }
     }
 
@@ -165,6 +171,17 @@ public class CsvSchemaColumn
         ((DfIntColumnStored) dfColumn).addInt(this.intFormatter.parseAsInt(aString), false);
     }
 
+    public void parseAsBooleanAndAdd(String aString, DfColumn dfColumn)
+    {
+        if (aString == null)
+        {
+            dfColumn.addEmptyValue();
+            return;
+        }
+
+        ((DfBooleanColumnStored) dfColumn).addBoolean(this.booleanFormatter.parseAsBoolean(aString), false);
+    }
+
     public String parseAsString(String aString)
     {
         return this.csvSchema.stripQuotesIfAny(aString);
@@ -178,6 +195,11 @@ public class CsvSchemaColumn
     public FloatFormatter getFloatFormatter()
     {
         return this.floatFormatter;
+    }
+
+    public BooleanFormatter getBooleanFormatter()
+    {
+        return this.booleanFormatter;
     }
 
     public LongFormatter getLongFormatter()
