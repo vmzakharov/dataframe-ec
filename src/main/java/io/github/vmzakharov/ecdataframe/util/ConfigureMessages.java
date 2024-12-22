@@ -42,6 +42,7 @@ final public class ConfigureMessages
         addMessage("DF_COL_CONTAINS_NULL",            "Column '${columnName}' contains null value in row ${rowIndex}");
         addMessage("CSV_FILE_WRITE_FAIL",             "Failed to write data frame to '${fileName}'");
         addMessage("CSV_UNSUPPORTED_VAL_TO_STR",      "Do not know how to convert value of type ${valueType} to a string");
+        addMessage("CSV_UNSUPPORTED_COL_TYPE",        "Serializing columns of type of type ${valueType} is not supported");
         addMessage("CSV_INFER_SCHEMA_FAIL",           "Failed to infer schema from  '${fileName}'");
         addMessage("CSV_MISSING_COL_HEADER",          "Error parsing a CSV file: a column header cannot be empty");
         addMessage("CSV_SCHEMA_HEADER_SIZE_MISMATCH", "The number of elements in the header (${headerCount}) does not match the number of columns in the schema (${schemaColumnCount})");

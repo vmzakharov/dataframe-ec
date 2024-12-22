@@ -1,79 +1,27 @@
 package io.github.vmzakharov.ecdataframe.dataset;
 
-import io.github.vmzakharov.ecdataframe.dataframe.DfBooleanColumnStored;
 import io.github.vmzakharov.ecdataframe.dataframe.DfColumn;
-import io.github.vmzakharov.ecdataframe.dataframe.DfDoubleColumnStored;
-import io.github.vmzakharov.ecdataframe.dataframe.DfFloatColumnStored;
-import io.github.vmzakharov.ecdataframe.dataframe.DfIntColumnStored;
-import io.github.vmzakharov.ecdataframe.dataframe.DfLongColumnStored;
 import io.github.vmzakharov.ecdataframe.dsl.value.ValueType;
 
-import java.math.BigDecimal;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
-import java.time.format.ResolverStyle;
-
-public class CsvSchemaColumn
+public abstract class CsvSchemaColumn
 {
     private final String name;
     private final ValueType type;
-    private final String pattern;
+    private String pattern;
 
     transient private final CsvSchema csvSchema;
-    transient private DateTimeFormatter dateTimeFormatter;
-    transient private DoubleFormatter doubleFormatter;
-    transient private FloatFormatter floatFormatter;
-    transient private LongFormatter longFormatter;
-    transient private IntFormatter intFormatter;
-    transient private BooleanFormatter booleanFormatter;
 
     public CsvSchemaColumn(CsvSchema newCsvSchema, String newName, ValueType newType, String newPattern)
     {
         this.csvSchema = newCsvSchema;
         this.name = newName;
         this.type = newType;
+        this.pattern = newPattern;
+    }
 
-        if (newPattern == null && (this.type.isTemporal()))
-        {
-            if (this.type.isDate())
-            {
-                this.pattern = "uuuu-M-d";
-            }
-            else
-            {
-                this.pattern = "uuuu-M-d'T'H:m:s";
-            }
-        }
-        else
-        {
-            this.pattern = newPattern;
-        }
-
-        if (this.type.isTemporal())
-        {
-            this.dateTimeFormatter = DateTimeFormatter.ofPattern(this.pattern).withResolverStyle(ResolverStyle.STRICT);
-        }
-        else if (this.type.isDouble())
-        {
-            this.doubleFormatter = new DoubleFormatter(this.pattern);
-        }
-        else if (this.type.isLong())
-        {
-            this.longFormatter = new LongFormatter(this.pattern);
-        }
-        else if (this.type.isInt())
-        {
-            this.intFormatter = new IntFormatter(this.pattern);
-        }
-        else if (this.type.isFloat())
-        {
-            this.floatFormatter = new FloatFormatter(this.pattern);
-        }
-        else if (this.type.isBoolean())
-        {
-            this.booleanFormatter = new BooleanFormatter(this.pattern);
-        }
+    protected CsvSchema csvSchema()
+    {
+        return this.csvSchema;
     }
 
     public String getName()
@@ -91,124 +39,12 @@ public class CsvSchemaColumn
         return this.pattern;
     }
 
-    public LocalDate parseAsLocalDate(String aString)
+    protected void setPattern(String newPattern)
     {
-        if (aString == null)
-        {
-            return null;
-        }
-
-        String trimmed = aString.trim();
-
-        return trimmed.isEmpty() ? null : LocalDate.parse(trimmed, this.dateTimeFormatter);
+        this.pattern = newPattern;
     }
 
-    public LocalDateTime parseAsLocalDateTime(String aString)
-    {
-        if (aString == null)
-        {
-            return null;
-        }
+    abstract public void parseAndAddToColumn(String aString, DfColumn dfColumn);
 
-        String trimmed = aString.trim();
-
-        return trimmed.isEmpty() ? null : LocalDateTime.parse(trimmed, this.dateTimeFormatter);
-    }
-
-    public BigDecimal parseAsDecimal(String aString)
-    {
-        if (aString == null)
-        {
-            return null;
-        }
-
-        String trimmed = aString.trim();
-
-        return trimmed.isEmpty() ? null : new BigDecimal(trimmed);
-    }
-
-    public void parseAsDoubleAndAdd(String aString, DfColumn dfColumn)
-    {
-        if (aString == null)
-        {
-            dfColumn.addEmptyValue();
-            return;
-        }
-
-        ((DfDoubleColumnStored) dfColumn).addDouble(this.doubleFormatter.parseAsDouble(aString));
-    }
-
-    public void parseAsFloatAndAdd(String aString, DfColumn dfColumn)
-    {
-        if (aString == null)
-        {
-            dfColumn.addEmptyValue();
-            return;
-        }
-
-        ((DfFloatColumnStored) dfColumn).addFloat(this.floatFormatter.parseAsFloat(aString));
-    }
-
-    public void parseAsLongAndAdd(String aString, DfColumn dfColumn)
-    {
-        if (aString == null)
-        {
-            dfColumn.addEmptyValue();
-            return;
-        }
-
-        ((DfLongColumnStored) dfColumn).addLong(this.longFormatter.parseAsLong(aString), false);
-    }
-
-    public void parseAsIntAndAdd(String aString, DfColumn dfColumn)
-    {
-        if (aString == null)
-        {
-            dfColumn.addEmptyValue();
-            return;
-        }
-
-        ((DfIntColumnStored) dfColumn).addInt(this.intFormatter.parseAsInt(aString), false);
-    }
-
-    public void parseAsBooleanAndAdd(String aString, DfColumn dfColumn)
-    {
-        if (aString == null)
-        {
-            dfColumn.addEmptyValue();
-            return;
-        }
-
-        ((DfBooleanColumnStored) dfColumn).addBoolean(this.booleanFormatter.parseAsBoolean(aString), false);
-    }
-
-    public String parseAsString(String aString)
-    {
-        return this.csvSchema.stripQuotesIfAny(aString);
-    }
-
-    public DoubleFormatter getDoubleFormatter()
-    {
-        return this.doubleFormatter;
-    }
-
-    public FloatFormatter getFloatFormatter()
-    {
-        return this.floatFormatter;
-    }
-
-    public BooleanFormatter getBooleanFormatter()
-    {
-        return this.booleanFormatter;
-    }
-
-    public LongFormatter getLongFormatter()
-    {
-        return this.longFormatter;
-    }
-
-    public IntFormatter getIntFormatter()
-    {
-        return this.intFormatter;
-    }
+    abstract public String formatColumnValueAsString(DfColumn column, int rowIndex);
 }

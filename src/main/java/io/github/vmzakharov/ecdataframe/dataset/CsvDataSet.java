@@ -1,14 +1,7 @@
 package io.github.vmzakharov.ecdataframe.dataset;
 
 import io.github.vmzakharov.ecdataframe.dataframe.DataFrame;
-import io.github.vmzakharov.ecdataframe.dataframe.DfBooleanColumn;
 import io.github.vmzakharov.ecdataframe.dataframe.DfColumn;
-import io.github.vmzakharov.ecdataframe.dataframe.DfDateColumn;
-import io.github.vmzakharov.ecdataframe.dataframe.DfDateTimeColumn;
-import io.github.vmzakharov.ecdataframe.dataframe.DfDoubleColumn;
-import io.github.vmzakharov.ecdataframe.dataframe.DfFloatColumn;
-import io.github.vmzakharov.ecdataframe.dataframe.DfIntColumn;
-import io.github.vmzakharov.ecdataframe.dataframe.DfLongColumn;
 import io.github.vmzakharov.ecdataframe.dsl.value.ValueType;
 import org.eclipse.collections.api.block.procedure.Procedure;
 import org.eclipse.collections.api.list.ListIterable;
@@ -53,8 +46,6 @@ extends DataSetAbstract
     private boolean emptyElementsConvertedToNulls = false;
 
     private CsvSchema schema;
-
-    private DateTimeFormatter[] formatters;
 
     public CsvDataSet(String newDataFileName, String newName)
     {
@@ -199,71 +190,10 @@ extends DataSetAbstract
         }
         else
         {
-            valueAsLiteral = switch (dfColumn.getType())
-            {
-                case LONG ->
-                {
-                    long longValue = ((DfLongColumn) dfColumn).getLong(rowIndex);
-                    yield schemaColumn.getLongFormatter().format(longValue);
-                }
-                case DOUBLE ->
-                {
-                    double doubleValue = ((DfDoubleColumn) dfColumn).getDouble(rowIndex);
-                    yield schemaColumn.getDoubleFormatter().format(doubleValue);
-                }
-                case INT ->
-                {
-                    int intValue = ((DfIntColumn) dfColumn).getInt(rowIndex);
-                    yield schemaColumn.getIntFormatter().format(intValue);
-                }
-                case FLOAT ->
-                {
-                    float floatValue = ((DfFloatColumn) dfColumn).getFloat(rowIndex);
-                    yield schemaColumn.getFloatFormatter().format(floatValue);
-                }
-                case BOOLEAN ->
-                {
-                    boolean booleanValue = ((DfBooleanColumn) dfColumn).getBoolean(rowIndex);
-                    yield schemaColumn.getBooleanFormatter().format(booleanValue);
-                }
-                case STRING ->
-                {
-                    String stringValue = dfColumn.getValueAsString(rowIndex);
-                    yield this.schema.getQuoteCharacter() + stringValue + this.schema.getQuoteCharacter();
-                }
-                case DATE ->
-                {
-                    LocalDate dateValue = ((DfDateColumn) dfColumn).getTypedObject(rowIndex);
-                    yield this.formatterForColumn(columnIndex).format(dateValue);
-                }
-                case DATE_TIME ->
-                {
-                    LocalDateTime dateTimeValue = ((DfDateTimeColumn) dfColumn).getTypedObject(rowIndex);
-                    yield this.formatterForColumn(columnIndex).format(dateTimeValue);
-                }
-                default -> throw exceptionByKey("CSV_UNSUPPORTED_VAL_TO_STR")
-                        .with("valueType", dfColumn.getType())
-                        .get();
-            };
+            valueAsLiteral = schemaColumn.formatColumnValueAsString(dfColumn, rowIndex);
         }
 
         writer.write(valueAsLiteral);
-    }
-
-    private DateTimeFormatter formatterForColumn(int columnIndex)
-    {
-        if (this.formatters == null)
-        {
-            this.formatters = new DateTimeFormatter[this.schema.columnCount()];
-        }
-
-        if (this.formatters[columnIndex] == null)
-        {
-            String pattern = this.schema.columnAt(columnIndex).getPattern();
-            this.formatters[columnIndex] = DateTimeFormatter.ofPattern(pattern);
-        }
-
-        return this.formatters[columnIndex];
     }
 
     protected Writer createWriter()
@@ -504,20 +434,7 @@ extends DataSetAbstract
 
         DfColumn lastColumn = df.newColumn(schemaCol.getName(), columnType);
 
-        Procedure<String> populator = switch (columnType)
-        {
-            case LONG -> s -> schemaCol.parseAsLongAndAdd(s, lastColumn);
-            case DOUBLE -> s -> schemaCol.parseAsDoubleAndAdd(s, lastColumn);
-            case INT -> s -> schemaCol.parseAsIntAndAdd(s, lastColumn);
-            case FLOAT -> s -> schemaCol.parseAsFloatAndAdd(s, lastColumn);
-            case BOOLEAN -> s -> schemaCol.parseAsBooleanAndAdd(s, lastColumn);
-            case STRING -> s -> lastColumn.addObject(schemaCol.parseAsString(s));
-            case DATE -> s -> lastColumn.addObject(schemaCol.parseAsLocalDate(s));
-            case DATE_TIME -> s -> lastColumn.addObject(schemaCol.parseAsLocalDateTime(s));
-            case DECIMAL -> s -> lastColumn.addObject(schemaCol.parseAsDecimal(s));
-            default -> throw exceptionByKey("CSV_POPULATING_BAD_COL_TYPE").with("columnType", columnType)
-                                                                          .get();
-        };
+        Procedure<String> populator = s -> schemaCol.parseAndAddToColumn(s, lastColumn);
 
         columnPopulators.add(populator);
     }

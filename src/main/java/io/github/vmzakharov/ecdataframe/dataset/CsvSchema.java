@@ -4,6 +4,8 @@ import io.github.vmzakharov.ecdataframe.dsl.value.ValueType;
 import org.eclipse.collections.api.factory.Lists;
 import org.eclipse.collections.api.list.MutableList;
 
+import static io.github.vmzakharov.ecdataframe.util.ExceptionFactory.exceptionByKey;
+
 public class CsvSchema
 {
     private String nullMarker;
@@ -69,7 +71,20 @@ public class CsvSchema
 
     public CsvSchema addColumn(String name, ValueType type, String format)
     {
-        CsvSchemaColumn newColumn = new CsvSchemaColumn(this, name, type, format);
+        CsvSchemaColumn newColumn = switch (type)
+            {
+                case INT: yield new IntSchemaColumn(this, name, format);
+                case LONG: yield new LongSchemaColumn(this, name, format);
+                case FLOAT: yield new FloatSchemaColumn(this, name, format);
+                case DOUBLE: yield new DoubleSchemaColumn(this, name, format);
+                case BOOLEAN: yield new BooleanSchemaColumn(this, name, format);
+                case STRING: yield new StringSchemaColumn(this, name, format);
+                case DATE: yield new DateSchemaColumn(this, name, format);
+                case DATE_TIME: yield new DateTimeSchemaColumn(this, name, format);
+                case DECIMAL: yield new DecimalSchemaColumn(this, name, format);
+                default: throw exceptionByKey("CSV_UNSUPPORTED_COL_TYPE").with("valueType", type).get();
+            };
+
         this.columns.add(newColumn);
         return this;
     }
@@ -82,16 +97,6 @@ public class CsvSchema
     public int columnCount()
     {
         return this.columns.size();
-    }
-
-    public String stripQuotesIfAny(String aString)
-    {
-        if (aString == null || !this.surroundedByQuotes(aString))
-        {
-            return aString;
-        }
-
-        return aString.substring(1, aString.length() - 1);
     }
 
     public boolean surroundedByQuotes(String aString)

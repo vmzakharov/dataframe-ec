@@ -957,7 +957,7 @@ public class DataFrameLoadTest
                 """
                 Name,EmployeeId,Salary,Bonus
                 "Alice",1234,12000010.1,100.1
-                "Bob",1235,1000005.12,100.2
+                "Bob",1235,,100.2
                 "Doris",1237,100000.701,100.3
                 """
         );
@@ -968,7 +968,7 @@ public class DataFrameLoadTest
                 new DataFrame("Employees")
                         .addStringColumn("Name").addLongColumn("EmployeeId").addDecimalColumn("Salary").addDoubleColumn("Bonus")
                         .addRow("Alice", 1234, BigDecimal.valueOf(120000101, 1), 100.1)
-                        .addRow("Bob",   1235, BigDecimal.valueOf(100000512, 2), 100.2)
+                        .addRow("Bob",   1235,                             null, 100.2)
                         .addRow("Doris", 1237, BigDecimal.valueOf(100000701, 3), 100.3)
                 , df
         );

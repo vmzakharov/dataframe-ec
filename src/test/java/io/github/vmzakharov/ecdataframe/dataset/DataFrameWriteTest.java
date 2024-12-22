@@ -5,13 +5,11 @@ import io.github.vmzakharov.ecdataframe.dsl.value.ValueType;
 
 import org.junit.jupiter.api.Test;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
-import static io.github.vmzakharov.ecdataframe.dsl.value.ValueType.DATE;
-import static io.github.vmzakharov.ecdataframe.dsl.value.ValueType.DOUBLE;
-import static io.github.vmzakharov.ecdataframe.dsl.value.ValueType.LONG;
-import static io.github.vmzakharov.ecdataframe.dsl.value.ValueType.STRING;
+import static io.github.vmzakharov.ecdataframe.dsl.value.ValueType.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class DataFrameWriteTest
@@ -145,6 +143,40 @@ public class DataFrameWriteTest
                 'Diane'|10001|2012-09-20|''|130000.0
                 'Ed'|10002|-null-|-null-|0.0
                 """;
+
+        assertEquals(expected, dataSet.getWrittenData());
+    }
+
+    @Test
+    public void writeBigDecimal()
+    {
+        DataFrame dataFrame = new DataFrame("Employees")
+            .addStringColumn("Name").addLongColumn("EmployeeId").addDecimalColumn("Salary").addDoubleColumn("Bonus")
+            .addRow("Alice", 1234, BigDecimal.valueOf(120000101, 1), 100.1)
+            .addRow("Bob",   1235,                             null, 100.2)
+            .addRow("Doris", 1237, BigDecimal.valueOf(100000701, 3), 100.3)
+            ;
+
+        dataFrame.addColumn("TwoSalaries", "Salary * 2");
+
+        CsvSchema schema = new CsvSchema()
+            .addColumn("Name", STRING)
+            .addColumn("EmployeeId", LONG)
+            .addColumn("Salary", DECIMAL)
+            .addColumn("Bonus", DOUBLE)
+            .addColumn("TwoSalaries", DECIMAL, "\"$#,##0.00\"")
+            ;
+
+        StringBasedCsvDataSet dataSet = new StringBasedCsvDataSet("Foo", "Employees", schema, "");
+
+        dataSet.write(dataFrame);
+
+        String expected = """
+            Name,EmployeeId,Salary,Bonus,TwoSalaries
+            "Alice",1234,12000010.1,100.1,"$24,000,020.20"
+            "Bob",1235,,100.2,
+            "Doris",1237,100000.701,100.3,"$200,001.40"
+            """;
 
         assertEquals(expected, dataSet.getWrittenData());
     }
