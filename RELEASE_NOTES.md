@@ -1,4 +1,6 @@
 # Releases
+### 1.2.0
+* no functional changes, refactors csv/string conversion support classes
 ### 1.1.0
 * adds support for columns of boolean type
 ### 1.0.0
