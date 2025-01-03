@@ -53,7 +53,9 @@ Learn dataframe-ec with a Kata! Check out [dataframe-ec kata](https://github.com
 ### Examples
 
 #### Creating a Data Frame
-A data frame can be **loaded from a CSV file**. Let's say there is a file called "donut_orders.csv" with the following contents:
+A data frame can be **loaded from a CSV file**. The examples below give some basic idea about how this works. For more details on reading and writing CSV (and CSV-like) files see the **[Csv File Support](docs/CSV_FILE_SUPPORT.md)** document.
+
+Let's say there is a file called "donut_orders.csv" with the following contents:
 
 ```
 Customer,  Count,  Price,  Date
