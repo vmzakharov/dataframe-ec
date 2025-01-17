@@ -47,16 +47,34 @@ extends DataSetAbstract
 
     private CsvSchema schema;
 
+    /**
+     * Create a new CSV data set pointing to the file with the name {@code newDataFileName}
+     * @param newDataFileName the location of the data set (the file name)
+     * @param newName the name of the data set
+     */
     public CsvDataSet(String newDataFileName, String newName)
     {
         this(newDataFileName, newName, null);
     }
 
+    /**
+     * Create a new CSV data set named {@code newName} pointing to the file stored at the location
+     * {@code newDataFilePath}
+     * @param newDataFilePath the location of the data set (the path of the file)
+     * @param newName the name of the data set
+     */
     public CsvDataSet(Path newDataFilePath, String newName)
     {
         this(newDataFilePath, newName, null);
     }
 
+    /**
+     * Create a new CSV data set pointing to the file with the name {@code newDataFileName} described by the provided
+     * schema
+     * @param newDataFileName the location of the data set (the file name)
+     * @param newName the name of the data set
+     * @param newSchema the schema describing the format of the columns in the file
+     */
     public CsvDataSet(String newDataFileName, String newName, CsvSchema newSchema)
     {
         super(newName);
@@ -64,6 +82,13 @@ extends DataSetAbstract
         this.schema = newSchema;
     }
 
+    /**
+     * Create a new CSV data set pointing to a file at the location {@code newDataFilePath} described by the provided
+     * schema
+     * @param newDataFilePath the location of the data set (the path of the file)
+     * @param newName the name of the data set
+     * @param newSchema the schema describing the format of the columns in the file
+     */
     public CsvDataSet(Path newDataFilePath, String newName, CsvSchema newSchema)
     {
         super(newName);
@@ -71,6 +96,10 @@ extends DataSetAbstract
         this.schema = newSchema;
     }
 
+    /**
+     * Returns the name of the file storing the data set (including full path to it) as a string
+     * @return the data set file name as string
+     */
     private String getDataFileName()
     {
         return this.dataFilePath.toString();
@@ -226,7 +255,7 @@ extends DataSetAbstract
     }
 
     /**
-     * Load the first lines of the data set as a data frame.
+     * Loads the entire data set as a data frame.
      * If a schema is not specified for this data set, an attempt will be made to infer the schema from the data in
      * the first several lines of the data set.
      * @return a data frame representing the contents of the data set
@@ -237,7 +266,7 @@ extends DataSetAbstract
     }
 
     /**
-     * load the first lines of the data set as a data frame
+     * Loads the first lines of the data set as a data frame
      * @param headLineCount the number of lines to load from the beginning of the data set
      * @return a data frame representing the first {@code headLineCount} lines in the data set
      */
