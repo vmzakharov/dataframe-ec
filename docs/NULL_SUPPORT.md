@@ -25,7 +25,12 @@ For example, if `longColumn` is a data frame column of type `DfLongColumn` (stor
 
 Using `null` as an operand in an expression results in that expression evaluating to `null`. This sort of follows property 1. How much is `5 + I don't know`? Well, it's `I don't know`. And so on.
 
-### 3. `null` == `null` is `false`
+One edge case here is using `null` in boolean expressions. Specifically, one can argue that<br>
+`T or null == T`<br>
+and<br>
+`F and null == F`
+
+### 3. `null == null` is `false`
 
 For the same reason it is impossible to compare nulls as we don't know the values being compared. You can compare null-ity though, for example in a DSL expression like this
 
@@ -35,7 +40,9 @@ x is null == y is null // will evaluate to true if both x and y are nulls
 
 ## Null Support in the Expression DSL
 
-The expression DSL generally conforms to the three principles listed above. Note that in the Java code the `null` value in the DSL is represented by the constant `Value.VOID` which is the only instance of the value type of `VoidValue`. 
+The expression DSL generally conforms to the three principles listed above, including how it treats boolean expressions (that is, `true or null` is `true`, `false and null` is `false`).
+
+Note that in the Java code the `null` value in the DSL is represented by the constant `Value.VOID` which is the only instance of the value type of `VoidValue`. 
 
 ### Operators
 
@@ -45,7 +52,7 @@ The data frame expression DSL supports operators for checking for nulls as well 
 |------------------|---------------------------------------------------------|-----------------------------------------------------------------------------------------------------------|
 | `x is null`      | returns `true` if the value of `x` is null              |                                                                                                           |
 | `x is not null`  | returns `true` if the value of `x` is not null          |                                                                                                           |
-| `x is empty`    | returns `true` if the value of `x` is empty or null     | for most types there is really no "empty" value, but stings and lists can be properly empty and not nulls |
+| `x is empty`    | returns `true` if the value of `x` is empty or null     | for most types there is really no "empty" value, but stings and lists<br/> can be properly empty and not nulls |
 | `x is not empty` | returns `true` if the value of `x` is not empty |                                                                                                           |
 
 
