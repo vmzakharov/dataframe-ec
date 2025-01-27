@@ -50,6 +50,18 @@ public class BasicDataFrameTest
     }
 
     @Test
+    public void renameDataFrame()
+    {
+        DataFrame df = new DataFrame("df1");
+
+        assertEquals("df1", df.getName());
+
+        df.setName("beep-boop");
+
+        assertEquals("beep-boop", df.getName());
+    }
+
+    @Test
     public void addColumn()
     {
         DataFrame dataFrame = new DataFrame("df1")

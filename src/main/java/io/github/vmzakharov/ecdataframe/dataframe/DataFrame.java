@@ -61,9 +61,11 @@ import static io.github.vmzakharov.ecdataframe.util.ExceptionFactory.exceptionBy
 public class DataFrame
 implements DfIterate
 {
-    private final String name;
+    private String name;
+
     private final MutableMap<String, DfColumn> columnsByName = Maps.mutable.of();
     private final MutableList<DfColumn> columns = Lists.mutable.of();
+
     private int rowCount = 0;
 
     private final ThreadLocal<DataFrameEvalContext> localEvalContext;
@@ -472,6 +474,17 @@ implements DfIterate
         return this.columns.size();
     }
 
+    /**
+     * Sets the name of the data frame
+     */
+    public void setName(String newName)
+    {
+        this.name = newName;
+    }
+
+    /**
+     * @return the name of this data frame
+     */
     public String getName()
     {
         return this.name;
