@@ -358,17 +358,6 @@ implements DfIterate
         }
     }
 
-    public void enablePooling()
-    {
-        this.poolingEnabled = true;
-        this.columns.forEach(DfColumn::enablePooling);
-    }
-
-    public boolean isPoolingEnabled()
-    {
-        return this.poolingEnabled;
-    }
-
     public DfColumn getColumnNamed(String columnName)
     {
         DfColumn column = this.columnsByName.get(columnName);
@@ -837,10 +826,33 @@ implements DfIterate
         return this;
     }
 
-    private void disablePooling()
+    /**
+     * Turns off pooling of object values and drops object pools.
+     * See also {@link #enablePooling()}
+     */
+    public void disablePooling()
     {
         this.poolingEnabled = false;
         this.columns.forEach(DfColumn::disablePooling);
+    }
+
+    /**
+     * Turns on pooling of object values. This can result in memory savings when data frame is populated with data.
+     * If pooling is enabled on a data frame that already has data, the existing data will be pooled.
+     * Note, if pooling is enabled, data frames produced from this one via filtering or union operations will also have
+     * pooling enabled. Retaining pooling  may be useful if rows will be added to the resulting data frame, otherwise
+     * call  on this data frame before performing these operations, alternatively call {@link #disablePooling()} on the
+     * derived data frame
+     */
+    public void enablePooling()
+    {
+        this.poolingEnabled = true;
+        this.columns.forEach(DfColumn::enablePooling);
+    }
+
+    public boolean isPoolingEnabled()
+    {
+        return this.poolingEnabled;
     }
 
     private void determineRowCount()
@@ -1227,7 +1239,10 @@ implements DfIterate
     public Twin<DataFrame> partition(String filterExpressionString)
     {
         DataFrame selected = this.cloneStructure(this.name + "-selected");
+        this.inheritPoolingSettings(selected);
+
         DataFrame rejected = this.cloneStructure(this.name + "-rejected");
+        this.inheritPoolingSettings(rejected);
 
         Expression filterExpression = ExpressionParserHelper.DEFAULT.toExpression(filterExpressionString);
 
@@ -1245,8 +1260,8 @@ implements DfIterate
             }
         }
 
-        selected.seal();
-        rejected.seal();
+        this.sealMindingPooling(selected);
+        this.sealMindingPooling(rejected);
 
         return Tuples.twin(selected, rejected);
     }
@@ -1280,26 +1295,52 @@ implements DfIterate
         return this.filterBy(filterExpressionString, "rejected", false);
     }
 
+    private void inheritPoolingSettings(DataFrame dataFrame)
+    {
+        if (this.isPoolingEnabled())
+        {
+            dataFrame.enablePooling();
+        }
+    }
+
+    private void sealMindingPooling(DataFrame dataFrame)
+    {
+        if (this.isPoolingEnabled())
+        {
+            dataFrame.determineRowCount();
+            dataFrame.resetBitmap();
+        }
+        else
+        {
+            dataFrame.seal();
+        }
+    }
+
     private DataFrame filterBy(String filterExpressionString, String operation, boolean select)
     {
         DataFrame filtered = this.cloneStructure(this.getName() + "-" + operation);
+        this.inheritPoolingSettings(filtered);
+
         Expression filterExpression = ExpressionParserHelper.DEFAULT.toExpression(filterExpressionString);
         for (int i = 0; i < this.rowCount; i++)
         {
-            this.getEvalContext().setRowIndex(i);
+            this.getEvalContext()
+                .setRowIndex(i);
             Value filterValue = filterExpression.evaluate(this.getEvalVisitor());
             if (((BooleanValue) filterValue).is(select))
             {
                 filtered.copyRowFrom(this, i);
             }
         }
-        filtered.seal();
+
+        this.sealMindingPooling(filtered);
         return filtered;
     }
 
     private DataFrame selectByMarkValue(IntPredicate flaggedAtIndex, String description)
     {
         DataFrame filtered = this.cloneStructure(this.getName() + "-" + description);
+        this.inheritPoolingSettings(filtered);
 
         for (int i = 0; i < this.rowCount; i++)
         {
@@ -1308,7 +1349,8 @@ implements DfIterate
                 filtered.copyRowFrom(this, this.rowIndexMap(i));
             }
         }
-        filtered.seal();
+
+        this.sealMindingPooling(filtered);
 
         return filtered;
     }
@@ -1494,23 +1536,29 @@ implements DfIterate
         }
 
         DataFrame dfUnion = new DataFrame("union");
+        this.inheritPoolingSettings(dfUnion);
 
         this.columns.forEach(
                 col -> col.mergeWithInto(other.getColumnNamed(col.getName()), dfUnion)
         );
 
-        dfUnion.seal();
+        this.sealMindingPooling(dfUnion);
         return dfUnion;
     }
 
     /**
-     * enables flagging the rows as true or false - effectively creating a bitmap of the data frame
+     * Enables flagging the rows as true or false - effectively creating a bitmap of the data frame rows.
+     * This method initializes the bitmap so that no flags are set.
      */
     public void resetBitmap()
     {
         this.bitmap = BooleanArrayList.newWithNValues(this.rowCount, false);
     }
 
+    /**
+     * Flags a row in the data frame. The data frame can be filtered based on the flagged rows.
+     * @param rowIndex the index of the row to flag
+     */
     public void setFlag(int rowIndex)
     {
         this.ensureBitmapCapacity();
@@ -1528,6 +1576,11 @@ implements DfIterate
         }
     }
 
+    /**
+     * checks if a row is flagged
+     * @param rowIndex the index of the row to check
+     * @return {@code true} if the row a {@code rowIndex} is flagged, {@code false}
+     */
     public boolean isFlagged(int rowIndex)
     {
         this.ensureBitmapCapacity();

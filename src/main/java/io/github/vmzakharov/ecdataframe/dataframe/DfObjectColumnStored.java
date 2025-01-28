@@ -53,7 +53,15 @@ implements DfColumnStored
     @Override
     public void enablePooling()
     {
-        this.pool = new UnifiedSet<>();
+        if (this.pool == null)
+        {
+            this.pool = new UnifiedSet<>();
+            for (int i = 0; i < this.values.size(); i++)
+            {
+                T value = this.values.get(i);
+                this.values.set(i, this.pool.put(value));
+            }
+        }
     }
 
     @Override
@@ -122,6 +130,13 @@ implements DfColumnStored
     @Override
     protected void addAllItems(ListIterable<T> items)
     {
-        this.values.addAllIterable(items);
+        if (this.pool == null)
+        {
+            this.values.addAllIterable(items);
+        }
+        else
+        {
+            items.forEach(each -> this.values.add(this.pool.put(each)));
+        }
     }
 }
