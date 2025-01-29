@@ -560,7 +560,7 @@ pets.lookupIn(codes)
     .resolveLookup();
 ```
 
-Note that if using this approach, once the all the lookup parameters are specified you need to call the `resolveLookup()` methof to actually execute the lookup.
+Note that if using this approach, once the all the lookup parameters are specified you need to call the `resolveLookup()` method to actually execute the lookup.
 
 #### Pivot
 
