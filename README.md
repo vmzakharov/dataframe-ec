@@ -3,6 +3,37 @@ A tabular data structure (aka a data frame) based on the Eclipse Collections fra
 
 For more on Eclipse Collections see: https://www.eclipse.org/collections/.
 
+## Table of Contents
+
+<!-- TOC -->
+* [Where to Get It](#where-to-get-it)
+* [Code Kata](#code-kata)
+* [Data Frame Operations](#data-frame-operations)
+* [Additional Reading](#additional-reading)
+* [Code Examples](#code-examples)
+    * [Creating a Data Frame](#creating-a-data-frame)
+    * [Sum of Columns](#sum-of-columns)
+    * [Aggregation Functions](#aggregation-functions)
+    * [Sum With Group By](#sum-with-group-by)
+    * [Add a Calculated Column](#add-a-calculated-column)
+    * [Filter](#filter)
+    * [Drop Column](#drop-column)
+    * [Sort](#sort)
+    * [Union](#union)
+    * [Distinct](#distinct)
+    * [Join](#join)
+    * [Join With Complements](#join-with-complements)
+    * [Lookup Join](#lookup-join)
+    * [Pivot](#pivot)
+* [Domain Specific Language](#domain-specific-language)
+  * [Script](#script)
+  * [Value Types](#value-types)
+  * [Literals](#literals)
+  * [Variables](#variables)
+  * [Expressions](#expressions)
+  * [Statements](#statements)
+  * [Functions](#functions)
+<!-- TOC -->
 ## Where to Get It
 
 Get the latest release of `dataframe-ec` here:
