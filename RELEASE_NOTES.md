@@ -1,4 +1,11 @@
 # Releases
+### 1.3.0
+* pooling enhancements:
+  * pooling state (enabled or disabled) is maintained for derived data frames
+  * pools are built from the current data when first enabled on non-empty data frames
+* data frame name can be changed
+* adds missing `getBoolean()` to data frame cursor (row) objects
+* documentation updates
 ### 1.2.0
 * no functional changes, refactors csv/string conversion support classes
 ### 1.1.0

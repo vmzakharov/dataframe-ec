@@ -1,4 +1,3 @@
-
 # dataframe-ec
 A tabular data structure (aka a data frame) based on the Eclipse Collections framework. The underlying data frame structure is columnar, with focus on memory optimization achieved by using efficient Eclipse Collections data structures and APIs.
 
@@ -12,7 +11,7 @@ Get the latest release of `dataframe-ec` here:
 <dependency>
   <groupId>io.github.vmzakharov</groupId>
   <artifactId>dataframe-ec</artifactId>
-  <version>1.2.0</version>
+  <version>1.3.0</version>
 </dependency>
 ```
 
@@ -50,10 +49,17 @@ Learn dataframe-ec with a Kata! Check out [dataframe-ec kata](https://github.com
 - **flag rows** - individually or matching a criteria
 <br>...and more!
 
-### Examples
+## Additional Reading
+
+* [Csv File Support](docs/CSV_FILE_SUPPORT.md) - reading and writing CSV (and CSV-like) files
+* [Handling Null Values](docs/NULL_SUPPORT.md) - dealing with real life data requires flexibility in handling nulls
+* [Object Pooling](docs/POOLING.md) - the framework uses pooling to save memory
+* [JSON Support](https://github.com/vmzakharov/dataframe-ec-json-support) - a companion project that support reading and writing JSON formatted text
+
+## Code Examples
 
 #### Creating a Data Frame
-A data frame can be **loaded from a CSV file**. The examples below give some basic idea about how this works. For more details on reading and writing CSV (and CSV-like) files see the **[Csv File Support](docs/CSV_FILE_SUPPORT.md)** document.
+A data frame can be **loaded from a CSV file**. For more details on reading and writing CSV (and CSV-like) files see the **[Csv File Support](docs/CSV_FILE_SUPPORT.md)** document.
 
 Let's say there is a file called "donut_orders.csv" with the following contents:
 
@@ -181,7 +187,7 @@ var script = ExpressionParserHelper.DEFAULT.toScript("""
         }
         """);
 
-DataFrame projectionValue = ((DataFrameValue) script.evaluate(visitor)).dataFrameValue();
+DataFrame projectionValue = ((DataFrameValue) script.evaluate(visitor)).dataFrame();
 ```
 
 `projectionValue`
