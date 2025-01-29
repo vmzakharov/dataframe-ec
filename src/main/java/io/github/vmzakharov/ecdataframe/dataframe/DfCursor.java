@@ -39,6 +39,11 @@ public class DfCursor
         return this.dataFrame.getFloat(columnName, this.rowIndex);
     }
 
+    public boolean getBoolean(String columnName)
+    {
+        return this.dataFrame.getBoolean(columnName, this.rowIndex);
+    }
+
     public BigDecimal getDecimal(String columnName)
     {
         return this.dataFrame.getDecimal(columnName, this.rowIndex);

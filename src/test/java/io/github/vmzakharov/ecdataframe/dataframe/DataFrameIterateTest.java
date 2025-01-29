@@ -29,13 +29,13 @@ public class DataFrameIterateTest
         this.dataFrame = new DataFrame("FrameOfData")
             .addStringColumn("Name").addLongColumn("Bar").addDoubleColumn("Baz")
             .addDateColumn("Date").addDateTimeColumn("DateTime").addDecimalColumn("Decimal")
-            .addIntColumn("Qux").addFloatColumn("Thud")
-            .addRow("Alice",   11L, 20.0, LocalDate.of(2023, 10, 21), LocalDateTime.of(2023, 10, 21, 11, 11, 11), BigDecimal.valueOf(123, 2), 110, 10.25f)
-            .addRow("Carol",   12L, 10.0, LocalDate.of(2023, 12, 24), LocalDateTime.of(2023, 10, 21, 11, 11, 11), BigDecimal.valueOf(124, 2), 120, 12.50f)
-            .addRow("Alice",   33L, 25.0, LocalDate.of(2023, 11, 23), LocalDateTime.of(2023, 11, 23, 11, 13, 11), BigDecimal.valueOf(123, 2), 330, 14.75f)
-            .addRow("Carol",   24L, 66.1, LocalDate.of(2023, 12, 24), LocalDateTime.of(2023, 12, 24, 11, 14, 11), BigDecimal.valueOf(222, 2), 240, 16.25f)
-            .addRow("Carol",   24L, 41.0, LocalDate.of(2023, 12, 24), LocalDateTime.of(2023, 12, 24, 11, 15, 11), BigDecimal.valueOf(333, 2), 240, 18.50f)
-            .addRow("Abigail", 33L, 11.0, LocalDate.of(2023, 11, 23), LocalDateTime.of(2023, 10, 21, 11, 11, 11), BigDecimal.valueOf(123, 2), 330, 20.75f)
+            .addIntColumn("Qux").addFloatColumn("Thud").addBooleanColumn("Boolean")
+            .addRow("Alice",   11L, 20.0, LocalDate.of(2023, 10, 21), LocalDateTime.of(2023, 10, 21, 11, 11, 11), BigDecimal.valueOf(123, 2), 110, 10.25f, true)
+            .addRow("Carol",   12L, 10.0, LocalDate.of(2023, 12, 24), LocalDateTime.of(2023, 10, 21, 11, 11, 11), BigDecimal.valueOf(124, 2), 120, 12.50f, false)
+            .addRow("Alice",   33L, 25.0, LocalDate.of(2023, 11, 23), LocalDateTime.of(2023, 11, 23, 11, 13, 11), BigDecimal.valueOf(123, 2), 330, 14.75f, false)
+            .addRow("Carol",   24L, 66.1, LocalDate.of(2023, 12, 24), LocalDateTime.of(2023, 12, 24, 11, 14, 11), BigDecimal.valueOf(222, 2), 240, 16.25f, true)
+            .addRow("Carol",   24L, 41.0, LocalDate.of(2023, 12, 24), LocalDateTime.of(2023, 12, 24, 11, 15, 11), BigDecimal.valueOf(333, 2), 240, 18.50f, true)
+            .addRow("Abigail", 33L, 11.0, LocalDate.of(2023, 11, 23), LocalDateTime.of(2023, 10, 21, 11, 11, 11), BigDecimal.valueOf(123, 2), 330, 20.75f, false)
         ;
     }
 
@@ -90,6 +90,10 @@ public class DataFrameIterateTest
         assertEquals(1, decimalCount.occurrencesOf(BigDecimal.valueOf(124, 2)));
         assertEquals(1, decimalCount.occurrencesOf(BigDecimal.valueOf(222, 2)));
         assertEquals(1, decimalCount.occurrencesOf(BigDecimal.valueOf(333, 2)));
+
+        StringBuilder booleans = new StringBuilder();
+        this.dataFrame.forEach(row -> booleans.append(row.getBoolean("Boolean") ? 'T' : 'F'));
+        assertEquals("TFFTTF", booleans.toString());
     }
 
     @Test

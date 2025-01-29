@@ -812,11 +812,13 @@ implements DfIterate
 
     /**
      * Indicates that no further updates will be made to this data frame and ensures that the data frame is in a
-     * consistent internal state. This method should be invoked when done populating a data frame with data. Failure to
-     * do so may result in degraded performance or delayed problem detection. It is usually OK to skip it in the context
-     * of unit tests.
+     * consistent internal state.
+     * This method will also adjust row count (in case, data was added to columns), disable pooling and drop pools if
+     * any were allocated, and reset any row selections.
+     * This method should be invoked when done populating a data frame with data. Failure to do so may result in
+     * degraded performance or delayed problem detection. It is usually OK to skip it in the context of unit tests.
      *
-     * @return the data frame
+     * @return this data frame
      */
     public DataFrame seal()
     {
@@ -1305,14 +1307,12 @@ implements DfIterate
 
     private void sealMindingPooling(DataFrame dataFrame)
     {
-        if (this.isPoolingEnabled())
+        dataFrame.determineRowCount();
+        dataFrame.resetBitmap();
+
+        if (!this.isPoolingEnabled())
         {
-            dataFrame.determineRowCount();
-            dataFrame.resetBitmap();
-        }
-        else
-        {
-            dataFrame.seal();
+            dataFrame.disablePooling();
         }
     }
 
@@ -1324,8 +1324,7 @@ implements DfIterate
         Expression filterExpression = ExpressionParserHelper.DEFAULT.toExpression(filterExpressionString);
         for (int i = 0; i < this.rowCount; i++)
         {
-            this.getEvalContext()
-                .setRowIndex(i);
+            this.getEvalContext().setRowIndex(i);
             Value filterValue = filterExpression.evaluate(this.getEvalVisitor());
             if (((BooleanValue) filterValue).is(select))
             {
@@ -1351,7 +1350,6 @@ implements DfIterate
         }
 
         this.sealMindingPooling(filtered);
-
         return filtered;
     }
 
