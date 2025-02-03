@@ -27,7 +27,24 @@ With pooling, there are 4 instances of strings and 3 instances of dates.
 
 Pooling can be enabled and disabled at the data frame or at the individual column level.
 
-To enabling pooling at the data frame level, call `enablePooling()` on a data frame instance. 
+To enabling pooling at the data frame level, call `enablePooling()` on a data frame instance, for example
+
+```java
+DataFrame df = new DataFrame("Data Frame");
+// ...populate data frame...
+df.enablePooling();
+```
+
+This method will enable pooling on all data frame columns (specifically, object columns, as there is no pooling of primitive values, so enabling pooling on primitive columns does nothing.)
+
+To enable pooling for a specific column call `enablePooling()` on this column, for example
+```java
+DataFrame df = new DataFrame("Data Frame");
+// ...populate data frame...
+df.getColumnNamed("name").enablePooling();
+```
+
+To disable pooling call `disablePooling()` on either a data frame instance or a column instance, depending on the desired scope.  
 
 ### Data Frame Transformation and Pooling
 
@@ -35,4 +52,4 @@ By default, the data frames created as a result of extracting data from an exist
 
 Note that if the source data frame was created with pooling enabled, regardless of its current pooling status, the derived data frames will benefit from that. That is, the total number of value instances will not increase as no new instances will be created. So you only need pooling on derived data frames if you are planning to add data to them.
 
-If the source data frame has pooling enabled, and you don't need pooling for a derived data frame as you are not planning to add any data to it, call `disablePooling` on it to avoid the overhead of having an active pool.
+If the source data frame has pooling enabled, and you do not need pooling for a derived data frame as you are not planning to add any data to it, call `disablePooling` on it to avoid the overhead of having an active pool.

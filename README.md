@@ -3,37 +3,6 @@ A tabular data structure (aka a data frame) based on the Eclipse Collections fra
 
 For more on Eclipse Collections see: https://www.eclipse.org/collections/.
 
-## Table of Contents
-
-<!-- TOC -->
-* [Where to Get It](#where-to-get-it)
-* [Code Kata](#code-kata)
-* [Data Frame Operations](#data-frame-operations)
-* [Additional Reading](#additional-reading)
-* [Code Examples](#code-examples)
-    * [Creating a Data Frame](#creating-a-data-frame)
-    * [Sum of Columns](#sum-of-columns)
-    * [Aggregation Functions](#aggregation-functions)
-    * [Sum With Group By](#sum-with-group-by)
-    * [Add a Calculated Column](#add-a-calculated-column)
-    * [Filter](#filter)
-    * [Drop Column](#drop-column)
-    * [Sort](#sort)
-    * [Union](#union)
-    * [Distinct](#distinct)
-    * [Join](#join)
-    * [Join With Complements](#join-with-complements)
-    * [Lookup Join](#lookup-join)
-    * [Pivot](#pivot)
-* [Domain Specific Language](#domain-specific-language)
-  * [Script](#script)
-  * [Value Types](#value-types)
-  * [Literals](#literals)
-  * [Variables](#variables)
-  * [Expressions](#expressions)
-  * [Statements](#statements)
-  * [Functions](#functions)
-<!-- TOC -->
 ## Where to Get It
 
 Get the latest release of `dataframe-ec` here:
@@ -82,14 +51,14 @@ Learn dataframe-ec with a Kata! Check out [dataframe-ec kata](https://github.com
 
 ## Additional Reading
 
-* [Csv File Support](docs/CSV_FILE_SUPPORT.md) - reading and writing CSV (and CSV-like) files
+* [CSV File Support](docs/CSV_FILE_SUPPORT.md) - reading and writing CSV (and CSV-like) files
 * [Handling Null Values](docs/NULL_SUPPORT.md) - dealing with real life data requires flexibility in handling nulls
 * [Object Pooling](docs/POOLING.md) - the framework uses pooling to save memory
 * [JSON Support](https://github.com/vmzakharov/dataframe-ec-json-support) - a companion project that support reading and writing JSON formatted text
 
 ## Code Examples
 
-#### Creating a Data Frame
+### Creating a Data Frame
 A data frame can be **loaded from a CSV file**. For more details on reading and writing CSV (and CSV-like) files see the **[Csv File Support](docs/CSV_FILE_SUPPORT.md)** document.
 
 Let's say there is a file called "donut_orders.csv" with the following contents:
@@ -229,20 +198,11 @@ DataFrame projectionValue = ((DataFrameValue) script.evaluate(visitor)).dataFram
 |"Bob" | 40 | "Nebraska"|
 |"Carl" | 50 | "Idaho"|
 
-#### Sum of Columns
-```Java
-DataFrame totalOrdered = orders.sum(Lists.immutable.of("Count", "Price"));
-```
+### Aggregation Functions
 
-`totalOrdered`
+#### Built-in Aggregation Functions
 
-|Count | Price|
-|---:|---:|
-|31 | 133.0700|
-
-#### Aggregation Functions
-
-The following aggregation functions are supported
+The following aggregation functions are supported out of the box.
 - `sum`
 - `min`
 - `max`
@@ -250,6 +210,22 @@ The following aggregation functions are supported
 - `avg2d` - average, the return value is of type double for any primitive input type
 - `count`
 - `same` - the result is `null` if the aggregated values are not the equal to each other, otherwise it equals to that value
+
+It is possible to add custom aggregation functions at runtime (see unit tests for examples).
+
+For the following examples we will use the `orders` data frame we created earlier:
+
+`orders`
+
+|Customer | Count | Price | Date|
+|---|---:|---:|---|
+|"Alice" | 5 | 23.4500 | 2020-10-15|
+|"Bob" | 10 | 40.3400 | 2020-11-10|
+|"Alice" | 4 | 19.5000 | 2020-10-19|
+|"Carl" | 11 | 44.7800 | 2020-12-25|
+|"Doris" | 1 | 5.0000 | 2020-09-01|
+
+#### Aggregation Example
 
 ```Java
 DataFrame orderStats = orders.aggregate(Lists.immutable.of(max("Price", "MaxPrice"), min("Price", "MinPrice"), sum("Price", "Total")));
@@ -260,6 +236,17 @@ DataFrame orderStats = orders.aggregate(Lists.immutable.of(max("Price", "MaxPric
 |MaxPrice | MinPrice | Total|
 |---:|---:|---:|
 |44.7800 | 5.0000 | 133.0700|
+
+#### Sum of Columns
+```Java
+DataFrame totalOrdered = orders.sum(Lists.immutable.of("Count", "Price"));
+```
+
+`totalOrdered`
+
+|Count | Price|
+|---:|---:|
+|31 | 133.0700|
 
 #### Sum With Group By
 ```Java
@@ -275,7 +262,7 @@ DataFrame totalsByCustomer = orders.sumBy(Lists.immutable.of("Count", "Price"), 
 |"Carl" | 11 | 44.7800|
 |"Doris" | 1 | 5.0000|
 
-#### Add a Calculated Column
+### Add a Calculated Column
 ```Java
 orders.addColumn("AvgDonutPrice", "Price / Count");
 ```
@@ -289,7 +276,7 @@ orders.addColumn("AvgDonutPrice", "Price / Count");
 |"Carl" | 11 | 44.7800 | 2020-12-25 | 4.0709|
 |"Doris" | 1 | 5.0000 | 2020-09-01 | 5.0000|
 
-#### Filter
+### Filtering
 Selection of a dataframe containing the rows matching the filter condition
 ```Java
 DataFrame bigOrders = orders.selectBy("Count >= 10");
@@ -334,7 +321,7 @@ Result - a pair of data frames:
 |"Alice" | 4 | 19.5000 | 2020-10-19 | 4.8750|
 |"Doris" | 1 | 5.0000 | 2020-09-01 | 5.0000|
 
-#### Drop Column
+### Drop Column
 ```Java
 orders.dropColumn("AvgDonutPrice");
 ```
@@ -348,7 +335,7 @@ orders.dropColumn("AvgDonutPrice");
 |"Carl" | 11 | 44.7800 | 2020-12-25|
 |"Doris" | 1 | 5.0000 | 2020-09-01|
 
-#### Sort
+### Sort
 Sort by the order date:
 ```Java
 orders.sortBy(Lists.immutable.of("Date"));
@@ -377,7 +364,7 @@ orders.sortByExpression("substr(Customer, 1)");
 |"Bob" | 10 | 40.3400 | 2020-11-10|
 |"Doris" | 1 | 5.0000 | 2020-09-01|
 
-#### Union
+### Union
 
 The union operation concatenates two data frames with the same schema. Note that it does not remove duplicate rows.
 ```Java
@@ -398,7 +385,7 @@ DataFrame combinedOrders = orders.union(otherOrders);
 |"Doris" | 1 | 5.0000 | 2020-09-01|
 |"Eve" | 2 | 9.8000 | 2020-12-05|
 
-#### Distinct
+### Distinct
 Say we want to get a list of all clients who placed orders, which are listed in the `orders` data frame above. We can
 use the `distinct()` method for that:
 
@@ -415,7 +402,9 @@ DataFrame distinctCustomers = orders.distinct(Lists.immutable.of("Customer"));
 |"Carl"|
 |"Doris"|
 
-#### Join
+### Joins
+
+#### Inner and Outer Joins
 ```Java
 DataFrame joining1 = new DataFrame("df1")
         .addStringColumn("Foo").addStringColumn("Bar").addStringColumn("Letter").addLongColumn("Baz")
@@ -560,9 +549,9 @@ pets.lookupIn(codes)
     .resolveLookup();
 ```
 
-Note that if using this approach, once the all the lookup parameters are specified you need to call the `resolveLookup()` method to actually execute the lookup.
+Note that if using this approach, once all the lookup parameters are specified you will need to call the `resolveLookup()` method to actually execute the lookup.
 
-#### Pivot
+### Pivot
 
 Say we have a data frame of individual donut sales like this:
 
@@ -650,17 +639,22 @@ A DSL script is a sequence of one or more statements (see below for the kinds of
 
 ### Value Types
 
-The language supports variable and literal values of the following types:
-- string
-- int - 32-bit integer values (up to  2^31 – 1)
-- long - 64-bit integer values (up to 2^63 - 1)
-- float - 32-bit floating point values
-- double - 64-bit floating point values
-- decimal - arbitrary precision (for all practical reasons) numbers
-- date
-- date-time
-- vector
-- boolean
+The language supports variables and literal values of the following types:
+
+| DSL Type    | Corresponding<br>Java Type | Notes                                                 |
+|-------------|----------------------------|-------------------------------------------------------|
+| `STRING`    | `String`                   |                                                       |
+| `INT`       | `int`                      | 32-bit integer values (up to  2^31 – 1)               |
+| `LONG`      | `long`                     | 64-bit integer values (up to 2^63 - 1)                |
+| `FLOAT`     | `float`                    | 32-bit floating point values                          |
+| `DOUBLE`    | `double`                   | 64-bit floating point values                          |
+| `DECIMAL`   | `BigDecimal`               | arbitrary precision (for all practical reasons) numbers |
+| `DATE`      | `LocalDate`                |                                                       |
+| `DATE_TIME` | `LocalDateTime`            |                                                       |
+| `BOOLEAN`   | `boolean`                  |                                                       |
+| `VECTOR`    | n/a                        | a list of values, a tuple (values coul                |
+| `VOID`      | n/a                        | a singleton instance of this type representrs `null` value |
+
 
 There is no implicit type conversion of values and variables to avoid inadvertent errors, to minimize surprising results, and to fail early.
 
@@ -670,7 +664,7 @@ The following are examples of literals
 
 | Type    | Example                                                                                                                                                   |
 |---------|-----------------------------------------------------------------------------------------------------------------------------------------------------------|
-| String  | `"Hello"` or `'Abracadabra'` (both single and double quotes are supported)                                                                                |
+| String  | `"Hello"`<br>`'Abracadabra'`<br>(both single and double quotes are supported)                                                                            |
 | Long    | `123`                                                                                                                                                     |
 | Double  | `123.456`                                                                                                                                                 |
 | Decimal | There is no decimal literal per se, however there is a built-in function `toDecimal()` that lets specify decimal constants, e.g. `toDecimal(1234, 3)`     |
@@ -710,11 +704,11 @@ substr(a + b, 3)
 The following statements are available:
 - assignment
 - conditional
-- a free-standing expression
+- a freestanding expression
 
 ### Functions
 
-There are two types of functions - intrinsic (built-in) and explicitly declared using the DSL `function` declaration.
+There are two types of functions—intrinsic (built-in) and explicitly declared using the DSL `function` declaration.
 
 Recursion (direct or indirect) is not supported.
 

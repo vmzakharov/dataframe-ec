@@ -68,9 +68,9 @@ Writing of data frames to a compressed file is not currently supported.
 
 ## DataSet and Schema Classes
 
-The main class for working with CSV files is `CsvDataSet`. It has methods for loading a data frame from a CSV file, for writing a data to a CSV file, as well as methods for describing file and column formats.    
+The main class for working with CSV files is `CsvDataSet`. It has methods for loading a data frame from a CSV file, for writing a data frame to a CSV file, as well as methods for describing file and column formats.    
 
-The column types and their formats are specified via instances of the `CsvSchema` class. The schema can be specified explicitly or the data set instance can attempt to infer the schema from the data in the file.
+The column types and their formats are specified via instances of the `CsvSchema` class. The schema can be specified explicitly or a data set instance can attempt to infer the schema from the data in the file.
 
 ### CsvDataSet Constructors
 
@@ -99,19 +99,19 @@ These are the methods defining how to interpret empty elements, i.e. when there 
 | `void`      | `write(DataFrame dataFrame)`     | Writes `dataFrame` to the file specified by this data set instance |
 
 ### CsvSchema Methods Describing File Format
-These are the methods describing the file-wide properties. The methods that configure the properties return the instance of the `CsvSchema` they are invoked on so this lends itself to using a builder pattern in the code.
+These are the methods describing the file-wide properties. The methods that configure the properties return the instance of the `CsvSchema` they are invoked on so this lends itself nicely to using the builder pattern in the code.
 
-| Type        | Method                                    | Description                                                                                                                                 | Default Value |
-|-------------|-------------------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------|---------------|
-| `CsvSchema` | `nullMarker(String newNullMarker)`        | if specified:<br/>when reading this column value is read as `null`<br/>when writing the data frame value of `null` is written as this value | empty         |
-| `CsvSchema` | `separator(char newSeparator)`            | Column value separator                                                                                                                      | `,`           | 
-| `CsvSchema` | `quoteCharacter(char newQuoteCharacter)`  | Quote character to denote string value boundary                                                                                             | `"`           |
-| `CsvSchema` | `hasHeaderLine(boolean newHasHeaderLine)` | If true the CSV file has a header row, only data rows otherwise                                                                             | true          |
-| `String`    | `getNullMarker()`                         |                                                                                                                                             | 
-| `boolean`   | `hasNullMarker()`                         |                                                                                                                                             |
-| `char`      | `getSeparator()`                          |                                                                                                                                             |
-| `char`      | `getQuoteCharacter()`                     |                                                                                                                                             |
-| `boolean`   | `hasHeaderLine()`                         |                                                                                                                                             |
+| Type        | Method                                    | Description                                                                                                                                   | Default Value |
+|-------------|-------------------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------|---------------|
+| `CsvSchema` | `nullMarker(String newNullMarker)`        | if specified:<br/>when reading, this column value is read as `null`<br/>when writing, the data frame value of `null` is written as this value | empty         |
+| `CsvSchema` | `separator(char newSeparator)`            | Column value separator                                                                                                                        | `,`           | 
+| `CsvSchema` | `quoteCharacter(char newQuoteCharacter)`  | Quote character to denote string value boundary                                                                                               | `"`           |
+| `CsvSchema` | `hasHeaderLine(boolean newHasHeaderLine)` | If true the CSV file has a header row, otherwise it contains only data rows                                                                   | true          |
+| `String`    | `getNullMarker()`                         |                                                                                                                                               | 
+| `boolean`   | `hasNullMarker()`                         |                                                                                                                                               |
+| `char`      | `getSeparator()`                          |                                                                                                                                               |
+| `char`      | `getQuoteCharacter()`                     |                                                                                                                                               |
+| `boolean`   | `hasHeaderLine()`                         |                                                                                                                                               |
 
 ### CsvSchema Methods Describing Column Format
 
