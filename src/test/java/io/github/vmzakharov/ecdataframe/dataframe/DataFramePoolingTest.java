@@ -40,6 +40,34 @@ public class DataFramePoolingTest
     }
 
     @Test
+    public void poolingEnabledForOneColumn()
+    {
+        DataFrame df = this.createDataFrame();
+        df.getColumnNamed("name").enablePooling();
+
+        this.populateDataFrame(df, 0);
+        this.populateDataFrame(df, 1);
+
+        MutableSet<Object> names = this.createIdentitySet().withAll(df.getStringColumn("name").toList());
+        MutableSet<Object> dates = this.createIdentitySet().withAll(df.getDateColumn("date").toList());
+
+        assertEquals(5, names.size());
+        assertEquals(10, dates.size());
+
+        df = this.createDataFrame();
+        df.getColumnNamed("date").enablePooling();
+
+        this.populateDataFrame(df, 0);
+        this.populateDataFrame(df, 1);
+
+        names = this.createIdentitySet().withAll(df.getStringColumn("name").toList());
+        dates = this.createIdentitySet().withAll(df.getDateColumn("date").toList());
+
+        assertEquals(10, names.size());
+        assertEquals(5, dates.size());
+    }
+
+    @Test
     public void enablingPoolingCompressesData()
     {
         DataFrame df = this.createDataFrame();
