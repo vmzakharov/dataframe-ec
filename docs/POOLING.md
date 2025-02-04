@@ -17,7 +17,7 @@ Without pooling there are 10 instances of string objects and 10 instances of dat
 
 ![](data_frame_no_pooling.png)
 
-With pooling, there are 4 instances of strings and 3 instances of dates.
+With pooling, there are 4 instances of strings and 3 instances of dates. By Grabthar's Hammer... what a savings.
 
 ![](data_frame_with_pooling.png)
 
@@ -31,8 +31,8 @@ To enabling pooling at the data frame level, call `enablePooling()` on a data fr
 
 ```java
 DataFrame df = new DataFrame("Data Frame");
-// ...populate data frame...
 df.enablePooling();
+// ...populate data frame...
 ```
 
 This method will enable pooling on all data frame columns (specifically, object columns, as there is no pooling of primitive values, so enabling pooling on primitive columns does nothing.)
@@ -40,11 +40,15 @@ This method will enable pooling on all data frame columns (specifically, object 
 To enable pooling for a specific column call `enablePooling()` on this column, for example
 ```java
 DataFrame df = new DataFrame("Data Frame");
-// ...populate data frame...
 df.getColumnNamed("name").enablePooling();
+// ...populate data frame...
 ```
 
+Calling `enablePooling()` on a data frame (or a column) with data will cause the necessary pools to be rebuilt, and the data repopulated, potentially resulting in memory compression at the cost of this extra work. 
+
 To disable pooling call `disablePooling()` on either a data frame instance or a column instance, depending on the desired scope.  
+
+Note that calling `seal()` method (indicating that the dataframe construction is complete) will in turn call `disablePooling()`.
 
 ### Data Frame Transformation and Pooling
 
