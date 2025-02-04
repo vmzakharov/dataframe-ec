@@ -641,36 +641,36 @@ A DSL script is a sequence of one or more statements (see below for the kinds of
 
 The language supports variables and literal values of the following types:
 
-| DSL Type    | Corresponding<br>Java Type | Notes                                                 |
-|-------------|----------------------------|-------------------------------------------------------|
-| `STRING`    | `String`                   |                                                       |
-| `INT`       | `int`                      | 32-bit integer values (up to  2^31 – 1)               |
-| `LONG`      | `long`                     | 64-bit integer values (up to 2^63 - 1)                |
-| `FLOAT`     | `float`                    | 32-bit floating point values                          |
-| `DOUBLE`    | `double`                   | 64-bit floating point values                          |
-| `DECIMAL`   | `BigDecimal`               | arbitrary precision (for all practical reasons) numbers |
-| `DATE`      | `LocalDate`                |                                                       |
-| `DATE_TIME` | `LocalDateTime`            |                                                       |
-| `BOOLEAN`   | `boolean`                  |                                                       |
-| `VECTOR`    | n/a                        | a list of values, a tuple (values coul                |
-| `VOID`      | n/a                        | a singleton instance of this type representrs `null` value |
+| DSL Type    | Corresponding<br>Java Type | Notes                                                          |
+|-------------|----------------------------|----------------------------------------------------------------|
+| `STRING`    | `String`                   |                                                                |
+| `INT`       | `int`                      | 32-bit integer values (up to  2^31 – 1)                        |
+| `LONG`      | `long`                     | 64-bit integer values (up to 2^63 - 1)                         |
+| `FLOAT`     | `float`                    | 32-bit floating point values                                   |
+| `DOUBLE`    | `double`                   | 64-bit floating point values                                   |
+| `DECIMAL`   | `BigDecimal`               | arbitrary precision (for all practical reasons) numbers        |
+| `DATE`      | `LocalDate`                |                                                                |
+| `DATE_TIME` | `LocalDateTime`            |                                                                |
+| `BOOLEAN`   | `boolean`                  |                                                                |
+| `VECTOR`    | n/a                        | a list of values, a tuple (values could be of different types) |
+| `VOID`      | n/a                        | a singleton instance of this type represents `null` value      |
 
-
-There is no implicit type conversion of values and variables to avoid inadvertent errors, to minimize surprising results, and to fail early.
+There is no implicit type conversion of values and variables to avoid errors, to minimize surprising results, and to fail early.
 
 ### Literals
 
 The following are examples of literals
 
-| Type    | Example                                                                                                                                                   |
-|---------|-----------------------------------------------------------------------------------------------------------------------------------------------------------|
-| String  | `"Hello"`<br>`'Abracadabra'`<br>(both single and double quotes are supported)                                                                            |
-| Long    | `123`                                                                                                                                                     |
-| Double  | `123.456`                                                                                                                                                 |
-| Decimal | There is no decimal literal per se, however there is a built-in function `toDecimal()` that lets specify decimal constants, e.g. `toDecimal(1234, 3)`     |
-| Date    | There is no date literal per se, however there is a built-in function `toDate()` that lets specify date constants, e.g. `toDate(2021, 11, 25)`            |
-| Vector  | `(1, 2, 3)` <br>`('A', 'B', 'C')` <br>`(x, x + 1, x + 2)`                                                                                                 |
-| Boolean | there are no literal of boolean type as there was no scenario where they would be required, however boolean variables and expressions are fully supported |
+| Type        | Example                                                                                                                                                             |
+|-------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `STRING`    | `"Hello"`<br>`'Abracadabra'`<br>(both single and double quotes are supported)                                                                                       |
+| `LONG`      | `123`                                                                                                                                                               |
+| `DOUBLE`    | `123.456`                                                                                                                                                           |
+| `DECIMAL`   | There is no decimal literal per se, however there is a built-in function `toDecimal()` that lets specify decimal constants, e.g. `toDecimal(1234, 3)`               |
+| `DATE`      | There is no date literal per se, however there is a built-in function `toDate()` that lets specify date constants, e.g. `toDate(2021, 11, 25)`                      |
+| `DATE_TIME` | There is no date literal per se, however there is a built-in function `toDateTime()` that lets specify date/time constants, e.g. `toDate(2021, 11, 25, 12, 13, 14)` |
+| `VECTOR`    | `(1, 2, 3)` <br>`('A', 'B', 'C')` <br>`(x, x + 1, x + 2)`                                                                                                           |
+| `BOOLEAN`   | there are no literal of boolean type as there was no scenario where they would be required, however boolean variables and expressions are fully supported           |
 
 ### Variables
 
