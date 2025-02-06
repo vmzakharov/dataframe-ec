@@ -50,14 +50,32 @@ public class BasicDataFrameTest
     }
 
     @Test
+    public void addEmptyRow()
+    {
+        DataFrame df = new DataFrame("df1")
+            .addStringColumn("Name").addLongColumn("Count").addDoubleColumn("Value")
+            .addRow("Alice", 5, 23.45)
+            .addRow()
+            .addRow("Bob",  10, 12.34)
+            .addRow();
+
+        assertEquals(Lists.immutable.of("Alice", null, "Bob", null), df.getStringColumn("Name").toList());
+        
+        assertEquals(5, df.getLong("Count", 0));
+        assertEquals(10, df.getLong("Count", 2));
+        assertEquals(23.45, df.getDouble("Value", 0));
+        assertEquals(12.34, df.getDouble("Value", 2));
+
+        this.assertNullValuesInColumn(df, "Count", false, true, false, true);
+        this.assertNullValuesInColumn(df, "Value", false, true, false, true);
+    }
+
+    @Test
     public void renameDataFrame()
     {
         DataFrame df = new DataFrame("df1");
-
         assertEquals("df1", df.getName());
-
         df.setName("beep-boop");
-
         assertEquals("beep-boop", df.getName());
     }
 
@@ -188,7 +206,7 @@ public class BasicDataFrameTest
     }
 
     @Test
-    public void isNull()
+    public void dataFrameValuesIsNull()
     {
         DataFrame df = new DataFrame("df1")
                 .addStringColumn("Name").addLongColumn("Count").addDoubleColumn("Value").addDateColumn("Foo")

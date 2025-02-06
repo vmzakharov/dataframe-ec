@@ -436,6 +436,11 @@ implements DfIterate
         return this.rowCount;
     }
 
+    /**
+     * Adds an empty row to this data frame.
+     * This is the same as adding {@code null} value to each stored column.
+     * @return this data frame
+     */
     public DataFrame addRow()
     {
         this.columns.forEach(DfColumn::addEmptyValue);
@@ -443,6 +448,13 @@ implements DfIterate
         return this;
     }
 
+    /**
+     * Adds a row of values to this data frame. The number of added values cannot exceed the number of columns in the
+     * data frame. The number of added values can be lower than the number of columns in the data frame if the "missing"
+     * columns are computed columns.
+     * @param values values to add to the respective data frame columns
+     * @return this data frame
+     */
     public DataFrame addRow(Object... values)
     {
         if (values.length > this.columnCount())
@@ -480,7 +492,7 @@ implements DfIterate
     }
 
     /**
-     * Add a computed column of int type to this data frame. The column type will be inferred from the expression
+     * Add a computed column of {@code int} type to this data frame. The column type will be inferred from the expression
      * provided
      *
      * @param columnName the name of the column to be added
