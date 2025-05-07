@@ -76,14 +76,14 @@ The column types and their formats are specified via instances of the `CsvSchema
 
 | Constructor                                                               | Description                                                                                                     |
 |---------------------------------------------------------------------------|-----------------------------------------------------------------------------------------------------------------|
-| `CsvDataSet(String newDataFileName, String newName)`                      | Create a new CSV data set maned `newName` pointing to the file with the name `newDataFileName`                  |
+| `CsvDataSet(String newDataFileName, String newName)`                      | Create a new CSV data set named `newName` pointing to the file with the name `newDataFileName`                   |
 | `CsvDataSet(Path newDataFilePath, String newName)`                        | Create a new CSV data set named `newName` pointing to the file stored at the location `newDataFilePath`         |
 | `CsvDataSet(String newDataFileName, String newName, CsvSchema newSchema)` | Create a new CSV data set pointing to the file with the name `newDataFileName` described by the provided schema |
 | `CsvDataSet(Path newDataFilePath, String newName, CsvSchema newSchema)`   | Create a new CSV data set pointing to a file at the location `newDataFilePath` described by the provided schema |
 
 ### CsvDataSet Methods: Handling Empty Elements 
 
-These are the methods defining how to interpret empty elements, i.e. when there are two adjacent column delimiters next to each other or a column delimiter at the very beginning or atthe very end of a line.
+These are the methods defining how to interpret empty elements, i.e. when there are two adjacent column delimiters next to each other or a column delimiter at the very beginning or at the very end of a line.
 
 | Type         | Method                           | Description                                                                                                                                                                                  |
 |--------------|----------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
@@ -106,7 +106,7 @@ These are the methods describing the file-wide properties. The methods that conf
 | `CsvSchema` | `nullMarker(String newNullMarker)`        | if specified:<br/>when reading, this column value is read as `null`<br/>when writing, the data frame value of `null` is written as this value | empty         |
 | `CsvSchema` | `separator(char newSeparator)`            | Column value separator                                                                                                                        | `,`           | 
 | `CsvSchema` | `quoteCharacter(char newQuoteCharacter)`  | Quote character to denote string value boundary                                                                                               | `"`           |
-| `CsvSchema` | `hasHeaderLine(boolean newHasHeaderLine)` | If true the CSV file has a header row, otherwise it contains only data rows                                                                   | true          |
+| `CsvSchema` | `hasHeaderLine(boolean newHasHeaderLine)` | If `true` the CSV file has a header row, otherwise it contains only data rows                                                                 | true          |
 | `String`    | `getNullMarker()`                         |                                                                                                                                               | 
 | `boolean`   | `hasNullMarker()`                         |                                                                                                                                               |
 | `char`      | `getSeparator()`                          |                                                                                                                                               |
@@ -282,7 +282,7 @@ CsvDataSet dataSet = new StringBasedCsvDataSet("Foo", "Employees", """
 DataFrame loaded = dataSet.loadAsDataFrame();
 ```
 
-If a data frame is written to an instance of the `StringBasedCsvDataSet` the resulting text is available via the `getWrittenData` method. Writing data to this data set (using the `write` method) will "overwrite" the previously written or stored data.  
+If a data frame is written to an instance of `StringBasedCsvDataSet` the resulting text is available via the `getWrittenData` method. Writing data to this data set (using the `write` method) will "overwrite" the previously written or stored data.  
 
 ```java
 DataFrame dataFrame = new DataFrame("source")
