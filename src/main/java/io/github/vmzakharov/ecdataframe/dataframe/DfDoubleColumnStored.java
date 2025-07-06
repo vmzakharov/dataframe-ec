@@ -67,12 +67,6 @@ implements DfColumnStored
     }
 
     @Override
-    public String getValueAsString(int rowIndex)
-    {
-        return Double.toString(this.getDouble(rowIndex));
-    }
-
-    @Override
     public Object getObject(int rowIndex)
     {
         if (this.isNull(rowIndex))
