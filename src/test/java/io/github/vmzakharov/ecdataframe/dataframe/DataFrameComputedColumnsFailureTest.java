@@ -1,5 +1,6 @@
 package io.github.vmzakharov.ecdataframe.dataframe;
 
+import io.github.vmzakharov.ecdataframe.dsl.value.FloatValue;
 import io.github.vmzakharov.ecdataframe.util.ConfigureMessages;
 import io.github.vmzakharov.ecdataframe.util.FormatWithPlaceholders;
 
@@ -86,7 +87,8 @@ public class DataFrameComputedColumnsFailureTest
     @Test
     public void undefinedReference()
     {
-        Exception e = assertThrows(RuntimeException.class, () -> this.df.addLongColumn("Wat", "Count + Chocola"));
+        Exception e = assertThrows(RuntimeException.class,
+                () -> this.df.addLongColumn("Wat", "Count + Chocola"));
         assertEquals(
                 FormatWithPlaceholders.messageFromKey("DF_CALC_COL_INFER_TYPE")
                                       .with("dataFrameName", "df1")
@@ -96,5 +98,47 @@ public class DataFrameComputedColumnsFailureTest
                                       .toString()
                 ,
                 e.getMessage());
+    }
+
+    @Test void setObjectThrows()
+    {
+        this.df.addColumn("TwoFloaties", "Floatie * 2");
+
+        Exception e = assertThrows(RuntimeException.class,
+                () -> this.df.getColumnNamed("TwoFloaties").setObject(1, 1.25));
+
+        assertEquals(
+            FormatWithPlaceholders.messageFromKey("DF_SET_VAL_ON_COMP_COL").with("columnName", "TwoFloaties").toString(),
+            e.getMessage());
+    }
+
+    @Test void addValueThrows()
+    {
+        this.df.addColumn("TwoFloaties", "Floatie * 2");
+
+        Exception e = assertThrows(RuntimeException.class,
+                () -> this.df.getColumnNamed("TwoFloaties").addValue(new FloatValue(10.25f))
+        );
+
+        assertEquals(
+            FormatWithPlaceholders.messageFromKey("DF_CALC_COL_MODIFICATION").with("columnName", "TwoFloaties").toString(),
+            e.getMessage());
+    }
+
+    @Test void addObjectThrowsUnlessNull()
+    {
+        this.df.addColumn("TwoFloaties", "Floatie * 2");
+
+        assertEquals(4, this.df.getColumnNamed("TwoFloaties").getSize());
+        this.df.getColumnNamed("TwoFloaties").addObject(null); // doesn't do anything
+        assertEquals(4, this.df.getColumnNamed("TwoFloaties").getSize());
+
+        Exception e = assertThrows(RuntimeException.class,
+                () -> this.df.getColumnNamed("TwoFloaties").addObject(10.25f)
+        );
+
+        assertEquals(
+            FormatWithPlaceholders.messageFromKey("DF_CALC_COL_MODIFICATION").with("columnName", "TwoFloaties").toString(),
+            e.getMessage());
     }
 }
