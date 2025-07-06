@@ -5,6 +5,10 @@ import org.eclipse.collections.api.list.ImmutableList;
 
 import org.junit.jupiter.api.Test;
 
+import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 public class DataFrameCopyTest
@@ -136,5 +140,28 @@ public class DataFrameCopyTest
         DataFrame copiedDataFrame = originalDataFrame.copy("MyNewCopy", columnNamesToCopy);
 
         DataFrameUtil.assertEquals(expectedDataFrame, copiedDataFrame);
+    }
+
+    @Test
+    public void copyAllTypes()
+    {
+        DataFrame original = new DataFrame("df1")
+                .addStringColumn("string1")
+                .addLongColumn("long1").addIntColumn("int1")
+                .addDoubleColumn("double1").addFloatColumn("float1")
+                .addBooleanColumn("boolean1")
+                .addDateColumn("date1").addDateTimeColumn("dateTime1")
+                .addDecimalColumn("decimal1")
+                .addRow("a",   10L, null, 13.25, 41.0f,  null,  LocalDate.of(2020, 10, 20),                                   null, BigDecimal.valueOf(123, 2))
+                .addRow("b",  null,   22, 23.25,  null, false,                        null, LocalDateTime.of(2020, 10, 20, 16, 32), BigDecimal.valueOf(456, 2))
+                .addRow(null,  30L,   23,  null, 43.0f, false,  LocalDate.of(2020, 10, 24), LocalDateTime.of(2020, 11, 20, 17, 33),                       null)
+                .addRow("d",   40L,   24, 43.25, 44.5f,  true,  LocalDate.of(2020, 10, 26), LocalDateTime.of(2020, 12, 20, 18, 34), BigDecimal.valueOf(901, 2))
+                ;
+
+        DataFrame copy = original.copy("MyNewCopy");
+
+        assertNotSame(original, copy);
+
+        DataFrameUtil.assertEquals(original, copy);
     }
 }

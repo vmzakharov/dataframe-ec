@@ -4,7 +4,9 @@ import org.eclipse.collections.impl.factory.Lists;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 public class DataFrameUnionTest
 {
@@ -72,6 +74,57 @@ public class DataFrameUnionTest
                 .addRow("Heidi", 2, null, LocalDate.of(2020, 8, 11))
                 .addRow("Ivan", null, 36.78, LocalDate.of(2020, 8, 12))
                 .addRow(null, 4, 47.89, LocalDate.of(2020, 8, 10));
+
+        DataFrameUtil.assertEquals(expected, union);
+    }
+
+    @Test
+    public void allTypesWithNulls()
+    {
+        DataFrame df1 = new DataFrame("df1")
+            .addStringColumn("string1")
+            .addLongColumn("long1").addIntColumn("int1")
+            .addDoubleColumn("double1").addFloatColumn("float1")
+            .addBooleanColumn("boolean1")
+            .addDateColumn("date1").addDateTimeColumn("dateTime1")
+            .addDecimalColumn("decimal1")
+            .addRow("a",   10L, null, 13.25, 41.0f,  null,  LocalDate.of(2020, 10, 20),                                   null, BigDecimal.valueOf(123, 2))
+            .addRow("b",  null,   22, 23.25,  null, false,                        null, LocalDateTime.of(2020, 10, 20, 16, 32), BigDecimal.valueOf(456, 2))
+            .addRow(null,  30L,   23,  null, 43.0f, false,  LocalDate.of(2020, 10, 24), LocalDateTime.of(2020, 11, 20, 17, 33),                       null)
+            .addRow("d",   40L,   24, 43.25, 44.5f,  true,  LocalDate.of(2020, 10, 26), LocalDateTime.of(2020, 12, 20, 18, 34), BigDecimal.valueOf(901, 2))
+            ;
+
+        DataFrame df2 = new DataFrame("df2")
+            .addStringColumn("string1")
+            .addLongColumn("long1").addIntColumn("int1")
+            .addDoubleColumn("double1").addFloatColumn("float1")
+            .addBooleanColumn("boolean1")
+            .addDateColumn("date1").addDateTimeColumn("dateTime1")
+            .addDecimalColumn("decimal1")
+            .addRow("a",  10L,   21, 13.25, 41.0f,  true,  LocalDate.of(2020, 10, 20), LocalDateTime.of(2020,  9, 20, 15, 31), BigDecimal.valueOf(123, 2))
+            .addRow(null, 20L,   22,  null, 42.0f, false,                        null, LocalDateTime.of(2020, 10, 20, 16, 32), BigDecimal.valueOf(456, 2))
+            .addRow("c", null,   23, 33.50,  null, false,  LocalDate.of(2020, 10, 24),                                   null, BigDecimal.valueOf(789, 2))
+            .addRow("d",  40L, null, 43.25, 44.5f,  null,  LocalDate.of(2020, 10, 26), LocalDateTime.of(2020, 12, 20, 18, 34),                       null)
+            ;
+
+        DataFrame union = df1.union(df2);
+
+        DataFrame expected = new DataFrame("expected")
+            .addStringColumn("string1")
+            .addLongColumn("long1").addIntColumn("int1")
+            .addDoubleColumn("double1").addFloatColumn("float1")
+            .addBooleanColumn("boolean1")
+            .addDateColumn("date1").addDateTimeColumn("dateTime1")
+            .addDecimalColumn("decimal1")
+            .addRow("a",   10L, null, 13.25, 41.0f,  null,  LocalDate.of(2020, 10, 20),                                   null, BigDecimal.valueOf(123, 2))
+            .addRow("b",  null,   22, 23.25,  null, false,                        null, LocalDateTime.of(2020, 10, 20, 16, 32), BigDecimal.valueOf(456, 2))
+            .addRow(null,  30L,   23,  null, 43.0f, false,  LocalDate.of(2020, 10, 24), LocalDateTime.of(2020, 11, 20, 17, 33),                       null)
+            .addRow("d",   40L,   24, 43.25, 44.5f,  true,  LocalDate.of(2020, 10, 26), LocalDateTime.of(2020, 12, 20, 18, 34), BigDecimal.valueOf(901, 2))
+            .addRow("a",  10L,   21, 13.25, 41.0f,  true,  LocalDate.of(2020, 10, 20), LocalDateTime.of(2020,  9, 20, 15, 31), BigDecimal.valueOf(123, 2))
+            .addRow(null, 20L,   22,  null, 42.0f, false,                        null, LocalDateTime.of(2020, 10, 20, 16, 32), BigDecimal.valueOf(456, 2))
+            .addRow("c", null,   23, 33.50,  null, false,  LocalDate.of(2020, 10, 24),                                   null, BigDecimal.valueOf(789, 2))
+            .addRow("d",  40L, null, 43.25, 44.5f,  null,  LocalDate.of(2020, 10, 26), LocalDateTime.of(2020, 12, 20, 18, 34),                       null)
+            ;
 
         DataFrameUtil.assertEquals(expected, union);
     }
