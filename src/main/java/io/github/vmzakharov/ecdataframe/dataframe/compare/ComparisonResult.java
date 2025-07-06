@@ -35,9 +35,11 @@ abstract public class ComparisonResult
         return this.delta();
     }
 
-    /*
-    used to populate the delta value in case one of the values being compared is null. Otherwise, populating delta is
-    delegated to the relevant type specific subclass
+    /**
+     * Sets the value of the "difference" or delta value between the values being compared.
+     * It is used in this class to populate the delta value in case one of the values being compared is null.
+     * Otherwise, populating delta is delegated to the relevant type-specific subclass
+     * @param newDelta the calculated value of the "difference" or delta between the values being compared
      */
     abstract protected void delta(int newDelta);
 
@@ -61,6 +63,9 @@ abstract public class ComparisonResult
         return this.nullSide == NO_NULLS;
     }
 
+    /*
+    TODO: Fix visibility mismatch between the method and the return type
+     */
     public NullSide nullSide()
     {
         return this.nullSide;
