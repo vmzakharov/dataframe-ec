@@ -55,7 +55,7 @@ implements DfColumn
                 attachTo.newColumn(newName, this.getType(), ((DfColumnComputed) this).getExpressionAsString());
     }
 
-    protected DfColumn validateAndCreateTargetColumn(DfColumn other, DataFrame target)
+    protected DfColumnStored validateAndCreateTargetColumn(DfColumn other, DataFrame target)
     {
         if (!this.getType().equals(other.getType()))
         {
@@ -74,7 +74,7 @@ implements DfColumn
         return newColumn;
     }
 
-    protected DfColumn copyColumnSchemaAndEnsureCapacity(DataFrame target)
+    protected DfColumnStored copyColumnSchemaAndEnsureCapacity(DataFrame target)
     {
         DfColumnStored newColumn = target.newColumn(this.getName(), this.getType());
 

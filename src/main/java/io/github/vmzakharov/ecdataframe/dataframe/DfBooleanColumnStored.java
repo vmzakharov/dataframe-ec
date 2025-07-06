@@ -172,7 +172,6 @@ implements DfColumnStored
         this.nullMap = BooleanLists.mutable.withInitialCapacity(newCapacity);
     }
 
-    @Override
     protected void addAllItemsFrom(DfBooleanColumn intColumn)
     {
         int size = intColumn.getSize();

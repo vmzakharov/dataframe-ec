@@ -64,7 +64,7 @@ extends DfColumnAbstract
     @Override
     public DfColumn mergeWithInto(DfColumn other, DataFrame target)
     {
-        DfBooleanColumn mergedCol = (DfBooleanColumn) this.validateAndCreateTargetColumn(other, target);
+        DfBooleanColumnStored mergedCol = (DfBooleanColumnStored) this.validateAndCreateTargetColumn(other, target);
 
         mergedCol.addAllItemsFrom(this);
         mergedCol.addAllItemsFrom((DfBooleanColumn) other);
@@ -75,13 +75,11 @@ extends DfColumnAbstract
     @Override
     public DfColumn copyTo(DataFrame target)
     {
-        DfBooleanColumn targetCol = (DfBooleanColumn)  this.copyColumnSchemaAndEnsureCapacity(target);
+        DfBooleanColumnStored targetCol = (DfBooleanColumnStored) this.copyColumnSchemaAndEnsureCapacity(target);
 
         targetCol.addAllItemsFrom(this);
         return targetCol;
     }
-
-    protected abstract void addAllItemsFrom(DfBooleanColumn items);
 
     @Override
     public DfCellComparator columnComparator(DfColumn otherColumn)

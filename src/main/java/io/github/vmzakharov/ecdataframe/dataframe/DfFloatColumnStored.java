@@ -140,7 +140,6 @@ implements DfColumnStored
         this.values = FloatLists.mutable.withInitialCapacity(newCapacity);
     }
 
-    @Override
     protected void addAllItemsFrom(DfFloatColumn doubleColumn)
     {
         int size = doubleColumn.getSize();

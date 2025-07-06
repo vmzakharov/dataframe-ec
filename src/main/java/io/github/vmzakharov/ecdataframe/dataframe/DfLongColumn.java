@@ -63,7 +63,7 @@ extends DfColumnAbstract
     @Override
     public DfColumn mergeWithInto(DfColumn other, DataFrame target)
     {
-        DfLongColumn mergedCol = (DfLongColumn) this.validateAndCreateTargetColumn(other, target);
+        DfLongColumnStored mergedCol = (DfLongColumnStored) this.validateAndCreateTargetColumn(other, target);
 
         mergedCol.addAllItemsFrom(this);
         mergedCol.addAllItemsFrom((DfLongColumn) other);
@@ -74,13 +74,11 @@ extends DfColumnAbstract
     @Override
     public DfColumn copyTo(DataFrame target)
     {
-        DfLongColumn targetCol = (DfLongColumn)  this.copyColumnSchemaAndEnsureCapacity(target);
+        DfLongColumnStored targetCol = (DfLongColumnStored) this.copyColumnSchemaAndEnsureCapacity(target);
 
         targetCol.addAllItemsFrom(this);
         return targetCol;
     }
-
-    protected abstract void addAllItemsFrom(DfLongColumn items);
 
     @Override
     public DfCellComparator columnComparator(DfColumn otherColumn)

@@ -42,18 +42,6 @@ implements DfColumnComputed
     }
 
     @Override
-    protected void addAllItemsFrom(DfDoubleColumn doubleColumn)
-    {
-        this.throwUnmodifiableColumnException();
-    }
-
-    @Override
-    public int getSize()
-    {
-        return this.getDataFrame().rowCount();
-    }
-
-    @Override
     public String getExpressionAsString()
     {
         return this.expressionAsString;

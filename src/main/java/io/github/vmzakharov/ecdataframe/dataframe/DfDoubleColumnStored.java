@@ -141,7 +141,6 @@ implements DfColumnStored
         this.values = DoubleLists.mutable.withInitialCapacity(newCapacity);
     }
 
-    @Override
     protected void addAllItemsFrom(DfDoubleColumn doubleColumn)
     {
         int size = doubleColumn.getSize();

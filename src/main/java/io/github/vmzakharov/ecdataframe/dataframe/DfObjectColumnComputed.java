@@ -3,7 +3,6 @@ package io.github.vmzakharov.ecdataframe.dataframe;
 import io.github.vmzakharov.ecdataframe.dsl.Expression;
 import io.github.vmzakharov.ecdataframe.util.ExpressionParserHelper;
 import org.eclipse.collections.api.list.ImmutableList;
-import org.eclipse.collections.api.list.ListIterable;
 import org.eclipse.collections.impl.factory.Lists;
 import org.eclipse.collections.impl.list.primitive.IntInterval;
 
@@ -37,12 +36,6 @@ implements DfColumnComputed
     }
 
     @Override
-    public int getSize()
-    {
-        return this.getDataFrame().rowCount();
-    }
-
-    @Override
     public String getExpressionAsString()
     {
         return this.expressionAsString;
@@ -52,11 +45,5 @@ implements DfColumnComputed
     public Expression getExpression()
     {
         return this.expression;
-    }
-
-    @Override
-    protected void addAllItems(ListIterable<T> items)
-    {
-        this.throwUnmodifiableColumnException();
     }
 }

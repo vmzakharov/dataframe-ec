@@ -127,7 +127,6 @@ implements DfColumnStored
         this.values = Lists.mutable.withInitialCapacity(newCapacity);
     }
 
-    @Override
     protected void addAllItems(ListIterable<T> items)
     {
         if (this.pool == null)
