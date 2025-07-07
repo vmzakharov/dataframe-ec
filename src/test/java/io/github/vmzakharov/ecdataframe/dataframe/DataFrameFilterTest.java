@@ -83,9 +83,7 @@ public class DataFrameFilterTest
     public void selectionWithComputedFields()
     {
         this.dataFrame.addColumn("Foo", "double1 + float1");
-        System.out.println(this.dataFrame.toString());
         DataFrame filtered = this.dataFrame.selectBy("(string1 == 'b' or string1 == 'd' or string1 == 'e') and Foo > 50");
-        System.out.println(filtered);
 
         DataFrame expected = this.createBlankDataFrame("Expected FrameOfData")
             .addRow("d",   40L,   24, 43.25, 44.5f,  true,  LocalDate.of(2020, 10, 26), LocalDateTime.of(2020, 12, 20, 18, 34), BigDecimal.valueOf(901, 2))
