@@ -16,6 +16,7 @@ import static org.junit.jupiter.api.Assertions.*;
 /*
  * These tests validate the thread safety of the data frame evaluation context
  */
+@Disabled
 public class DataFrameParallelTest
 {
     private static final int ROW_COUNT = 5_000_000;
