@@ -29,11 +29,20 @@ implements DfColumn
         return this.dataFrame;
     }
 
+    /**
+     * sets the data frame this column is a part of.
+     * @deprecated
+     * the code currently prevents this value of the data frame from being changed once set.
+     * in future releases, this value will be made explicitly final and this method will be removed.
+     * @param newDataFrame the data frame this column is a part of
+     */
+    @Deprecated(since = "1.4.0", forRemoval = true)
     public void setDataFrame(DataFrame newDataFrame)
     {
         if (this.dataFrame != null)
         {
-            exceptionByKey("DF_COL_ALREADY_LINKED").with("columnName", this.getName()).fire();
+            exceptionByKey("DF_COL_ALREADY_LINKED").with("columnName", this.getName())
+                                                   .fire();
         }
 
         this.dataFrame = newDataFrame;
