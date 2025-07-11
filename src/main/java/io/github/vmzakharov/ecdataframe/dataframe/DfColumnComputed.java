@@ -65,7 +65,6 @@ extends DfColumn
     }
 
     default void throwUnmodifiableColumnException()
-
     {
         throw exceptionByKey("DF_CALC_COL_MODIFICATION").with("columnName", this.getName()).getUnsupported();
     }

@@ -30,6 +30,10 @@ implements DfColumnStored
         {
             this.addFloat(((FloatValue) value).floatValue());
         }
+        else if (value.isVoid())
+        {
+            this.addEmptyValue();
+        }
         else
         {
             this.throwAddingIncompatibleValueException(value);
