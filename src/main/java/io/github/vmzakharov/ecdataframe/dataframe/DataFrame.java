@@ -452,6 +452,7 @@ implements DfIterate
      * Adds a row of values to this data frame. The number of added values cannot exceed the number of columns in the
      * data frame. The number of added values can be lower than the number of columns in the data frame if the "missing"
      * columns are computed columns.
+     * Adding a value to a computed column will trigger a runtime exception.
      * @param values values to add to the respective data frame columns
      * @return this data frame
      */
@@ -854,9 +855,9 @@ implements DfIterate
      * Turns on pooling of object values. This can result in memory savings when data frame is populated with data.
      * If pooling is enabled on a data frame that already has data, the existing data will be pooled.
      * Note, if pooling is enabled, data frames produced from this one via filtering or union operations will also have
-     * pooling enabled. Retaining pooling  may be useful if rows will be added to the resulting data frame, otherwise
-     * call  on this data frame before performing these operations, alternatively call {@link #disablePooling()} on the
-     * derived data frame
+     * pooling enabled. Retaining pooling may be useful if rows are added to the resulting data frames, otherwise
+     * call {@link  #seal()} or {@link #disablePooling()} on this data frame before performing these operations,
+     * alternatively call {@link #disablePooling()} on the derived data frames
      */
     public void enablePooling()
     {
