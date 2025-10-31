@@ -4,12 +4,14 @@ import io.github.vmzakharov.ecdataframe.dataframe.DataFrame;
 import io.github.vmzakharov.ecdataframe.dataframe.DataFrameUtil;
 import io.github.vmzakharov.ecdataframe.dsl.value.ValueType;
 import org.eclipse.collections.api.map.MutableMap;
-
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.Locale;
 
 import static io.github.vmzakharov.ecdataframe.dsl.value.ValueType.*;
 import static org.junit.jupiter.api.Assertions.*;
@@ -246,9 +248,12 @@ public class DataFrameLoadTest
         DataFrameUtil.assertEquals(expected, loaded);
     }
 
-    @Test
-    public void dateParsingWithSchemaFormat1()
+    @ParameterizedTest
+    @ValueSource(strings = {"en_GB", "JAPAN", "US"})
+    public void dateParsingWithSchemaFormat(Locale locale)
     {
+        Locale.setDefault(locale);
+
         CsvSchema schema = new CsvSchema();
         schema.addColumn("Name", STRING);
         schema.addColumn("Date", DATE, "d-MMM-uuuu");
@@ -266,7 +271,8 @@ public class DataFrameLoadTest
         DataFrame loaded = dataSet.loadAsDataFrame();
 
         DataFrame expected = new DataFrame("Expected")
-                .addStringColumn("Name").addDateColumn("Date")
+                .addStringColumn("Name")
+                .addDateColumn("Date")
                 .addRow("Alice", LocalDate.of(2020, 1, 1))
                 .addRow("Bob", LocalDate.of(2010, 1, 1))
                 .addRow("Carl", LocalDate.of(2005, 11, 21))
@@ -276,9 +282,12 @@ public class DataFrameLoadTest
         DataFrameUtil.assertEquals(expected, loaded);
     }
 
-    @Test
-    public void dateParsingWithSchemaFormat2()
+    @ParameterizedTest
+    @ValueSource(strings = {"en_GB", "JAPAN", "US"})
+    public void dateParsingIgnoreTimeWithSchemaFormat(Locale locale)
     {
+        Locale.setDefault(locale);
+
         CsvSchema schema = new CsvSchema();
         schema.addColumn("Name", STRING);
         schema.addColumn("Date", DATE, "M/d/uuuu h:m:s a");
@@ -298,13 +307,50 @@ public class DataFrameLoadTest
         DataFrame loaded = dataSet.loadAsDataFrame();
 
         DataFrame expected = new DataFrame("Expected")
-                .addStringColumn("Name").addDateColumn("Date")
+                .addStringColumn("Name")
+                .addDateColumn("Date")
                 .addRow("Alice", LocalDate.of(2020, 11, 11))
                 .addRow("Bob", LocalDate.of(2010, 1, 31))
                 .addRow("Carl", LocalDate.of(2005, 1, 5))
                 .addRow("Diane", LocalDate.of(2012, 2, 9))
                 .addRow("Ed", null)
                 .addRow("Frank", LocalDate.of(2012, 2, 19));
+
+        DataFrameUtil.assertEquals(expected, loaded);
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"en_GB", "JAPAN", "US"})
+    public void dateTimeParsingWithSchemaFormat(Locale locale)
+    {
+        Locale.setDefault(locale);
+
+        CsvSchema schema = new CsvSchema();
+        schema.addColumn("Name", STRING);
+        schema.addColumn("DateTime", DATE_TIME, "M/d/uuuu h:m:s a");
+
+        CsvDataSet dataSet = new StringBasedCsvDataSet("Foo", "Dates", schema,
+                """
+                Name,DateTime
+                "Alice",11/11/2020 11:11:11 AM
+                "Bob",01/31/2010 12:12:00 PM
+                "Carl",1/5/2005 12:00:00 AM
+                "Diane",2/09/2012 4:55:15 PM
+                "Ed",
+                "Frank",2/19/2012 04:05:15 PM
+                """
+        );
+
+        DataFrame loaded = dataSet.loadAsDataFrame();
+
+        DataFrame expected = new DataFrame("Expected")
+                .addStringColumn("Name").addDateTimeColumn("DateTime")
+                .addRow("Alice", LocalDateTime.of(2020, 11, 11, 11, 11, 11))
+                .addRow("Bob", LocalDateTime.of(2010, 1, 31, 12, 12, 0))
+                .addRow("Carl", LocalDateTime.of(2005, 1, 5, 0, 0, 0))
+                .addRow("Diane", LocalDateTime.of(2012, 2, 9, 16, 55, 15))
+                .addRow("Ed", null)
+                .addRow("Frank", LocalDateTime.of(2012, 2, 19, 16, 5, 15));
 
         DataFrameUtil.assertEquals(expected, loaded);
     }

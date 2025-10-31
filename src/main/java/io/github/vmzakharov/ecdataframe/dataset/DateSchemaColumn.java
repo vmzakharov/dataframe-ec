@@ -7,6 +7,7 @@ import io.github.vmzakharov.ecdataframe.dsl.value.ValueType;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.ResolverStyle;
+import java.util.Locale;
 
 public class DateSchemaColumn
 extends CsvSchemaColumn
@@ -22,7 +23,7 @@ extends CsvSchemaColumn
             this.setPattern("uuuu-M-d");
         }
 
-        this.dateTimeFormatter = DateTimeFormatter.ofPattern(this.getPattern()).withResolverStyle(ResolverStyle.STRICT);
+        this.dateTimeFormatter = DateTimeFormatter.ofPattern(this.getPattern(), Locale.ROOT).withResolverStyle(ResolverStyle.STRICT);
     }
 
     @Override
