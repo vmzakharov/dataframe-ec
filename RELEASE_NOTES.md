@@ -1,4 +1,7 @@
 # Releases
+### 1.4.0
+* `Date` and `DateTime` column values are parsed using `Locale.ROOT` when loading a data frame from a CSV file
+* removes some mutating methods from computed columns (which would result in an exception being thrown at runtime)
 ### 1.3.0
 * pooling enhancements:
   * pooling state (enabled or disabled) is maintained for derived data frames
