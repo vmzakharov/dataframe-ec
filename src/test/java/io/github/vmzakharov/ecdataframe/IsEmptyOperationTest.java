@@ -1,6 +1,7 @@
 package io.github.vmzakharov.ecdataframe;
 
 import io.github.vmzakharov.ecdataframe.dsl.SimpleEvalContext;
+import io.github.vmzakharov.ecdataframe.dsl.value.StringValue;
 import io.github.vmzakharov.ecdataframe.dsl.value.Value;
 
 import org.junit.jupiter.api.Test;
@@ -55,6 +56,32 @@ public class IsEmptyOperationTest
 
         scriptEvaluatesToTrue("x is null", context);
         scriptEvaluatesToFalse("x is not null", context);
+    }
+
+    @Test
+    public void twoVoidValuesInExpression()
+    {
+        SimpleEvalContext context = new SimpleEvalContext();
+        context.setVariable("x", Value.VOID);
+        context.setVariable("y", Value.VOID);
+
+        scriptEvaluatesToTrue("x is null and y is null", context);
+        scriptEvaluatesToTrue("x is null or y is null", context);
+        scriptEvaluatesToFalse("x is not null and y is not null", context);
+        scriptEvaluatesToFalse("x is not null or y is not null", context);
+    }
+
+    @Test
+    public void voidAndNotVoidValuesInExpression()
+    {
+        SimpleEvalContext context = new SimpleEvalContext();
+        context.setVariable("x", Value.VOID);
+        context.setVariable("z", new StringValue("hello"));
+
+        scriptEvaluatesToFalse("x is null and z is null", context);
+        scriptEvaluatesToTrue("x is null or z is null", context);
+        scriptEvaluatesToFalse("x is not null and z is not null", context);
+        scriptEvaluatesToTrue("x is not null or z is not null", context);
     }
 
     @Test

@@ -12,7 +12,7 @@ For example, if `longColumn` is a data frame column of type `DfLongColumn` (stor
 
 | Expression                    | Behavior                                                    |
 |-------------------------------|-------------------------------------------------------------|
-| `longColumn.longColumn(5)`    | throws an NPE if the column value at row index `5` is `null` |
+| `longColumn.getLong(5)`    | throws an NPE if the column value at row index `5` is `null` |
 | `longColumn.asLongIterable()` | throws an NPE if one or more column values are `null`        |
 
 ## About Nulls
@@ -35,8 +35,18 @@ and<br>
 For the same reason it is impossible to compare nulls as we don't know the values being compared. You can compare null-ity though, for example in a DSL expression like this
 
 ```javascript
-x is null == y is null // will evaluate to true if both x and y are nulls
+x is null == y is null // will evaluate to true if both x and y are nulls, or if neither is null
 ```
+
+Note, while the expression above is valid, it is somewhat confusing. Depending on the context, you might want to use something like this
+```javascript
+x is null and y is null // true if both x and y are nulls
+```
+or this
+```javascript
+x is not null or y is not null // true if either x is not null or y is not null
+```
+instead.
 
 ## Null Support in the Expression DSL
 
