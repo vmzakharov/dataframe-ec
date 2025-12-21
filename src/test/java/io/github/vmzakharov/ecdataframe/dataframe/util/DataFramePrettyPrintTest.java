@@ -5,6 +5,8 @@ import io.github.vmzakharov.ecdataframe.dataframe.DataFrame;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.util.Locale;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 public class DataFramePrettyPrintTest
@@ -21,6 +23,8 @@ public class DataFramePrettyPrintTest
                 .addRow("Carl", 3, "xyz", 1_234.345678)
                 .addRow("Doris", 4_000_000, "klm", 1.3)
         ;
+
+        Locale.setDefault(Locale.ROOT); // avoids failing tests due to locale differences
     }
 
     @Test
