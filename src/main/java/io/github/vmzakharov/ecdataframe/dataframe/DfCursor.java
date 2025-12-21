@@ -24,7 +24,7 @@ public class DfCursor
         return this.dataFrame.getLong(columnName, this.rowIndex);
     }
 
-    public long getInt(String columnName)
+    public int getInt(String columnName)
     {
         return this.dataFrame.getInt(columnName, this.rowIndex);
     }

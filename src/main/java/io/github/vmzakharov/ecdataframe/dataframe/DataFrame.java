@@ -713,7 +713,7 @@ implements DfIterate
         return this.getLongColumn(columnName).getLong(this.rowIndexMap(rowIndex));
     }
 
-    public long getInt(String columnName, int rowIndex)
+    public int getInt(String columnName, int rowIndex)
     {
         return this.getIntColumn(columnName).getInt(this.rowIndexMap(rowIndex));
     }

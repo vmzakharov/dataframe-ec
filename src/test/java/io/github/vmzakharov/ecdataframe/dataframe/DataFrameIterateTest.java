@@ -7,8 +7,10 @@ import org.eclipse.collections.api.list.ListIterable;
 import org.eclipse.collections.api.list.MutableList;
 import org.eclipse.collections.api.list.primitive.DoubleList;
 import org.eclipse.collections.api.list.primitive.FloatList;
+import org.eclipse.collections.api.list.primitive.MutableIntList;
 import org.eclipse.collections.impl.factory.primitive.DoubleLists;
 import org.eclipse.collections.impl.factory.primitive.FloatLists;
+import org.eclipse.collections.impl.factory.primitive.IntLists;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -64,6 +66,10 @@ public class DataFrameIterateTest
             ,
             nameBarBaz.toString()
         );
+
+        MutableIntList ints = IntLists.mutable.of();
+        this.dataFrame.forEach(c -> ints.add(c.getInt("Qux")));
+        assertEquals(IntLists.immutable.of(110, 120, 330, 240, 240, 330), ints);
 
         MutableBag<LocalDate> dateCount = Bags.mutable.of();
 
